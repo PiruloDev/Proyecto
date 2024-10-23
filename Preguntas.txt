@@ -1,0 +1,72 @@
+Se utilizará un cuestionario como instrumento de recolección de información, dirigido a dos personas clave en el proceso de ventas: el dueño y el vendedor de la panadería. 
+Este método permitirá obtener datos precisos y estandarizados de manera rápida, facilitando la evaluación del rendimiento de las ventas y las estrategias implementadas.
+Se utilizara la metodología de pirámide organizará las preguntas desde aspectos generales hasta cuestiones más específicas, lo que favorecerá una comprensión clara y respuestas reflexivas, contribuyendo así a la mejora de las operaciones de venta en la panadería.
+Las preguntas se centrarán en cómo gestionan las ventas y en que podría ayudar el sistema de información.
+Preguntas para el dueño: 
+1. Preguntas Generales
+¿Sabe usted lo que es una página web?
+Sí
+No
+¿Cree que tener presencia en internet podría beneficiar las ventas de la panadería?
+Sí
+No
+2. Preguntas sobre el Negocio y las Ventas
+3. ¿Qué medios utiliza actualmente para promocionar la panadería?
+Publicidad local
+Redes sociales
+Ninguno
+Otros: ____________________
+¿Qué productos generan más ventas en la panadería?
+a---. b----.c----.d----.
+¿Sabe usted lo que son Nequi y Daviplata?
+Sí
+No
+6.¿Utiliza actualmente Nequi o Daviplata para recibir pagos?
+Sí
+No
+7.¿Le gustaría habilitar pagos a través de Nequi y Daviplata en la página web?
+Sí
+No
+3. Opinión y Expectativas
+8. ¿Qué funcionalidades considera indispensables en una página web para la panadería?
+Catálogo de productos
+Sistema de pedidos en línea
+Promociones y descuentos
+Información de contacto y ubicación
+¿Le interesaría recibir capacitación para gestionar ventas en línea?
+Sí
+No
+¿Desea añadir algún comentario o sugerencia?
+El cuestionario para el vendedor se orienta a obtener información sobre su experiencia directa con los clientes, los métodos de pago más utilizados y los desafíos en la gestión de ventas diarias. 
+Esto se debe a que el vendedor es quien tiene contacto constante con los compradores y puede proporcionar datos valiosos sobre las preferencias del cliente, los hábitos de compra y las dificultades operativas.
+1. Preguntas Generales
+¿Con qué frecuencia los clientes le preguntan por las formas de pago?
+Todos los días
+Algunas veces por semana
+Rara vez
+¿Qué tipo de pagos prefiere la mayoría de los clientes?
+Efectivo
+Nequi
+Daviplata
+2. Preguntas sobre Procesos de Venta
+3. ¿Ha tenido alguna experiencia utilizando Nequi o Daviplata para recibir pagos?
+Sí
+No
+¿Considera que la opción de pagos digitales facilitaría las ventas?
+Sí
+No
+5. ¿Le resulta fácil manejar los sistemas actuales de ventas en la panadería?
+Sí
+No
+6. ¿Qué productos se venden más rápido en la panadería?
+a--.b---.c---.d---.
+3. Opinión sobre la Implementación de Ventas en Línea
+7. ¿Cree que los clientes utilizarían una página web para hacer pedidos?
+Sí
+No
+¿Qué dificultades cree que podría tener para gestionar ventas digitales?
+4. Capacitación y Comentarios Finales
+9. ¿Le gustaría recibir capacitación sobre el uso de nuevas plataformas de pago?
+Sí
+No
+¿Desea añadir algún comentario o sugerencia?
