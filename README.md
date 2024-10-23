@@ -11,10 +11,10 @@ Nuestro principal objetivo es desarrollar un sistema de información orientado a
 A lo largo de nuestra formación académica, iremos implementando nuevas funcionalidades, líneas de código más eficientes y entornos de usuario más interactivos e inmersivos, con el fin de ofrecer un producto final de alta calidad, tanto para los dueños como para los consumidores en general.
 _______________________________________________________________________________________________________________________________
 
-Andrés Alcalá
-Damián Ávila
-Ana Goyeneche
-Sharyth Zamora
-Brayan Jiménez
+Andrés Alcalá,
+Damián Ávila,
+Ana Goyeneche,
+Sharyth Zamora,
+Brayan Jiménez.
 
 Ficha: 2996176
