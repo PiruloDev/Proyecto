@@ -1,0 +1,15 @@
+Requerimientos No Funcionales.
+
+Interfaz
+Usabilidad
+Seguridad
+Escalabilidad
+Disponibilidad
+Rendimiento
+Mantenibilidad
+Portabilidad
+Confiabilidad
+Accesibilidad
+Interoperabilidad
+Auditoría y Registro
+Recuperación
