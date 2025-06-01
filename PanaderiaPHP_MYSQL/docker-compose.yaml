@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Servicio de la Aplicación PHP
+  app:
+    build:
+      context: ./app # Directorio donde está el Dockerfile de PHP
+      dockerfile: Dockerfile
+    container_name: mi_app_php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+    environment:
+      - MYSQL_HOST=db_mysql
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-mi_base_de_datos} # Mantenemos el valor por defecto o de .env
+      - MYSQL_USER=${MYSQL_USER:-usuario_dev}             # Mantenemos el valor por defecto o de .env
+      - MYSQL_PASSWORD=""                                 # <--- CAMBIO AQUÍ: Aplicación usará contraseña vacía
+    depends_on:
+      - db_mysql
+    networks:
+      - mi_red_dev
+
+  # Servicio de la Base de Datos MySQL
+  db_mysql:
+    image: mysql:8.0
+    container_name: mi_db_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes" # Permite que root tenga contraseña vacía
+      MYSQL_ROOT_PASSWORD: ""           # Establece la contraseña de root a vacía
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mi_base_de_datos}
+      MYSQL_USER: ${MYSQL_USER:-usuario_dev}
+      MYSQL_PASSWORD: ""                # Mantenemos usuario_dev también sin contraseña
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database_scripts:/docker-entrypoint-initdb.d
+    networks:
+      - mi_red_dev
+
+volumes:
+  mysql_data:
+
+networks:
+  mi_red_dev:
+    driver: bridge

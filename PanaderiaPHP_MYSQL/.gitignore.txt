@@ -1,0 +1,16 @@
+# Ignorar la carpeta de datos de MySQL si se creara localmente (no debería con este setup)
+mysql_data/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de VSCode local (no los del .devcontainer)
+.vscode/
+
+# Variables de entorno locales (si las usaras)
+.env
+
+# Archivos de Composer (si lo usas)
+/vendor/
+composer.lock
