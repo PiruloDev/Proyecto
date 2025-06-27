@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Castillo del Pan - Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/bootstrap-grid.min.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="header-top-bar">
+            <div class="logo">
+                <img src="../IMG/LogoCastillo.png" alt="El Castillo del Pan Logo">
+                <span>El Castillo del Pan</span>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="menu.html" class="nav-link">Menús</a></li>
+                    <li><a href="cotizacion.html" class="nav-link">Pedidos</a></li>
+                    <li><a href="contactanos.html" class="nav-link">Contáctanos</a></li>
+                </ul>
+            </nav>
+            <div class="user-access">
+                <i class="fas fa-user-circle"></i>
+                <span>Acceder</span>
+            </div>
+        </div>
+    </header>
+
+    <main id="homepage">
+        <section class="search-bar-section">
+            <div class="search-container">
+                <input type="text" placeholder="Tengo ganas de...">
+                <i class="fas fa-search"></i>
+            </div>
+        </section>
+
+        <div id="miCarrusel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="../IMG/carrusel1.webp" class="d-block w-100" alt="carrusel1">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel2.webp" class="d-block w-100" alt="carrusel2">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel3.webp" class="d-block w-100" alt="carrusel3">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel4.jpg" class="d-block w-100" alt="carrusel4">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel5.jpg" class="d-block w-100" alt="carrusel5">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel6.webp" class="d-block w-100" alt="carrusel6">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel7.avif" class="d-block w-100" alt="carrusel7">
+                </div>
+                <div class="carousel-item">
+                    <img src="../IMG/carrusel8.avif" class="d-block w-100" alt="carrusel8">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#miCarrusel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#miCarrusel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+
+
+        <section class="recommendations-section">
+            <h2 class="section-title">Nuestras recomendaciones</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="../IMG/PanGrande.jpg" alt="Pan Grande">
+                    <a href="pan_grande.html" class="view-more">Ver más...</a>
+                    <span>Pan Grande</span>
+                </div>
+                <div class="product-card">
+                    <img src="../IMG/Hojaldre.JPG" alt="Hojaldres">
+                    <a href="#" class="view-more">Ver más...</a>
+                    <span>Hojaldres</span>
+                </div>
+                <div class="product-card">
+                    <img src="../IMG/Tamal.jpg" alt="Tamales">
+                    <a href="#" class="view-more">Ver más...</a>
+                    <span>Tamales</span>
+                </div>
+                <div class="product-card">
+                    <img src="../IMG/Galletas.jpg" alt="Galletas">
+                    <a href="#" class="view-more">Ver más...</a>
+                    <span>Galletas</span>
+                </div>
+                <div class="product-card">
+                    <img src="../IMG/Torta.jpg" alt="Tortas">
+                    <a href="#" class="view-more">Ver más...</a>
+                    <span>Tartas</span>
+                </div>
+                <div class="product-card">
+                    <img src="../IMG/Reposteria.jpg" alt="Repostería">
+                    <a href="#" class="view-more">Ver más...</a>
+                    <span>Repostería</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+
+    <footer class="main-footer">
+        <div class="allergens-info-footer">
+            <p>Todos nuestros productos son totalmente naturales</p>
+            <div class="info-item">
+                <i class="fas fa-apple-alt"></i>
+                <span>Frutos secos</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-tint"></i>
+                <span>Leche</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-wheat-alt"></i>
+                <span>Trigo y levadura</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-egg"></i>
+                <span>Huevos</span>
+            </div>
+        </div>
+        <div class="footer-content">
+            <div class="footer-nav">
+                <div class="nav-item">
+                    <i class="fas fa-registered"></i>
+                    <span>Términos y Condiciones</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Nuestra Historia</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Política de privacidad</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Contacto</span>
+                </div>
+
+
+            </div>
+            <div class="contact-info">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Encuéntranos en:</span>
+                <span>KR 11 #72 - 58 SUR</span>
+                <span>BOSA EL RECREO</span>
+            </div>
+            <p>&copy;2025 Pan & Code</p>
+        </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
