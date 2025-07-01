@@ -240,6 +240,18 @@ INSERT INTO Ordenes_Salida (ID_CLIENTE, ID_PEDIDO, FECHA_FACTURACION, TOTAL_FACT
 (2, 2, '2025-06-19 17:00:00', 11700.00),
 (3, 3, '2025-06-21 14:30:00', 15500.00);
 
+-- ALTER TABLE PARA PRODUCTOS (ACTIVO/INACTIVO)
+
+ALTER TABLE Productos 
+ADD COLUMN ACTIVO TINYINT(1) DEFAULT 1 COMMENT '1 = Activo, 0 = Inactivo';
+
+-- Actualizar todos los productos existentes como activos
+UPDATE Productos SET ACTIVO = 1 WHERE ACTIVO IS NULL;
+
+-- Verificar los cambios
+SELECT ID_PRODUCTO, NOMBRE_PRODUCTO, ACTIVO FROM Productos;
+
+
 -- APARTADO DE SEGURIDAD 
 -- Función para generar salt aleatorio
 DELIMITER //
