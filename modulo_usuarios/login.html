@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Panadería</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/estilos_login.css">
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100">
+    
+    <div class="login-container">
+        
+        <div class="logo text-center">
+            <img src="../../img/LogoCastillo.png" alt="Logo de El Castillo del Pan" class="img-fluid">
+        </div>
+        
+        <h2 class="h3 mb-4 text-center">Iniciar Sesión</h2>
+        
+        <form id="loginForm" action="../modulo_usuario/vistas_cliente/homepage_cliente.html" method="get"> 
+            
+            <div class="mb-3">
+                <label for="tipoUsuario" class="form-label">Tipo de Usuario:</label>
+                <select id="tipoUsuario" name="tipo_usuario" class="form-select" required>
+                    <option value="">Seleccione el tipo de usuario</option>
+                    <option value="admin">👑 Administrador</option>
+                    <option value="empleado">👨‍💼 Empleado</option>
+                    <option value="cliente">👤 Cliente</option>
+                </select>
+            </div>
+            
+            <div id="userInfo" class="alert alert-info d-none" role="alert">
+                <h4 class="alert-heading"></h4>
+                <p class="mb-0"></p>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="usuario" name="usuario" required placeholder=" ">
+                <label for="usuario">Usuario:</label>
+            </div>
+            
+            <div class="form-floating mb-4">
+                <input type="password" class="form-control" id="password" name="password" required placeholder=" ">
+                <label for="password">Contraseña:</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                Iniciar Sesión
+            </button>
+            
+            <div class="text-center mb-3">
+                <a href="recuperar_contrasena.html" class="text-decoration-none">
+                    ¿Olvidaste la contraseña?
+                </a>
+            </div>
+
+        </form>
+        
+        <div class="footer-links text-center">
+            <a href="registro_cliente.html" class="text-decoration-none">
+                ¿No tienes cuenta? Regístrate como cliente
+            </a>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Cliente - El Castillo del Pan</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  <link rel="stylesheet" href="styles-panaderia.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos específicos para esta página si son necesarios, además de styles-panaderia.css */
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-blanco-cálido">
+  <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center logo" href="index.html">
+        <img src="img/LogoCastillo.png" width="50" alt="LogoPan&Code" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+        <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="menu.html">Menú</a></li>
+          <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="pedidos.html">Pedidos</a></li>
+          <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="contacto.html">Contáctanos</a></li>
+          <a href="acceso.html" class="btn btn-light btn-rounded fw-bold">Acceder</a>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-5">
+    <div class="form-container">
+        <h2 class="text-marron text-center mb-4">Registro de Nuevo Cliente</h2>
+        <form id="registroForm">
+            <div class="mb-3">
+                <label for="nombre" class="form-label text-marron">Nombre Completo</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label text-marron">Teléfono</label>
+                <input type="tel" class="form-control" id="telefono" name="telefono">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label text-marron">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label text-marron">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-4">
+                <label for="confirmPassword" class="form-label text-marron">Confirmar Contraseña</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="btn btn-marron w-100">Registrarse</button>
+            <p class="text-center mt-3 text-gris-oscuro">¿Ya tienes una cuenta? <a href="" class="text-marron fw-semibold">Inicia Sesión aquí</a></p>
+        </form>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-light py-5 animate__animated animate__fadeInUp animate__delay-4s">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h5 class="fw-bold">El Castillo del Pan 👑</h5>
+          <p>Principal Carrera 11 # 72 - 58 SUR Bosa el Recreo</p>
+        </div>
+        <div class="col-md-4">
+          <h5 class="fw-bold">Horarios de Atención</h5>
+          <p>Lunes a sábado: 8:00 am - 5:00 pm</p>
+          <p>Domingo: 8:30 am - 4:00 pm</p>
+          <p><strong>contactenos@elcastillodelpan.com.co</strong></p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <p>&copy; 2025 El Castillo del Pan</p>
+          <p>Todos los derechos reservados</p>
+          <div>
+            <a href="#" class="text-light me-2"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="#" class="text-light me-2"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="#" class="text-light"><i class="bi bi-whatsapp fs-4"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Este script simulará el proceso de registro
+    document.getElementById('registroForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Evita el envío real del formulario
+
+        // Aquí podrías añadir validaciones de formulario (ej. contraseñas coinciden)
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert('Las contraseñas no coinciden. Por favor, inténtelo de nuevo.');
+            return;
+        }
+
+        // Simular que el registro fue exitoso
+        // Redirige a la pantalla de registro exitoso
+        window.location.href = 'registro-exitoso.html';
+    });
+  </script>
+</body>
+</html>
