@@ -23,6 +23,35 @@ try {
     die("Error de conexión PDO: " . $e->getMessage());
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Usuarios</title>
+    <link rel="stylesheet" href="usuariosregistrados.css">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Usuarios Registrados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Cliente activo</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <form action="usuariosregistrados.php" method="post">
+        <button type="submit">Descargar Reporte</button>
+    </form>
+</body>
+</html>
 <?php
             $sql = "SELECT * FROM Clientes";
             $resultado = $conexion->query($sql);
