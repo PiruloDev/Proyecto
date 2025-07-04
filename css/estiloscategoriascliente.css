@@ -1,0 +1,127 @@
+/* styles-panaderia.css */
+
+/* --- Colores principales para el tema de la panadería --- */
+:root {
+  --blanco-calido: #f8f5ed;   /* Fondo general, un blanco roto/crema muy claro */
+  --crema: #ebdccf;          /* Color para fondos de navbar, hero sections */
+  --marron: #6f4e37;         /* Marrón oscuro para textos importantes, títulos, enlaces */
+  --gris-oscuro: #555;       /* Gris para descripciones de texto, información general */
+  --btn-marron: #8b5e3c;     /* Marrón para el color de fondo de botones principales */
+  --btn-marron-hover: #a1704d; /* Marrón más claro para el estado hover de botones */
+  --negro-footer: #343a40;   /* Gris oscuro casi negro para el footer */
+  --blanco-footer: #f8f9fa;  /* Blanco para texto del footer */
+  --verde-exito: #28a745;    /* Un verde estándar para precios o mensajes de éxito */
+}
+
+/* --- Estilos generales del body y fuentes --- */
+body {
+  font-family: 'Quicksand', sans-serif;
+  color: var(--gris-oscuro); /* Color de texto base */
+  background-color: var(--blanco-calido); /* Fondo de la página */
+}
+
+h1, h2, h3, h4, h5, h6, .fw-bold {
+  font-family: 'Poppins', sans-serif; /* O 'Nunito', según tu preferencia principal para títulos */
+}
+
+/* --- Clases de utilidad para aplicar los colores --- */
+.bg-blanco-cálido {
+  background-color: var(--blanco-calido) !important;
+}
+
+.bg-crema {
+  background-color: var(--crema) !important;
+}
+
+.text-marron {
+  color: var(--marron) !important;
+}
+
+.text-gris-oscuro {
+  color: var(--gris-oscuro) !important;
+}
+
+.border-marron {
+  border-color: var(--marron) !important;
+}
+
+.btn-marron {
+  background-color: var(--btn-marron);
+  color: white;
+  border-color: var(--btn-marron);
+}
+
+.btn-marron:hover {
+  background-color: var(--btn-marron-hover);
+  border-color: var(--btn-marron-hover);
+  color: white;
+}
+
+.btn-outline-marron {
+  color: var(--marron);
+  border-color: var(--marron);
+}
+
+.btn-outline-marron:hover,
+.btn-outline-marron.active {
+  background-color: var(--marron);
+  color: white;
+}
+
+.text-success { /* Para los precios, usando un verde Bootstrap */
+    color: var(--verde-exito) !important;
+}
+
+/* --- Estilos específicos de componentes para mantener consistencia --- */
+
+/* Navbar */
+.navbar-brand .logo img {
+  border-color: var(--marron) !important; /* Borde del logo */
+  background-color: white; /* Fondo del logo */
+}
+
+.navbar-nav .nav-link {
+  color: var(--marron) !important; /* Color de los enlaces de navegación */
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+  color: var(--btn-marron-hover) !important; /* Color al pasar el ratón y para el enlace activo */
+}
+
+.navbar-text { /* Para el texto del usuario en la navbar */
+  color: var(--marron) !important;
+}
+
+/* Hero Section (en categoria usuario.html) */
+.hero {
+  background-color: var(--crema);
+  color: var(--marron);
+}
+
+
+/* Cards de productos */
+.card {
+  border: none; /* Elimina el borde por defecto de Bootstrap si no lo quieres */
+}
+
+.card-img-top {
+  height: 180px; /* Altura fija para las imágenes de las cards */
+  object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+}
+
+/* Footer */
+footer {
+  background-color: var(--negro-footer) !important;
+  color: var(--blanco-footer) !important;
+}
+
+footer a {
+  color: var(--blanco-footer) !important;
+}
+
+footer a:hover {
+  color: var(--btn-marron-hover) !important;
+}
+
+/* ... otras reglas CSS existentes para carrusel, animaciones, etc. ... */

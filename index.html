@@ -1,176 +1,145 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es-CO">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Castillo del Pan - Inicio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../css/bootstrap-grid.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Castillo del Pan</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <link rel="stylesheet" href="styles-panaderia.css">
 </head>
-
-<body>
-
-    <header class="main-header">
-        <div class="header-top-bar">
-            <div class="logo">
-                <img src="../IMG/LogoCastillo.png" alt="El Castillo del Pan Logo">
-                <span>El Castillo del Pan</span>
-            </div>
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="menu.html" class="nav-link">Menús</a></li>
-                    <li><a href="cotizacion.html" class="nav-link">Pedidos</a></li>
-                    <li><a href="contactanos.html" class="nav-link">Contáctanos</a></li>
-                </ul>
-            </nav>
-            <div class="user-access">
-                <i class="fas fa-user-circle"></i>
-                <span>Acceder</span>
-            </div>
+<body class="bg-blanco-cálido">
+  <header>
+    <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center logo" href="#">
+          <img src="img/LogoCastillo.png" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+          <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link active text-marron fw-semibold" aria-current="page" href="modulos/modulo_categorias/modulo categoria/vista_cliente/categoria usuario.html">Menú</a></li>
+            <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="../">Pedidos</a></li>
+            <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a></li>
+          </ul>
+          <a href="modulos/modulo_usuario/login.html" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
         </div>
-    </header>
+      </div>
+    </nav>
+  </header>
 
-    <main id="homepage">
-        <section class="search-bar-section">
-            <div class="search-container">
-                <input type="text" placeholder="Tengo ganas de...">
-                <i class="fas fa-search"></i>
-            </div>
-        </section>
-
-        <div id="miCarrusel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="../IMG/carrusel1.webp" class="d-block w-100" alt="carrusel1">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel2.webp" class="d-block w-100" alt="carrusel2">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel3.webp" class="d-block w-100" alt="carrusel3">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel4.jpg" class="d-block w-100" alt="carrusel4">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel5.jpg" class="d-block w-100" alt="carrusel5">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel6.webp" class="d-block w-100" alt="carrusel6">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel7.avif" class="d-block w-100" alt="carrusel7">
-                </div>
-                <div class="carousel-item">
-                    <img src="../IMG/carrusel8.avif" class="d-block w-100" alt="carrusel8">
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#miCarrusel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#miCarrusel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
+  <main>
+    <section class="container mt-4 d-flex justify-content-center">
+      <div id="smallCarousel" class="carousel slide small-carousel" data-bs-ride="carousel">
+        <div class="carousel-inner rounded-3 shadow">
+          <div class="carousel-item active" data-bs-interval="3000">
+            <a href="#" class="carousel-link">
+              <img src="img/carrusel/Panes grandes.jpg" class="d-block w-100 carousel-small-img" alt="Panes grandes">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Panes Artesanales</h5>
+              </div>
+            </a>
+          </div>
+          <div class="carousel-item" data-bs-interval="3000">
+            <a href="#" class="carousel-link">
+              <img src="img/carrusel/Postres.jpeg" class="d-block w-100 carousel-small-img" alt="Postres">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Dulces Tentaciones</h5>
+              </div>
+            </a>
+          </div>
+          <div class="carousel-item" data-bs-interval="3000">
+            <a href="#" class="carousel-link">
+              <img src="img/carrusel/Torta.jpeg" class="d-block w-100 carousel-small-img" alt="Torta">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>Tortas a tu Gusto</h5>
+              </div>
+            </a>
+          </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#smallCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#smallCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
+        </button>
+      </div>
+    </section>
 
-
-        <section class="recommendations-section">
-            <h2 class="section-title">Nuestras recomendaciones</h2>
-            <div class="product-grid">
-                <div class="product-card">
-                    <img src="../IMG/PanGrande.jpg" alt="Pan Grande">
-                    <a href="pan_grande.html" class="view-more">Ver más...</a>
-                    <span>Pan Grande</span>
-                </div>
-                <div class="product-card">
-                    <img src="../IMG/Hojaldre.JPG" alt="Hojaldres">
-                    <a href="#" class="view-more">Ver más...</a>
-                    <span>Hojaldres</span>
-                </div>
-                <div class="product-card">
-                    <img src="../IMG/Tamal.jpg" alt="Tamales">
-                    <a href="#" class="view-more">Ver más...</a>
-                    <span>Tamales</span>
-                </div>
-                <div class="product-card">
-                    <img src="../IMG/Galletas.jpg" alt="Galletas">
-                    <a href="#" class="view-more">Ver más...</a>
-                    <span>Galletas</span>
-                </div>
-                <div class="product-card">
-                    <img src="../IMG/Torta.jpg" alt="Tortas">
-                    <a href="#" class="view-more">Ver más...</a>
-                    <span>Tartas</span>
-                </div>
-                <div class="product-card">
-                    <img src="../IMG/Reposteria.jpg" alt="Repostería">
-                    <a href="#" class="view-more">Ver más...</a>
-                    <span>Repostería</span>
-                </div>
+    <section class="container my-5">
+      <h2 class="text-center text-gris-oscuro mb-4 animate__animated animate__fadeInUp">Nuestros Productos Destacados</h2>
+      <p class="text-center text-cafe-claro mb-5 animate__animated animate__fadeInUp animate__delay-1s">Una selección de nuestras delicias más populares.</p>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+          <div class="card h-100 rounded-3 shadow-sm">
+            <img src="img/catalogo/descarga.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
+            <div class="card-body">
+              <h5 class="card-title text-marron fw-bold">Brazo de Reina</h5>
+              <p class="card-text text-gris-oscuro">Bizcochuelo suave relleno de arequipe artesanal, un clásico irresistible.</p>
             </div>
-        </section>
-    </main>
-
-    <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-        crossorigin="anonymous"></script>
-
-    <footer class="main-footer">
-        <div class="allergens-info-footer">
-            <p>Todos nuestros productos son totalmente naturales</p>
-            <div class="info-item">
-                <i class="fas fa-apple-alt"></i>
-                <span>Frutos secos</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-tint"></i>
-                <span>Leche</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-wheat-alt"></i>
-                <span>Trigo y levadura</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-egg"></i>
-                <span>Huevos</span>
-            </div>
+          </div>
         </div>
-        <div class="footer-content">
-            <div class="footer-nav">
-                <div class="nav-item">
-                    <i class="fas fa-registered"></i>
-                    <span>Términos y Condiciones</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-history"></i>
-                    <span>Nuestra Historia</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-history"></i>
-                    <span>Política de privacidad</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-history"></i>
-                    <span>Contacto</span>
-                </div>
-
-
+        <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+          <div class="card h-100 rounded-3 shadow-sm">
+            <img src="img/catalogo/hojaldre.jpeg" class="card-img-top rounded-top-3 card-img-custom" alt="Hojaldres">
+            <div class="card-body">
+              <h5 class="card-title text-marron fw-bold">Hojaldres</h5>
+              <p class="card-text text-gris-oscuro">Capas crujientes de masa fina con rellenos selectos y dorados perfectos.</p>
             </div>
-            <div class="contact-info">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Encuéntranos en:</span>
-                <span>KR 11 #72 - 58 SUR</span>
-                <span>BOSA EL RECREO</span>
+          </div>
+        </div>
+        <div class="col animate__animated animate__fadeInUp animate__delay-3s">
+          <div class="card h-100 rounded-3 shadow-sm">
+            <img src="img/catalogo/pangrande.jpeg" class="card-img-top rounded-top-3 card-img-custom" alt="Panes grandes">
+            <div class="card-body">
+              <h5 class="card-title text-marron fw-bold">Panes Grandes</h5>
+              <p class="card-text text-gris-oscuro">Pan artesanal con corteza dorada y miga suave, ideal para compartir.</p>
             </div>
-            <p>&copy;2025 Pan & Code</p>
+          </div>
         </div>
-        </div>
-    </footer>
+      </div>
+    </section>
+  </main>
 
+  <footer class="bg-dark text-light py-5 animate__animated animate__fadeInUp animate__delay-4s">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h5 class="fw-bold text-crema">El Castillo del Pan 👑</h5>
+          <p class="text-cafe-con-leche">Principal Carrera 11 # 72 - 58 SUR Bosa el Recreo</p>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h5 class="fw-bold text-crema">Horarios de Atención</h5>
+          <p class="text-cafe-con-leche">Lunes a sábado: 8:00 am - 5:00 pm</p>
+          <p class="text-cafe-con-leche">Domingo: 8:30 am - 4:00 pm</p>
+          <p class="text-cafe-con-leche"><strong>contactenos@elcastillodelpan.com.co</strong></p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <p class="text-cafe-con-leche">&copy; 2025 El Castillo del Pan</p>
+          <p class="text-cafe-con-leche">Todos los derechos reservados</p>
+          <div>
+            <a href="#" class="text-crema me-2 social-icon-hover"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="#" class="text-crema me-2 social-icon-hover"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="#" class="text-crema social-icon-hover"><i class="bi bi-whatsapp fs-4"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
