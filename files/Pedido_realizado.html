@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos Pan&Code</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  <link rel="stylesheet" href="../Pedidos%20Pan&Code/style.css">
+  <link rel="stylesheet" href="./Bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+
+<body>
+  <div class="main-wrapper d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="IMG/LogoPan&Code.png" width="100" alt="Logo Pan&Code">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarToggler">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link active" href="#">Menú</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Pedidos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Contáctenos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Mi cuenta</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <img src="../Pedidos%20Pan&Code/IMG/cafe.jpg" class="img-fluid w-100" alt="Café"
+         style="max-height:250px; object-fit:cover;">
+
+    <div class="container text-center my-3">
+      <img src="../Pedidos%20Pan&Code/IMG/compra%20finalizada.jpg" class="img-fluid"
+           alt="Compra finalizada" style="max-height:250px; object-fit:cover;">
+    </div>
+
+    <section class="container my-5 flex-grow-1">
+      <div class="row g-4 justify-content-center">
+
+        <div class="col-md-8">
+          <div class="card h-100">
+            <img src="../Pedidos%20Pan&Code/IMG/jamon%20y%20queso.jpeg" class="card-img-top"
+                 alt="Pan de Jamón y Queso">
+            <div class="card-body">
+              <h5 class="card-title">Pan de Jamón y Queso</h5>
+              <p class="card-text">
+                Pan artesanal de corteza dorada, relleno con finas láminas de jamón ahumado y una mezcla de quesos
+                maduros fundidos lentamente para realzar su sabor. Ideal para paladares exigentes.
+              </p>
+              <p class="card-text"><small class="text-muted">Última actualización hace 4 horas</small></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+          <div class="card p-3 h-100">
+            <div class="card-body d-flex flex-column justify-content-between h-100 fs-6">
+              <div>
+                <h5 class="card-title text-center mb-3">Totales del carrito</h5>
+                <img src="../Pedidos%20Pan&Code/IMG/LogoPan&Code.png" class="img-fluid mb-3" alt="Logo Pan&Code">
+                <ul class="list-unstyled">
+                  <li class="mb-2">Subtotal: <span id="subtotalTexto"><strong>$8.000</strong></span></li>
+                  <li class="mb-2">Envío: <strong>$2.500</strong></li>
+                  <li class="mb-2">Total: <strong id="totalTexto" class="text-success">$10.500</strong></li>
+                </ul>
+              </div>
+              <button class="btn btn-success w-100 mt-3">Pagar ahora</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="bg-dark text-white py-4 mt-auto">
+      <div class="container">
+        <div class="row text-center text-md-start">
+
+          <div class="col-md-4 mb-4">
+            <h2 class="h5 fw-bold">El Castillo del Pan</h2>
+            <p class="mb-0">Principal Carrera 11 # 72‑58 SUR</p>
+            <p>Bosa El Recreo, Bogotá</p>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <h5 class="fw-semibold">Horarios de Atención</h5>
+            <p class="mb-1">Lunes a sábado: 8:00 am – 5:00 pm</p>
+            <p class="mb-1">Domingo: 8:30 am – 4:00 pm</p>
+            <p><strong>contactenos@elcastillodelpan.com.co</strong></p>
+          </div>
+
+          <div class="col-md-4 mb-4 text-center text-md-end d-flex flex-column align-items-center align-items-md-end">
+            <div class="mb-2">
+              <p class="mb-0">&copy; 2025 El Castillo del Pan</p>
+              <p class="mb-0">Todos los derechos reservados.</p>
+            </div>
+            <div>
+              <a href="https://facebook.com"  class="text-white me-3"><i class="bi bi-facebook fs-4"></i></a>
+              <a href="https://instagram.com" class="text-white me-3"><i class="bi bi-instagram fs-4"></i></a>
+              <a href="https://wa.me/1234567890" class="text-white"><i class="bi bi-whatsapp fs-4"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
