@@ -9,8 +9,8 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">
-        <img src="img/68e66361-fb35-4d56-9cba-5c466a186142.jpg" alt="Logo Panadería" class="logo-img">
+        <div class="logo animated-logo">
+            <img src="../files/img/logoprincipal.jpg" alt="Logo Panadería" class="logo-img">
         </div>
         <h1>Iniciar Sesión</h1>
         
@@ -121,12 +121,35 @@
         }
         
         function resetButton() {
-            document.getElementById('btnText').textContent = 'Iniciar Sesión';
-            document.getElementById('loading').style.display = 'none';
+            const btnText = document.getElementById('btnText');
+            const loading = document.getElementById('loading');
+            
+            if (btnText) {
+                btnText.textContent = 'Iniciar Sesión';
+            }
+            if (loading) {
+                loading.style.display = 'none';
+            }
         }
+        
+        // Resetear el formulario al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            resetButton();
+        });
         
         // Verificar si hay error en la URL (después de redirección)
         window.onload = function() {
+            // Asegurar que el loading esté oculto al cargar la página
+            const loading = document.getElementById('loading');
+            const btnText = document.getElementById('btnText');
+            
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            if (btnText) {
+                btnText.textContent = 'Iniciar Sesión';
+            }
+            
             const urlParams = new URLSearchParams(window.location.search);
             const error = urlParams.get('error');
             

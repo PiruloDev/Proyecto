@@ -99,6 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($resultado) {
                 $cliente_id = $pdo_conexion->lastInsertId();
                 $registro_exitoso = true;
+                
+                // Mostrar aviso emergente antes de redirigir
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        mostrarAvisoExitoso();
+                    });
+                </script>";
             } else {
                 $errores[] = "Error al registrar el cliente.";
             }
@@ -115,228 +122,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styleregister.css">
     <title>Registro de Cliente - Panadería</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-        
-        .logo {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .required {
-            color: #e74c3c;
-        }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="tel"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .error-message ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .success-icon {
-            font-size: 48px;
-            color: #28a745;
-            margin-bottom: 15px;
-        }
-        
-        .cliente-info {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: left;
-        }
-        
-        .cliente-info h4 {
-            margin-bottom: 10px;
-            color: #495057;
-        }
-        
-        .cliente-info p {
-            margin: 5px 0;
-            color: #6c757d;
-        }
-        
-        .login-link {
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .password-help {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .form-row .form-group {
-            flex: 1;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <?php if (isset($registro_exitoso) && $registro_exitoso): ?>
-            <!-- Mensaje de éxito -->
-            <div class="success-icon">✓</div>
-            <h1>¡Registro Exitoso!</h1>
-            
-            <div class="success-message">
-                Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión con tus credenciales.
+    <div class="registro-container">
+        <!-- Formulario de registro -->
+        <div class="registro-left">
+            <div class="logo-registro">
+                <img src="../files/img/logoprincipal.jpg" alt="Logo Panadería" class="logo-img-registro">
             </div>
-            
-            <div class="cliente-info">
-                <h4>Datos registrados:</h4>
-                <p><strong>ID de Cliente:</strong> <?php echo htmlspecialchars($cliente_id); ?></p>
-                <p><strong>Nombre:</strong> <?php echo htmlspecialchars($nombre); ?></p>
-                <p><strong>Email:</strong> <?php echo htmlspecialchars($email); ?></p>
-                <?php if (!empty($telefono)): ?>
-                    <p><strong>Teléfono:</strong> <?php echo htmlspecialchars($telefono); ?></p>
-                <?php endif; ?>
-                <p><strong>Estado:</strong> <span style="color: #28a745;">Activo</span></p>
-            </div>
-            
-            <div class="login-link">
-                <a href="login.php" class="btn">Iniciar Sesión</a>
-            </div>
-            
-        <?php else: ?>
-            <!-- Formulario de registro -->
-            <div class="logo">🥖</div>
-            <h1>Registro de Cliente</h1>
-            
+            <h1 class="titulo-registro">Registro Cliente</h1>
+        </div>
+        
+        <div class="registro-right">
             <?php if (!empty($errores)): ?>
-                <div class="error-message">
+                <div class="error-message-registro" style="display: block;">
                     <strong>Por favor corrige los siguientes errores:</strong>
-                    <ul>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
                         <?php foreach ($errores as $error): ?>
                             <li><?php echo htmlspecialchars($error); ?></li>
                         <?php endforeach; ?>
@@ -345,71 +149,114 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php endif; ?>
             
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-                <div class="form-group">
-                    <label for="nombre">Nombre Completo <span class="required">*</span></label>
-                    <input type="text" 
-                           id="nombre" 
-                           name="nombre" 
-                           value="<?php echo isset($nombre) ? htmlspecialchars($nombre) : ''; ?>"
-                           required
-                           maxlength="100"
-                           placeholder="Ingresa tu nombre completo">
-                </div>
+                    <div class="form-group-registro">
+                        <label for="nombre" class="label-registro">Nombre Completo <span style="color: #F44336;">*</span></label>
+                        <input type="text" 
+                               id="nombre" 
+                               name="nombre" 
+                               class="input-registro"
+                               value="<?php echo isset($nombre) ? htmlspecialchars($nombre) : ''; ?>"
+                               required
+                               maxlength="100"
+                               placeholder="Ingresa tu nombre completo">
+                    </div>
+                    
+                    <div class="form-group-registro">
+                        <label for="email" class="label-registro">Correo Electrónico <span style="color: #F44336;">*</span></label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               class="input-registro"
+                               value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>"
+                               required
+                               maxlength="150"
+                               placeholder="ejemplo@correo.com">
+                    </div>
+                    
+                    <div class="form-group-registro">
+                        <label for="telefono" class="label-registro">Teléfono (opcional)</label>
+                        <input type="text" 
+                               id="telefono" 
+                               name="telefono" 
+                               class="input-registro"
+                               value="<?php echo isset($telefono) ? htmlspecialchars($telefono) : ''; ?>"
+                               maxlength="20"
+                               placeholder="Ej: +52 123 456 7890">
+                    </div>
+                    
+                    <div class="form-group-registro">
+                        <label for="password" class="label-registro">Contraseña <span style="color: #F44336;">*</span></label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="input-registro"
+                               required
+                               minlength="6"
+                               maxlength="255"
+                               placeholder="Mínimo 6 caracteres">
+                        <small style="color: var(--text-light); font-size: 12px; margin-top: 5px; display: block;">Mínimo 6 caracteres</small>
+                    </div>
+                    
+                    <div class="form-group-registro">
+                        <label for="confirm_password" class="label-registro">Confirmar Contraseña <span style="color: #F44336;">*</span></label>
+                        <input type="password" 
+                               id="confirm_password" 
+                               name="confirm_password" 
+                               class="input-registro"
+                               required
+                               minlength="6"
+                               maxlength="255"
+                               placeholder="Repite tu contraseña">
+                    </div>
+                    
+                    <button type="submit" class="btn-registro">Registrarme</button>
+                </form>
                 
-                <div class="form-group">
-                    <label for="email">Correo Electrónico <span class="required">*</span></label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>"
-                           required
-                           maxlength="150"
-                           placeholder="ejemplo@correo.com">
+                <div class="footer-links-registro">
+                    ¿Ya tienes cuenta? <a href="login.php">Inicia sesión aquí</a>
                 </div>
-                
-                <div class="form-group">
-                    <label for="telefono">Teléfono (opcional)</label>
-                    <input type="tel" 
-                           id="telefono" 
-                           name="telefono" 
-                           value="<?php echo isset($telefono) ? htmlspecialchars($telefono) : ''; ?>"
-                           maxlength="20"
-                           placeholder="Ej: +52 123 456 7890">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Contraseña <span class="required">*</span></label>
-                    <input type="password" 
-                           id="password" 
-                           name="password" 
-                           required
-                           minlength="6"
-                           maxlength="255"
-                           placeholder="Mínimo 6 caracteres">
-                    <div class="password-help">Mínimo 6 caracteres</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirm_password">Confirmar Contraseña <span class="required">*</span></label>
-                    <input type="password" 
-                           id="confirm_password" 
-                           name="confirm_password" 
-                           required
-                           minlength="6"
-                           maxlength="255"
-                           placeholder="Repite tu contraseña">
-                </div>
-                
-                <button type="submit" class="btn">Registrarme</button>
-            </form>
-            
-            <div class="login-link">
-                ¿Ya tienes cuenta? <a href="login.php">Inicia sesión aquí</a>
             </div>
-        <?php endif; ?>
-    </div>
+        </div>
+        
+        <!-- Modal de registro exitoso -->
+        <div id="modalExitoso" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="check-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="12" fill="#28a745"/>
+                            <path d="m9 12 2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2>¡Registro Exitoso!</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Tu cuenta ha sido creada exitosamente.</p>
+                    <p>Ahora puedes iniciar sesión con tus credenciales.</p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="irAlLogin()" class="btn-modal">Ir al Login</button>
+                </div>
+            </div>
+        </div>
     
     <script>
+        // Función para mostrar el aviso de registro exitoso
+        function mostrarAvisoExitoso() {
+            const modal = document.getElementById('modalExitoso');
+            modal.style.display = 'flex';
+            
+            // Auto-cerrar después de 5 segundos si el usuario no hace click
+            setTimeout(function() {
+                irAlLogin();
+            }, 5000);
+        }
+        
+        // Función para ir al login
+        function irAlLogin() {
+            window.location.href = 'login.php?success=registered';
+        }
+        
         // Validación en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById('password');
