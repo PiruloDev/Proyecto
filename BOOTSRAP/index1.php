@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>El Castillo del Pan</title>
-  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  <link rel="icon" type="image/x-icon" href="img/LogoCastillo.jpg">
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   
@@ -14,14 +14,14 @@
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-  <link rel="stylesheet" href="styles-panaderia.css">
+  <link rel="stylesheet" href="css/styl_index_general.css">
 </head>
 <body class="bg-blanco-cálido">
   <header>
     <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
       <div class="container">
-        <a class="navbar-brand d-flex align-items-center logo" href="#">
-          <img src="img/LogoCastillo.png" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+        <a class="navbar-brand d-flex align-items-center logo" href="index1.php">
+          <img src="img/LogoCastillo.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
           <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,10 +30,10 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link active text-marron fw-semibold" aria-current="page" href="modulos/modulo_categorias/modulo categoria/vista_cliente/categoria usuario.html">Menú</a></li>
-            <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="../">Pedidos</a></li>
+            <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="#">Pedidos</a></li>
             <li class="nav-item"><a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a></li>
           </ul>
-          <a href="modulos/modulo_usuario/login.html" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
+          <a href="login.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
         </div>
       </div>
     </nav>
@@ -45,7 +45,7 @@
         <div class="carousel-inner rounded-3 shadow">
           <div class="carousel-item active" data-bs-interval="3000">
             <a href="#" class="carousel-link">
-              <img src="img/carrusel/Panes grandes.jpg" class="d-block w-100 carousel-small-img" alt="Panes grandes">
+              <img src="img/catalogo/pangrande.jpeg" class="d-block w-100 carousel-small-img" alt="Panes grandes">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Panes Artesanales</h5>
               </div>
@@ -53,7 +53,7 @@
           </div>
           <div class="carousel-item" data-bs-interval="3000">
             <a href="#" class="carousel-link">
-              <img src="img/carrusel/Postres.jpeg" class="d-block w-100 carousel-small-img" alt="Postres">
+              <img src="img/catalogo/postres.jpeg" class="d-block w-100 carousel-small-img" alt="Postres">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Dulces Tentaciones</h5>
               </div>
@@ -61,7 +61,7 @@
           </div>
           <div class="carousel-item" data-bs-interval="3000">
             <a href="#" class="carousel-link">
-              <img src="img/carrusel/Torta.jpeg" class="d-block w-100 carousel-small-img" alt="Torta">
+              <img src="img/catalogo/tortas.jpeg" class="d-block w-100 carousel-small-img" alt="Torta">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Tortas a tu Gusto</h5>
               </div>
@@ -85,7 +85,7 @@
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <div class="col animate__animated animate__fadeInUp animate__delay-1s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="img/catalogo/descarga.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
+            <img src="img/catalogo/Brazodereina.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Brazo de Reina</h5>
               <p class="card-text text-gris-oscuro">Bizcochuelo suave relleno de arequipe artesanal, un clásico irresistible.</p>
@@ -131,9 +131,9 @@
           <p class="text-cafe-con-leche">&copy; 2025 El Castillo del Pan</p>
           <p class="text-cafe-con-leche">Todos los derechos reservados</p>
           <div>
-            <a href="#" class="text-crema me-2 social-icon-hover"><i class="bi bi-facebook fs-4"></i></a>
-            <a href="#" class="text-crema me-2 social-icon-hover"><i class="bi bi-instagram fs-4"></i></a>
-            <a href="#" class="text-crema social-icon-hover"><i class="bi bi-whatsapp fs-4"></i></a>
+            <a href="https://facebook.com/" class="text-crema me-2 social-icon-hover"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="https://www.instagram.com/" class="text-crema me-2 social-icon-hover"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="https://web.whatsapp.com/" class="text-crema social-icon-hover"><i class="bi bi-whatsapp fs-4"></i></a>
           </div>
         </div>
       </div>
