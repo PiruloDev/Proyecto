@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Pedido Registrado con Éxito! - El Castillo del Pan</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <link rel="stylesheet" href="../../css/stylehomepage.cs"> 
+</head>
+<body class="bg-blanco-cálido d-flex flex-column min-vh-100">
+
+  <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <img src="img/LogoCastillo.png" alt="Logo El Castillo del Pan" width="40" class="d-inline-block align-text-top me-2 rounded-circle">
+        <span class="text-marron fw-bold">El Castillo del Pan</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link text-marron active" aria-current="page" href="index.html">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-marron" href="productos.html">Productos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-marron" href="contacto.html">Contacto</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-marron" href="pedidos_lista_cliente.html">Mis Pedidos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-sm btn-outline-marron ms-lg-2" href="perfil_cliente.html">
+              <i class="bi bi-person-circle me-1"></i> Mi Perfil
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-sm btn-marron text-crema ms-lg-2" href="carrito.html">
+              <i class="bi bi-cart-fill me-1"></i> Carrito (0)
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-5 flex-grow-1 d-flex align-items-center justify-content-center">
+    <div class="card rounded-3 shadow-lg bg-crema p-4 p-md-5 text-center animate__animated animate__zoomIn">
+      <div class="card-body">
+        <i class="bi bi-check-circle-fill text-verde-romero display-1 mb-3 animate__animated animate__bounceIn"></i>
+        <h2 class="card-title text-gris-oscuro mb-3 animate__animated animate__fadeIn animate__delay-0-5s">
+          ¡Tu pedido ha sido registrado con éxito!
+        </h2>
+        <p class="card-text text-marron lead mb-4 animate__animated animate__fadeIn animate__delay-1s">
+          Gracias por tu compra en El Castillo del Pan. Aquí está el resumen de tu pedido.
+        </p>
+
+        <div class="table-responsive mb-4 animate__animated animate__fadeInUp animate__delay-1-5s">
+          <table class="table table-striped table-hover align-middle caption-top">
+            <caption class="text-start text-marron fw-bold mb-2"><i class="bi bi-list-ol me-2"></i>Detalles de tu pedido <span class="text-gris-oscuro">#P005</span></caption>
+            <thead class="bg-cafe-con-leche text-gris-oscuro">
+              <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Precio Unitario</th>
+                <th scope="col">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pan de Queso Artesanal</td>
+                <td>2</td>
+                <td>$ 2.500 COP</td>
+                <td>$ 5.000 COP</td>
+              </tr>
+              <tr>
+                <td>Torta de Chocolate Fudge</td>
+                <td>1</td>
+                <td>$ 45.000 COP</td>
+                <td>$ 45.000 COP</td>
+              </tr>
+              <tr>
+                <td>Café Latte con Caramelo</td>
+                <td>3</td>
+                <td>$ 8.000 COP</td>
+                <td>$ 24.000 COP</td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-light text-gris-oscuro fw-bold">
+              <tr>
+                <td colspan="3" class="text-end">Total del Pedido:</td>
+                <td class="text-verde-romero fw-bold fs-5">$ 74.000 COP</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <p class="text-gris-oscuro animate__animated animate__fadeIn animate__delay-2s">
+          Recibirás una confirmación en tu correo electrónico con los detalles completos y el seguimiento de tu pedido.
+        </p>
+
+        <a href="index.html" class="btn btn-marron btn-lg fw-bold mt-4 animate__animated animate__pulse animate__infinite">
+          <i class="bi bi-house-door-fill me-2"></i> Volver al Inicio
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container text-center">
+      <p>&copy; 2025 El Castillo del Pan. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
