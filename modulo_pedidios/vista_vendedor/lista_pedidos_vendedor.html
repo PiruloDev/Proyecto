@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pedidos - Panel de Empleado - El Castillo del Pan</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <link rel="stylesheet" href="../../css/.css">
+
+  <style>
+    /* Estilo para que el fondo del modal sea más oscuro y notable */
+    .modal-backdrop.show {
+      opacity: 0.12; /* Aumenta la opacidad del fondo difuminado */
+    }
+    /* Clase para la fila activa/seleccionada */
+    .table-hover tbody tr.selected {
+        background-color: var(--bs-crema-lighter); /* Usar una variable de Bootstrap si está definida en tu CSS, si no un color fijo */
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-blanco-cálido">
+  <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <img src="../../img/logoprincipal.jpg" alt="Logo El Castillo del Pan" width="40" class="d-inline-block align-text-top me-2 rounded-circle">
+        <span class="text-marron fw-bold">El Castillo del Pan (Empleado)</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavEmployee" aria-controls="navbarNavEmployee" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavEmployee">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link text-marron active" aria-current="page" href="pedidos_empleado.html">
+              <i class="bi bi-card-checklist me-1"></i> Gestión de Pedidos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-marron" href="gestion_productos_empleado.html">
+              <i class="bi bi-box-seam me-1"></i> Gestión Productos
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link text-marron dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle me-1"></i> Mi Cuenta
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="perfil_empleado.html">Ver Perfil</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="login.html">Cerrar Sesión</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-fluid my-5"> <h3 class="text-gris-oscuro mb-4 animate__animated animate__fadeInDown">
+      <i class="bi bi-clipboard-check me-2 text-marron"></i> Panel de Gestión de Pedidos
+    </h3>
+
+    <div class="row g-4 justify-content-center"> <div class="col-xxl-6 col-xl-6 col-lg-12"> <div class="card rounded-3 shadow-sm bg-crema p-4 animate__animated animate__fadeInLeft h-100">
+          <h5 class="text-marron fw-bold mb-3"><i class="bi bi-hourglass-split me-2"></i> Pedidos Pendientes (Aprobar/Rechazar)</h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tabla-pedidos-aprobar">
+              <thead class="bg-cafe-con-leche text-gris-oscuro">
+                <tr>
+                  <th scope="col"># Pedido</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-pedido-id="APP001">
+                  <td class="fw-bold text-marron">APP001</td>
+                  <td>Laura G.</td>
+                  <td>05/07/2025</td>
+                  <td class="text-verde-romero fw-bold">$ 95.000 COP</td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-success btn-ver-detalles" title="Ver Detalles y Aprobar/Rechazar"
+                            data-bs-toggle="modal" data-bs-target="#detalleAprobarRechazarModal">
+                      <i class="bi bi-clipboard-check"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr data-pedido-id="APP002">
+                  <td class="fw-bold text-marron">APP002</td>
+                  <td>Pedro R.</td>
+                  <td>05/07/2025</td>
+                  <td class="text-verde-romero fw-bold">$ 30.000 COP</td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-success btn-ver-detalles" title="Ver Detalles y Aprobar/Rechazar"
+                            data-bs-toggle="modal" data-bs-target="#detalleAprobarRechazarModal">
+                      <i class="bi bi-clipboard-check"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr data-pedido-id="APP003">
+                    <td class="fw-bold text-marron">APP003</td>
+                    <td>Sofía M.</td>
+                    <td>04/07/2025</td>
+                    <td class="text-verde-romero fw-bold">$ 12.500 COP</td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-outline-success btn-ver-detalles" title="Ver Detalles y Aprobar/Rechazar"
+                              data-bs-toggle="modal" data-bs-target="#detalleAprobarRechazarModal">
+                        <i class="bi bi-clipboard-check"></i>
+                      </button>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center text-muted p-3 mt-4 border rounded" id="no-aprobar-pedidos-message" style="display: none;">
+            <i class="bi bi-check-circle display-4 text-success mb-3"></i>
+            <p class="fs-5">¡No hay pedidos pendientes de aprobación!</p>
+            <small>Todo está al día.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xxl-6 col-xl-6 col-lg-12"> <div class="card rounded-3 shadow-sm bg-crema p-4 animate__animated animate__fadeInRight h-100">
+          <h5 class="text-marron fw-bold mb-3"><i class="bi bi-arrow-repeat me-2"></i> Pedidos en Proceso (Actualizar Estado)</h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tabla-pedidos-actualizar">
+              <thead class="bg-cafe-con-leche text-gris-oscuro">
+                <tr>
+                  <th scope="col"># Pedido</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-pedido-id="ACT001">
+                  <td class="fw-bold text-marron">ACT001</td>
+                  <td>Roberto P.</td>
+                  <td><span class="badge bg-info text-dark" id="estado-ACT001">En Preparación</span></td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-actualizar-estado" title="Actualizar Estado"
+                            data-bs-toggle="modal" data-bs-target="#actualizarEstadoModal">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr data-pedido-id="ACT002">
+                  <td class="fw-bold text-marron">ACT002</td>
+                  <td>Elena S.</td>
+                  <td><span class="badge bg-warning text-dark" id="estado-ACT002">Listo para Recoger</span></td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-actualizar-estado" title="Actualizar Estado"
+                            data-bs-toggle="modal" data-bs-target="#actualizarEstadoModal">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr data-pedido-id="ACT003">
+                    <td class="fw-bold text-marron">ACT003</td>
+                    <td>Gabriel C.</td>
+                    <td><span class="badge bg-secondary" id="estado-ACT003">Entregado</span></td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-outline-secondary btn-actualizar-estado" disabled title="Pedido Ya Entregado">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center text-muted p-3 mt-4 border rounded" id="no-actualizar-pedidos-message" style="display: none;">
+            <i class="bi bi-check-circle display-4 text-success mb-3"></i>
+            <p class="fs-5">¡No hay pedidos para actualizar estado!</p>
+            <small>Todo está gestionado.</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center">
+      <p>&copy; 2025 El Castillo del Pan. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <div class="modal fade" id="detalleAprobarRechazarModal" tabindex="-1" aria-labelledby="detalleAprobarRechazarModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content rounded-3 shadow-lg bg-crema">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title text-marron fw-bold" id="detalleAprobarRechazarModalLabel">
+            <i class="bi bi-box-seam me-2"></i> Detalles del Pedido <span id="modal-app-pedido-id">#APP001</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 pt-0">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p class="text-gris-oscuro mb-1"><strong class="text-marron">Cliente:</strong> <span id="modal-app-cliente-nombre">Laura G.</span></p>
+              <p class="text-gris-oscuro mb-1"><strong class="text-marron">Fecha Pedido:</strong> <span id="modal-app-fecha-pedido">05/07/2025</span></p>
+              <p class="text-gris-oscuro mb-1"><strong class="text-marron">Hora Recogida:</strong> <span id="modal-app-hora-recogida">09:30 AM</span></p>
+            </div>
+            <div class="col-md-6">
+              <p class="text-gris-oscuro mb-1"><strong class="text-marron">Teléfono:</strong> <span id="modal-app-telefono">+57 300 123 4567</span></p>
+            </div>
+          </div>
+
+          <h6 class="text-marron fw-bold mb-3"><i class="bi bi-list-ol me-2"></i> Productos del Pedido:</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-0">
+              <thead>
+                <tr class="text-gris-oscuro">
+                  <th scope="col">Producto</th>
+                  <th scope="col" class="text-end">Cantidad</th>
+                  <th scope="col" class="text-end">Precio Unit.</th>
+                  <th scope="col" class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="modal-app-productos-list">
+                <tr>
+                  <td>Pan Campesino Grande</td>
+                  <td class="text-end">1</td>
+                  <td class="text-end">$ 12.000 COP</td>
+                  <td class="text-end fw-bold">$ 12.000 COP</td>
+                </tr>
+                <tr>
+                  <td>Arepas de Maíz (x6)</td>
+                  <td class="text-end">2</td>
+                  <td class="text-end">$ 8.000 COP</td>
+                  <td class="text-end">$ 16.000 COP</td>
+                </tr>
+                <tr>
+                  <td>Pastel de Pollo</td>
+                  <td class="text-end">3</td>
+                  <td class="text-end">$ 15.000 COP</td>
+                  <td class="text-end">$ 45.000 COP</td>
+                </tr>
+                <tr>
+                  <td>Gaseosa Coca-Cola 1.5L</td>
+                  <td class="text-end">2</td>
+                  <td class="text-end">$ 11.000 COP</td>
+                  <td class="text-end">$ 22.000 COP</td>
+                </tr>
+              </tbody>
+              <tfoot class="border-top">
+                <tr>
+                  <td colspan="3" class="text-end text-marron fw-bold fs-5">TOTAL FINAL:</td>
+                  <td class="text-end text-verde-romero fw-bold fs-5" id="modal-app-total-final">$ 95.000 COP</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0 pt-0">
+          <button type="button" class="btn btn-danger fw-bold" id="btn-rechazar-pedido" data-bs-toggle="modal" data-bs-target="#confirmacionAccionModal" data-accion="rechazar">
+            <i class="bi bi-x-circle-fill me-2"></i> Rechazar Pedido
+          </button>
+          <button type="button" class="btn btn-success fw-bold" id="btn-aprobar-pedido" data-bs-toggle="modal" data-bs-target="#confirmacionAccionModal" data-accion="aprobar">
+            <i class="bi bi-check-circle-fill me-2"></i> Aprobar Pedido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirmacionAccionModal" tabindex="-1" aria-labelledby="confirmacionAccionModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-3 shadow-lg bg-crema">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title text-marron fw-bold" id="confirmacionAccionModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Confirmar Acción
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 pt-0">
+          <p class="text-gris-oscuro" id="confirmacion-mensaje"></p>
+          <ul class="list-group list-group-flush mb-3" id="confirmacion-productos-lista">
+            </ul>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal" id="btn-cancelar-confirmacion">
+            <i class="bi bi-x-circle-fill me-2"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-primary fw-bold" id="btn-confirmar-accion"
+                  data-bs-toggle="modal" data-bs-target="#accionExitosaModal">
+            <i class="bi bi-check-circle-fill me-2"></i> Sí, Continuar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="accionExitosaModal" tabindex="-1" aria-labelledby="accionExitosaModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-3 shadow-lg bg-crema">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title text-marron fw-bold" id="accionExitosaModalLabel">
+            <i class="bi bi-check-circle-fill me-2 text-success"></i> Acción Exitosa
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 pt-0 text-center">
+          <p class="lead text-gris-oscuro" id="exito-mensaje">¡El pedido ha sido procesado correctamente!</p>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal" id="btn-cerrar-exito">
+            <i class="bi bi-x-circle-fill me-2"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="actualizarEstadoModal" tabindex="-1" aria-labelledby="actualizarEstadoModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-3 shadow-lg bg-crema">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title text-marron fw-bold" id="actualizarEstadoModalLabel">
+            <i class="bi bi-pencil-square me-2"></i> Actualizar Estado Pedido <span id="modal-act-pedido-id">#ACT001</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 pt-0">
+          <p class="text-gris-oscuro mb-1"><strong class="text-marron">Cliente:</strong> <span id="modal-act-cliente-nombre">Roberto P.</span></p>
+          <p class="text-gris-oscuro mb-3"><strong class="text-marron">Estado Actual:</strong> <span class="badge bg-info text-dark" id="modal-act-estado-actual">En Preparación</span></p>
+
+          <div class="mb-3">
+            <label for="selectEstadoPedido" class="form-label text-marron fw-bold"><i class="bi bi-arrow-right-circle me-1"></i> Selecciona Nuevo Estado:</label>
+            <select class="form-select" id="selectEstadoPedido">
+              <option value="En Preparación">En Preparación</option>
+              <option value="Listo para Recoger">Listo para Recoger</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+
+          <h6 class="text-marron fw-bold mb-3 mt-4"><i class="bi bi-basket-fill me-2"></i> Productos:</h6>
+          <ul class="list-group list-group-flush mb-0" id="modal-act-productos-list">
+            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-gris-oscuro">
+                <span>Producto X</span> <span class="fw-bold">2x</span>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle-fill me-2"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-primary fw-bold" id="btn-guardar-estado"
+                  data-bs-toggle="modal" data-bs-target="#confirmacionActualizarEstadoModal">
+            <i class="bi bi-save-fill me-2"></i> Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirmacionActualizarEstadoModal" tabindex="-1" aria-labelledby="confirmacionActualizarEstadoModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-3 shadow-lg bg-crema">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title text-marron fw-bold" id="confirmacionActualizarEstadoModalLabel">
+            <i class="bi bi-question-circle-fill me-2 text-info"></i> Confirmar Actualización
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 pt-0 text-center">
+          <p class="text-gris-oscuro" id="confirmacion-actualizar-mensaje"></p>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal" id="btn-cancelar-actualizacion">
+            <i class="bi bi-x-circle-fill me-2"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success fw-bold" id="btn-confirmar-actualizacion"
+                  data-bs-toggle="modal" data-bs-target="#accionExitosaModal">
+            <i class="bi bi-check-circle-fill me-2"></i> Sí, Actualizar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Datos simulados (vendrían de un backend PHP)
+      const pedidosPendientesAprobar = {
+        'APP001': {
+          cliente: 'Laura G.',
+          fecha: '05/07/2025',
+          horaRecogida: '09:30 AM',
+          telefono: '+57 300 123 4567',
+          total: '$ 95.000 COP',
+          productos: [
+            { nombre: 'Pan Campesino Grande', cantidad: 1, precio_unitario: '$ 12.000 COP', subtotal: '$ 12.000 COP' },
+            { nombre: 'Arepas de Maíz (x6)', cantidad: 2, precio_unitario: '$ 8.000 COP', subtotal: '$ 16.000 COP' },
+            { nombre: 'Pastel de Pollo', cantidad: 3, precio_unitario: '$ 15.000 COP', subtotal: '$ 45.000 COP' },
+            { nombre: 'Gaseosa Coca-Cola 1.5L', cantidad: 2, precio_unitario: '$ 11.000 COP', subtotal: '$ 22.000 COP' }
+          ]
+        },
+        'APP002': {
+          cliente: 'Pedro R.',
+          fecha: '05/07/2025',
+          horaRecogida: '01:00 PM',
+          telefono: '+57 310 987 6543',
+          total: '$ 30.000 COP',
+          productos: [
+            { nombre: 'Buñuelos (x5)', cantidad: 1, precio_unitario: '$ 10.000 COP', subtotal: '$ 10.000 COP' },
+            { nombre: 'Chocolate Caliente', cantidad: 2, precio_unitario: '$ 10.000 COP', subtotal: '$ 20.000 COP' }
+          ]
+        },
+        'APP003': {
+            cliente: 'Sofía M.',
+            fecha: '04/07/2025',
+            horaRecogida: '04:00 PM',
+            telefono: '+57 320 555 1234',
+            total: '$ 12.500 COP',
+            productos: [
+              { nombre: 'Pan de Yuca', cantidad: 5, precio_unitario: '$ 2.500 COP', subtotal: '$ 12.500 COP' }
+            ]
+          }
+      };
+
+      const pedidosParaActualizar = {
+        'ACT001': { cliente: 'Roberto P.', estado: 'En Preparación', fecha: '05/07/2025', horaRecogida: '10:00 AM', productos: [{nombre: 'Pizza Pequeña', cantidad:1, precio_unitario: '$50.000 COP', subtotal:'$50.000 COP'}] },
+        'ACT002': { cliente: 'Elena S.', estado: 'Listo para Recoger', fecha: '05/07/2025', horaRecogida: '02:00 PM', productos: [{nombre: 'Torta Red Velvet', cantidad:1, precio_unitario: '$70.000 COP', subtotal:'$70.000 COP'}] },
+        'ACT003': { cliente: 'Gabriel C.', estado: 'Entregado', fecha: '04/07/2025', horaRecogida: '09:00 AM', productos: [{nombre: 'Brownie', cantidad:2, precio_unitario: '$10.000 COP', subtotal:'$20.000 COP'}] }
+      };
+
+      let currentPedidoId = null; // Para el pedido que se está gestionando en cualquier modal
+      let currentAccion = null; // 'aprobar' o 'rechazar' para el primer flujo
+      let lastSelectedRow = null; // Para mantener el estilo de fila seleccionada
+      let nuevoEstadoSeleccionado = null; // Para el nuevo estado en el flujo de actualización
+
+      // --- Funciones de Utilidad ---
+      function getBadgeClassForStatus(status) {
+          switch (status) {
+              case 'En Preparación': return 'bg-info text-dark';
+              case 'Listo para Recoger': return 'bg-warning text-dark';
+              case 'Entregado': return 'bg-secondary';
+              case 'Rechazado': return 'bg-danger'; // Si lo añades en algún momento
+              default: return 'bg-light text-dark';
+          }
+      }
+
+      function checkEmptyTables() {
+          const tablaAprobarBody = document.querySelector('#tabla-pedidos-aprobar tbody');
+          const noAprobarMessage = document.getElementById('no-aprobar-pedidos-message');
+          if (tablaAprobarBody.children.length === 0) {
+              noAprobarMessage.style.display = 'block';
+          } else {
+              noAprobarMessage.style.display = 'none';
+          }
+
+          const tablaActualizarBody = document.querySelector('#tabla-pedidos-actualizar tbody');
+          const noActualizarMessage = document.getElementById('no-actualizar-pedidos-message');
+          if (tablaActualizarBody.children.length === 0) {
+              noActualizarMessage.style.display = 'block';
+          } else {
+              noActualizarMessage.style.display = 'none';
+          }
+      }
+
+      // --- Modales y Eventos (Flujo Aprobar/Rechazar) ---
+
+      // 1. Modal Detalle Aprobar/Rechazar
+      const detalleAprobarRechazarModal = document.getElementById('detalleAprobarRechazarModal');
+      const bsDetalleAprobarRechazarModal = new bootstrap.Modal(detalleAprobarRechazarModal, {
+          backdrop: 'static', // Asegura que el fondo permanezca cuando se abra el siguiente modal
+          keyboard: false // Opcional: previene que se cierre con ESC
+      });
+
+      detalleAprobarRechazarModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const row = button.closest('tr');
+        currentPedidoId = row.getAttribute('data-pedido-id');
+
+        if (lastSelectedRow) {
+            lastSelectedRow.classList.remove('selected');
+        }
+        row.classList.add('selected');
+        lastSelectedRow = row;
+
+        const pedido = pedidosPendientesAprobar[currentPedidoId];
+        if (pedido) {
+          document.getElementById('modal-app-pedido-id').textContent = '#' + currentPedidoId;
+          document.getElementById('modal-app-cliente-nombre').textContent = pedido.cliente;
+          document.getElementById('modal-app-fecha-pedido').textContent = pedido.fecha;
+          document.getElementById('modal-app-hora-recogida').textContent = pedido.horaRecogida;
+          document.getElementById('modal-app-telefono').textContent = pedido.telefono;
+          document.getElementById('modal-app-notas').textContent = pedido.notas;
+          document.getElementById('modal-app-total-final').textContent = pedido.total;
+
+          const productosList = document.getElementById('modal-app-productos-list');
+          productosList.innerHTML = '';
+          pedido.productos.forEach(producto => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${producto.nombre}</td>
+              <td class="text-end">${producto.cantidad}</td>
+              <td class="text-end">${producto.precio_unitario}</td>
+              <td class="text-end fw-bold">${producto.subtotal}</td>
+            `;
+            productosList.appendChild(row);
+          });
+        }
+      });
+
+      // 2. Modal Confirmación de Acción (Aprobar/Rechazar)
+      const confirmacionAccionModal = document.getElementById('confirmacionAccionModal');
+      const bsConfirmacionAccionModal = new bootstrap.Modal(confirmacionAccionModal, {
+          backdrop: 'static', // Asegura que el fondo permanezca
+          keyboard: false
+      });
+
+      confirmacionAccionModal.addEventListener('show.bs.modal', function (event) {
+        // No ocultamos el modal anterior explícitamente aquí, ya que el backdrop es compartido.
+        // Se ocultará automáticamente cuando el nuevo modal tome el foco.
+
+        const button = event.relatedTarget;
+        currentAccion = button.getAttribute('data-accion');
+
+        const confirmacionMensaje = document.getElementById('confirmacion-mensaje');
+        const confirmacionProductosLista = document.getElementById('confirmacion-productos-lista');
+        const pedido = pedidosPendientesAprobar[currentPedidoId];
+
+        if (currentAccion === 'aprobar') {
+          confirmacionMensaje.innerHTML = `¿Seguro que va a <strong class="text-success">APROBAR</strong> el pedido <span class="fw-bold text-marron">#${currentPedidoId}</span> de <span class="fw-bold">${pedido.cliente}</span>?`;
+          document.getElementById('btn-confirmar-accion').classList.remove('btn-danger');
+          document.getElementById('btn-confirmar-accion').classList.add('btn-success');
+        } else if (currentAccion === 'rechazar') {
+          confirmacionMensaje.innerHTML = `¿Seguro que va a <strong class="text-danger">RECHAZAR</strong> el pedido <span class="fw-bold text-marron">#${currentPedidoId}</span> de <span class="fw-bold">${pedido.cliente}</span>?`;
+          document.getElementById('btn-confirmar-accion').classList.remove('btn-success');
+          document.getElementById('btn-confirmar-accion').classList.add('btn-danger');
+        }
+
+        confirmacionProductosLista.innerHTML = '';
+        pedido.productos.forEach(producto => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center bg-transparent text-gris-oscuro';
+            li.innerHTML = `<span>${producto.nombre}</span> <span class="fw-bold">${producto.cantidad}x</span>`;
+            confirmacionProductosLista.appendChild(li);
+        });
+      });
+
+      // Botón "Sí, Continuar" en el modal de Confirmación Aprobar/Rechazar
+      const btnConfirmarAccion = document.getElementById('btn-confirmar-accion');
+      btnConfirmarAccion.addEventListener('click', function() {
+        const exitoMensaje = document.getElementById('exito-mensaje');
+        const rowToRemove = document.querySelector(`#tabla-pedidos-aprobar tr[data-pedido-id="${currentPedidoId}"]`);
+
+        if (currentAccion === 'aprobar') {
+          exitoMensaje.textContent = `¡El pedido #${currentPedidoId} ha sido APROBADO correctamente!`;
+          if (rowToRemove) {
+            rowToRemove.remove(); // Eliminar de la tabla de aprobación
+            const tablaActualizarBody = document.querySelector('#tabla-pedidos-actualizar tbody');
+            const pedidoAprobado = pedidosPendientesAprobar[currentPedidoId];
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-pedido-id', currentPedidoId);
+            newRow.innerHTML = `
+                <td class="fw-bold text-marron">${currentPedidoId}</td>
+                <td>${pedidoAprobado.cliente}</td>
+                <td><span class="badge ${getBadgeClassForStatus('En Preparación')}" id="estado-${currentPedidoId}">En Preparación</span></td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-actualizar-estado" title="Actualizar Estado"
+                            data-bs-toggle="modal" data-bs-target="#actualizarEstadoModal">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                </td>
+            `;
+            tablaActualizarBody.prepend(newRow); // Añadirlo al principio de la tabla de actualización
+            // Añadir a los datos simulados de pedidosParaActualizar (importante para el nuevo flujo)
+            pedidosParaActualizar[currentPedidoId] = {
+                cliente: pedidoAprobado.cliente,
+                estado: 'En Preparación',
+                fecha: pedidoAprobado.fecha,
+                horaRecogida: pedidoAprobado.horaRecogida,
+                productos: pedidoAprobado.productos // Conservar productos para futuras visualizaciones
+            };
+            delete pedidosPendientesAprobar[currentPedidoId];
+          }
+        } else if (currentAccion === 'rechazar') {
+          exitoMensaje.textContent = `¡El pedido #${currentPedidoId} ha sido RECHAZADO correctamente!`;
+          if (rowToRemove) {
+            rowToRemove.remove();
+            delete pedidosPendientesAprobar[currentPedidoId];
+          }
+        }
+        // Ocultamos el modal de confirmación, el modal de éxito se abrirá inmediatamente.
+        bsConfirmacionAccionModal.hide();
+      });
+
+      // Botón "Cancelar" en el modal de Confirmación Aprobar/Rechazar
+      const btnCancelarConfirmacion = document.getElementById('btn-cancelar-confirmacion');
+      btnCancelarConfirmacion.addEventListener('click', function() {
+          bsConfirmacionAccionModal.hide(); // Ocultar el modal de confirmación
+          bsDetalleAprobarRechazarModal.show(); // Reabrir el modal de detalles
+      });
+
+      // Evento al cerrar el modal de Éxito (común para ambos flujos)
+      const accionExitosaModal = document.getElementById('accionExitosaModal');
+      accionExitosaModal.addEventListener('hidden.bs.modal', function () {
+          checkEmptyTables();
+          if (lastSelectedRow) {
+            lastSelectedRow.classList.remove('selected');
+            lastSelectedRow = null;
+          }
+          // Asegúrate de que todos los modales estén cerrados y el backdrop eliminado
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) {
+            backdrop.remove();
+          }
+      });
+
+
+      // --- NUEVO FLUJO: Actualizar Estado ---
+
+      // 1. Modal Actualizar Estado
+      const actualizarEstadoModal = document.getElementById('actualizarEstadoModal');
+      const bsActualizarEstadoModal = new bootstrap.Modal(actualizarEstadoModal, {
+          backdrop: 'static', // Asegura que el fondo permanezca
+          keyboard: false
+      });
+
+      actualizarEstadoModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const row = button.closest('tr');
+        currentPedidoId = row.getAttribute('data-pedido-id');
+
+        if (lastSelectedRow) {
+            lastSelectedRow.classList.remove('selected');
+        }
+        row.classList.add('selected');
+        lastSelectedRow = row;
+
+        const pedido = pedidosParaActualizar[currentPedidoId];
+        if (pedido) {
+          document.getElementById('modal-act-pedido-id').textContent = '#' + currentPedidoId;
+          document.getElementById('modal-act-cliente-nombre').textContent = pedido.cliente;
+          
+          const estadoActualSpan = document.getElementById('modal-act-estado-actual');
+          estadoActualSpan.textContent = pedido.estado;
+          estadoActualSpan.className = `badge ${getBadgeClassForStatus(pedido.estado)}`; // Asegurar que el badge se actualice
+
+          const selectEstadoPedido = document.getElementById('selectEstadoPedido');
+          selectEstadoPedido.value = pedido.estado; // Seleccionar el estado actual en el dropdown
+
+          const productosList = document.getElementById('modal-act-productos-list');
+          productosList.innerHTML = '';
+          pedido.productos.forEach(producto => {
+              const li = document.createElement('li');
+              li.className = 'list-group-item d-flex justify-content-between align-items-center bg-transparent text-gris-oscuro';
+              li.innerHTML = `<span>${producto.nombre}</span> <span class="fw-bold">${producto.cantidad}x</span>`;
+              productosList.appendChild(li);
+          });
+        }
+      });
+
+      // Botón "Guardar Cambios" en el modal Actualizar Estado
+      const btnGuardarEstado = document.getElementById('btn-guardar-estado');
+      btnGuardarEstado.addEventListener('click', function() {
+        const selectEstadoPedido = document.getElementById('selectEstadoPedido');
+        nuevoEstadoSeleccionado = selectEstadoPedido.value;
+
+        const confirmacionActualizarMensaje = document.getElementById('confirmacion-actualizar-mensaje');
+        confirmacionActualizarMensaje.innerHTML = `¿Seguro que desea actualizar el estado del pedido <span class="fw-bold text-marron">#${currentPedidoId}</span> a <strong class="text-info">${nuevoEstadoSeleccionado}</strong>?`;
+
+        // Ocultar el modal de actualización, el de confirmación se abrirá inmediatamente.
+        bsActualizarEstadoModal.hide();
+      });
+
+      // 2. Modal Confirmación de Actualización de Estado
+      const confirmacionActualizarEstadoModal = document.getElementById('confirmacionActualizarEstadoModal');
+      const bsConfirmacionActualizarEstadoModal = new bootstrap.Modal(confirmacionActualizarEstadoModal, {
+          backdrop: 'static', // Asegura que el fondo permanezca
+          keyboard: false
+      });
+
+      // Botón "Sí, Actualizar" en el modal de Confirmación de Actualización
+      const btnConfirmarActualizacion = document.getElementById('btn-confirmar-actualizacion');
+      btnConfirmarActualizacion.addEventListener('click', function() {
+        // Lógica real para actualizar el estado en el backend
+        // Actualizar el estado en nuestros datos simulados
+        pedidosParaActualizar[currentPedidoId].estado = nuevoEstadoSeleccionado;
+
+        // Actualizar la tabla visualmente
+        const estadoSpan = document.getElementById(`estado-${currentPedidoId}`);
+        if (estadoSpan) {
+            estadoSpan.textContent = nuevoEstadoSeleccionado;
+            estadoSpan.className = `badge ${getBadgeClassForStatus(nuevoEstadoSeleccionado)}`;
+
+            // Deshabilitar botón si el estado es 'Entregado'
+            if (nuevoEstadoSeleccionado === 'Entregado') {
+                const row = estadoSpan.closest('tr');
+                if (row) {
+                    const updateButton = row.querySelector('.btn-actualizar-estado');
+                    if (updateButton) {
+                        updateButton.disabled = true;
+                        updateButton.classList.remove('btn-outline-primary');
+                        updateButton.classList.add('btn-outline-secondary');
+                        updateButton.title = 'Pedido Ya Entregado';
+                    }
+                }
+            }
+        }
+
+        const exitoMensaje = document.getElementById('exito-mensaje');
+        exitoMensaje.textContent = `¡El estado del pedido #${currentPedidoId} ha sido actualizado a "${nuevoEstadoSeleccionado}"!`;
+
+        // Ocultar el modal de confirmación (ya lo hace data-bs-target al abrir el de éxito)
+        bsConfirmacionActualizarEstadoModal.hide();
+      });
+
+      // Botón "Cancelar" en el modal de Confirmación de Actualización
+      const btnCancelarActualizacion = document.getElementById('btn-cancelar-actualizacion');
+      btnCancelarActualizacion.addEventListener('click', function() {
+          bsConfirmacionActualizarEstadoModal.hide(); // Ocultar el modal de confirmación
+          bsActualizarEstadoModal.show(); // Reabrir el modal de actualizar estado
+      });
+
+      // Ejecutar al cargar para el estado inicial de las tablas vacías
+      checkEmptyTables();
+    });
+  </script>
+</body>
+</html>
