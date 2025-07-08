@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap');
+:root {
+    --primary-color: #8C5A37;  /* Un marrón terracota, sofisticado y cálido */
+    --primary-hover: #6E462A;  /* Una versión más oscura para el hover */
+    --text-dark: #3D2C21;      /* Un marrón muy oscuro para texto principal */
+    --text-light: #6B5B51;     /* Un marrón más claro para texto secundario */
+    --border-color: #D3C5BC;   /* Un color suave para los bordes */
+    --container-bg: rgba(255, 255, 255, 0.75); /* Fondo blanco semitransparente */
+}
+
+body {
+    background-image: url(../files/img/pan-rtzqhi1ok4k1bxlo.jpg);
+    background-repeat: no-repeat;                 
+    background-size: cover;                                
+    height: 100vh;                                     
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Lato', sans-serif;
+}
+.logo-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(140, 90, 55, 0.4);
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    animation: bounce 2s infinite;
+    transition: all 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(140, 90, 55, 0.5);
+}
+
+.login-container {
+    background: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+.logo {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+/* Contenedor específico para el logo con imagen */
+.logo.animated-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+    animation: bounce 2s infinite;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 70%;
+    backdrop-filter: blur(5px);
+    width: 120px;
+    height: 120px;
+    box-shadow: 0 10px 30px rgba(140, 90, 55, 0.3);
+    font-size: initial;
+}
+
+.logo.animated-logo img {
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(140, 90, 55, 0.3);
+    border-radius: 50%;
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--text-dark);
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    font-weight: bold;
+}
+
+input[type="text"], input[type="password"], input[type="email"], select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(140, 90, 55, 0.2);
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(140, 90, 55, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(140, 90, 55, 0.3);
+}
+
+.footer-links {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+    color: var(--text-dark);
+}
+
+.loading-spinner {
+    border: 3px solid rgba(140, 90, 55, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+0%, 100% {
+    transform: translateY(0);
+}
+    50% {
+        transform: translateY(-10px);
+    }
+}
+.success-message{
+    font-family: 'Exo 2', sans-serif;
+    color: var(--text-dark);
+    margin-bottom: 30px;
+    font-size: 16px;
+}

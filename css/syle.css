@@ -1,0 +1,180 @@
+/* styles-admin.css */
+
+/* Variables de color (opcional, pero buena práctica si se extiende mucho) */
+:root {
+  --marron-panadero: #8D6E63; /* */
+  --gris-oscuro: #3E2723; /* */
+  --crema-vainilla: #FFF3E0; /* */
+  --blanco-calido: #FAF9F6; /* */
+  --verde-romero: #81C784; /* */
+  --rojo-dulce: #E57373; /* */
+}
+
+/* Sidebar Offcanvas - Estilos base */
+.sidebar-panel {
+  width: 250px; /* Ancho del sidebar cuando está abierto */
+  background-color: var(--gris-oscuro) !important; /* Gris Oscuro para el fondo del sidebar */
+  color: var(--crema-vainilla) !important; /* Crema Vainilla para el texto */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease; /* Transición para un posible cambio de ancho */
+}
+
+/* Título/Logo en el Sidebar (para desktop) */
+.sidebar-heading {
+    padding: 1.5rem;
+    font-size: 1.2rem;
+    color: var(--crema-vainilla); /* */
+    display: flex;
+    align-items: center;
+}
+.sidebar-heading img {
+    margin-right: 10px;
+}
+
+/* Ítems de la lista del Sidebar */
+.sidebar-panel .list-group-item {
+  border-radius: 0;
+  color: var(--crema-vainilla) !important; /* */
+  padding: 0.85rem 1.5rem;
+  font-family: 'Poppins', sans-serif; /* Poppins para navegación */
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-panel .list-group-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important; /* Un gris muy sutil al hover */
+  color: var(--crema-vainilla) !important; /* */
+}
+
+.sidebar-panel .list-group-item.active-sidebar {
+  background-color: var(--marron-panadero) !important; /* Marrón Panadero para el elemento activo */
+  color: var(--crema-vainilla) !important; /* */
+  font-weight: 600; /* */
+  border-left: 5px solid var(--crema-vainilla); /* Indicador visual de activo */
+  padding-left: calc(1.5rem - 5px); /* Ajuste de padding */
+}
+
+/* Estilos de Iconos en el Sidebar */
+.sidebar-panel .list-group-item i {
+  font-size: 1.2rem;
+  width: 24px; /* Ancho fijo para alinear los iconos */
+  text-align: center;
+}
+
+/* Contenido Principal */
+#page-content-wrapper {
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  background-color: var(--blanco-calido) !important; /* Blanco Cálido para el fondo del contenido */
+  flex-grow: 1; /* Para que ocupe el espacio restante */
+}
+
+/* Navbar Superior del Panel */
+.navbar-dark.bg-gris-oscuro {
+    background-color: var(--gris-oscuro) !important; /* */
+}
+.navbar-dark .navbar-brand {
+    color: var(--crema-vainilla) !important; /* */
+    font-family: 'Poppins', sans-serif; /* */
+}
+.navbar-dark .btn-outline-crema {
+    color: var(--crema-vainilla) !important; /* */
+    border-color: var(--crema-vainilla) !important; /* */
+}
+.navbar-dark .btn-outline-crema:hover {
+    background-color: var(--crema-vainilla) !important; /* */
+    color: var(--gris-oscuro) !important; /* */
+}
+
+/* Tarjetas de Resumen */
+.card.bg-crema {
+    background-color: var(--crema-vainilla) !important; /* */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.card.bg-crema i {
+    color: var(--marron-panadero) !important; /* */
+}
+/* Específico para el icono de Productos Activos (verde) */
+.card.bg-crema i.bi-check-circle-fill {
+    color: var(--verde-romero) !important; /* */
+}
+.card.bg-crema .card-title {
+    color: var(--gris-oscuro) !important; /* */
+    font-family: 'Poppins', sans-serif; /* */
+}
+.card.bg-crema .card-text {
+    color: var(--marron-panadero) !important; /* */
+    font-family: 'Quicksand', sans-serif; /* */
+}
+/* Si el texto no es el primario, usar gris oscuro */
+.card.bg-crema .card-text.text-gris-oscuro {
+    color: var(--gris-oscuro) !important; /* */
+}
+
+/* Secciones de Gestión (botones) */
+.btn-outline-marron {
+  color: var(--marron-panadero) !important; /* */
+  border-color: var(--marron-panadero) !important; /* */
+  font-family: 'Poppins', sans-serif; /* */
+  font-weight: bold; /* */
+  transition: all 0.3s ease; /* */
+}
+.btn-outline-marron:hover {
+  background-color: var(--marron-panadero) !important; /* */
+  color: var(--crema-vainilla) !important; /* */
+}
+
+.btn-verde-romero {
+  background-color: var(--verde-romero) !important; /* */
+  border-color: var(--verde-romero) !important; /* */
+  color: white !important; /* Asumo blanco para un buen contraste */
+  font-family: 'Poppins', sans-serif; /* */
+  font-weight: bold; /* */
+  transition: all 0.3s ease; /* */
+}
+.btn-verde-romero:hover {
+  background-color: darken(#81C784, 10%) !important; /* Oscurecer al hover */
+  border-color: darken(#81C784, 10%) !important;
+}
+
+.btn-rojo-dulce {
+  background-color: var(--rojo-dulce) !important; /* */
+  border-color: var(--rojo-dulce) !important; /* */
+  color: white !important;
+  font-family: 'Poppins', sans-serif; /* */
+  font-weight: bold; /* */
+  transition: all 0.3s ease; /* */
+}
+.btn-rojo-dulce:hover {
+  background-color: darken(#E57373, 10%) !important; /* Oscurecer al hover */
+  border-color: darken(#E57373, 10%) !important;
+}
+
+
+/* Media Queries para comportamiento del Offcanvas en Desktop */
+@media (min-width: 992px) { /* Para pantallas 'lg' y superiores */
+  .sidebar-panel {
+    position: sticky; /* Se mantiene en la posición mientras haces scroll */
+    top: 0;
+    height: 100vh; /* Ocupa la altura completa del viewport */
+    width: 250px; /* Asegura el ancho en desktop */
+    transform: translateX(0) !important; /* Asegura que siempre esté visible */
+    visibility: visible !important;
+  }
+  .sidebar-panel .offcanvas-header {
+    display: none !important; /* Oculta el botón de cerrar en desktop */
+  }
+  #page-content-wrapper {
+    margin-left: 250px; /* Deja espacio para el sidebar */
+  }
+  .navbar-dark .btn-primary.d-lg-none { /* Oculta el botón del toggler del sidebar en desktop */
+    display: none !important;
+  }
+}
+
+/* Pequeño ajuste para el botón de cerrar Offcanvas en móviles */
+.offcanvas-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Hace que la X sea visible en fondo oscuro */
+}

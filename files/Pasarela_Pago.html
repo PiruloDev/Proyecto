@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos Pan&Code</title>
+  <link rel="icon" type="image/x-icon" href="./IMG/LogoPan&Code.png">
+  <link rel="stylesheet" href="../Pedidos%20Pan&Code/style.css">
+  <link rel="stylesheet" href="./Bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+
+<body>
+      <div class="main-wrapper">
+<nav class="navbar navbar-expand-md navbar-light">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarToggler">
+      <a class="navbar-brand" href="#">
+        <img src="IMG/LogoPan&Code.png" width="100" alt="LogoPan&Code">
+        </a>
+    
+      <ul class="navbar-nav d-flex justify-content-center align-items-center">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Menú</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pedidos</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="#">Contactenos</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="#">Mi cuenta</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+  <div class="row">
+
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <img src="../Pedidos%20Pan&Code/IMG/jamon%20y%20queso.jpeg" class="img-fluid rounded-top" alt="Jamón y Queso">
+        <div class="card-body">
+          <h5 class="card-title">Pan de Jamón y Queso</h5>
+          <p class="card-text">Pan artesanal de corteza dorada, relleno con finas láminas de jamón ahumado y una mezcla de quesos maduros, fundidos lentamente para realzar su sabor. Ideal para paladares exigentes.</p>
+          <p class="card-text"><small class="text-muted">Última actualización hace 4 horas</small></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna 2: Contador de cantidad -->
+    <div class="col-md-4 d-flex align-items-center">
+      <div class="card w-100 p-3">
+        <h5 class="card-title text-center">Cantidad</h5>
+        <p class="card-text text-center">Precio unitario: <strong>$8.000</strong></p>
+        <div class="d-flex justify-content-center align-items-center gap-2">
+          <button class="btn btn-outline-danger" onclick="modificarCantidad(-1)">−</button>
+          <input type="text" id="cantidad" class="form-control text-center" value="1" style="width: 60px;" readonly>
+          <button class="btn btn-outline-success" onclick="modificarCantidad(1)">+</button>
+        </div>
+        <p class="mt-3 text-center">Subtotal: <strong id="subtotal">$8.000</strong></p>
+      </div>
+    </div>
+
+    <!-- Columna 3: Totales del carrito -->
+    <div class="col-md-4 d-flex">
+  <div class="card p-4 w-100">
+    <div class="card-body d-flex flex-column justify-content-between h-100">
+      <h5 class="card-title text-center mb-3">Totales del carrito</h5>
+
+      <ul class="list-unstyled">
+        <li class="mb-2">Subtotal: <span id="subtotalTexto"><strong>$8.000</strong></span></li>
+        <li class="mb-2">Envío: <strong>$2.500</strong></li>
+        <li class="mb-2">Total: <strong id="totalTexto" class="text-success">$10.500</strong></li>
+      </ul>
+
+      <a href="../Pedidos Pan&Code/Contacto para envio.html" class="btn btn-primary w-100 mt-3">Finalizar compra</a>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+
+<script>
+  const precioUnitario = 8000;
+  const envio = 2500;
+
+  function modificarCantidad(cambio) {
+    const cantidadInput = document.getElementById("cantidad");
+    const subtotalTexto = document.getElementById("subtotal");
+    const subtotalResumen = document.getElementById("subtotalTexto");
+    const totalResumen = document.getElementById("totalTexto");
+
+    let cantidad = parseInt(cantidadInput.value);
+    cantidad += cambio;
+    if (cantidad < 1) cantidad = 1;
+
+    cantidadInput.value = cantidad;
+
+    const nuevoSubtotal = cantidad * precioUnitario;
+    const total = nuevoSubtotal + envio;
+
+    subtotalTexto.textContent = "$" + nuevoSubtotal.toLocaleString("es-CO");
+    subtotalResumen.textContent = "$" + nuevoSubtotal.toLocaleString("es-CO");
+    totalResumen.textContent = "$" + total.toLocaleString("es-CO");
+  }
+</script>
+
+<nav class="navbar navbar-light bg-light py-3">
+  <div class="container d-flex flex-column align-items-center">
+    <a class="navbar-brand fs-3 text-center mb-3">¿Quieres seguir agregando productos?</a>
+    <form class="d-flex w-100 justify-content-center" style="max-width: 600px;">
+      <input class="form-control me-2" type="search" placeholder="Buscar..." aria-label="Buscar">
+      <button class="btn btn-outline-success" type="submit">Buscar</button>
+    </form>
+  </div>
+</nav>
+
+
+
+<footer class="main-footer bg-dark text-white py-4">
+  <div class="container">
+    <div class="row text-center text-md-start align-items-start">
+      
+      <div class="col-md-4 mb-4">
+        <h2 class="fw-bold">El castillo del pan</h2>
+         <p class="fw-bold">Principal Carrera 11 # 72 - 58 SUR Bosa el Recreo</p>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <h5 class="fw-semibold">Horarios de Atención</h5>
+        <p class="mb-1">Lunes a sábado: 8:00 am a 5:00 pm</p>
+        <p class="mb-1">Domingo: 8:30 am a 4:00 pm</p>
+        <p><strong>contactenos@elcastillodelpan.com.co</strong></p>
+      </div>
+
+      <div class="col-md-4 mb-4 text-center text-md-end d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-md-end">
+  <div class="me-md-3">
+    <p class="mb-0">&copy; 2025 El castillo del pan</p>
+    <p class="mb-2">Todos los derechos reservados.</p>
+  </div>
+  <div class="d-flex align-items-center">
+    <a href="https://facebook.com" class="text-white me-3">
+      <i class="bi bi-facebook fs-4"></i>
+    </a>
+    <a href="https://instagram.com" class="text-white me-3">
+      <i class="bi bi-instagram fs-4"></i>
+    </a>
+    <a href="https://wa.me/1234567890" class="text-white">
+      <i class="bi bi-whatsapp fs-4"></i>
+    </a>
+  </div>
+</div>
+</footer>
+
+  <script src="./Bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
