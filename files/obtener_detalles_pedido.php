@@ -38,11 +38,12 @@ if (!$pedido) {
 }
 
 // Obtener detalles del pedido
-$query_detalles = "SELECT dp.*, pr.NOMBRE_PRODUCTO as producto_nombre, 
-                          pr.TIPO_PRODUCTO_MARCA as producto_imagen
+$query_detalles = "SELECT dp.*, pr.ID_PRODUCTO as producto_id, pr.NOMBRE_PRODUCTO as producto_nombre, 
+                          COALESCE(pr.DESCRIPCION_PRODUCTO, pr.TIPO_PRODUCTO_MARCA, '') as producto_descripcion
                    FROM Detalle_Pedidos dp
                    JOIN Productos pr ON dp.ID_PRODUCTO = pr.ID_PRODUCTO
-                   WHERE dp.ID_PEDIDO = ?";
+                   WHERE dp.ID_PEDIDO = ?
+                   ORDER BY dp.ID_DETALLE";
 $stmt_detalles = mysqli_prepare($conexion, $query_detalles);
 mysqli_stmt_bind_param($stmt_detalles, 'i', $pedido_id);
 mysqli_stmt_execute($stmt_detalles);
@@ -117,8 +118,8 @@ $result_detalles = mysqli_stmt_get_result($stmt_detalles);
         <table class="table table-striped">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Producto</th>
-                    <th>Imagen</th>
                     <th>Cantidad</th>
                     <th>Precio Unit.</th>
                     <th>Subtotal</th>
@@ -132,15 +133,20 @@ $result_detalles = mysqli_stmt_get_result($stmt_detalles);
                     $total_verificacion += $subtotal;
                 ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($detalle['producto_nombre']); ?></td>
                         <td>
-                            <div class="bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 5px;">
-                                <i class="fas fa-bread-slice text-muted"></i>
+                            <span class="badge bg-info">#<?php echo $detalle['producto_id']; ?></span>
+                        </td>
+                        <td>
+                            <div>
+                                <div class="fw-bold"><?php echo htmlspecialchars($detalle['producto_nombre']); ?></div>
+                                <?php if (!empty($detalle['producto_descripcion'])): ?>
+                                    <small class="text-muted"><?php echo htmlspecialchars($detalle['producto_descripcion']); ?></small>
+                                <?php endif; ?>
                             </div>
                         </td>
                         <td><span class="badge bg-primary"><?php echo $detalle['CANTIDAD_PRODUCTO']; ?></span></td>
                         <td>$<?php echo number_format($detalle['PRECIO_UNITARIO'], 2); ?></td>
-                        <td><strong>$<?php echo number_format($subtotal, 2); ?></strong></td>
+                        <td><strong class="text-success">$<?php echo number_format($subtotal, 2); ?></strong></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>

@@ -10,6 +10,13 @@ if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_tipo'] !== 'admi
 
 require_once 'conexion.php';
 
+// Función para registrar cambios en el log
+function registrarCambio($conexion, $producto_id, $tipo_cambio, $valor_anterior, $valor_nuevo, $usuario_id, $ip_usuario) {
+    $stmt = $conexion->prepare("INSERT INTO productos_logs (producto_id, tipo_cambio, valor_anterior, valor_nuevo, usuario_id, usuario_tipo, ip_usuario) VALUES (?, ?, ?, ?, ?, 'admin', ?)");
+    $stmt->bind_param("isssss", $producto_id, $tipo_cambio, $valor_anterior, $valor_nuevo, $usuario_id, $ip_usuario);
+    $stmt->execute();
+}
+
 // Verificar que sea una petición POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Content-Type: application/json');
@@ -21,6 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $producto_id = intval($_POST['producto_id'] ?? 0);
 $accion = $_POST['accion'] ?? '';
 $nuevo_valor = $_POST['nuevo_valor'] ?? '';
+
+// Obtener información del usuario y IP
+$usuario_id = $_SESSION['usuario_id'] ?? 0;
+$ip_usuario = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
 // Validar datos
 if ($producto_id <= 0 || empty($accion)) {
@@ -56,6 +67,9 @@ try {
             $stmt->bind_param("di", $nuevo_precio, $producto_id);
             
             if ($stmt->execute()) {
+                // Registrar el cambio en el log
+                registrarCambio($conexion, $producto_id, 'precio', $producto['PRECIO_PRODUCTO'], $nuevo_precio, $usuario_id, $ip_usuario);
+                
                 $response['success'] = true;
                 $response['message'] = 'Precio actualizado correctamente';
                 $response['nuevo_precio'] = $nuevo_precio;
@@ -75,6 +89,9 @@ try {
             $stmt->bind_param("ii", $nuevo_stock, $producto_id);
             
             if ($stmt->execute()) {
+                // Registrar el cambio en el log
+                registrarCambio($conexion, $producto_id, 'stock', $producto['PRODUCTO_STOCK_MIN'], $nuevo_stock, $usuario_id, $ip_usuario);
+                
                 $response['success'] = true;
                 $response['message'] = 'Stock actualizado correctamente';
                 $response['nuevo_stock'] = $nuevo_stock;
@@ -95,6 +112,9 @@ try {
             $stmt->bind_param("ii", $nuevo_stock, $producto_id);
             
             if ($stmt->execute()) {
+                // Registrar el cambio en el log
+                registrarCambio($conexion, $producto_id, 'stock', $producto['PRODUCTO_STOCK_MIN'], $nuevo_stock, $usuario_id, $ip_usuario);
+                
                 $response['success'] = true;
                 $response['message'] = "Stock incrementado en $incremento unidades";
                 $response['nuevo_stock'] = $nuevo_stock;
@@ -120,6 +140,9 @@ try {
             $stmt->bind_param("ii", $nuevo_stock, $producto_id);
             
             if ($stmt->execute()) {
+                // Registrar el cambio en el log
+                registrarCambio($conexion, $producto_id, 'stock', $producto['PRODUCTO_STOCK_MIN'], $nuevo_stock, $usuario_id, $ip_usuario);
+                
                 $response['success'] = true;
                 $response['message'] = "Stock decrementado en $decremento unidades";
                 $response['nuevo_stock'] = $nuevo_stock;

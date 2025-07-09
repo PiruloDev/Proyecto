@@ -110,21 +110,55 @@ if (!$resultado) {
                         <td><?php echo htmlspecialchars($fila['ID_PRODUCTO']); ?></td>
                         <td><?php echo htmlspecialchars($fila['NOMBRE_PRODUCTO']); ?></td>
                         <td class="precio">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span id="precio-tabla-<?php echo $fila['ID_PRODUCTO']; ?>" style="font-weight: 600;">
+                            <div class="editable-cell" data-producto-id="<?php echo $fila['ID_PRODUCTO']; ?>" data-field="precio">
+                                <span class="value-display" id="precio-display-<?php echo $fila['ID_PRODUCTO']; ?>">
                                     $<?php echo number_format($fila['PRECIO_PRODUCTO'], 0, ',', '.'); ?>
                                 </span>
-                                <button onclick="editarPrecioTabla(<?php echo $fila['ID_PRODUCTO']; ?>, <?php echo $fila['PRECIO_PRODUCTO']; ?>)" 
-                                        class="btn-edit-precio"
-                                        title="Editar precio"
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 4px 6px; border-radius: 15px; cursor: pointer; display: flex; align-items: center; font-size: 0.7em; transition: all 0.3s ease;"
-                                        onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)';"
-                                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">edit</span>
+                                <input type="number" 
+                                       class="value-input" 
+                                       id="precio-input-<?php echo $fila['ID_PRODUCTO']; ?>"
+                                       value="<?php echo $fila['PRECIO_PRODUCTO']; ?>"
+                                       min="0.01" 
+                                       step="0.01"
+                                       style="display: none;">
+                                <div class="edit-controls" style="display: none;">
+                                    <button class="btn-save" onclick="guardarCambio(<?php echo $fila['ID_PRODUCTO']; ?>, 'precio')" title="Guardar">
+                                        <span class="material-symbols-outlined">check</span>
+                                    </button>
+                                    <button class="btn-cancel" onclick="cancelarEdicion(<?php echo $fila['ID_PRODUCTO']; ?>, 'precio')" title="Cancelar">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <button class="btn-edit" onclick="editarCampo(<?php echo $fila['ID_PRODUCTO']; ?>, 'precio')" title="Editar precio">
+                                    <span class="material-symbols-outlined">edit</span>
                                 </button>
                             </div>
                         </td>
-                        <td><?php echo htmlspecialchars($fila['PRODUCTO_STOCK_MIN']); ?></td>
+                        <td class="stock">
+                            <div class="editable-cell" data-producto-id="<?php echo $fila['ID_PRODUCTO']; ?>" data-field="stock">
+                                <span class="value-display" id="stock-display-<?php echo $fila['ID_PRODUCTO']; ?>">
+                                    <?php echo htmlspecialchars($fila['PRODUCTO_STOCK_MIN']); ?>
+                                </span>
+                                <input type="number" 
+                                       class="value-input" 
+                                       id="stock-input-<?php echo $fila['ID_PRODUCTO']; ?>"
+                                       value="<?php echo $fila['PRODUCTO_STOCK_MIN']; ?>"
+                                       min="0" 
+                                       step="1"
+                                       style="display: none;">
+                                <div class="edit-controls" style="display: none;">
+                                    <button class="btn-save" onclick="guardarCambio(<?php echo $fila['ID_PRODUCTO']; ?>, 'stock')" title="Guardar">
+                                        <span class="material-symbols-outlined">check</span>
+                                    </button>
+                                    <button class="btn-cancel" onclick="cancelarEdicion(<?php echo $fila['ID_PRODUCTO']; ?>, 'stock')" title="Cancelar">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <button class="btn-edit" onclick="editarCampo(<?php echo $fila['ID_PRODUCTO']; ?>, 'stock')" title="Editar stock">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </div>
+                        </td>
                         <td><?php echo htmlspecialchars($fila['TIPO_PRODUCTO_MARCA']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($fila['FECHA_VENCIMIENTO_PRODUCTO'])); ?></td>
                         <td>
@@ -1230,6 +1264,240 @@ if (!$resultado) {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
+        }
+
+        // =================================================================
+        // FUNCIONES PARA EDICIÓN INLINE EN LA TABLA
+        // =================================================================
+
+        // Función para editar campo (precio o stock)
+        function editarCampo(productoId, campo) {
+            const displayElement = document.getElementById(`${campo}-display-${productoId}`);
+            const inputElement = document.getElementById(`${campo}-input-${productoId}`);
+            const editButton = displayElement.parentElement.querySelector('.btn-edit');
+            const controlsElement = displayElement.parentElement.querySelector('.edit-controls');
+            
+            // Ocultar display y botón editar
+            displayElement.style.display = 'none';
+            editButton.style.display = 'none';
+            
+            // Mostrar input y controles
+            inputElement.style.display = 'inline-block';
+            controlsElement.style.display = 'inline-flex';
+            
+            // Focus en el input
+            inputElement.focus();
+            inputElement.select();
+            
+            // Agregar evento para guardar con Enter
+            inputElement.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    guardarCambio(productoId, campo);
+                } else if (e.key === 'Escape') {
+                    cancelarEdicion(productoId, campo);
+                }
+            });
+        }
+
+        // Función para cancelar edición
+        function cancelarEdicion(productoId, campo) {
+            const displayElement = document.getElementById(`${campo}-display-${productoId}`);
+            const inputElement = document.getElementById(`${campo}-input-${productoId}`);
+            const editButton = displayElement.parentElement.querySelector('.btn-edit');
+            const controlsElement = displayElement.parentElement.querySelector('.edit-controls');
+            
+            // Restaurar valor original
+            const valorOriginal = displayElement.textContent.replace(/[$,\s]/g, '').replace('unidades', '');
+            inputElement.value = valorOriginal;
+            
+            // Mostrar display y botón editar
+            displayElement.style.display = 'inline-block';
+            editButton.style.display = 'inline-flex';
+            
+            // Ocultar input y controles
+            inputElement.style.display = 'none';
+            controlsElement.style.display = 'none';
+        }
+
+        // Función para guardar cambio
+        function guardarCambio(productoId, campo) {
+            const inputElement = document.getElementById(`${campo}-input-${productoId}`);
+            const nuevoValor = parseFloat(inputElement.value);
+            
+            // Validaciones
+            if (isNaN(nuevoValor)) {
+                alert('Por favor ingrese un valor numérico válido');
+                inputElement.focus();
+                return;
+            }
+            
+            if (campo === 'precio' && nuevoValor <= 0) {
+                alert('El precio debe ser mayor a 0');
+                inputElement.focus();
+                return;
+            }
+            
+            if (campo === 'stock' && nuevoValor < 0) {
+                alert('El stock no puede ser negativo');
+                inputElement.focus();
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const displayElement = document.getElementById(`${campo}-display-${productoId}`);
+            const editableCell = displayElement.parentElement;
+            const valorOriginal = displayElement.textContent;
+            
+            editableCell.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; color: #007bff;">
+                    <span class="material-symbols-outlined">sync</span>
+                    Guardando...
+                </div>
+            `;
+            
+            // Realizar petición AJAX
+            const accion = campo === 'precio' ? 'actualizar_precio' : 'actualizar_stock';
+            
+            fetch('actualizar_producto_stock_precio.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `producto_id=${productoId}&accion=${accion}&nuevo_valor=${nuevoValor}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar exitosamente
+                    restaurarCeldaEditable(productoId, campo, data[`nuevo_${campo}`] || nuevoValor);
+                    
+                    // Mostrar notificación de éxito
+                    mostrarNotificacionInline(`${campo} actualizado correctamente`, 'success');
+                } else {
+                    // Error al actualizar
+                    restaurarCeldaEditableConError(productoId, campo, valorOriginal);
+                    mostrarNotificacionInline(`Error: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                restaurarCeldaEditableConError(productoId, campo, valorOriginal);
+                mostrarNotificacionInline('Error de conexión. Intente nuevamente.', 'error');
+            });
+        }
+
+        // Función para restaurar celda editable después de guardar
+        function restaurarCeldaEditable(productoId, campo, nuevoValor) {
+            const editableCell = document.querySelector(`[data-producto-id="${productoId}"][data-field="${campo}"]`);
+            const valorFormateado = campo === 'precio' ? `$${formatearPrecio(nuevoValor)}` : nuevoValor;
+            
+            editableCell.innerHTML = `
+                <span class="value-display" id="${campo}-display-${productoId}">
+                    ${valorFormateado}
+                </span>
+                <input type="number" 
+                       class="value-input" 
+                       id="${campo}-input-${productoId}"
+                       value="${nuevoValor}"
+                       min="${campo === 'precio' ? '0.01' : '0'}" 
+                       step="${campo === 'precio' ? '0.01' : '1'}"
+                       style="display: none;">
+                <div class="edit-controls" style="display: none;">
+                    <button class="btn-save" onclick="guardarCambio(${productoId}, '${campo}')" title="Guardar">
+                        <span class="material-symbols-outlined">check</span>
+                    </button>
+                    <button class="btn-cancel" onclick="cancelarEdicion(${productoId}, '${campo}')" title="Cancelar">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <button class="btn-edit" onclick="editarCampo(${productoId}, '${campo}')" title="Editar ${campo}">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+            `;
+            
+            // Efecto de resaltado para indicar que se guardó
+            const displayElement = document.getElementById(`${campo}-display-${productoId}`);
+            displayElement.style.backgroundColor = '#d4edda';
+            displayElement.style.color = '#155724';
+            displayElement.style.padding = '4px 8px';
+            displayElement.style.borderRadius = '4px';
+            displayElement.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                displayElement.style.backgroundColor = '';
+                displayElement.style.color = '';
+                displayElement.style.padding = '';
+            }, 2000);
+        }
+
+        // Función para restaurar celda en caso de error
+        function restaurarCeldaEditableConError(productoId, campo, valorOriginal) {
+            const editableCell = document.querySelector(`[data-producto-id="${productoId}"][data-field="${campo}"]`);
+            const valorSinFormato = valorOriginal.replace(/[$,\s]/g, '').replace('unidades', '');
+            
+            editableCell.innerHTML = `
+                <span class="value-display" id="${campo}-display-${productoId}">
+                    ${valorOriginal}
+                </span>
+                <input type="number" 
+                       class="value-input" 
+                       id="${campo}-input-${productoId}"
+                       value="${valorSinFormato}"
+                       min="${campo === 'precio' ? '0.01' : '0'}" 
+                       step="${campo === 'precio' ? '0.01' : '1'}"
+                       style="display: none;">
+                <div class="edit-controls" style="display: none;">
+                    <button class="btn-save" onclick="guardarCambio(${productoId}, '${campo}')" title="Guardar">
+                        <span class="material-symbols-outlined">check</span>
+                    </button>
+                    <button class="btn-cancel" onclick="cancelarEdicion(${productoId}, '${campo}')" title="Cancelar">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <button class="btn-edit" onclick="editarCampo(${productoId}, '${campo}')" title="Editar ${campo}">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+            `;
+        }
+
+        // Función para mostrar notificaciones inline
+        function mostrarNotificacionInline(mensaje, tipo) {
+            const notificacion = document.createElement('div');
+            notificacion.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                background: ${tipo === 'success' ? '#28a745' : '#dc3545'};
+            `;
+            notificacion.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">${tipo === 'success' ? 'check_circle' : 'error'}</span>
+                    ${mensaje}
+                </div>
+            `;
+            
+            document.body.appendChild(notificacion);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notificacion.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto-remover
+            setTimeout(() => {
+                notificacion.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notificacion);
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>

@@ -602,206 +602,241 @@ body {
     }
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-    
-    .header-section {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .header-section h1 {
-        font-size: 2rem;
-    }
-    
-    .tabla-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .filtro-busqueda {
-        width: 100%;
-    }
-    
-    .filtro-busqueda input {
-        width: 100%;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        width: 95%;
-        margin: 10% auto;
-    }
-    
-    .modal-actions {
-        flex-direction: column;
-    }
-    
-    .modal-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .acciones {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .btn-action {
-        width: 35px;
-        height: 35px;
-    }
-}
+/* ===============================================
+   ESTILOS PARA EDICIÓN INLINE EN TABLA
+   =============================================== */
 
-@media (max-width: 480px) {
-    .header-section h1 {
-        font-size: 1.5rem;
-    }
-    
-    .tabla-contenedor {
-        font-size: 0.8rem;
-    }
-    
-    #tabla-productos th,
-    #tabla-productos td {
-        padding: 8px 6px;
-    }
-    
-    .modal-body {
-        padding: 20px;
-    }
-    
-    .modal-header {
-        padding: 15px 20px;
-    }
-}
-
-/* Estilos para el contenido de gestión */
-.gestion-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    margin-bottom: 30px;
-}
-
-.gestion-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 25px;
-    border-left: 4px solid var(--primary-color);
-}
-
-.gestion-card h3 {
-    color: var(--text-dark);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.info-label {
-    font-weight: 600;
-    color: var(--text-light);
-}
-
-.info-value {
-    font-weight: 500;
-    color: var(--text-dark);
-}
-
-.precio-valor {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: var(--success-color);
-}
-
-/* Botones de acción en gestión */
-.gestion-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.gestion-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-    color: var(--white);
-    border: none;
-    padding: 12px 20px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
+/* Contenedor de celda editable */
+.editable-cell {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
-    justify-content: center;
-    transition: var(--transition);
-    font-family: 'Exo 2', sans-serif;
+    padding: 4px;
+    min-height: 40px;
+    position: relative;
 }
 
-.gestion-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(140, 90, 55, 0.3);
-}
-
-.gestion-btn.eliminar {
-    background: linear-gradient(135deg, var(--danger-color) 0%, rgba(244, 67, 54, 0.9) 100%);
-}
-
-.gestion-btn.eliminar:hover {
-    box-shadow: 0 4px 20px rgba(244, 67, 54, 0.3);
-}
-
-.gestion-btn.historial {
-    background: linear-gradient(135deg, var(--info-color) 0%, rgba(33, 150, 243, 0.9) 100%);
-}
-
-.gestion-btn.historial:hover {
-    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
-}
-
-/* Separador */
-.modal-separator {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 2px solid #eee;
-}
-
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--light-gray);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
+/* Display de valor */
+.editable-cell .value-display {
+    font-weight: 600;
+    padding: 6px 8px;
     border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: default;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
+/* Input de edición */
+.editable-cell .value-input {
+    padding: 6px 8px;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100px;
+    background: white;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+.editable-cell .value-input:focus {
+    outline: none;
+    border-color: var(--info-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    transform: scale(1.02);
+}
+
+/* Botón de editar */
+.editable-cell .btn-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    min-width: 32px;
+    height: 32px;
+}
+
+.editable-cell:hover .btn-edit {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.editable-cell .btn-edit .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* Controles de edición */
+.editable-cell .edit-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.editable-cell .btn-save,
+.editable-cell .btn-cancel {
+    border: none;
+    padding: 4px 6px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    transition: all 0.3s ease;
+    min-width: 28px;
+    height: 28px;
+}
+
+.editable-cell .btn-save {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.editable-cell .btn-save:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.editable-cell .btn-cancel {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+}
+
+.editable-cell .btn-cancel:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.editable-cell .btn-save .material-symbols-outlined,
+.editable-cell .btn-cancel .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* Estilos específicos para precio */
+.precio .editable-cell {
+    justify-content: flex-start;
+}
+
+.precio .value-display {
+    color: #28a745;
+    font-size: 1.1em;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+/* Estilos específicos para stock */
+.stock .editable-cell {
+    justify-content: flex-start;
+}
+
+.stock .value-display {
+    color: #17a2b8;
+    font-size: 1.1em;
+    background: rgba(23, 162, 184, 0.1);
+    border: 1px solid rgba(23, 162, 184, 0.2);
+}
+
+/* Efecto de carga */
+.editable-cell .loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #007bff;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.editable-cell .loading .material-symbols-outlined {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Efecto de éxito */
+.editable-cell .success-highlight {
+    background: rgba(40, 167, 69, 0.2) !important;
+    color: #155724 !important;
+    border: 1px solid rgba(40, 167, 69, 0.4) !important;
+    animation: successPulse 2s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive para dispositivos móviles */
+@media (max-width: 768px) {
+    .editable-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        min-height: auto;
+    }
+    
+    .editable-cell .value-input {
+        width: 80px;
+        font-size: 12px;
+    }
+    
+    .editable-cell .btn-edit,
+    .editable-cell .btn-save,
+    .editable-cell .btn-cancel {
+        min-width: 24px;
+        height: 24px;
+        padding: 2px 4px;
+    }
+    
+    .editable-cell .btn-edit .material-symbols-outlined,
+    .editable-cell .btn-save .material-symbols-outlined,
+    .editable-cell .btn-cancel .material-symbols-outlined {
+        font-size: 12px;
+    }
+}
+
+/* Tooltip para botones */
+.editable-cell [title] {
+    position: relative;
+}
+
+.editable-cell [title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 4px;
+}
+
+.editable-cell [title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
 }

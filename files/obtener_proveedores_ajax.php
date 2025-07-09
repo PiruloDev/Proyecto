@@ -1,5 +1,26 @@
 <?php
-header('Content-Type: application/json');
+session_start();
+
+// Headers de seguridad
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+header('Content-Type: application/json; charset=utf-8');
+
+// Verificación de autenticación
+if (!isset($_SESSION['usuario_logueado']) || 
+    $_SESSION['usuario_logueado'] !== true || 
+    !isset($_SESSION['usuario_tipo']) || 
+    $_SESSION['usuario_tipo'] !== 'admin') {
+    
+    http_response_code(401);
+    echo json_encode([
+        'success' => false,
+        'error' => 'No autorizado'
+    ]);
+    exit();
+}
+
 require_once 'conexion.php';
 
 try {

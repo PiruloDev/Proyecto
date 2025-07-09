@@ -73,9 +73,19 @@ try {
     $salt = bin2hex(random_bytes(16)); // Generar salt aleatorio
     $password_hash = hash('sha256', $password . $salt);
     
-    // Insertar el nuevo empleado
-    $consulta_insertar = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASEÑA_EMPLEADO, SALT_EMPLEADO, ACTIVO_EMPLEADO, FECHA_REGISTRO) 
-                          VALUES (?, ?, ?, ?, 1, NOW())";
+    // Verificar si la columna FECHA_REGISTRO existe en la tabla
+    $check_column = "SHOW COLUMNS FROM Empleados LIKE 'FECHA_REGISTRO'";
+    $column_result = $conexion->query($check_column);
+    $fecha_registro_exists = ($column_result && $column_result->num_rows > 0);
+    
+    // Insertar el nuevo empleado (con o sin FECHA_REGISTRO dependiendo de si existe)
+    if ($fecha_registro_exists) {
+        $consulta_insertar = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASEÑA_EMPLEADO, SALT_EMPLEADO, ACTIVO_EMPLEADO, FECHA_REGISTRO) 
+                              VALUES (?, ?, ?, ?, 1, NOW())";
+    } else {
+        $consulta_insertar = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASEÑA_EMPLEADO, SALT_EMPLEADO, ACTIVO_EMPLEADO) 
+                              VALUES (?, ?, ?, ?, 1)";
+    }
     
     $stmt_insertar = $conexion->prepare($consulta_insertar);
     

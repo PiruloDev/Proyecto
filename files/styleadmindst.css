@@ -435,149 +435,241 @@ body {
     margin-right: 8px;
 }
 
-/* ====================================
-   RESPONSIVE DESIGN
-   ==================================== */
+/* ===== ESTILOS PARA GESTIÓN DE INGREDIENTES ===== */
 
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
+/* Estilos para elementos editables */
+.stock-editable, .precio-editable {
+    cursor: pointer;
+    padding: 2px 6px;
     border-radius: 4px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 60px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
+.stock-editable:hover, .precio-editable:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    border: 1px dashed #007bff;
 }
 
-.sidebar-nav {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) transparent;
+/* Badges para estado de stock */
+.badge-stock-alto {
+    background-color: var(--success-green) !important;
+    color: white;
 }
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
+.badge-stock-medio {
+    background-color: var(--warning-orange) !important;
+    color: white;
 }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: transparent;
+.badge-stock-bajo {
+    background-color: var(--danger-red) !important;
+    color: white;
 }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 3px;
+/* Estilos para botones de acción en tabla */
+.btn-group .btn {
+    margin: 0 1px;
 }
 
-/* Responsive */
+.btn-sm i {
+    font-size: 0.8rem;
+}
+
+/* Modal de ingredientes específico */
+#ingredientesModal .modal-xl {
+    max-width: 95%;
+}
+
+#ingredientesModal .table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Estadísticas de ingredientes */
+.ingredientes-stats {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.ingredientes-stats .stat-item {
+    text-align: center;
+    padding: 10px;
+}
+
+.ingredientes-stats .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+}
+
+.ingredientes-stats .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Form de agregar ingrediente */
+#formAgregarIngrediente .form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+#formAgregarIngrediente .form-control, 
+#formAgregarIngrediente .form-select {
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#formAgregarIngrediente .form-control:focus, 
+#formAgregarIngrediente .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(140, 90, 55, 0.25);
+}
+
+/* Alertas personalizadas para ingredientes */
+.alert-ingrediente {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-ingrediente.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-ingrediente.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.alert-ingrediente.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+/* Spinner personalizado para carga de ingredientes */
+.ingredientes-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 3rem;
+}
+
+.ingredientes-loader .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+    color: var(--primary-color);
+}
+
+/* Tabla de ingredientes */
+#ingredientesTableBody tr:hover {
+    background-color: rgba(140, 90, 55, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* Botones de exportar */
+.btn-export {
+    background: linear-gradient(135deg, var(--success-green), #45a049);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-export:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* Responsive para tablets */
 @media (max-width: 768px) {
-    .dashboard-content {
-        padding: 20px 15px;
+    #ingredientesModal .modal-xl {
+        max-width: 98%;
+        margin: 10px;
     }
     
-    .page-title {
+    .ingredientes-stats {
+        text-align: center;
+    }
+    
+    .ingredientes-stats .stat-number {
         font-size: 1.5rem;
     }
     
-    .bienvenida-admin {
-        font-size: 1rem;
-    }
-    
-    .top-header {
-        height: 100px;
-        padding: 0 20px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-    }
-    
-    .actions-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .stat-card {
-        padding: 20px;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-    }
-    
-    .action-btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .top-header {
+    .btn-group {
         flex-direction: column;
-        padding: 20px;
-        text-align: center;
-        gap: 15px;
-        height: 110px;
+        align-items: stretch;
     }
     
-    .dashboard-content {
-        padding: 15px 10px;
-    }
-    
-    .page-title {
-        font-size: 1.3rem;
-    }
-    
-    .bienvenida-admin {
-        font-size: 0.9rem;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .stat-card {
-        padding: 15px;
-    }
-    
-    .stat-number {
-        font-size: 1.8rem;
-    }
-    
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
-    }
-    
-    .action-card .card-body {
-        padding: 20px;
-    }
-    
-    .action-btn {
-        padding: 10px 14px;
-        font-size: 0.8rem;
+    .btn-group .btn {
+        margin: 1px 0;
+        border-radius: 4px !important;
     }
 }
 
-@media (max-width: 420px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+/* Animaciones para elementos de ingredientes */
+@keyframes fadeInIngrediente {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .top-header {
-        padding: 15px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .dashboard-content {
-        padding: 10px;
-    }
+}
+
+.ingrediente-row {
+    animation: fadeInIngrediente 0.5s ease-out;
+}
+
+/* Tooltips personalizados */
+.tooltip-ingrediente {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip-ingrediente::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.tooltip-ingrediente:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Estilos para campos requeridos */
+.form-label .text-danger {
+    font-weight: bold;
+}
+
+.form-control:invalid {
+    border-color: var(--danger-red);
+}
+
+.form-control:invalid:focus {
+    border-color: var(--danger-red);
+    box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.25);
 }
