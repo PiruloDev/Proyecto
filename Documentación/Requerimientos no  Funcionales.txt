@@ -1,0 +1,15 @@
+Requerimientos No Funcionales.
+
+RNF 01- Interfaz
+RNF 02- Usabilidad
+RNF 03- Seguridad
+RNF 04- Escalabilidad
+RNF 05- Disponibilidad
+RNF 06- Rendimiento
+RNF 07- Mantenibilidad
+RNF 08- Portabilidad
+RNF 09- Confiabilidad
+RNF 10- Accesibilidad
+RNF 11- Interoperabilidad
+RNF 12- Auditoría y Registro
+RNF 13- Recuperación
