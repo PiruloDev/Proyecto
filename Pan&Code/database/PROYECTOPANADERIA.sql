@@ -4,6 +4,37 @@
 -- Autor: Sistema de Gestión de Panadería
 -- Fecha: 2025
 -- Descripción: Base de datos completa para gestión de panadería
+-- Versión: 2.1 - Incluye sistema de logs y actualización de estructura
+-- ==================================================================
+
+-- CARACTERÍSTICAS PRINCIPALES:
+-- - Gestión completa de productos con descripción opcional
+-- - Sistema de pedidos con detalles de productos
+-- - Control de inventario y stock mínimo
+-- - Gestión de empleados, clientes y administradores
+-- - Sistema de logs para auditoría de cambios en productos
+-- - Triggers automáticos para actualización de totales
+-- - Funciones de utilidad para encriptación y generación de códigos
+-- - Estructura optimizada para dashboard de empleados y administradores
+
+-- ESTRUCTURA DE TABLAS PRINCIPALES:
+-- - Productos: Incluye DESCRIPCION_PRODUCTO opcional
+-- - Detalle_Pedidos: Sin columnas de imagen, solo datos esenciales
+-- - Empleados: Con control de estado activo/inactivo
+-- - Pedidos: Con estados y totales automáticos
+-- - Sistema de logs: Para auditoría de cambios
+
+-- INSTRUCCIONES DE INSTALACIÓN:
+-- 
+-- OPCIÓN 1: INSTALACIÓN NUEVA (Base de datos desde cero)
+-- 1. Ejecutar todo el script completo
+-- 2. La base de datos se creará con todas las tablas y datos
+--
+-- OPCIÓN 2: ACTUALIZACIÓN DE BASE EXISTENTE
+-- 1. Ejecutar solo las secciones de "MIGRACIONES Y ACTUALIZACIONES"
+-- 2. Verificar que los cambios se aplicaron correctamente
+-- 3. Los datos existentes se mantendrán intactos
+--
 -- ==================================================================
 
 -- Configuración inicial
@@ -38,7 +69,8 @@ CREATE TABLE Empleados (
     EMAIL_EMPLEADO VARCHAR(100) NOT NULL,
     ACTIVO_EMPLEADO BOOLEAN DEFAULT TRUE,
     CONTRASEÑA_EMPLEADO VARCHAR(255),
-    SALT_EMPLEADO VARCHAR(32)
+    SALT_EMPLEADO VARCHAR(32),
+    FECHA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla: Administradores - Almacena información de los administradores 
@@ -112,8 +144,9 @@ CREATE TABLE Productos (
     ID_ADMIN INT,
     ID_CATEGORIA_PRODUCTO INT,
     NOMBRE_PRODUCTO VARCHAR(100) NOT NULL,   
+    DESCRIPCION_PRODUCTO TEXT,
     PRODUCTO_STOCK_MIN INT NOT NULL,
-    PRECIO_PRODUCTO INT NOT NULL,    
+    PRECIO_PRODUCTO DECIMAL(10,2) NOT NULL,    
     FECHA_VENCIMIENTO_PRODUCTO DATE NOT NULL,
     FECHA_INGRESO_PRODUCTO DATE NOT NULL,
     TIPO_PRODUCTO_MARCA VARCHAR(100) NOT NULL,
@@ -168,6 +201,38 @@ CREATE TABLE Ordenes_Salida (
     CONSTRAINT FK_ORDENSALIDA_PEDIDO
         FOREIGN KEY (ID_PEDIDO) REFERENCES Pedidos(ID_PEDIDO) ON UPDATE CASCADE ON DELETE RESTRICT
 );
+
+-- ==================================================================
+-- TABLA DE LOGS PARA CAMBIOS EN PRODUCTOS
+-- ==================================================================
+
+-- Tabla para registrar cambios en productos (logs de auditoría)
+CREATE TABLE productos_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    producto_id INT NOT NULL,
+    tipo_cambio ENUM('precio', 'stock', 'activacion', 'desactivacion') NOT NULL,
+    valor_anterior VARCHAR(50),
+    valor_nuevo VARCHAR(50),
+    usuario_id INT,
+    usuario_tipo ENUM('admin', 'empleado') DEFAULT 'admin',
+    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_usuario VARCHAR(45),
+    INDEX idx_producto_logs_fecha (fecha_cambio),
+    INDEX idx_producto_logs_producto (producto_id),
+    INDEX idx_producto_logs_tipo (tipo_cambio),
+    CONSTRAINT FK_PRODUCTO_LOG
+        FOREIGN KEY (producto_id) REFERENCES Productos(ID_PRODUCTO) ON DELETE CASCADE
+);
+
+-- Trigger para actualizar FECHA_ULTIMA_MODIFICACION automáticamente
+DELIMITER //
+CREATE TRIGGER tr_actualizar_fecha_producto 
+    BEFORE UPDATE ON Productos
+    FOR EACH ROW
+BEGIN
+    SET NEW.FECHA_ULTIMA_MODIFICACION = CURRENT_TIMESTAMP;
+END//
+DELIMITER ;
 
 -- ==================================================================
 -- FUNCIONES DE UTILIDAD
@@ -444,37 +509,37 @@ INSERT INTO `ingredientes` (`ID_INGREDIENTE`, `ID_PROVEEDOR`, `ID_CATEGORIA`, `N
 ('20', '5', '16', 'Dulce de Leche', '10', '2025-11-15', 'DDL-KG');
 
 -- Inserción en tabla: Productos 
-INSERT INTO `productos` (`ID_PRODUCTO`, `ID_ADMIN`, `ID_CATEGORIA_PRODUCTO`, `NOMBRE_PRODUCTO`, `PRODUCTO_STOCK_MIN`, `PRECIO_PRODUCTO`, `FECHA_VENCIMIENTO_PRODUCTO`, `FECHA_INGRESO_PRODUCTO`, `TIPO_PRODUCTO_MARCA`) VALUES
-('1', '1', '8', 'Tamales Tolimenses', '10', '3800.00', '2025-09-15', '2025-07-01', 'Propio'),
-('2', '1', '4', 'Pan Tajado Integral', '15', '4200.00', '2025-07-02', '2025-07-01', 'Propio'),
-('3', '1', '7', 'Yogurt Fresa Litro', '12', '6000.00', '2025-07-30', '2025-07-03', 'Alpina'),
-('4', '1', '5', 'Galleta de Tres Ojos', '20', '2500.00', '2025-11-01', '2025-07-01', 'Propio'),
-('5', '1', '1', 'Pan Campesino Grande', '8', '5500.00', '2025-07-08', '2025-07-04', 'Propio'),
-('6', '1', '3', 'Torta de Chocolate Pequeña', '5', '18000.00', '2025-07-07', '2025-07-04', 'Propio'),
-('7', '1', '2', 'Croissant de Almendras', '18', '3500.00', '2025-07-06', '2025-07-05', 'Propio'),
-('8', '1', '1', 'Baguette Clásica', '25', '2800.00', '2025-07-06', '2025-07-05', 'Propio'),
-('9', '1', '5', 'Bizcochos de Achira', '15', '4000.00', '2025-12-01', '2025-07-01', 'Propio'),
-('10', '1', '6', 'Jugo de Naranja Natural (500ml)', '10', '4500.00', '2025-07-05', '2025-07-04', 'Postobón'),
-('11', '1', '7', 'Postre de Tres Leches', '7', '7500.00', '2025-07-08', '2025-07-04', 'Propio'),
-('12', '1', '4', 'Pan Blanco de Molde', '20', '3900.00', '2025-07-02', '2025-07-01', 'Propio'),
-('13', '1', '3', 'Muffin de Arándanos', '15', '3000.00', '2025-07-07', '2025-07-04', 'Propio'),
-('14', '1', '2', 'Pan de Bono Pequeño', '30', '1500.00', '2025-07-06', '2025-07-05', 'Propio'),
-('15', '1', '8', 'Empanadas de Carne (unidad)', '20', '2000.00', '2025-07-06', '2025-07-05', 'Propio'),
-('16', '1', '3', 'Brazo de Reina', '10', '9500.00', '2025-07-09', '2025-07-04', 'Propio'),
-('17', '1', '1', 'Pan Trenza Integral', '12', '4800.00', '2025-07-07', '2025-07-03', 'Propio'),
-('18', '1', '5', 'Galletas Surtidas de Mantequilla', '25', '3200.00', '2025-12-30', '2025-07-01', 'Propio'),
-('19', '1', '7', 'Avena La Lechera (500ml)', '18', '5800.00', '2025-08-20', '2025-07-03', 'Nestlé'),
-('20', '1', '9', 'Ponqué de Naranja (Porción)', '15', '3000.00', '2025-07-08', '2025-07-04', 'Propio'),
-('21', '1', '10', 'Pan Artesanal de Masa Madre', '7', '8000.00', '2025-07-07', '2025-07-05', 'Propio'),
-('22', '1', '3', 'Cheesecake de Frutos Rojos', '6', '25000.00', '2025-07-09', '2025-07-04', 'Propio'),
-('23', '1', '4', 'Pan de Hamburguesa', '30', '4500.00', '2025-07-10', '2025-07-02', 'Propio'),
-('24', '1', '5', 'Galletas de Avena y Pasas', '22', '2700.00', '2026-01-01', '2025-07-01', 'Propio'),
-('25', '1', '7', 'Kumiss Natural', '10', '4900.00', '2025-07-25', '2025-07-03', 'Alquería'),
-('26', '1', '9', 'Brownie con Nuez', '40', '1800.00', '2025-07-08', '2025-07-05', 'Propio'),
-('27', '1', '1', 'Pan Blandito', '28', '2500.00', '2025-07-07', '2025-07-05', 'Propio'),
-('28', '1', '3', 'Milhoja de Arequipe', '12', '6000.00', '2025-07-08', '2025-07-04', 'Propio'),
-('29', '1', '2', 'Mogolla Chicharrona', '15', '3500.00', '2025-07-06', '2025-07-05', 'Propio'),
-('30', '1', '8', 'Arequipe (Tarro 500g)', '8', '9000.00', '2026-04-10', '2025-07-01', 'Propio');
+INSERT INTO `productos` (`ID_PRODUCTO`, `ID_ADMIN`, `ID_CATEGORIA_PRODUCTO`, `NOMBRE_PRODUCTO`, `DESCRIPCION_PRODUCTO`, `PRODUCTO_STOCK_MIN`, `PRECIO_PRODUCTO`, `FECHA_VENCIMIENTO_PRODUCTO`, `FECHA_INGRESO_PRODUCTO`, `TIPO_PRODUCTO_MARCA`) VALUES
+('1', '1', '8', 'Tamales Tolimenses', 'Tradicionales tamales envueltos en hoja de plátano, con masa de maíz y relleno de carne de cerdo y pollo', '10', '3800.00', '2025-09-15', '2025-07-01', 'Propio'),
+('2', '1', '4', 'Pan Tajado Integral', 'Pan de molde integral, ideal para desayunos saludables, rico en fibra', '15', '4200.00', '2025-07-02', '2025-07-01', 'Propio'),
+('3', '1', '7', 'Yogurt Fresa Litro', 'Yogurt cremoso con trozos de fresa natural, sin conservantes artificiales', '12', '6000.00', '2025-07-30', '2025-07-03', 'Alpina'),
+('4', '1', '5', 'Galleta de Tres Ojos', 'Galleta tradicional colombiana con tres círculos de dulce, crujiente y deliciosa', '20', '2500.00', '2025-11-01', '2025-07-01', 'Propio'),
+('5', '1', '1', 'Pan Campesino Grande', 'Pan artesanal de corteza dorada y miga suave, ideal para acompañar comidas', '8', '5500.00', '2025-07-08', '2025-07-04', 'Propio'),
+('6', '1', '3', 'Torta de Chocolate Pequeña', 'Deliciosa torta de chocolate húmeda con cobertura de chocolate, perfecta para ocasiones especiales', '5', '18000.00', '2025-07-07', '2025-07-04', 'Propio'),
+('7', '1', '2', 'Croissant de Almendras', NULL, '18', '3500.00', '2025-07-06', '2025-07-05', 'Propio'),
+('8', '1', '1', 'Baguette Clásica', 'Pan francés tradicional con corteza crujiente y miga aireada', '25', '2800.00', '2025-07-06', '2025-07-05', 'Propio'),
+('9', '1', '5', 'Bizcochos de Achira', NULL, '15', '4000.00', '2025-12-01', '2025-07-01', 'Propio'),
+('10', '1', '6', 'Jugo de Naranja Natural (500ml)', 'Jugo 100% natural exprimido de naranjas frescas, sin azúcar añadido', '10', '4500.00', '2025-07-05', '2025-07-04', 'Postobón'),
+('11', '1', '7', 'Postre de Tres Leches', 'Clásico postre colombiano empapado en tres tipos de leche, suave y cremoso', '7', '7500.00', '2025-07-08', '2025-07-04', 'Propio'),
+('12', '1', '4', 'Pan Blanco de Molde', NULL, '20', '3900.00', '2025-07-02', '2025-07-01', 'Propio'),
+('13', '1', '3', 'Muffin de Arándanos', 'Muffin esponjoso con arándanos frescos, perfecto para el desayuno o merienda', '15', '3000.00', '2025-07-07', '2025-07-04', 'Propio'),
+('14', '1', '2', 'Pan de Bono Pequeño', NULL, '30', '1500.00', '2025-07-06', '2025-07-05', 'Propio'),
+('15', '1', '8', 'Empanadas de Carne (unidad)', 'Empanada frita rellena de carne molida sazonada con especias tradicionales', '20', '2000.00', '2025-07-06', '2025-07-05', 'Propio'),
+('16', '1', '3', 'Brazo de Reina', 'Bizcocho enrollado relleno de dulce de leche y cubierto con coco rallado', '10', '9500.00', '2025-07-09', '2025-07-04', 'Propio'),
+('17', '1', '1', 'Pan Trenza Integral', NULL, '12', '4800.00', '2025-07-07', '2025-07-03', 'Propio'),
+('18', '1', '5', 'Galletas Surtidas de Mantequilla', 'Variedad de galletas caseras de mantequilla con diferentes formas y sabores', '25', '3200.00', '2025-12-30', '2025-07-01', 'Propio'),
+('19', '1', '7', 'Avena La Lechera (500ml)', NULL, '18', '5800.00', '2025-08-20', '2025-07-03', 'Nestlé'),
+('20', '1', '9', 'Ponqué de Naranja (Porción)', 'Porción individual de ponqué de naranja con glaseado cítrico', '15', '3000.00', '2025-07-08', '2025-07-04', 'Propio'),
+('21', '1', '10', 'Pan Artesanal de Masa Madre', 'Pan elaborado con masa madre natural, fermentación larga para mejor digestibilidad', '7', '8000.00', '2025-07-07', '2025-07-05', 'Propio'),
+('22', '1', '3', 'Cheesecake de Frutos Rojos', 'Cheesecake cremoso con base de galleta y cobertura de frutos rojos frescos', '6', '25000.00', '2025-07-09', '2025-07-04', 'Propio'),
+('23', '1', '4', 'Pan de Hamburguesa', NULL, '30', '4500.00', '2025-07-10', '2025-07-02', 'Propio'),
+('24', '1', '5', 'Galletas de Avena y Pasas', 'Galletas nutritivas con avena integral y pasas, sin azúcar refinado', '22', '2700.00', '2026-01-01', '2025-07-01', 'Propio'),
+('25', '1', '7', 'Kumiss Natural', NULL, '10', '4900.00', '2025-07-25', '2025-07-03', 'Alquería'),
+('26', '1', '9', 'Brownie con Nuez', 'Brownie de chocolate intenso con trozos de nuez, húmedo y delicioso', '40', '1800.00', '2025-07-08', '2025-07-05', 'Propio'),
+('27', '1', '1', 'Pan Blandito', NULL, '28', '2500.00', '2025-07-07', '2025-07-05', 'Propio'),
+('28', '1', '3', 'Milhoja de Arequipe', 'Delicada milhoja rellena de arequipe casero y cubierta con azúcar glass', '12', '6000.00', '2025-07-08', '2025-07-04', 'Propio'),
+('29', '1', '2', 'Mogolla Chicharrona', NULL, '15', '3500.00', '2025-07-06', '2025-07-05', 'Propio'),
+('30', '1', '8', 'Arequipe (Tarro 500g)', 'Arequipe casero cremoso y dulce, perfecto para postres y acompañamientos', '8', '9000.00', '2026-04-10', '2025-07-01', 'Propio');
 
 -- Inserción en tabla: Pedidos
 INSERT INTO Pedidos (ID_CLIENTE, ID_EMPLEADO, ID_ESTADO_PEDIDO, FECHA_INGRESO, FECHA_ENTREGA, TOTAL_PRODUCTO) VALUES
@@ -729,3 +794,241 @@ SELECT * FROM Estado_Pedidos;
 -- ('Listo'),
 -- ('Entregado'),
 -- ('Cancelado');
+
+-- ==================================================================
+-- MIGRACIONES Y ACTUALIZACIONES DEL SISTEMA
+-- ==================================================================
+
+-- ==================================================================
+-- MIGRACIÓN: ACTUALIZAR TIPO DE DATO PRECIO_PRODUCTO
+-- ==================================================================
+-- NOTA: Solo ejecutar si la base de datos ya existe y necesita actualización
+-- Descomentar las siguientes líneas para migrar una base de datos existente:
+
+<<cite:sql>>
+-- Actualizar tipo de dato de PRECIO_PRODUCTO de INT a DECIMAL
+ALTER TABLE Productos MODIFY COLUMN PRECIO_PRODUCTO DECIMAL(10,2) NOT NULL;
+
+-- Verificar la estructura actualizada
+DESCRIBE Productos;
+<<cite:sql>>
+
+-- ==================================================================
+-- VERIFICACIÓN Y CREACIÓN DE TABLA DE LOGS
+-- ==================================================================
+-- Script para verificar y crear tabla productos_logs si no existe
+
+-- Verificar si la tabla productos_logs existe
+SET @table_exists = (
+    SELECT COUNT(*) 
+    FROM information_schema.tables 
+    WHERE table_schema = DATABASE() 
+    AND table_name = 'productos_logs'
+);
+
+-- Crear tabla productos_logs si no existe (para bases de datos existentes)
+SET @sql = IF(@table_exists = 0, 
+    'CREATE TABLE productos_logs (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        producto_id INT NOT NULL,
+        tipo_cambio ENUM(''precio'', ''stock'', ''activacion'', ''desactivacion'') NOT NULL,
+        valor_anterior VARCHAR(50),
+        valor_nuevo VARCHAR(50),
+        usuario_id INT,
+        usuario_tipo ENUM(''admin'', ''empleado'') DEFAULT ''admin'',
+        fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ip_usuario VARCHAR(45),
+        INDEX idx_producto_logs_fecha (fecha_cambio),
+        INDEX idx_producto_logs_producto (producto_id),
+        INDEX idx_producto_logs_tipo (tipo_cambio),
+        CONSTRAINT FK_PRODUCTO_LOG
+            FOREIGN KEY (producto_id) REFERENCES Productos(ID_PRODUCTO) ON DELETE CASCADE
+    )', 
+    'SELECT ''Tabla productos_logs ya existe'' as mensaje'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- ==================================================================
+-- VERIFICACIÓN Y CREACIÓN DE TRIGGER
+-- ==================================================================
+-- Script para verificar y crear trigger si no existe
+
+-- Verificar si el trigger existe
+SET @trigger_exists = (
+    SELECT COUNT(*) 
+    FROM information_schema.triggers 
+    WHERE trigger_schema = DATABASE() 
+    AND trigger_name = 'tr_actualizar_fecha_producto'
+);
+
+-- Crear trigger si no existe
+SET @sql_trigger = IF(@trigger_exists = 0,
+    'CREATE TRIGGER tr_actualizar_fecha_producto 
+        BEFORE UPDATE ON Productos
+        FOR EACH ROW
+    BEGIN
+        SET NEW.FECHA_ULTIMA_MODIFICACION = CURRENT_TIMESTAMP;
+    END',
+    'SELECT ''Trigger tr_actualizar_fecha_producto ya existe'' as mensaje'
+);
+
+PREPARE stmt_trigger FROM @sql_trigger;
+EXECUTE stmt_trigger;
+DEALLOCATE PREPARE stmt_trigger;
+
+-- ==================================================================
+-- CONSULTAS DE MANTENIMIENTO Y VERIFICACIÓN
+-- ==================================================================
+
+-- Verificar estructura de tabla Productos
+SELECT 
+    COLUMN_NAME as 'Campo',
+    COLUMN_TYPE as 'Tipo',
+    IS_NULLABLE as 'Nulo',
+    COLUMN_DEFAULT as 'Por_Defecto',
+    EXTRA as 'Extra'
+FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME = 'Productos'
+ORDER BY ORDINAL_POSITION;
+
+-- Verificar existencia de tabla productos_logs
+SELECT 
+    TABLE_NAME as 'Tabla',
+    TABLE_ROWS as 'Filas',
+    CREATE_TIME as 'Fecha_Creacion'
+FROM information_schema.TABLES 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME IN ('Productos', 'productos_logs');
+
+-- Verificar triggers relacionados con Productos
+SELECT 
+    TRIGGER_NAME as 'Trigger',
+    EVENT_MANIPULATION as 'Evento',
+    EVENT_OBJECT_TABLE as 'Tabla',
+    TRIGGER_BODY as 'Accion'
+FROM information_schema.TRIGGERS 
+WHERE TRIGGER_SCHEMA = DATABASE() 
+AND EVENT_OBJECT_TABLE = 'Productos';
+
+-- Verificar índices de la tabla productos_logs
+SELECT 
+    INDEX_NAME as 'Indice',
+    COLUMN_NAME as 'Columna',
+    NON_UNIQUE as 'No_Unico'
+FROM information_schema.STATISTICS 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME = 'productos_logs'
+ORDER BY INDEX_NAME, SEQ_IN_INDEX;
+
+-- ==================================================================
+-- CONSULTAS DE PRUEBA PARA LOGS
+-- ==================================================================
+
+-- Consulta para ver logs recientes (ejecutar después de hacer cambios)
+-- SELECT * FROM productos_logs ORDER BY fecha_cambio DESC LIMIT 10;
+
+-- Consulta para ver cambios de un producto específico
+-- SELECT 
+--     pl.*,
+--     p.NOMBRE_PRODUCTO
+-- FROM productos_logs pl
+-- JOIN Productos p ON pl.producto_id = p.ID_PRODUCTO
+-- WHERE pl.producto_id = 1
+-- ORDER BY pl.fecha_cambio DESC;
+
+-- Consulta para ver estadísticas de cambios
+-- SELECT 
+--     tipo_cambio,
+--     COUNT(*) as total_cambios,
+--     DATE(fecha_cambio) as fecha
+-- FROM productos_logs 
+-- GROUP BY tipo_cambio, DATE(fecha_cambio)
+-- ORDER BY fecha DESC, tipo_cambio;
+
+-- ==================================================================
+-- SCRIPT DE LIMPIEZA (OPCIONAL)
+-- ==================================================================
+
+-- Limpiar logs antiguos (ejecutar solo si es necesario)
+-- DELETE FROM productos_logs WHERE fecha_cambio < DATE_SUB(NOW(), INTERVAL 90 DAY);
+
+-- Resetear AUTO_INCREMENT de la tabla logs
+-- ALTER TABLE productos_logs AUTO_INCREMENT = 1;
+
+-- ============================================================
+-- MIGRACIÓN: Agregar columna FECHA_REGISTRO a tabla Empleados
+-- ============================================================
+
+-- Verificar y agregar columna FECHA_REGISTRO a la tabla Empleados si no existe
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'Empleados' 
+     AND COLUMN_NAME = 'FECHA_REGISTRO') = 0,
+    'ALTER TABLE Empleados ADD COLUMN FECHA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'SELECT "La columna FECHA_REGISTRO ya existe en la tabla Empleados" as mensaje'
+));
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- ============================================================
+-- MIGRACIÓN: Agregar columna DESCRIPCION_PRODUCTO a tabla Productos
+-- ============================================================
+
+-- Verificar y agregar columna DESCRIPCION_PRODUCTO a la tabla Productos si no existe
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'Productos' 
+     AND COLUMN_NAME = 'DESCRIPCION_PRODUCTO') = 0,
+    'ALTER TABLE Productos ADD COLUMN DESCRIPCION_PRODUCTO TEXT AFTER NOMBRE_PRODUCTO',
+    'SELECT "La columna DESCRIPCION_PRODUCTO ya existe en la tabla Productos" as mensaje'
+));
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- ==================================================================
+-- VERIFICACIÓN DE ESTRUCTURA FINAL
+-- ==================================================================
+
+-- Verificar que todas las tablas principales existen
+SELECT 
+    TABLE_NAME as 'Tabla_Existente'
+FROM information_schema.TABLES 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME IN ('Productos', 'Detalle_Pedidos', 'Pedidos', 'Empleados', 'Clientes', 'Administradores')
+ORDER BY TABLE_NAME;
+
+-- Verificar estructura de tabla Productos (debe incluir DESCRIPCION_PRODUCTO)
+SELECT 
+    COLUMN_NAME as 'Columna',
+    DATA_TYPE as 'Tipo',
+    IS_NULLABLE as 'Permite_NULL'
+FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME = 'Productos'
+ORDER BY ORDINAL_POSITION;
+
+-- Verificar estructura de tabla Detalle_Pedidos (debe tener solo columnas esenciales)
+SELECT 
+    COLUMN_NAME as 'Columna',
+    DATA_TYPE as 'Tipo',
+    IS_NULLABLE as 'Permite_NULL'
+FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = DATABASE() 
+AND TABLE_NAME = 'Detalle_Pedidos'
+ORDER BY ORDINAL_POSITION;
+
+-- ==================================================================
+-- FIN DE ACTUALIZACIONES DEL SISTEMA
+-- ==================================================================
+
+COMMIT;
