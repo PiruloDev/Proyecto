@@ -8,29 +8,27 @@ import com.example.Proyecto.Services.Empleados.PojoDeleteEmpleado;
 import com.example.Proyecto.Services.Empleados.PojoEmpleado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Map;
+
+
+@RequestMapping("/")
 @RestController
 public class ConexionController {
     @Autowired
     private ConexionAdminService conexionAdminService;
-    @GetMapping("/admin")
-    public List<String> obtenerAdministradores() {
-        return conexionAdminService.obtenerAdministradores();
-    }
-    @Autowired
-    private ConexionClienteService conexionClienteService;
-    @GetMapping("/clientes")
-    public List<String>obtenerClientes() {
-        return conexionClienteService.obtenerClientes();
-    }
     @Autowired
     private ConexionEmpleadoService conexionEmpleadoService;
-    @GetMapping("/empleados")
-    public List<String>obtenerEmpleados(){
-        return conexionEmpleadoService.obtenerEmpleados();
+    @Autowired
+    private ConexionClienteService conexionClienteService;
+
+    // ----> Administradores GET
+    @GetMapping("/detalle/administrador")
+    public List<Map<String, Object>> obtenerDetallesAdministrador() {
+        return conexionAdminService.obtenerDetallesAdministrador();
     }
-    @PostMapping("/crearadmin")
+    // ----> Administradores POST
+    @PostMapping("/administradores")
     public String crearAdmin(@RequestBody PojoAdmin pojoAdmin) {
         boolean creado = conexionAdminService.crearAdmin(pojoAdmin);
         if (creado) {
@@ -39,7 +37,13 @@ public class ConexionController {
             return "Error al crear un nuevo Administrador";
         }
     }
-    @PostMapping("/crearcliente")
+    // ----> Clientes GET
+    @GetMapping("/detalle/cliente")
+    public List<Map<String, Object>> obtenerDetallesCliente() {
+        return conexionClienteService.obtenerDetallesCliente();
+    }
+    // ----> Clientes POST
+    @PostMapping("/clientes")
     public String crearCliente(@RequestBody PojoCliente pojoCliente) {
         boolean creado = conexionClienteService.crearCliente(pojoCliente);
         if (creado) {
@@ -48,16 +52,25 @@ public class ConexionController {
             return "Error al crear un nuevo Cliente";
         }
     }
-    @PostMapping("/crearempleado")
+    // ----> Empleados GET
+    @GetMapping("/detalle/empleados")
+    public List<Map<String, Object>> obtenerDetallesEmpleado(){
+        return conexionEmpleadoService.obtenerDetallesEmpleado();
+    }
+
+    // ----> Empleados POST
+    @PostMapping("/empleados")
     public String crearEmpleado(@RequestBody PojoEmpleado pojoEmpleado) {
         boolean creado = conexionEmpleadoService.crearEmpleado(pojoEmpleado);
         if (creado) {
-            return "Nuevo Cliente creado exitosamente";
+            return "Nuevo Empleado creado exitosamente";
         } else {
-            return "Error al crear un nuevo Cliente";
+            return "Error al crear un nuevo Empleado";
         }
     }
-    @DeleteMapping("/empleado")
+
+    // ----> Empleados DELETE
+    @DeleteMapping("/empleados")
     public String eliminarEmpleado(@RequestBody PojoDeleteEmpleado pojoDeleteEmpleado) {
         boolean eliminado = conexionEmpleadoService.eliminarEmpleado(pojoDeleteEmpleado.getId());
         if (eliminado) {
