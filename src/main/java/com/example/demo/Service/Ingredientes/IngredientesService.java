@@ -1,6 +1,7 @@
 package com.example.demo.Service.Ingredientes;
 
 import com.example.demo.Ingredientes;
+import com.example.demo.Pedidos;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class IngredientesService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Método para obtener lista de nombres de ingredientes
+    // Metodo para obtener lista de nombres de ingredientes
     public List<String> obtenerIngredientes() {
         String sql = "SELECT NOMBRE_INGREDIENTE FROM Ingredientes";
         return jdbcTemplate.query(sql, new RowMapper<String>() {
@@ -26,7 +27,7 @@ public class IngredientesService {
         });
     }
 
-    // Método para obtener todos los ingredientes
+    // Metodo para obtener todos los ingredientes
     public List<Ingredientes> obtenerTodosLosIngredientes() {
         String sql = "SELECT * FROM Ingredientes";
 
@@ -48,7 +49,7 @@ public class IngredientesService {
     }
 
 
-    // Método para crear un nuevo ingrediente (POST)
+    // Metodo para crear un nuevo ingrediente (POST)
     public void crearIngrediente(Ingredientes ingrediente) {
         String sql = "INSERT INTO Ingredientes (ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, CANTIDAD_INGREDIENTE, FECHA_VENCIMIENTO, REFERENCIA_INGREDIENTE, FECHA_ENTREGA_INGREDIENTE) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -62,5 +63,46 @@ public class IngredientesService {
                 ingrediente.getFechaEntregaIngrediente()// FECHA_ENTREGA_INGREDIENTE
         );
     }
+    //Intento metodo
+    // Metodo para actualizar un ingrediente (PUT)
+    public int editarIngrediente(Ingredientes ingrediente) {
+        String sql = "UPDATE Ingredientes SET " +
+                "ID_PROVEEDOR = ?, " +
+                "ID_CATEGORIA = ?, " +
+                "NOMBRE_INGREDIENTE = ?, " +
+                "CANTIDAD_INGREDIENTE = ?, " +
+                "FECHA_VENCIMIENTO = ?, " +
+                "REFERENCIA_INGREDIENTE = ?, " +
+                "FECHA_ENTREGA_INGREDIENTE = ? " +
+                "WHERE ID_INGREDIENTE = ?";
+
+        return jdbcTemplate.update(sql,
+                ingrediente.getIdProveedor(),
+                ingrediente.getIdCategoria(),
+                ingrediente.getNombreIngrediente(),
+                ingrediente.getCantidadIngrediente(),
+                ingrediente.getFechaVencimiento(),
+                ingrediente.getReferenciaIngrediente(),
+                ingrediente.getFechaEntregaIngrediente(),
+                ingrediente.getIdIngrediente() // se actualiza el que tiene este ID
+        );
+    }
+
+
+    // Metodo para eliminar un ingrediente (DELETE)
+    public int eliminarIngrediente(int idIngrediente) {
+        String sql = "DELETE FROM Ingredientes WHERE ID_INGREDIENTE = ?";
+        return jdbcTemplate.update(sql, idIngrediente);
+    }
+
+    //Métodod para actualizar cantidad de ingrediente
+    public int actualizarCantidad(int id, int cantidad) {
+        return jdbcTemplate.update(
+                "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE=? WHERE ID_INGREDIENTE=?",
+                cantidad, id
+        );
+    }
+
+
 
 }

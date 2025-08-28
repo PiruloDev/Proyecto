@@ -39,7 +39,4 @@ public class ConexionController {
         // Si la actualización fue exitosa
         return new ResponseEntity<Clientes>(clienteActualizadoDB, HttpStatus.OK);
     }
-
-
-
 }
