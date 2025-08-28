@@ -1,4 +1,5 @@
 package com.example.Proyecto.Services.Clientes;
+import com.example.Proyecto.Services.Empleados.PojoEmpleado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.dao.DataAccessException;
@@ -33,13 +34,12 @@ public class ConexionClienteService {
     }
 
     public boolean crearCliente(PojoCliente pojoCliente) {
-        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASEÑA_CLI) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, ?)";
         try {
             if (pojoCliente.getContrasena() == null || pojoCliente.getContrasena().trim().isEmpty()) {
                 System.out.println("Error: La contraseña no puede ser nula o vacía");
                 return false;
             }
-
             String contrasenaHasheada = passwordEncoder.encode(pojoCliente.getContrasena());
                 int result = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada);
             return result > 0;
@@ -47,4 +47,16 @@ public class ConexionClienteService {
             return false;
         }
     }
+    public boolean actualizarCliente(PojoCliente pojoCliente) {
+        String sql = "UPDATE Clientes SET NOMBRE_CLI = ?, EMAIL_CLI = ?, TELEFONO_CLI = ?, CONTRASENA_CLI = ?";
+        try {
+            String contrasenaHasheada = passwordEncoder.encode(pojoCliente.getContrasena());
+            int value = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada);
+            return value > 0;
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
+

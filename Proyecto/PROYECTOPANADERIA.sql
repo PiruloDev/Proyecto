@@ -13,7 +13,7 @@ CREATE TABLE Clientes (
     ACTIVO_CLI BOOLEAN DEFAULT TRUE,    
     EMAIL_CLI VARCHAR(100),
     CONTRASEÑA_CLI VARCHAR(255),
-    SALT_CLI VARCHAR(32)
+    FECHA_ULTIMA_MODIFICACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Tabla: Empleados
@@ -23,8 +23,8 @@ CREATE TABLE Empleados (
     EMAIL_EMPLEADO VARCHAR(100),
     ACTIVO_EMPLEADO BOOLEAN DEFAULT TRUE,
     CONTRASEÑA_EMPLEADO VARCHAR(255),
-    SALT_EMPLEADO VARCHAR(32),
-    FECHA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    FECHA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FECHA_ULTIMA_MODIFICACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Tabla: Administradores
@@ -33,8 +33,7 @@ CREATE TABLE Administradores (
     NOMBRE_ADMIN VARCHAR(100) NOT NULL,    
     TELEFONO_ADMIN VARCHAR(20),            
     EMAIL_ADMIN VARCHAR(100),
-    CONTRASEÑA_ADMIN VARCHAR(255),
-    SALT_ADMIN VARCHAR(32)
+    CONTRASEÑA_ADMIN VARCHAR(255)
 );
 
 -- Tabla: Proveedores
@@ -122,7 +121,7 @@ CREATE TABLE Pedidos (
     FECHA_ENTREGA DATETIME,
     TOTAL_PRODUCTO DECIMAL(10,2),
     CONSTRAINT FK_CLIENTE_PEDIDO
-        FOREIGN KEY (ID_CLIENTE) REFERENCES Clientes(ID_CLIENTE) ON UPDATE CASCADE ON DELETE RESTRICT,
+        FOREIGN KEY (ID_CLIENTE) REFERENCES Clientes(ID_CLIENTE) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT FK_EMPLEADO_PEDIDO
         FOREIGN KEY (ID_EMPLEADO) REFERENCES Empleados(ID_EMPLEADO) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT FK_ESTADO_PEDIDO_PEDIDO
@@ -151,33 +150,19 @@ CREATE TABLE Ordenes_Salida (
     FECHA_FACTURACION DATETIME,
     TOTAL_FACTURA DECIMAL(10,2),
     CONSTRAINT FK_ORDENSALIDA_CLIENTE
-        FOREIGN KEY (ID_CLIENTE) REFERENCES Clientes(ID_CLIENTE) ON UPDATE CASCADE ON DELETE RESTRICT,
+        FOREIGN KEY (ID_CLIENTE) REFERENCES Clientes(ID_CLIENTE) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT FK_ORDENSALIDA_PEDIDO
-        FOREIGN KEY (ID_PEDIDO) REFERENCES Pedidos(ID_PEDIDO) ON UPDATE CASCADE ON DELETE RESTRICT
-);
-    CONSTRAINT FK_ORDENSALIDA_PEDIDO
-        FOREIGN KEY (ID_PEDIDO) REFERENCES Pedidos(ID_PEDIDO) ON UPDATE CASCADE ON DELETE RESTRICT
+        FOREIGN KEY (ID_PEDIDO) REFERENCES Pedidos(ID_PEDIDO) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Función: GenerateSalt
+-- Función: HashPassword (simplificada sin salt)
 DELIMITER //
-CREATE FUNCTION GenerateSalt() 
-RETURNS VARCHAR(32)
-READS SQL DATA
-DETERMINISTIC
-BEGIN
-    RETURN SUBSTRING(MD5(CONCAT(RAND(), NOW(), CONNECTION_ID())), 1, 32);
-END//
-DELIMITER ;
-
--- Función: HashPassword
-DELIMITER //
-CREATE FUNCTION HashPassword(password VARCHAR(255), salt VARCHAR(32)) 
+CREATE FUNCTION HashPassword(password VARCHAR(255)) 
 RETURNS VARCHAR(255)
 READS SQL DATA
 DETERMINISTIC
 BEGIN
-    RETURN SHA2(CONCAT(password, salt), 256);
+    RETURN SHA2(password, 256);
 END//
 DELIMITER ;
 
@@ -223,6 +208,50 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Trigger: Auditoría - Actualizar fecha de modificación de clientes
+DELIMITER //
+CREATE TRIGGER tr_clientes_fecha_modificacion
+    BEFORE UPDATE ON Clientes
+    FOR EACH ROW
+BEGIN
+    SET NEW.FECHA_ULTIMA_MODIFICACION = CURRENT_TIMESTAMP;
+END//
+DELIMITER ;
+
+-- Trigger: Auditoría - Actualizar fecha de modificación de empleados
+DELIMITER //
+CREATE TRIGGER tr_empleados_fecha_modificacion
+    BEFORE UPDATE ON Empleados
+    FOR EACH ROW
+BEGIN
+    SET NEW.FECHA_ULTIMA_MODIFICACION = CURRENT_TIMESTAMP;
+END//
+DELIMITER ;
+
+-- Trigger: Validación de email para clientes
+DELIMITER //
+CREATE TRIGGER tr_clientes_validar_email
+    BEFORE INSERT ON Clientes
+    FOR EACH ROW
+BEGIN
+    IF NEW.EMAIL_CLI IS NOT NULL AND NEW.EMAIL_CLI NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email inválido para cliente';
+    END IF;
+END//
+DELIMITER ;
+
+-- Trigger: Validación de email para empleados
+DELIMITER //
+CREATE TRIGGER tr_empleados_validar_email
+    BEFORE INSERT ON Empleados
+    FOR EACH ROW
+BEGIN
+    IF NEW.EMAIL_EMPLEADO IS NOT NULL AND NEW.EMAIL_EMPLEADO NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email inválido para empleado';
+    END IF;
+END//
+DELIMITER ;
+
 -- ==================================================================
 -- DML (DATA MANIPULATION LANGUAGE) - INSERCIÓN DE DATOS
 -- ==================================================================
@@ -243,7 +272,17 @@ INSERT INTO Empleados (NOMBRE_EMPLEADO) VALUES
 ('Damian Avila'),
 ('Brayan Jimenez'),
 ('Ana Goyeneche'),
-('Sharyt Zamora');
+('Sharyt Zamora'),
+('Carlos Mendoza'),
+('Sofia Rodriguez'),
+('Miguel Torres'),
+('Valentina Castro'),
+('Diego Herrera'),
+('Camila Vargas'),
+('Alejandro Morales'),
+('Isabella Gutierrez'),
+('Sebastian Ramirez'),
+('Natalia Delgado');
 
 -- Inserción en tabla: Administradores 
 INSERT INTO Administradores (NOMBRE_ADMIN, TELEFONO_ADMIN, EMAIL_ADMIN) VALUES
@@ -384,81 +423,34 @@ INSERT INTO Ordenes_Salida (ID_CLIENTE, ID_PEDIDO, FECHA_FACTURACION, TOTAL_FACT
 (3, 3, '2025-06-21 14:30:00', 15500.00);
 
 -- ==================================================================
--- DSL (DATA SECURITY LANGUAGE) - SEGURIDAD Y ENCRIPTACIÓN
--- ==================================================================
-
--- ==================================================================
--- CONFIGURACIÓN DE SEGURIDAD - CONTRASEÑAS
--- ==================================================================
-
--- Actualizar contraseñas de administradores con encriptación
-UPDATE Administradores 
-SET SALT_ADMIN = GenerateSalt()
-WHERE ID_ADMIN = 1;
-
-UPDATE Administradores 
-SET CONTRASEÑA_ADMIN = HashPassword('admin123', SALT_ADMIN)
-WHERE ID_ADMIN = 1;
-
--- Actualizar contraseñas de clientes con encriptación
-UPDATE Clientes 
-SET SALT_CLI = GenerateSalt()
-WHERE ID_CLIENTE IN (1, 2, 3);
-
-UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente123', SALT_CLI)
-WHERE ID_CLIENTE = 1;
-
-UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente456', SALT_CLI)
-WHERE ID_CLIENTE = 2;
-
-UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente789', SALT_CLI)
-WHERE ID_CLIENTE = 3;
-
--- Actualizar contraseñas de empleados con encriptación
--- ==================================================================
 -- DCL (DATA CONTROL LANGUAGE) - SEGURIDAD Y ENCRIPTACIÓN
 -- ==================================================================
 
--- Actualizar contraseñas de administradores con encriptación
+-- Actualizar contraseñas de administradores con encriptación (sin salt)
 UPDATE Administradores 
-SET SALT_ADMIN = GenerateSalt()
+SET CONTRASEÑA_ADMIN = HashPassword('admin123')
 WHERE ID_ADMIN = 1;
 
-UPDATE Administradores 
-SET CONTRASEÑA_ADMIN = HashPassword('admin123', SALT_ADMIN)
-WHERE ID_ADMIN = 1;
-
--- Actualizar contraseñas de clientes con encriptación
+-- Actualizar contraseñas de clientes con encriptación (sin salt)
 UPDATE Clientes 
-SET SALT_CLI = GenerateSalt()
-WHERE ID_CLIENTE IN (1, 2, 3);
-
-UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente123', SALT_CLI)
+SET CONTRASEÑA_CLI = HashPassword('cliente123')
 WHERE ID_CLIENTE = 1;
 
 UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente456', SALT_CLI)
+SET CONTRASEÑA_CLI = HashPassword('cliente456')
 WHERE ID_CLIENTE = 2;
 
 UPDATE Clientes 
-SET CONTRASEÑA_CLI = HashPassword('cliente789', SALT_CLI)
+SET CONTRASEÑA_CLI = HashPassword('cliente789')
 WHERE ID_CLIENTE = 3;
 
--- Actualizar contraseñas de empleados con encriptación
+-- Actualizar contraseñas de empleados con encriptación (sin salt)
 UPDATE Empleados 
-SET SALT_EMPLEADO = GenerateSalt()
-WHERE ID_EMPLEADO IN (1, 2, 3, 4, 5);
-
-UPDATE Empleados 
-SET CONTRASEÑA_EMPLEADO = HashPassword('empleado123', SALT_EMPLEADO)
+SET CONTRASEÑA_EMPLEADO = HashPassword('empleado123')
 WHERE ID_EMPLEADO = 1;
 
 UPDATE Empleados 
-SET CONTRASEÑA_EMPLEADO = HashPassword('empleado456', SALT_EMPLEADO)
+SET CONTRASEÑA_EMPLEADO = HashPassword('empleado456')
 WHERE ID_EMPLEADO = 2;
 
 COMMIT;

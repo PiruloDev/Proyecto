@@ -1,4 +1,5 @@
 package com.example.Proyecto.Services.Administrador;
+import com.example.Proyecto.Services.Empleados.PojoEmpleado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,12 +24,12 @@ public class ConexionAdminService {
         return jdbcTemplate.query(sql, new RowMapper<Map<String, Object>>() {
             @Override
             public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Map<String, Object> cliente = new HashMap<>();
-                cliente.put("Id:", rs.getInt("ID_ADMIN"));
-                cliente.put("Nombre:", rs.getString("NOMBRE_ADMIN"));
-                cliente.put("Correo Electronico:", rs.getString("EMAIL_ADMIN"));
-                cliente.put("Telefono:", rs.getString("TELEFONO_ADMIN"));
-                return cliente;
+                Map<String, Object> administrador = new HashMap<>();
+                administrador.put("Id:", rs.getInt("ID_ADMIN"));
+                administrador.put("Nombre:", rs.getString("NOMBRE_ADMIN"));
+                administrador.put("Correo Electronico:", rs.getString("EMAIL_ADMIN"));
+                administrador.put("Telefono:", rs.getString("TELEFONO_ADMIN"));
+                return administrador;
             }
         });
     }
@@ -45,6 +46,19 @@ public class ConexionAdminService {
             int result = jdbcTemplate.update(sql, pojoAdmin.getNombre(), pojoAdmin.getEmail(), pojoAdmin.getTelefono(), contrasenaHasheada);
             return result > 0;
         } catch (DataAccessException e) {
+            return false;
+        }
+    }
+
+    public boolean actualizarAdministrador(PojoAdmin pojoAdmin) {
+        String sql = "UPDATE Administradores SET NOMBRE_ADMIN = ?, EMAIL_ADMIN = ?, TELEFONO_ADMIN=?, CONTRASENA_ADMIN = ? WHERE ID_ADMIN = ?";
+        try {
+            String contrasenaHasheada = passwordEncoder.encode(pojoAdmin.getContrasena());
+            int value = jdbcTemplate.update(
+                    sql, pojoAdmin.getNombre(), pojoAdmin.getEmail(), pojoAdmin.getTelefono(), contrasenaHasheada, pojoAdmin.getId());
+            return value > 0;
+        } catch (DataAccessException e) {
+            e.printStackTrace();
             return false;
         }
     }
