@@ -1,45 +1,56 @@
-package com.example.demoJava1.UsuariosRegistrados;
+package com.example.demoJava1.UsuariosRegistrados.Service;
 
-import com.example.demoJava1.dto.UsuarioReporteDTO;
-import com.example.demoJava1.model.Cliente;
-import com.example.demoJava1.model.Empleado;
-import com.example.demoJava1.model.Administrador;
-import com.example.demoJava1.repository.ClienteRepository;
-import com.example.demoJava1.repository.EmpleadoRepository;
-import com.example.demoJava1.repository.AdministradorRepository;
+import com.example.demoJava1.UsuariosRegistrados.UsuariosRegistradosDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ReporteUsuariosService {
+public class UsuariosRegistradosService {
 
-    private final Cliente clienteRepo;
-    private final Empleados empleadoRepo;
-    private final Administradores adminRepo;
+        @Autowired
+        private JdbcTemplate jdbcTemplate;
 
-    public ReporteUsuariosService(Cliente clienteRepo,
-                                  Empleados empleadoRepo,
-                                  Administradores adminRepo) {
-        this.clienteRepo = clienteRepo;
-        this.empleadoRepo = empleadoRepo;
-        this.adminRepo = adminRepo;
-    }
+        public List<UsuariosRegistradosDTO> obtenerUsuariosRegistrados() {
+                List<UsuariosRegistradosDTO> usuariosRegistrados = new ArrayList<>();
 
-    public List<UsuariosRegistradosDTO> generarReporteUsuarios() {
-        List<UsuariosRegistradosDTO> reporte = new ArrayList<>();
+                // Clientes
+                String sqlClientes = "SELECT NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM clientes";
+                usuariosRegistrados.addAll(jdbcTemplate.query(sqlClientes, (rs, rowNum) ->
+                        new UsuariosRegistradosDTO(
+                                rs.getString("NOMBRE_CLI"),
+                                rs.getString("EMAIL_CLI"),
+                                rs.getString("TELEFONO_CLI"),
+                                "Cliente"
+                        )
+                ));
 
-        for (Cliente c : clienteRepo.findAll()) {
-            reporte.add(new UsuariosRegistradosDTO(c.getNombre(), c.getEmail(), "Cliente"));
+                // Empleados
+                String sqlEmpleados = "SELECT NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM empleados";
+                usuariosRegistrados.addAll(jdbcTemplate.query(sqlEmpleados, (rs, rowNum) ->
+                        new UsuariosRegistradosDTO(
+                                rs.getString("NOMBRE_EMPLEADO"),
+                                rs.getString("EMAIL_EMPLEADO"),
+                                null,
+                                "Empleado"
+                        )
+                ));
+
+                // Administradores
+                String sqlAdmins = "SELECT NOMBRE_ADMIN, EMAIL_ADMIN FROM administradores";
+                usuariosRegistrados.addAll(jdbcTemplate.query(sqlAdmins, (rs, rowNum) ->
+                        new UsuariosRegistradosDTO(
+                                rs.getString("NOMBRE_ADMIN"),
+                                rs.getString("EMAIL_ADMIN"),
+                                null,
+                                "Administrador"
+                        )
+                ));
+
+                return usuariosRegistrados;
         }
-        for (Empleado e : empleadoRepo.findAll()) {
-            reporte.add(new UsuarioReporteDTO(e.getNombre(), e.getEmail(), "Empleado"));
-        }
-        for (Administrador a : adminRepo.findAll()) {
-            reporte.add(new UsuarioReporteDTO(a.getNombre(), a.getEmail(), "Administrador"));
-        }
-
-        return reporte;
-    }
 }
+
