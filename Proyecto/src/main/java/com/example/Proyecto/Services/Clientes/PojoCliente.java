@@ -1,12 +1,17 @@
 package com.example.Proyecto.Services.Clientes;
 
 public class PojoCliente {
+    private int id;
     private String nombre;
     private String email;
     private String telefono;
     private String contrasena;
 
     public PojoCliente() {}
+
+    public int getId() {return id;}
+
+    public void setId(int id) {this.id = id;}
 
     public String getNombre() {
         return nombre;
