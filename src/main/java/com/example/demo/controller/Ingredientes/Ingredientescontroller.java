@@ -15,12 +15,12 @@ public class Ingredientescontroller {
     private IngredientesService ingredientesService;
 
     // GET → obtener todos los ingredientes
-    @GetMapping("ingredientes")
+    @GetMapping("/ingredientes")
     public List<String> obtenerIngredientes() {
         return ingredientesService.obtenerIngredientes();
     }
 
-    @GetMapping("/lista/ingredientes")
+    @GetMapping("/lista/")
     public List<Ingredientes> obtenerIngredientesListas() {
         return ingredientesService.obtenerTodosLosIngredientes();
     }
@@ -34,7 +34,7 @@ public class Ingredientescontroller {
     }
 
     // PUT → editar un ingrediente existente
-    @PutMapping("/ingrediente/{id}")
+    @PutMapping("ingrediente/{id}")
     public String editarIngrediente(@PathVariable int id, @RequestBody Ingredientes ingrediente) {
         ingrediente.setIdIngrediente(id); // asigna el ID de la URL al objeto
 
@@ -48,7 +48,7 @@ public class Ingredientescontroller {
     }
 
     // Metodo PATCH
-    @PatchMapping("/ingredientes/{id}/cantidad")
+    @PatchMapping("/{id}/cantidad")
     public String patchCantidad(@PathVariable int id, @RequestBody Map<String, Object> updates) {
         if (updates.containsKey("cantidadIngrediente")) {
             int cantidad = (int) updates.get("cantidadIngrediente");
@@ -60,7 +60,7 @@ public class Ingredientescontroller {
 
 
     // DELETE → eliminar un ingrediente por ID
-    @DeleteMapping("/ingrediente/{id}")
+    @DeleteMapping("/{id}")
     public String eliminarIngrediente(@PathVariable int id) {
         int filas = ingredientesService.eliminarIngrediente(id);
         if (filas > 0) {
