@@ -20,12 +20,12 @@ public class Ingredientescontroller {
         return ingredientesService.obtenerIngredientes();
     }
 
-    @GetMapping("/lista/")
+    @GetMapping("ingredientes/lista")
     public List<Ingredientes> obtenerIngredientesListas() {
         return ingredientesService.obtenerTodosLosIngredientes();
     }
 
-    // POST → crear un nuevo ingrediente
+    // Metodo post  crear un nuevo ingrediente
     @PostMapping("/crearingrediente")
     public String crearIngrediente(@RequestBody Ingredientes ingrediente) {
         ingredientesService.crearIngrediente(ingrediente);
@@ -60,7 +60,7 @@ public class Ingredientescontroller {
 
 
     // DELETE → eliminar un ingrediente por ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("ingrediente/{id}")
     public String eliminarIngrediente(@PathVariable int id) {
         int filas = ingredientesService.eliminarIngrediente(id);
         if (filas > 0) {

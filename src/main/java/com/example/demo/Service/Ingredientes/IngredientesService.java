@@ -29,7 +29,6 @@ public class IngredientesService {
     // Metodo para obtener todos los ingredientes
     public List<Ingredientes> obtenerTodosLosIngredientes() {
         String sql = "SELECT * FROM Ingredientes";
-
         return jdbcTemplate.query(sql, new RowMapper<Ingredientes>() {
             @Override
             public Ingredientes mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -41,7 +40,6 @@ public class IngredientesService {
                 ingrediente.setCantidadIngrediente(rs.getInt("CANTIDAD_INGREDIENTE"));
                 ingrediente.setFechaVencimiento(rs.getDate("FECHA_VENCIMIENTO"));
                 ingrediente.setReferenciaIngrediente(rs.getString("REFERENCIA_INGREDIENTE"));
-                ingrediente.setFechaEntregaIngrediente(rs.getDate("FECHA_ENTREGA_INGREDIENTE"));
                 return ingrediente;
             }
         });
@@ -74,7 +72,7 @@ public class IngredientesService {
                 "REFERENCIA_INGREDIENTE = ?, " +
                 "FECHA_ENTREGA_INGREDIENTE = ? " +
                 "WHERE ID_INGREDIENTE = ?";
-
+    //
         return jdbcTemplate.update(sql,
                 ingrediente.getIdProveedor(),
                 ingrediente.getIdCategoria(),
