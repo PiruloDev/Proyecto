@@ -22,6 +22,9 @@ import jakarta.persistence.Id;
      };
 
      public int getId() { return id; }
+    public void setId(int id) {
+        this.id = id;
+    }
      public String getNombre() { return nombre; }
      public String getTelefono() { return telefono; }
      public String getEmail() { return email; }
