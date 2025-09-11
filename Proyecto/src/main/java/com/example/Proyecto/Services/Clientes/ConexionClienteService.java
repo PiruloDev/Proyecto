@@ -48,10 +48,10 @@ public class ConexionClienteService {
         }
     }
     public boolean actualizarCliente(PojoCliente pojoCliente) {
-        String sql = "UPDATE Clientes SET NOMBRE_CLI = ?, EMAIL_CLI = ?, TELEFONO_CLI = ?, CONTRASENA_CLI = ?";
+        String sql = "UPDATE Clientes SET NOMBRE_CLI = ?, EMAIL_CLI = ?, TELEFONO_CLI = ?, CONTRASENA_CLI = ? WHERE ID_CLIENTE = ?";
         try {
             String contrasenaHasheada = passwordEncoder.encode(pojoCliente.getContrasena());
-            int value = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada);
+            int value = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada, pojoCliente.getId());
             return value > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();

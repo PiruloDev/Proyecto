@@ -70,14 +70,16 @@ public class ConexionController {
     }
 
     // ----> Clientes PATCH
-    @PatchMapping("/actualizar/cliente")
-    public ResponseEntity<String> actualizarCliente(@RequestBody PojoCliente pojoCliente){
+    @PatchMapping("/actualizar/cliente/{id}")
+    public ResponseEntity<String> actualizarCliente(@PathVariable int id, @RequestBody PojoCliente pojoCliente) {
+        pojoCliente.setId(id);
         boolean actualizado = conexionClienteService.actualizarCliente(pojoCliente);
-        if(actualizado) {
+
+        if (actualizado) {
             return ResponseEntity.ok("El Usuario ha sido actualizado correctamente");
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al actualizar el Usuario");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró un usuario con el ID especificado");
         }
     }
 
@@ -99,8 +101,9 @@ public class ConexionController {
     }
 
     // ----> Empleados UPDATE
-    @PatchMapping("/actualizar/empleado")
-    public ResponseEntity<String> actualizarEmpleado(@RequestBody PojoEmpleado pojoEmpleado){
+    @PatchMapping("/actualizar/empleado/{id}")
+    public ResponseEntity<String> actualizarEmpleado(@PathVariable int id, @RequestBody PojoEmpleado pojoEmpleado){
+        pojoEmpleado.setId(id);
         boolean actualizado = conexionEmpleadoService.actualizarEmpleado(pojoEmpleado);
         if(actualizado) {
             return ResponseEntity.ok("El Empleado ha sido actualizado correctamente");
