@@ -44,4 +44,30 @@ $respuesta = consumirCURL("/agregar/venta", "POST", $nuevaVenta);
 // Respuesta del servidor
 echo "Código HTTP: " . $respuesta["codigo"] . "\n";
 echo "Respuesta del servidor: " . $respuesta["respuesta"] . "\n";
+
+// --------- MÉTODO PATCH ----------
+$actualizar = readline("¿Desea actualizar una venta existente? (s/n): ");
+
+if (strtolower($actualizar) === "s") {
+    $idActualizar = readline("Ingrese el ID de la factura que desea actualizar: ");
+
+    echo "\nIngrese los nuevos datos (deje en blanco si no quiere modificar ese campo)\n";
+
+    $idCliente = readline("Nuevo ID del cliente: ");
+    $idPedido = readline("Nuevo ID del pedido: ");
+    $fechaFacturacion = readline("Nueva fecha de facturación (YYYY-MM-DD): ");
+    $totalFactura = readline("Nuevo total de la factura: ");
+
+    $datosActualizados = [];
+
+    if ($idCliente !== "") $datosActualizados["idCliente"] = (int)$idCliente;
+    if ($idPedido !== "") $datosActualizados["idPedido"] = (int)$idPedido;
+    if ($fechaFacturacion !== "") $datosActualizados["fechaFacturacion"] = $fechaFacturacion;
+    if ($totalFactura !== "") $datosActualizados["totalFactura"] = (float)$totalFactura;
+
+    $respuesta = consumirCURL("/actualizar/venta/$idActualizar", "PATCH", $datosActualizados);
+
+    echo "Código HTTP: " . $respuesta["codigo"] . "\n";
+    echo "Respuesta del servidor: " . $respuesta["respuesta"] . "\n";
+}
 ?>

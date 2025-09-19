@@ -1,26 +1,29 @@
 <?php
 
-$BASE_URL = "http://localhost:8080";
+$BASE_URL = "http://localhost:8080"; 
 
-// Función para consumir servicios con GET
+// FUNCIÓN GET
 function consumirGET($endpoint) {
     global $BASE_URL;
     $url = $BASE_URL . $endpoint;
 
-    $respuesta = file_get_contents($url);
+    $respuesta = @file_get_contents($url);
+
     if ($respuesta === FALSE) {
-        die("Error al consumir el servicio: $url");
+        die("Error al consumir el servicio GET: $url");
     }
+
     return json_decode($respuesta);
 }
 
-// Función para enviar datos con cURL (POST, PATCH, DELETE)
+// FUNCIÓN POST / PATCH / DELETE
+
 function consumirCURL($endpoint, $metodo, $data = null) {
     global $BASE_URL;
     $url = $BASE_URL . $endpoint;
 
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $metodo);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($metodo));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     if ($data !== null) {
@@ -41,6 +44,9 @@ function consumirCURL($endpoint, $metodo, $data = null) {
 
     curl_close($ch);
 
-    return ["codigo" => $http_code, "respuesta" => $respuesta];
+    return [
+        "codigo" => $http_code,
+        "respuesta" => $respuesta
+    ];
 }
 ?>
