@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__ . '/config.php';
 
-class actualizarEmpleado {
+class actualizarCliente {
     public function getActualizacionEndpoint(string $tipo, int $id): string {
         return match ($tipo) {
             'cliente' => endopointActualizacion::cliente($id),
@@ -23,6 +23,7 @@ class actualizarEmpleado {
         echo "\n¿Qué desea actualizar?\n";
         echo "1. Nombre\n";
         echo "2. Email\n";
+        echo "3. Teléfono\n";
         echo "4. Contraseña\n";
         echo "5. Todos los campos\n";
         echo "Seleccione una opción (1-5): ";
@@ -36,25 +37,31 @@ class actualizarEmpleado {
                 $datos_nuevos["nombre"] = $nombre;
                 break;
                 
-            case '2':
+            case "2":
+                $telefono = readline("Ingrese el nuevo telefono: ");
+                $datos_nuevos["telefono"] = $telefono;
+                break;
+                
+            case '3':
                 $email = readline("Ingrese el nuevo email: ");
                 $datos_nuevos["email"] = $email;
                 break;
 
-            case '3':
+            case '4':
                 $contrasena = readline("Ingrese la nueva contraseña: ");
                 $datos_nuevos["contrasena"] = $contrasena;
                 break;
                 
-            case '4':
+            case '5':
                 $nombre = readline("Ingrese el nombre: ");
                 $email = readline("Ingrese el email: ");
-                $telefono = readline("Ingrese el teléfono: ");
+                $telefono = readline("Ingrese el telefono: ");
                 $contrasena = readline("Ingrese la contraseña: ");
                 
                 $datos_nuevos = array(
                     "nombre" => $nombre,
                     "email" => $email,
+                    "telefono" => $telefono,
                     "contrasena" => $contrasena
                 );
                 break;
@@ -84,8 +91,6 @@ class actualizarEmpleado {
     }
     
     public function mostrarActualizacion(string $tipo): void {
-        echo "\n=== ACTUALIZACIÓN DE CLIENTE ===\n";
-        
         $resultado = $this->actualizarClientes($tipo);
         
         echo "\n HTTP Code: " . $resultado['http_code'] . "\n";
@@ -104,6 +109,6 @@ class actualizarEmpleado {
     }
 }
 
-$actualizacion = new actualizarEmpleado();
+$actualizacion = new actualizarCliente();
 $actualizacion->mostrarActualizacion('cliente');
 ?>
