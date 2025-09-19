@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +43,49 @@ public class ConexionClienteService {
                 return false;
             }
             String contrasenaHasheada = passwordEncoder.encode(pojoCliente.getContrasena());
-                int result = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada);
+            int result = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada);
             return result > 0;
         } catch (DataAccessException e) {
             return false;
         }
     }
-    public boolean actualizarCliente(PojoCliente pojoCliente) {
-        String sql = "UPDATE Clientes SET NOMBRE_CLI = ?, EMAIL_CLI = ?, TELEFONO_CLI = ?, CONTRASENA_CLI = ? WHERE ID_CLIENTE = ?";
+
+    public boolean actualizarCliente(int id, Map<String, Object> campos) {
+        if (campos.isEmpty()) {
+            return false;
+        }
+        StringBuilder sql = new StringBuilder("UPDATE Clientes SET ");
+        List<Object> parametros = new ArrayList<>();
+        boolean primero = true;
+        if (campos.containsKey("nombre")) {
+            if (!primero) sql.append(", ");
+            sql.append("NOMBRE_CLI = ?");
+            parametros.add(campos.get("nombre"));
+            primero = false;
+        }
+        if (campos.containsKey("email")) {
+            if (!primero) sql.append(", ");
+            sql.append("EMAIL_CLI = ?");
+            parametros.add(campos.get("email"));
+            primero = false;
+        }
+        if (campos.containsKey("telefono")) {
+            if (!primero) sql.append(", ");
+            sql.append("TELEFONO_CLI = ?");
+            parametros.add(campos.get("telefono"));
+            primero = false;
+        }
+        if (campos.containsKey("contrasena")) {
+            if (!primero) sql.append(", ");
+            sql.append("CONTRASENA_CLI = ?");
+            String contrasenaHasheada = passwordEncoder.encode((String) campos.get("contrasena"));
+            parametros.add(contrasenaHasheada);
+            primero = false;
+        }
+        sql.append(" WHERE ID_CLIENTE = ?");
+        parametros.add(id);
         try {
-            String contrasenaHasheada = passwordEncoder.encode(pojoCliente.getContrasena());
-            int value = jdbcTemplate.update(sql, pojoCliente.getNombre(), pojoCliente.getEmail(), pojoCliente.getTelefono(), contrasenaHasheada, pojoCliente.getId());
+            int value = jdbcTemplate.update(sql.toString(), parametros.toArray());
             return value > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();
@@ -60,4 +93,6 @@ public class ConexionClienteService {
         }
     }
 }
+
+
 

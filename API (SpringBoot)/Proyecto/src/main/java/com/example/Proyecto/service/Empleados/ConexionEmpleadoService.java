@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,15 +64,52 @@ public class ConexionEmpleadoService {
         }
     }
 
-    public boolean actualizarEmpleado(PojoEmpleado pojoEmpleado) {
-        String sql = "UPDATE Empleados SET NOMBRE_EMPLEADO = ?, EMAIL_EMPLEADO = ?, CONTRASENA_EMPLEADO = ? WHERE ID_EMPLEADO = ?";
+    public boolean actualizarEmpleado(int id, Map<String, Object> campos) {
+        if (!existeEmpleado(id) || campos.isEmpty()) {
+            return false;
+        }
+        StringBuilder sql = new StringBuilder("UPDATE Empleados SET ");
+        List<Object> parametros = new ArrayList<>();
+        boolean primero = true;
+        if (campos.containsKey("nombre")) {
+            if (!primero) sql.append(", ");
+            sql.append("NOMBRE_EMPLEADO = ?");
+            parametros.add(campos.get("nombre"));
+            primero = false;
+        }
+
+        if (campos.containsKey("email")) {
+            if (!primero) sql.append(", ");
+            sql.append("EMAIL_EMPLEADO = ?");
+            parametros.add(campos.get("email"));
+            primero = false;
+        }
+
+        if (campos.containsKey("contrasena")) {
+            if (!primero) sql.append(", ");
+            sql.append("CONTRASENA_EMPLEADO = ?");
+            String contrasenaHasheada = passwordEncoder.encode((String) campos.get("contrasena"));
+            parametros.add(contrasenaHasheada);
+            primero = false;
+        }
+
+        sql.append(" WHERE ID_EMPLEADO = ?");
+        parametros.add(id);
+
         try {
-            String contrasenaHasheada = passwordEncoder.encode(pojoEmpleado.getContrasena());
-            int value = jdbcTemplate.update(
-                    sql, pojoEmpleado.getNombre(), pojoEmpleado.getEmail(), contrasenaHasheada, pojoEmpleado.getId());
+            int value = jdbcTemplate.update(sql.toString(), parametros.toArray());
             return value > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean existeEmpleado(int id) {
+        String sql = "SELECT COUNT(*) FROM Empleados WHERE ID_EMPLEADO = ?";
+        try {
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+            return count != null && count > 0;
+        } catch (DataAccessException e) {
             return false;
         }
     }
