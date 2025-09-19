@@ -152,7 +152,6 @@ function deleteIngrediente() {
     }
 }
 
-// Bucle principal para el menú interactivo
 while (true) {
     echo "\n--- Menú de Operaciones API para Ingredientes ---\n";
     echo "1. Obtener todos los ingredientes (GET)\n";

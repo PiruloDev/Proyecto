@@ -30,6 +30,7 @@ public class ConexionControllerUsers {
     public List<Map<String, Object>> obtenerDetallesAdministrador() {
         return conexionAdminService.obtenerDetallesAdministrador();
     }
+
     // ----> Administradores POST
     @PostMapping("/crear/administrador")
     public String crearAdmin(@RequestBody PojoAdmin pojoAdmin) {
@@ -43,9 +44,9 @@ public class ConexionControllerUsers {
 
     // ----> Administradores PATCH
     @PatchMapping("/actualizar/administrador")
-    public ResponseEntity<String> actualizarAdministrador(@RequestBody PojoAdmin pojoAdmin){
+    public ResponseEntity<String> actualizarAdministrador(@RequestBody PojoAdmin pojoAdmin) {
         boolean actualizado = conexionAdminService.actualizarAdministrador(pojoAdmin);
-        if(actualizado) {
+        if (actualizado) {
             return ResponseEntity.ok("El Administrador ha sido actualizado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -72,18 +73,19 @@ public class ConexionControllerUsers {
 
     // ----> Clientes PATCH
     @PatchMapping("/actualizar/cliente/{id}")
-    public ResponseEntity<String> actualizarCliente(@PathVariable int id, @RequestBody Map<String, Object> campos){
+    public ResponseEntity<String> actualizarCliente(@PathVariable int id, @RequestBody Map<String, Object> campos) {
         boolean actualizado = conexionClienteService.actualizarCliente(id, campos);
-        if(actualizado) {
+        if (actualizado) {
             return ResponseEntity.ok("El Cliente ha sido actualizado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al actualizar el Cliente");
         }
     }
+
     // ----> Empleados GET
     @GetMapping("/detalle/empleado")
-    public List<Map<String, Object>> obtenerDetallesEmpleado(){
+    public List<Map<String, Object>> obtenerDetallesEmpleado() {
         return conexionEmpleadoService.obtenerDetallesEmpleado();
     }
 
@@ -100,9 +102,9 @@ public class ConexionControllerUsers {
 
     // ----> Empleados UPDATE
     @PatchMapping("/actualizar/empleado/{id}")
-    public ResponseEntity<String> actualizarEmpleado(@PathVariable int id, @RequestBody Map<String, Object> campos){
+    public ResponseEntity<String> actualizarEmpleado(@PathVariable int id, @RequestBody Map<String, Object> campos) {
         boolean actualizado = conexionEmpleadoService.actualizarEmpleado(id, campos);
-        if(actualizado) {
+        if (actualizado) {
             return ResponseEntity.ok("El Empleado ha sido actualizado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -111,9 +113,9 @@ public class ConexionControllerUsers {
     }
 
     // ----> Empleados DELETE
-    @DeleteMapping("/eliminar/empleado")
-    public String eliminarEmpleado(@RequestBody PojoDeleteEmpleado pojoDeleteEmpleado) {
-        boolean eliminado = conexionEmpleadoService.eliminarEmpleado(pojoDeleteEmpleado.getId());
+    @DeleteMapping("/eliminar/empleado/{id}")
+    public String eliminarEmpleado(@PathVariable int id) {
+        boolean eliminado = conexionEmpleadoService.eliminarEmpleado((long) id);
         if (eliminado) {
             return "Empleado eliminado exitosamente";
         } else {

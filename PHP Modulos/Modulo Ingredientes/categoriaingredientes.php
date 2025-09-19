@@ -37,9 +37,7 @@ function callApi($url, $method, $data = null) {
     ];
 }
 
-/*
-    Método GET 
-*/
+
 function getCategoriasIngredientes() {
     echo "--- Lista de Categorías de Ingredientes ---\n";
     $url = endpointGet::API_GET_CATEGORIAS;
@@ -62,9 +60,6 @@ function getCategoriasIngredientes() {
     }
 }
 
-/*
-    Método POST 
-*/
 function postCategoriaIngrediente() {
     $url = endpointPost::API_CREAR_CATEGORIA;
     $nombreCategoria = readline("Ingresa el nombre de la nueva categoria: ");
@@ -84,9 +79,6 @@ function postCategoriaIngrediente() {
     }
 }
 
-/*
-    Método PUT 
-*/
 function putCategoriaIngrediente() {
     $id = (int)readline("Ingresa el ID de la categoria a actualizar: ");
     $nombreNuevo = readline("Ingresa el nuevo nombre para la categoria: ");
@@ -109,9 +101,7 @@ function putCategoriaIngrediente() {
     }
 }
 
-/*
-    Método DELETE 
-*/
+
 function deleteCategoriaIngrediente() {
     $id = (int)readline("Ingresa el ID de la categoria a eliminar: ");
     $url = endpointDelete::categoria($id);
@@ -127,7 +117,6 @@ function deleteCategoriaIngrediente() {
     }
 }
 
-// Bucle principal
 while (true) {
     echo "\n--- Menú de Operaciones API para Categorías de Ingredientes ---\n";
     echo "1. Obtener todas las categorías (GET)\n";
