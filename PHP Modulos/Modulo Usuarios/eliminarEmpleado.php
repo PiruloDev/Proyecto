@@ -21,10 +21,9 @@ class eliminarEmpleado {
         
         echo "\n Empleado seleccionado ID: $id_empleado\n";
         echo "\nEsta seguro que desea eliminar este empleado?\n";
-        echo "1. Si\n";
-        echo "2. No\n";
+        echo "1. Si, eliminar empleado\n";
+        echo "2. No, cancelar operacion\n";
         echo "Seleccione una opcion (1-2): ";
-        echo "¡IMPORTANTE ! Esta accion no se puede deshacer. \n";
         
         $confirmacion = readline();
         
@@ -43,12 +42,16 @@ class eliminarEmpleado {
 
         $proceso = curl_init($url);
         curl_setopt_array($proceso, [
-            CURLOPT_CUSTOMREQUEST => "PATCH", 
+            CURLOPT_CUSTOMREQUEST => "DELETE",
             CURLOPT_POSTFIELDS => $data_json,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
-                "Content-Length: " . strlen($data_json))]);
+                "Accept: application/json",
+                "Content-Length: " . strlen($data_json)
+            ]
+        ]);
 
         $response = curl_exec($proceso);
         $http_code = curl_getinfo($proceso, CURLINFO_HTTP_CODE);
