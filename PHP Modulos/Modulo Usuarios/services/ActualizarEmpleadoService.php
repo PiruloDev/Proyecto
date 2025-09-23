@@ -84,8 +84,6 @@ class actualizarEmpleado {
     }
     
     public function mostrarActualizacion(string $tipo): void {
-        echo "\n=== ACTUALIZACIÓN DE EMPLEADO ===\n";
-        
         $resultado = $this->actualizarEmpleado($tipo);
         
         echo "\n HTTP Code: " . $resultado['http_code'] . "\n";
@@ -103,7 +101,6 @@ class actualizarEmpleado {
         echo "\n";
     }
 }
-
 $actualizacion = new actualizarEmpleado();
 $actualizacion->mostrarActualizacion('empleado');
 ?>

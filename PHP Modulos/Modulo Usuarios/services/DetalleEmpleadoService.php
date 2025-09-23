@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../configuration/config.php';
 
 class DetallesEmpleados {
     public function getDetalleEndpoint(string $tipo): string {
@@ -29,9 +29,6 @@ class DetallesEmpleados {
         return ['http_code' => $http_code,'data' => $dato];
     }
     public function mostrarDatos(string $tipo): void {
-        echo "\n=== DATOS DE EMPLEADOS ===\n";
-        echo "Endpoint: " . $this->getDetalleEndpoint($tipo) . "\n";
-        
         $resultado = $this->obtenerDatos($tipo);
         
         echo "HTTP Code: " . $resultado['http_code'] . "\n";

@@ -1,7 +1,7 @@
 ﻿<?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../configuration/config.php';
 
-class DetallesUsusarios {
+class detallesUsusarios {
     public function getDetalleEndpoint(string $tipo): string {
         return match ($tipo) {
             'cliente' => endpointDetalles::API_DETALLE_CLIENTE,
@@ -29,19 +29,6 @@ class DetallesUsusarios {
 
         return ['http_code' => $http_code,'data' => $dato];
     }
-    public function mostrarDatos(string $tipo): void {
-        echo "\n=== DATOS DE CLIENTES ===\n";
-        echo "Endpoint: " . $this->getDetalleEndpoint($tipo) . "\n";
-        
-        $resultado = $this->obtenerDatos($tipo);
-        
-        echo "HTTP Code: " . $resultado['http_code'] . "\n";
-        echo "Datos obtenidos:\n";
-        echo json_encode($resultado['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n";
-        echo "\n";
-        echo "El conteo total de clientes es: " . count($resultado['data']) . "\n";
-    }
 }
-$detalles = new DetallesUsusarios();
-$detalles->mostrarDatos('cliente');
+$detalles = new detallesUsusarios();
 ?>
