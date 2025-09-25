@@ -134,15 +134,31 @@ class ObtenerClienteController {
                             $datosActualizar['telefono'] = $nuevo_telefono;
                         }
                         break;
+                    case 'cambiar_contrasena':
+                        $nueva_contrasena = trim($_POST['nueva_contrasena'] ?? '');
+                        if (!empty($nueva_contrasena)) {
+                            $datosActualizar['contrasena'] = $nueva_contrasena;
+                        }
+                        break;
                 }
                 
                 if (!empty($datosActualizar)) {
+                    $debug_info = "<p style='color:blue;'>Debug: ID=" . $id_cliente . ", Datos: " . json_encode($datosActualizar) . "</p>";
+                    
                     $resultado = $this->actualizarClientes->actualizarCliente($id_cliente, $datosActualizar);
                     
+                    $debug_response = "<p style='color:orange;'>Debug Response: " . json_encode($resultado) . "</p>";
+                    
                     if ($resultado['success']) {
-                        $mensaje = "<p style='color:green;'>Cliente modificado exitosamente.</p>";
+                        $mensaje = "<p style='color:green;'>Cliente modificado exitosamente.</p>" . $debug_info . $debug_response;
+                        $resultadoClientes = $this->detallesClientes->obtenerDatos('cliente');
+                        $usuarios = $resultadoClientes['data'] ?? [];
+                        if ($id_cliente > 0 && $id_cliente <= count($usuarios)) {
+                            $cliente = $usuarios[$id_cliente - 1];
+                            $cliente['id'] = $id_cliente;
+                        }
                     } else {
-                        $mensaje = "<p style='color:red;'>Error al modificar cliente: " . ($resultado['error'] ?? 'Error desconocido') . "</p>";
+                        $mensaje = "<p style='color:red;'>Error al modificar cliente: " . ($resultado['error'] ?? 'Error desconocido') . "</p>" . $debug_info . $debug_response;
                     }
                 } else {
                     $mensaje = "<p style='color:red;'>No se proporcionaron datos válidos para la modificación.</p>";
@@ -166,7 +182,7 @@ class ObtenerClienteController {
                 $this->modificarCliente();
                 break;
             default:
-                $this->manejoPeticionCliente();
+                $this->peticionCliente();
                 break;
         }
     }

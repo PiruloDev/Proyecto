@@ -48,6 +48,12 @@
             <h4>Cambiar Telefono</h4>
             <input type="text" name="nuevo_telefono" placeholder="Nuevo telefono" required>
             <button type="submit" name="accion" value="cambiar_telefono">Cambiar Telefono</button>
+            
+            <hr>
+            
+            <h4>Cambiar Contraseña</h4>
+            <input type="password" name="nueva_contrasena" placeholder="Nueva contraseña" required>
+            <button type="submit" name="accion" value="cambiar_contrasena">Cambiar Contraseña</button>
         </form>
         
     <?php else: ?>
