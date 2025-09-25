@@ -28,16 +28,7 @@ class DetallesEmpleados {
 
         return ['http_code' => $http_code,'data' => $dato];
     }
-    public function mostrarDatos(string $tipo): void {
-        $resultado = $this->obtenerDatos($tipo);
-        
-        echo "HTTP Code: " . $resultado['http_code'] . "\n";
-        echo "Datos obtenidos:\n";
-        echo json_encode($resultado['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n";
-        echo "\n";
-        echo "El conteo total de empleados es: " . count($resultado['data']) . "\n";
-    }
 }
 $detalles = new DetallesEmpleados();
-$detalles->mostrarDatos('empleados');
+
 ?>

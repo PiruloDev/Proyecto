@@ -1,75 +1,55 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../configuration/config.php';
 
-class RegistroEmpleados { 
+class RegistroEmpleadoService { 
     public function getCreacionEndpoint(string $tipo): string {
         return match ($tipo) {
-            'cliente' => endpointCreacion::API_CREAR_EMPLEADO,
+            'empleado' => endpointCreacion::API_CREAR_EMPLEADO,
             default => throw new InvalidArgumentException("Tipo desconocido: $tipo"),
         };
     }
     
-    public function crearEmpleado(string $tipo): array {
-        $url = $this->getCreacionEndpoint($tipo);
-
-        echo "\n==============================\n";
-        echo "=== REGISTRO DE EMPLEADOS ===\n";
-        echo "==============================\n";
-
-        $nombre = readline("Ingrese el nombre: ");
-        $telefono = readline("Ingrese el telefono: ");
-        $correo = readline("Ingrese el correo: ");
-        $contrasena = readline("Ingrese la contraseña: ");
-
-        $datos_nuevos = array(
-            "nombre" => $nombre,
-            "email" => $correo,
-            "telefono" => $telefono,
-            "contrasena" => $contrasena
-        );
-
-        $data_json = json_encode($datos_nuevos);
+    public function registrarEmpleado(array $datosEmpleado): array {
+        $url = $this->getCreacionEndpoint('empleado');
+        
+        $data_json = json_encode($datosEmpleado);
         
         $proceso = curl_init($url);
-        curl_setopt($proceso, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($proceso, CURLOPT_POSTFIELDS, $data_json);
-        curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($proceso, CURLOPT_HTTPHEADER, array(
-            "Content-Type: application/json",
-            "Content-Length: " . strlen($data_json)
-        ));
+        curl_setopt_array($proceso, [
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => $data_json,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_HTTPHEADER => [
+                "Content-Type: application/json",
+                "Accept: application/json",
+                "Content-Length: " . strlen($data_json)
+            ]
+        ]);
 
         $response = curl_exec($proceso);
         $http_code = curl_getinfo($proceso, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($proceso);
         curl_close($proceso);
 
+        if ($response === false) {
+            return [
+                'success' => false,
+                'http_code' => 0,
+                'error' => "Error de conexión: $curl_error",
+                'data' => null
+            ];
+        }
+      
+        $data = json_decode($response, true);
+        
         return [
+            'success' => ($http_code === 200 || $http_code === 201),
             'http_code' => $http_code,
-            'data' => json_decode($response, true)
+            'data' => $data,
+            'error' => !($http_code === 200 || $http_code === 201) ? "HTTP Error: $http_code - $response" : null,
         ];
     }
-    
-    public function mostrarRegistro(string $tipo): void {
-        echo "\n=== REGISTRO DE NUEVO EMPLEADO ===\n";
-        echo "Endpoint: " . $this->getCreacionEndpoint($tipo) . "\n";
-        
-        $resultado = $this->crearEmpleado($tipo);
-        
-        echo "HTTP Code: " . $resultado['http_code'] . "\n";
-
-        if ($resultado['http_code'] == 200){
-            echo "Empleado registrado exitosamente.\n";
-        } else {
-            echo "Error al registrar el Empleado.\n";
-        }
-        if ($resultado['data'] !== null && !empty($resultado['data'])) {
-            echo "Respuesta del servidor:\n";
-            echo json_encode($resultado['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n";
-        }
-        echo "\n";
-    }
 }
-
-$registro = new RegistroEmpleados();
-$registro->mostrarRegistro('cliente');
 ?>

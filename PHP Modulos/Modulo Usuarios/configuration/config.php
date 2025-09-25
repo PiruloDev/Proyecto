@@ -10,7 +10,7 @@ class endpointCreacion {
     const API_CREAR_CLIENTE = 'http://localhost:8080/crear/cliente';
     const API_CREAR_EMPLEADO = 'http://localhost:8080/crear/empleado';
 }
-class endopointActualizacion {
+class endpointActualizacion {
     const API_ACTUALIZAR_ADMINISTRADOR = 'http://localhost:8080/actualizar/administrador';
     const API_ACTUALIZAR_CLIENTE = 'http://localhost:8080/actualizar/cliente';
     const API_ACTUALIZAR_EMPLEADO = 'http://localhost:8080/actualizar/empleado';
