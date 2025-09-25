@@ -1,88 +1,60 @@
-<?php
-$detalles = $detalles ?? [];
-$modo = $modo ?? "listar";
-$detalleEditar = $detalleEditar ?? null;
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Detalles de Pedido</title>
-</head>
-<body>
-    <h1>Gestión de Detalles de Pedido</h1>
+<h1>Gestión de Detalle de Pedidos</h1>
 
-    <!-- LISTA -->
-    <h2>Detalles Registrados</h2>
+<!-- Listado -->
+<h2>Lista de Detalles</h2>
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th><th>ID Pedido</th><th>ID Producto</th>
+        <th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th>
+    </tr>
     <?php if (!empty($detalles)): ?>
         <?php foreach ($detalles as $d): ?>
-            <div style="border:1px solid #ccc; margin:5px; padding:5px;">
-                <strong>ID Detalle:</strong> <?= htmlspecialchars($d['idDetalle']) ?><br>
-                <strong>ID Pedido:</strong> <?= htmlspecialchars($d['idPedido']) ?><br>
-                <strong>ID Producto:</strong> <?= htmlspecialchars($d['idProducto']) ?><br>
-                <strong>Cantidad:</strong> <?= htmlspecialchars($d['cantidadProducto']) ?><br>
-                <strong>Precio Unitario:</strong> <?= htmlspecialchars($d['precioUnitario']) ?><br>
-                <strong>Subtotal:</strong> <?= htmlspecialchars($d['subtotal']) ?><br>
-
-                <a href="?modulo=detallePedidos&accion=editar
-                    &id=<?= urlencode($d['idDetalle']) ?>
-                    &idPedido=<?= urlencode($d['idPedido']) ?>
-                    &idProducto=<?= urlencode($d['idProducto']) ?>
-                    &cantidadProducto=<?= urlencode($d['cantidadProducto']) ?>
-                    &precioUnitario=<?= urlencode($d['precioUnitario']) ?>
-                    &subtotal=<?= urlencode($d['subtotal']) ?>">
-                    ✏️ Editar
-                </a>
-                |
-                <a href="?modulo=detallePedidos&accion=eliminar&id=<?= urlencode($d['idDetalle']) ?>"
-                   onclick="return confirm('¿Eliminar este detalle?');">🗑️ Eliminar</a>
-            </div>
+            <tr>
+                <td><?= htmlspecialchars($d['idDetalle']) ?></td>
+                <td><?= htmlspecialchars($d['idPedido']) ?></td>
+                <td><?= htmlspecialchars($d['idProducto']) ?></td>
+                <td><?= htmlspecialchars($d['cantidadProducto']) ?></td>
+                <td><?= htmlspecialchars($d['precioUnitario']) ?></td>
+                <td><?= htmlspecialchars($d['subtotal']) ?></td>
+            </tr>
         <?php endforeach; ?>
     <?php else: ?>
-        <p>No hay registros.</p>
+        <tr><td colspan="6">No hay registros</td></tr>
     <?php endif; ?>
+</table>
 
-    <hr>
+<hr>
 
-    <!-- FORMULARIO AGREGAR -->
-    <?php if ($modo === "listar"): ?>
-        <h2>Agregar Nuevo Detalle</h2>
-        <form method="POST" action="?modulo=detallePedidos&accion=agregar">
-            <label>ID Pedido:</label><br>
-            <input type="number" name="idPedido" required><br>
-            <label>ID Producto:</label><br>
-            <input type="number" name="idProducto" required><br>
-            <label>Cantidad:</label><br>
-            <input type="number" name="cantidadProducto" required><br>
-            <label>Precio Unitario:</label><br>
-            <input type="number" step="0.01" name="precioUnitario" required><br>
-            <label>Subtotal:</label><br>
-            <input type="number" step="0.01" name="subtotal" required><br><br>
-            <input type="submit" value="➕ Agregar">
-        </form>
-    <?php endif; ?>
+<!-- Crear -->
+<h2>Crear Detalle</h2>
+<form method="POST" action="index.php?modulo=detallePedidos&accion=crear">
+    <label>ID Pedido:</label><input type="number" name="idPedido" required><br>
+    <label>ID Producto:</label><input type="number" name="idProducto" required><br>
+    <label>Cantidad:</label><input type="number" name="cantidadProducto" required><br>
+    <label>Precio Unitario:</label><input type="text" name="precioUnitario" required><br>
+    <label>Subtotal:</label><input type="text" name="subtotal" required><br>
+    <button type="submit">Crear</button>
+</form>
 
-    <!-- FORMULARIO EDITAR -->
-    <?php if ($modo === "editar" && $detalleEditar): ?>
-        <h2>Editar Detalle</h2>
-        <form method="POST" action="?modulo=detallePedidos&accion=editar">
-            <input type="hidden" name="idDetalle" value="<?= htmlspecialchars($detalleEditar['idDetalle']) ?>">
+<hr>
 
-            <label>ID Pedido:</label><br>
-            <input type="number" name="idPedido" value="<?= htmlspecialchars($detalleEditar['idPedido']) ?>" required><br>
-            <label>ID Producto:</label><br>
-            <input type="number" name="idProducto" value="<?= htmlspecialchars($detalleEditar['idProducto']) ?>" required><br>
-            <label>Cantidad:</label><br>
-            <input type="number" name="cantidadProducto" value="<?= htmlspecialchars($detalleEditar['cantidadProducto']) ?>" required><br>
-            <label>Precio Unitario:</label><br>
-            <input type="number" step="0.01" name="precioUnitario" value="<?= htmlspecialchars($detalleEditar['precioUnitario']) ?>" required><br>
-            <label>Subtotal:</label><br>
-            <input type="number" step="0.01" name="subtotal" value="<?= htmlspecialchars($detalleEditar['subtotal']) ?>" required><br><br>
-            <input type="submit" value="💾 Guardar Cambios">
-        </form>
-        <br>
-        <a href="index.php?modulo=detallePedidos&accion=listar">⬅️ Cancelar edición</a>
-    <?php endif; ?>
+<!-- Actualizar -->
+<h2>Actualizar Detalle</h2>
+<form method="POST" action="index.php?modulo=detallePedidos&accion=actualizar">
+    <label>ID Detalle:</label><input type="number" name="idDetalle" required><br>
+    <label>ID Pedido:</label><input type="number" name="idPedido" required><br>
+    <label>ID Producto:</label><input type="number" name="idProducto" required><br>
+    <label>Cantidad:</label><input type="number" name="cantidadProducto" required><br>
+    <label>Precio Unitario:</label><input type="text" name="precioUnitario" required><br>
+    <label>Subtotal:</label><input type="text" name="subtotal" required><br>
+    <button type="submit">Actualizar</button>
+</form>
 
-</body>
-</html>
+<hr>
+
+<!-- Eliminar -->
+<h2>Eliminar Detalle</h2>
+<form method="POST" action="index.php?modulo=detallePedidos&accion=eliminar">
+    <label>ID Detalle:</label><input type="number" name="idDetalle" required><br>
+    <button type="submit">Eliminar</button>
+</form>

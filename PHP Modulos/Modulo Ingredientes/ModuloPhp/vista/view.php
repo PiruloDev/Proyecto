@@ -1,115 +1,132 @@
 <?php
 // Variables que vienen del controller
 $mensaje = $mensaje ?? '';
-$detalles = $detalles ?? [];
-$detalle = $detalle ?? null; // Para edición
+$ingredientes = $ingredientes ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Detalles de Pedido</title>
+    <title>Ingredientes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .ingrediente-item { 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 5px; 
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"], input[type="date"] { 
+            width: 300px; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        input[type="submit"] { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        input[type="submit"]:hover { background-color: #0056b3; }
+    </style>
 </head>
 <body>
-    <h1>Gestión de Detalles de Pedido</h1>
-
-    <!-- Mostrar mensajes -->
+    <h1>Lista de Ingredientes</h1>
+    
+    <!-- Mostrar mensaje si existe -->
     <?php if (!empty($mensaje)): ?>
-        <div><?= htmlspecialchars($mensaje) ?></div>
+        <?= $mensaje ?>
     <?php endif; ?>
-
-    <!-- Lista de detalles (GET) -->
-    <h2>Detalles Registrados</h2>
-    <?php if (is_array($detalles) && !empty($detalles)): ?>
-        <?php foreach ($detalles as $d): ?>
-            <div class="detalle-item" style="border:1px solid #ccc; margin:5px; padding:5px;">
-                <strong>ID Detalle:</strong> <?= htmlspecialchars($d['idDetalle'] ?? 'N/A') ?><br>
-                <strong>ID Pedido:</strong> <?= htmlspecialchars($d['idPedido'] ?? 'N/A') ?><br>
-                <strong>ID Producto:</strong> <?= htmlspecialchars($d['idProducto'] ?? 'N/A') ?><br>
-                <strong>Cantidad:</strong> <?= htmlspecialchars($d['cantidadProducto'] ?? 'N/A') ?><br>
-                <strong>Precio Unitario:</strong> <?= htmlspecialchars($d['precioUnitario'] ?? 'N/A') ?><br>
-                <strong>Subtotal:</strong> <?= htmlspecialchars($d['subtotal'] ?? 'N/A') ?><br>
-
-                <!-- Acciones -->
-                <a href="?modulo=detallePedidos&accion=editar
-                    &id=<?= urlencode($d['idDetalle']) ?>
-                    &idPedido=<?= urlencode($d['idPedido']) ?>
-                    &idProducto=<?= urlencode($d['idProducto']) ?>
-                    &cantidadProducto=<?= urlencode($d['cantidadProducto']) ?>
-                    &precioUnitario=<?= urlencode($d['precioUnitario']) ?>
-                    &subtotal=<?= urlencode($d['subtotal']) ?>">
-                    ✏️ Editar
-                </a>
-                |
-                <a href="?modulo=detallePedidos&accion=eliminar&id=<?= urlencode($d['idDetalle']) ?>"
-                   onclick="return confirm('¿Seguro de eliminar este detalle?');">
-                    Eliminar
-                </a>
+    
+    <!-- Lista de ingredientes -->
+    <?php if (is_array($ingredientes) && !empty($ingredientes)): ?>
+        <h2>Ingredientes Registrados</h2>
+        <?php foreach ($ingredientes as $i): ?>
+            <div class="ingrediente-item">
+                <?php if (is_array($i)): ?>
+                    <!-- Formato array (datos de la API) -->
+                    <strong>ID:</strong> <?= htmlspecialchars($i['idIngrediente'] ?? 'N/A') ?><br>
+                    <strong>Proveedor ID:</strong> <?= htmlspecialchars($i['idProveedor'] ?? 'N/A') ?><br>
+                    <strong>Categoría ID:</strong> <?= htmlspecialchars($i['idCategoria'] ?? 'N/A') ?><br>
+                    <strong>Nombre:</strong> <?= htmlspecialchars($i['nombreIngrediente'] ?? 'N/A') ?><br>
+                    <strong>Cantidad:</strong> <?= htmlspecialchars($i['cantidadIngrediente'] ?? 'N/A') ?><br>
+                    <strong>Fecha Vencimiento:</strong> <?= htmlspecialchars($i['fechaVencimiento'] ?? 'N/A') ?><br>
+                    <strong>Referencia:</strong> <?= htmlspecialchars($i['referenciaIngrediente'] ?? 'N/A') ?><br>
+                    <strong>Fecha Entrega:</strong> <?= htmlspecialchars($i['fechaEntregaIngrediente'] ?? 'N/A') ?>
+                <?php else: ?>
+                    <!-- Formato string (tu formato original con separadores) -->
+                    <?php
+                    $partes = is_string($i) ? explode('________', $i) : [];
+                    $idIngrediente = $partes[0] ?? 'N/A';
+                    $idProveedor = $partes[1] ?? 'N/A';
+                    $idCategoria = $partes[2] ?? 'N/A';
+                    $nombreIngrediente = $partes[3] ?? 'N/A';
+                    $cantidadIngrediente = $partes[4] ?? 'N/A';
+                    $fechaVencimiento = $partes[5] ?? 'N/A';
+                    $referenciaIngrediente = $partes[6] ?? 'N/A';
+                    $fechaEntregaIngrediente = $partes[7] ?? 'N/A';
+                    ?>
+                    <strong>ID:</strong> <?= htmlspecialchars($idIngrediente) ?><br>
+                    <strong>Proveedor ID:</strong> <?= htmlspecialchars($idProveedor) ?><br>
+                    <strong>Categoría ID:</strong> <?= htmlspecialchars($idCategoria) ?><br>
+                    <strong>Nombre:</strong> <?= htmlspecialchars($nombreIngrediente) ?><br>
+                    <strong>Cantidad:</strong> <?= htmlspecialchars($cantidadIngrediente) ?><br>
+                    <strong>Fecha Vencimiento:</strong> <?= htmlspecialchars($fechaVencimiento) ?><br>
+                    <strong>Referencia:</strong> <?= htmlspecialchars($referenciaIngrediente) ?><br>
+                    <strong>Fecha Entrega:</strong> <?= htmlspecialchars($fechaEntregaIngrediente) ?>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <p style="color:red;">No hay detalles registrados o error al obtener los datos.</p>
+        <p style="color:red;">No hay ingredientes registrados o error al obtener los datos.</p>
     <?php endif; ?>
-
+    
     <hr>
-
-    <!-- POST: Agregar detalle -->
-    <h2>Agregar Nuevo Detalle</h2>
-    <form method="POST" action="?modulo=detallePedidos&accion=agregar">
-        <div>
-            <label for="idPedido">ID Pedido:</label>
-            <input type="number" name="idPedido" id="idPedido" required>
+    
+    <!-- Formulario para agregar ingrediente -->
+    <h2>Agregar Nuevo Ingrediente</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="idProveedor">ID del Proveedor:</label>
+            <input type="number" name="idProveedor" id="idProveedor" min="1" required>
         </div>
-        <div>
-            <label for="idProducto">ID Producto:</label>
-            <input type="number" name="idProducto" id="idProducto" required>
+        
+        <div class="form-group">
+            <label for="idCategoria">ID de la Categoría:</label>
+            <input type="number" name="idCategoria" id="idCategoria" min="1" required>
         </div>
-        <div>
-            <label for="cantidadProducto">Cantidad:</label>
-            <input type="number" name="cantidadProducto" id="cantidadProducto" required>
+        
+        <div class="form-group">
+            <label for="nombreIngrediente">Nombre del Ingrediente:</label>
+            <input type="text" name="nombreIngrediente" id="nombreIngrediente" required>
         </div>
-        <div>
-            <label for="precioUnitario">Precio Unitario:</label>
-            <input type="number" step="0.01" name="precioUnitario" id="precioUnitario" required>
+        
+        <div class="form-group">
+            <label for="cantidadIngrediente">Cantidad:</label>
+            <input type="number" name="cantidadIngrediente" id="cantidadIngrediente" min="0" required>
         </div>
-        <div>
-            <label for="subtotal">Subtotal:</label>
-            <input type="number" step="0.01" name="subtotal" id="subtotal" required>
+        
+        <div class="form-group">
+            <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+            <input type="date" name="fechaVencimiento" id="fechaVencimiento" required>
         </div>
-        <input type="submit" value=" Agregar Detalle">
+        
+        <div class="form-group">
+            <label for="referenciaIngrediente">Referencia:</label>
+            <input type="text" name="referenciaIngrediente" id="referenciaIngrediente" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="fechaEntregaIngrediente">Fecha de Entrega:</label>
+            <input type="date" name="fechaEntregaIngrediente" id="fechaEntregaIngrediente" required>
+        </div>
+        
+        <input type="submit" value="Agregar Ingrediente">
     </form>
-
-    <hr>
-
-    <!-- PUT: Actualizar detalle (si se seleccionó editar) -->
-    <?php if (!empty($detalle)): ?>
-        <h2>Actualizar Detalle</h2>
-        <form method="POST" action="?modulo=detallePedidos&accion=editar">
-            <input type="hidden" name="idDetalle" value="<?= htmlspecialchars($detalle['idDetalle']) ?>">
-
-            <div>
-                <label for="idPedido">ID Pedido:</label>
-                <input type="number" name="idPedido" value="<?= htmlspecialchars($detalle['idPedido']) ?>" required>
-            </div>
-            <div>
-                <label for="idProducto">ID Producto:</label>
-                <input type="number" name="idProducto" value="<?= htmlspecialchars($detalle['idProducto']) ?>" required>
-            </div>
-            <div>
-                <label for="cantidadProducto">Cantidad:</label>
-                <input type="number" name="cantidadProducto" value="<?= htmlspecialchars($detalle['cantidadProducto']) ?>" required>
-            </div>
-            <div>
-                <label for="precioUnitario">Precio Unitario:</label>
-                <input type="number" step="0.01" name="precioUnitario" value="<?= htmlspecialchars($detalle['precioUnitario']) ?>" required>
-            </div>
-            <div>
-                <label for="subtotal">Subtotal:</label>
-                <input type="number" step="0.01" name="subtotal" value="<?= htmlspecialchars($detalle['subtotal']) ?>" required>
-            </div>
-            <input type="submit" value=" Actualizar Detalle">
-        </form>
-    <?php endif; ?>
-
 </body>
 </html>

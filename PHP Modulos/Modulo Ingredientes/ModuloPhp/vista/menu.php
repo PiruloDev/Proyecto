@@ -26,9 +26,10 @@
     </form>
 
     <form action="index.php" method="get">
-        <input type="hidden" name="modulo" value="detallepedidos">
-        <input type="hidden" name="accion" value="listar">
-        <button type="submit">Detalle Pedidos</button>
-    </form>
+    <input type="hidden" name="modulo" value="detallePedidos">  <!-- ojo aquí -->
+    <input type="hidden" name="accion" value="listar">
+    <button type="submit">Detalle Pedidos</button>
+</form>
+
 </body>
 </html>

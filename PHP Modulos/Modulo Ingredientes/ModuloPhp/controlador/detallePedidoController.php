@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../service/detallePedidosService.php';
 
-class detallePedidosController {
+class DetallePedidosController {
     private $service;
 
     public function __construct() {
@@ -9,15 +9,15 @@ class detallePedidosController {
     }
 
     public function manejarPeticion() {
-        $accion = $_GET['accion'] ?? 'listar';
+        $accion = $_POST['accion'] ?? $_GET['accion'] ?? 'listar';
 
         switch ($accion) {
             case 'listar':
                 $detalles = $this->service->obtenerDetalles();
-                require __DIR__ . '/../vista/detallePedidosView.php';
+                include __DIR__ . '/../vista/detallePedidosView.php';
                 break;
 
-            case 'agregar':
+            case 'crear':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->service->agregarDetalle(
                         $_POST['idPedido'],
@@ -26,12 +26,11 @@ class detallePedidosController {
                         $_POST['precioUnitario'],
                         $_POST['subtotal']
                     );
-                    header("Location: index.php?modulo=detallePedidos&accion=listar");
-                    exit;
                 }
+                header("Location: index.php?modulo=detallePedidos&accion=listar");
                 break;
 
-            case 'editar':
+            case 'actualizar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->service->actualizarDetalle(
                         $_POST['idDetalle'],
@@ -41,32 +40,21 @@ class detallePedidosController {
                         $_POST['precioUnitario'],
                         $_POST['subtotal']
                     );
-                    header("Location: index.php?modulo=detallePedidos&accion=listar");
-                    exit;
                 }
-
-                // Si es GET, obtener datos desde querystring
-                $detalle = [
-                    "idDetalle" => $_GET['id'],
-                    "idPedido" => $_GET['idPedido'] ?? '',
-                    "idProducto" => $_GET['idProducto'] ?? '',
-                    "cantidadProducto" => $_GET['cantidadProducto'] ?? '',
-                    "precioUnitario" => $_GET['precioUnitario'] ?? '',
-                    "subtotal" => $_GET['subtotal'] ?? ''
-                ];
-                require __DIR__ . '/../vista/detallePedidosEditar.php';
+                header("Location: index.php?modulo=detallePedidos&accion=listar");
                 break;
 
             case 'eliminar':
-                if (isset($_GET['id'])) {
-                    $this->service->eliminarDetalle($_GET['id']);
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->service->eliminarDetalle($_POST['idDetalle']);
                 }
                 header("Location: index.php?modulo=detallePedidos&accion=listar");
-                exit;
                 break;
 
             default:
-                echo "Acción no válida.";
+                $detalles = $this->service->obtenerDetalles();
+                include __DIR__ . '/../vista/detallePedidosView.php';
+                break;
         }
     }
 }
