@@ -1,23 +1,23 @@
 <?php
 
-require_once __DIR__ . '/Config.php'; 
+require_once __DIR__ . '/config/configPedidos.php'; 
 
 $ruta = $_GET['ruta'] ?? 'pedidos'; 
 
 switch (strtolower($ruta)) {
     case 'pedidos':
         $nombreClase = 'PedidosController';
-        $archivoControlador = __DIR__ . '/Controlador/PedidosController.php';
+        $archivoControlador = __DIR__ . '/controllers/pedidoscontroller/PedidosController.php';
         break;
         
     case 'estados':
         $nombreClase = 'EstadosPeController';
-        $archivoControlador = __DIR__ . '/Controlador/EstadosPeController.php';
+        $archivoControlador = __DIR__ . '/controllers/pedidoscontroller/EstadosPeController.php';
         break;
         
     case 'pedidosproveedores':
         $nombreClase = 'PedidosProveedoresController';
-        $archivoControlador = __DIR__ . '/Controlador/PedidosProveedoresController.php';
+        $archivoControlador = __DIR__ . '/controllers/pedidoscontroller/PedidosProveedoresController.php';
         break;
         
     default:

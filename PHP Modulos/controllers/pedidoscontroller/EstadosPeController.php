@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Modelo/EstadosPeService.php';
+require_once __DIR__ . '/../../services/pedidoservices/EstadosPeService.php';
 
 class EstadosPeController {
 
@@ -42,7 +42,7 @@ class EstadosPeController {
         
         $estadosPedidos = $this->estadosPeService->obtenerEstadosPedidos();
         
-        require __DIR__ . '/../Vista/estados.php';
+        require __DIR__ . '/../../views/pedidosviews/estados.php';
     }
 
     private function getPostData(array $keys) {

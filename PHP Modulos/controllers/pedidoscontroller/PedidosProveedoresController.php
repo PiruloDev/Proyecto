@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Modelo/PedidosProveedoresService.php';
+require_once __DIR__ . '/../../services/pedidoservices/PedidosProveedoresService.php';
 
 class PedidosProveedoresController {
 
@@ -48,7 +48,7 @@ class PedidosProveedoresController {
         $pedidosProveedores = $this->pedidosProveedoresService->obtenerPedidosProveedores();
 
         // Cargar la vista con los datos y el mensaje
-        require __DIR__ . '/../Vista/pedidos_proveedores.php';
+        require __DIR__ . '/../../views/pedidosviews/pedidos_proveedores.php';
     }
 
     /**

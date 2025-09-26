@@ -1,8 +1,14 @@
 <?php
 
+require_once __DIR__ . '/../../config/configPedidos.php';
+
 class EstadosPeService {
 
-    private $apiUrl = "http://localhost:8080/estadosPedidos";
+    private $apiUrl;
+
+    public function __construct() {
+        $this->apiUrl = API_BASE_URL . ENDPOINT_ESTADOS_PEDIDOS;
+    }
 
     /**
      * Método privado para ejecutar cualquier petición cURL (GET, POST, PUT, DELETE).
