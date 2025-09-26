@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../services/DetalleClienteService.php';
-require_once __DIR__ . '/../services/CrearClienteService.php';
-require_once __DIR__ . '/../services/ActualizarClienteService.php';
+require_once __DIR__ . '/../../services/userservices/DetalleClienteService.php';
+require_once __DIR__ . '/../../services/userservices/CrearClienteService.php';
+require_once __DIR__ . '/../../services/userservices/ActualizarClienteService.php';
 
 class ObtenerClienteController {
     private $detallesClientes;
@@ -41,7 +41,7 @@ class ObtenerClienteController {
         $resultado = $this->detallesClientes->obtenerDatos('cliente');
         $usuarios = $resultado['data'] ?? [];
         
-        require_once __DIR__ . '/../views/index.php';
+        require_once __DIR__ . '/../../views/userviews/index.php';
     }
     
     public function actualizarCliente() {
@@ -87,7 +87,7 @@ class ObtenerClienteController {
             }
         }
         
-        require_once __DIR__ . '/../views/actualizar_cliente.php';
+        require_once __DIR__ . '/../../views/userviews/actualizar_cliente.php';
     }
     
     public function modificarCliente() {
@@ -113,9 +113,6 @@ class ObtenerClienteController {
                 $datosActualizar = [];
                 
                 switch ($accion) {
-                    case 'desactivar':
-                        $datosActualizar['nombre'] = '[DESACTIVADO]';
-                        break;
                     case 'cambiar_nombre':
                         $nuevo_nombre = trim($_POST['nuevo_nombre'] ?? '');
                         if (!empty($nuevo_nombre)) {
@@ -168,7 +165,7 @@ class ObtenerClienteController {
             }
         }
         
-        require_once __DIR__ . '/../views/modificar_cliente.php';
+        require_once __DIR__ . '/../../views/userviews/modificar_cliente.php';
     }
     
     public function manejoPeticionCliente() {

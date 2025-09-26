@@ -1,5 +1,5 @@
 ﻿<?php 
-require_once __DIR__ . '/../configuration/config.php';
+require_once __DIR__ . '/../../config/configUser.php';
 
 class ActualizarEmpleadoService {
     public function getActualizacionEndpoint(string $tipo, int $id): string {

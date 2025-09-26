@@ -1,5 +1,5 @@
 ﻿<?php
-require_once __DIR__ . '/../configuration/config.php';
+require_once __DIR__ . '/../../config/configUser.php';
 
 class detallesUsusarios {
     public function getDetalleEndpoint(string $tipo): string {

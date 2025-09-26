@@ -1,5 +1,5 @@
 <?php 
-require_once __DIR__ . '/../configuration/config.php';
+require_once __DIR__ . '/../../config/configUser.php';
 
 class EliminarEmpleadoService {
     public function getEliminacionEndpoint(string $tipo, int $id): string {
@@ -12,22 +12,15 @@ class EliminarEmpleadoService {
     public function eliminarEmpleado(int $id_empleado): array {
         $url = $this->getEliminacionEndpoint('empleado', $id_empleado);
         
-        $datos_eliminar = [
-            "id" => $id_empleado
-        ];
-        $data_json = json_encode($datos_eliminar);
-
+        // No enviamos cuerpo JSON ya que el ID va en la URL como PathVariable
         $proceso = curl_init($url);
         curl_setopt_array($proceso, [
             CURLOPT_CUSTOMREQUEST => "DELETE",
-            CURLOPT_POSTFIELDS => $data_json,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-                "Accept: application/json",
-                "Content-Length: " . strlen($data_json)
+                "Accept: application/json"
             ]
         ]);
 
@@ -45,13 +38,14 @@ class EliminarEmpleadoService {
             ];
         }
       
-        $data = json_decode($response, true);
+        // La API devuelve texto plano, no JSON
+        $is_success = ($http_code === 200) && (trim($response) === "Empleado eliminado exitosamente");
         
         return [
-            'success' => ($http_code === 200 || $http_code === 204),
+            'success' => $is_success,
             'http_code' => $http_code,
-            'data' => $data,
-            'error' => !($http_code === 200 || $http_code === 204) ? "HTTP Error: $http_code - $response" : null,
+            'data' => trim($response),
+            'error' => !$is_success ? "HTTP Error: $http_code - $response" : null
         ];
     }
 }
