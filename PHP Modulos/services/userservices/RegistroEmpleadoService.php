@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../configuration/config.php';
+require_once __DIR__ . '/../../config/configUser.php';
 
 class RegistroEmpleadoService { 
     public function getCreacionEndpoint(string $tipo): string {
@@ -42,13 +42,15 @@ class RegistroEmpleadoService {
             ];
         }
       
-        $data = json_decode($response, true);
+        // La API devuelve texto plano, no JSON
+        $is_success = ($http_code === 200 || $http_code === 201) && 
+                     (trim($response) === "Nuevo Empleado creado exitosamente");
         
         return [
-            'success' => ($http_code === 200 || $http_code === 201),
+            'success' => $is_success,
             'http_code' => $http_code,
-            'data' => $data,
-            'error' => !($http_code === 200 || $http_code === 201) ? "HTTP Error: $http_code - $response" : null,
+            'data' => trim($response),
+            'error' => !$is_success ? "HTTP Error: $http_code - $response" : null,
         ];
     }
 }

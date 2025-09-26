@@ -1,15 +1,18 @@
 <?php
-require_once __DIR__ . '/../configuration/config.php';
+require_once __DIR__ . '/../../config/configUser.php';
 
 class DetallesEmpleados {
     public function getDetalleEndpoint(string $tipo): string {
         return match ($tipo) {
-            'empleados' => endpointDetalles::API_DETALLE_EMPLEADO,
+            'empleado', 'empleados' => endpointDetalles::API_DETALLE_EMPLEADO,
             default => throw new InvalidArgumentException("Tipo desconocido: $tipo"),
         };
     }
     public function obtenerDatos(string $tipo): array {
         $url = $this->getDetalleEndpoint($tipo);
+        
+        // Agregar timestamp para evitar cache
+        $url .= '?t=' . time();
     
         $proceso = curl_init();
         curl_setopt($proceso, CURLOPT_URL, $url);
@@ -17,7 +20,8 @@ class DetallesEmpleados {
         curl_setopt($proceso, CURLOPT_TIMEOUT, 30);
         curl_setopt($proceso, CURLOPT_HTTPHEADER, [
             'Accept: application/json',
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'Cache-Control: no-cache'
         ]);
         
         $response = curl_exec($proceso);

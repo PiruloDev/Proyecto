@@ -18,27 +18,15 @@
         <p><strong>Nombre:</strong> <?= htmlspecialchars($cliente['Nombre:'] ?? 'N/A') ?></p>
         <p><strong>Email:</strong> <?= htmlspecialchars($cliente['Correo Electronico:'] ?? 'N/A') ?></p>
         <p><strong>Telefono:</strong> <?= htmlspecialchars($cliente['Telefono:'] ?? 'N/A') ?></p>
-        
-        <h3>Opciones de Modificacion</h3>
-        
+          
         <form method="POST" action="">
             <input type="hidden" name="id" value="<?= htmlspecialchars($cliente['id']) ?>">
-            
-            <h4>Desactivar Cliente</h4>
-            <p>Esto marcara el cliente como desactivado cambiando su nombre a [DESACTIVADO]</p>
-            <button type="submit" name="accion" value="desactivar" 
-                    onclick="return confirm('¿Esta seguro de que desea desactivar este cliente?')">
-                Desactivar Cliente
-            </button>
-            
             <hr>
             
             <h4>Cambiar Nombre</h4>
             <input type="text" name="nuevo_nombre" placeholder="Nuevo nombre" required>
             <button type="submit" name="accion" value="cambiar_nombre">Cambiar Nombre</button>
-            
             <hr>
-            
             <h4>Cambiar Email</h4>
             <input type="email" name="nuevo_email" placeholder="Nuevo email" required>
             <button type="submit" name="accion" value="cambiar_email">Cambiar Email</button>
@@ -61,6 +49,6 @@
     <?php endif; ?>
     
     <br>
-    <a href="index.php">Volver al listado de clientes</a>
+    <a href="/PHP%20Modulos/Userindex.php">Volver al listado de clientes</a>
 </body>
 </html>
