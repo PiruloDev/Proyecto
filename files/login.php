@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styleslogin.css">
+    <link rel="stylesheet" href="css/styleslogin.css">
     <title>Iniciar Sesión - Panadería</title>
 </head>
 <body>
@@ -15,18 +15,6 @@
         <h1>Iniciar Sesión</h1>
         
         <div id="errorMessage" class="error-message"></div>
-        
-        <?php if (isset($_GET['logout']) && $_GET['logout'] === 'success'): ?>
-            <div class="success-message">
-                Sesión cerrada correctamente. Gracias por usar nuestro sistema.
-            </div>
-        <?php endif; ?>
-        
-        <?php if (isset($_GET['success']) && $_GET['success'] === 'registered'): ?>
-            <div class="success-message">
-                Registro exitoso. Ya puede iniciar sesión con sus credenciales.
-            </div>
-        <?php endif; ?>
         
         <form id="loginForm" action="procesar_login.php" method="POST">
             <div class="form-group">

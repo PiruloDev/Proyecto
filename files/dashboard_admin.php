@@ -1,53 +1,4 @@
-<?php
-session_start();
 
-// Headers de seguridad para prevenir cache
-header("Cache-Control: no-cache, no-store, must-revalidate");
-header("Pragma: no-cache");
-header("Expires: 0");
-
-// Verificación de autenticación mejorada
-if (!isset($_SESSION['usuario_logueado']) || 
-    $_SESSION['usuario_logueado'] !== true || 
-    !isset($_SESSION['usuario_tipo']) || 
-    $_SESSION['usuario_tipo'] !== 'admin') {
-    
-    // Limpiar sesión si hay datos inconsistentes
-    session_destroy();
-    header('Location: login.php?error=session_invalid');
-    exit();
-}
-
-// Verificar que las variables de sesión sean válidas
-if (empty($_SESSION['usuario_nombre']) || empty($_SESSION['usuario_id'])) {
-    session_destroy();
-    header('Location: login.php?error=session_corrupted');
-    exit();
-}
-require_once 'conexion.php';
-
-// Inicializar variables con valores por defecto
-$total_productos = 0;
-$productos_activos = 0;
-$empleados_activos = 0;
-$clientes_activos = 0;
-$pedidos_hoy = 0;
-$error_message = '';
-
-try {
-    // Verificar conexión
-    if (!$conexion) {
-        throw new Exception("No se pudo conectar a la base de datos");
-    }
-
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Productos");
-    if (!$stmt) {
-        throw new Exception("Error preparando consulta de productos: " . $conexion->error);
-    }
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result) {
-        $total_productos = $result->fetch_assoc()['total'];
     }
     
     $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Productos WHERE ACTIVO = 1");
@@ -86,13 +37,6 @@ try {
         if ($result) {
             $pedidos_hoy = $result->fetch_assoc()['total'];
         }
-    }
-    
-} catch (Exception $e) {
-    $error_message = "Error obteniendo estadísticas: " . $e->getMessage();
-    error_log($error_message);
-}
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -101,7 +45,7 @@ try {
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styleadmindst.css">
+    <link rel="stylesheet" href="css/styleadmindst.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <title>Dashboard Administrador - El Castillo del Pan </title>

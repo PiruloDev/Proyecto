@@ -1,22 +1,3 @@
-<?php
-session_start();
-
-// Verificar si el usuario está logueado
-$user_name = '';
-$user_role = '';
-$user_logged_in = false;
-
-// Verificar múltiples formas de sesión para compatibilidad
-if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado']) {
-    $user_name = $_SESSION['usuario_nombre'] ?? '';
-    $user_role = $_SESSION['usuario_tipo'] ?? '';
-    $user_logged_in = true;
-} elseif (isset($_SESSION['user_name'])) {
-    $user_name = $_SESSION['user_name'];
-    $user_role = $_SESSION['role'] ?? '';
-    $user_logged_in = true;
-}
-?>
 <!DOCTYPE html>
 <html lang="es-CO">
 <head>
@@ -36,23 +17,8 @@ if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado']) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="stylehomepage.css">
-  <style>
-    body {
-      background-color: #bb9467 !important;
-    }
-    .card {
-      background-color: white !important;
-      border: 1px solid #e0e0e0 !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-    .product-card {
-      background-color: white !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-  </style>
+  <link rel="stylesheet" href="css/stylehomepage.css">
+  <link rel="stylesheet" href="css/homepage-custom.css">
 </head>
 
 <body class="bg-blanco-cálido">
@@ -84,24 +50,7 @@ if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado']) {
               <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
             </li>
           </ul>
-          <?php if ($user_logged_in): ?>
-            <div class="dropdown">
-              <a class="btn btn-user-glass dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($user_name); ?>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-glass">
-                <li><a class="dropdown-item" href="dashboard_cliente.php">
-                  <i class="fas fa-user-circle me-2"></i>Mi Perfil
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="logout.php">
-                  <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                </a></li>
-              </ul>
-            </div>
-          <?php else: ?>
-            <a href="login.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
-          <?php endif; ?>
+          <a href="login.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
         </div>
       </div>
     </nav>

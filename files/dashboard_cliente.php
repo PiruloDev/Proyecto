@@ -1,58 +1,3 @@
-<?php
-session_start();
-
-header("Cache-Control: no-cache, no-store, must-revalidate");
-header("Pragma: no-cache");
-header("Expires: 0");
-
-
-
-// Verificar que el usuario esté logueado y sea cliente
-if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_tipo'] !== 'cliente') {
-    header('Location: login.php?error=invalid');
-    exit();
-}
-
-require_once 'conexion.php';
-
-// Obtener estadísticas para el cliente
-try {
-    // Contar mis pedidos totales
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Pedidos WHERE ID_CLIENTE = ?");
-    $stmt->bind_param("i", $_SESSION['usuario_id']);
-    $stmt->execute();
-    $mis_pedidos_total = $stmt->get_result()->fetch_assoc()['total'];
-    
-    // Contar mis pedidos pendientes
-    $stmt = $conexion->prepare("
-        SELECT COUNT(*) as total 
-        FROM Pedidos 
-        WHERE ID_CLIENTE = ? AND ID_ESTADO_PEDIDO IN (1, 2, 3)
-    ");
-    $stmt->bind_param("i", $_SESSION['usuario_id']);
-    $stmt->execute();
-    $mis_pedidos_pendientes = $stmt->get_result()->fetch_assoc()['total'];
-    
-    // Obtener mis pedidos recientes
-    $stmt = $conexion->prepare("
-        SELECT p.ID_PEDIDO, e.NOMBRE_EMPLEADO, ep.NOMBRE_ESTADO, 
-        p.FECHA_INGRESO, p.FECHA_ENTREGA, p.TOTAL_PRODUCTO
-        FROM Pedidos p
-        INNER JOIN Empleados e ON p.ID_EMPLEADO = e.ID_EMPLEADO
-        INNER JOIN Estado_Pedidos ep ON p.ID_ESTADO_PEDIDO = ep.ID_ESTADO_PEDIDO
-        WHERE p.ID_CLIENTE = ?
-        ORDER BY p.FECHA_INGRESO DESC
-        LIMIT 5
-    ");
-    $stmt->bind_param("i", $_SESSION['usuario_id']);
-    $stmt->execute();
-    $mis_pedidos_recientes = $stmt->get_result();
-    
-} catch (Exception $e) {
-    error_log("Error obteniendo estadísticas del cliente: " . $e->getMessage());
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -64,7 +9,7 @@ try {
     <title>Dashboard Cliente - Panadería</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="styleclienteds.css">
+    <link rel="stylesheet" href="css/styleclienteds.css">
 </head>
 <body>
     <div class="container-fluid">
