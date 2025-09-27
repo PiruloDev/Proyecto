@@ -1,22 +1,22 @@
 <?php
-require_once __DIR__ . '/../Configuracion/Config.php';
+require_once __DIR__ . '/../../config/ConfigProductos.php';
 
-class ProductosService_Admin {
+class ProductosService {
     public function obtener() {
-        $res = file_get_contents(endpointDetalles::API_DETALLE_ADMIN);
+        $res = file_get_contents(endpointDetalles::API_DETALLE_PRODUCTO);
         return $res ? json_decode($res, true) : [];
     }
 
     public function crear($data) {
-        return $this->request(endpointCreacion::API_CREAR_ADMIN, "POST", $data);
+        return $this->request(endpointCreacion::API_CREAR_PRODUCTO, "POST", $data);
     }
 
     public function actualizar($id, $data) {
-        return $this->request(endpointActualizacion::admin($id), "PATCH", $data);
+        return $this->request(endpointActualizacion::producto($id), "PATCH", $data);
     }
 
     public function eliminar($id) {
-        return $this->request(endpointEliminacion::admin($id), "DELETE");
+        return $this->request(endpointEliminacion::producto($id), "DELETE");
     }
 
     private function request($url, $method, $data = null) {
@@ -29,6 +29,8 @@ class ProductosService_Admin {
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return ($code == 200 || $code == 201) ? ["success" => true] : ["success" => false, "error" => "HTTP $code"];
+        return ($code >= 200 && $code < 300) 
+            ? ["success" => true, "body" => $res] 
+            : ["success" => false, "error" => "HTTP $code", "body" => $res];
     }
 }
