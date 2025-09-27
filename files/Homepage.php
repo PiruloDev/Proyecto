@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>El Castillo del Pan</title>
-  <link rel="icon" type="image/x-icon" href="../images/logoprincipal.jpg">
+  <link rel="icon" type="image/x-icon" href="../files/img/logoprincipal.jpg">
   
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="../css/stylehomepage.css">
-  <link rel="stylesheet" href="../css/homepage-custom.css">
+  <link rel="stylesheet" href="css/stylehomepage.css">
+  <link rel="stylesheet" href="css/homepage-custom.css">
 </head>
 
 <body class="bg-blanco-cálido">
@@ -27,7 +27,7 @@
     <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center logo" href="index1.php">
-          <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+          <img src="../files/img/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
           <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
         <div class="carousel-inner">
           <div class="carousel-item active">
             <a href="#" class="carousel-link">
-              <img src="../images/pangrande1.jpg" class="d-block w-100 carousel-fixed-img" alt="Panes grandes">
+              <img src="../files/img/pangrande1.jpg" class="d-block w-100 carousel-fixed-img" alt="Panes grandes">
               <div class="carousel-caption d-none d-md-block">
                 <h5 class="fw-bold">Panes Artesanales</h5>
                 <p>Elaborados con masa madre tradicional</p>
@@ -78,7 +78,7 @@
           </div>
           <div class="carousel-item">
             <a href="#" class="carousel-link">
-              <img src="../images/torta1.jpg" class="d-block w-100 carousel-fixed-img" alt="Postres">
+              <img src="../files/img/torta1.jpg" class="d-block w-100 carousel-fixed-img" alt="Postres">
               <div class="carousel-caption d-none d-md-block">
                 <h5 class="fw-bold">Dulces Tentaciones</h5>
                 <p>Postres únicos para cada ocasión</p>
@@ -87,7 +87,7 @@
           </div>
           <div class="carousel-item">
             <a href="#" class="carousel-link">
-              <img src="../images/torta2.jpg" class="d-block w-100 carousel-fixed-img" alt="Torta">
+              <img src="../files/img/torta2.jpg" class="d-block w-100 carousel-fixed-img" alt="Torta">
               <div class="carousel-caption d-none d-md-block">
                 <h5 class="fw-bold">Tortas a tu Gusto</h5>
                 <p>Personalizadas para tus momentos especiales</p>
@@ -115,7 +115,7 @@
         <!-- Card 1 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-1s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/brazoreina1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
+            <img src="../files/img/brazoreina1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Brazo de Reina</h5>
               <p class="card-text text-gris-oscuro">Bizcochuelo suave relleno de arequipe artesanal, un clásico irresistible.</p>
@@ -130,7 +130,7 @@
         <!-- Card 2 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-2s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/hojaldre1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Hojaldres">
+            <img src="../files/img/hojaldre1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Hojaldres">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Hojaldres</h5>
               <p class="card-text text-gris-oscuro">Capas crujientes de masa fina con rellenos selectos y dorados perfectos.</p>
@@ -145,7 +145,7 @@
         <!-- Card 3 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-3s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/pangrande1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Panes grandes">
+            <img src="../files/img/pangrande1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Panes grandes">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Panes Grandes</h5>
               <p class="card-text text-gris-oscuro">Pan artesanal con corteza dorada y miga suave, ideal para compartir.</p>
@@ -160,7 +160,7 @@
         <!-- Card 4 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-4s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/brownie1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brownies">
+            <img src="../files/img/brownie1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Brownies">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Brownies</h5>
               <p class="card-text text-gris-oscuro">Esponjosos con rellenos de Chocolate.</p>
@@ -175,7 +175,7 @@
         <!-- Card 5 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-5s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/croissants.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Croissants">
+            <img src="../files/img/croissants.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Croissants">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Croissants</h5>
               <p class="card-text text-gris-oscuro">Hojaldre francés auténtico, mantequillosos y perfectamente dorados.</p>
@@ -190,7 +190,7 @@
         <!-- Card 6 -->
         <div class="col animate__animated animate__fadeInUp animate__delay-6s">
           <div class="card h-100 rounded-3 shadow-sm">
-            <img src="../images/muffins1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Muffins">
+            <img src="../files/img/muffins1.jpg" class="card-img-top rounded-top-3 card-img-custom" alt="Muffins">
             <div class="card-body">
               <h5 class="card-title text-marron fw-bold">Muffins</h5>
               <p class="card-text text-gris-oscuro">Esponjosos y llenos de sabor, perfectos para acompañar tu café.</p>
@@ -218,7 +218,7 @@
             <a href="#" class="btn btn-primary btn-rounded mt-3">Conoce más</a>
           </div>
           <div class="col-md-6 animate__animated animate__fadeInRight">
-            <img src="../images/Local.png" class="img-fluid rounded-3 shadow" alt="Nuestra panadería">
+            <img src="../files/img/Local.png" class="img-fluid rounded-3 shadow" alt="Nuestra panadería">
           </div>
         </div>
       </div>
