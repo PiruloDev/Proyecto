@@ -22,9 +22,9 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="css/stylehomepage.css">
-  <link rel="stylesheet" href="css/stylemenu.css">
-  <link rel="stylesheet" href="css/menu-custom.css">
+  <link rel="stylesheet" href="../css/stylehomepage.css">
+  <link rel="stylesheet" href="../css/stylemenu.css">
+  <link rel="stylesheet" href="../css/menu-custom.css">
 </head>
 <body class="bg-blanco-cálido">
     <!-- Header -->
@@ -32,7 +32,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center logo" href="Homepage.php">
-                    <img src="../files/img/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+                    <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
                     <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                 <h1 class="display-4 fw-bold text-cafe-crema mb-4 fade-in">
                     ¿Estás Listo para Disfrutar de tú antojo?
                 </h1>
-                <img src="Pan1.jpg" class="img-fluid" alt="Imagen representativa de un pan">
+                <img src="../images/Pan1.jpg" class="img-fluid" alt="Imagen representativa de un pan">
                 <p class="lead text-gris-oscuro mb-5 fade-in">
                     Descubre nuestros deliciosos productos artesanales, elaborados con los mejores ingredientes y mucho amor
                 </p>
@@ -153,7 +153,7 @@
                         <div class="col-lg-4 col-md-6 mb-4 product-card-item" data-nombre="<?php echo htmlspecialchars(strtolower($producto['NOMBRE_PRODUCTO'])); ?>">
                             <div class="product-card card h-100 shadow-sm border-0 card-hover">
                                 <div class="card-img-container position-relative">
-                                    <img src="<?php echo $image_path; ?>" class="card-img-top product-image" alt="<?php echo htmlspecialchars($producto['NOMBRE_PRODUCTO']); ?>" onerror="this.onerror=null;this.src='img/pan-rtzqhi1ok4k1bxlo.jpg';"> 
+                                    <img src="<?php echo $image_path; ?>" class="card-img-top product-image" alt="<?php echo htmlspecialchars($producto['NOMBRE_PRODUCTO']); ?>" onerror="this.onerror=null;this.src='../images/pan-rtzqhi1ok4k1bxlo.jpg';"> 
                                     <div class="price-badge">
                                         $<?php echo number_format($producto['PRECIO_PRODUCTO'], 0); ?>
                                     </div>

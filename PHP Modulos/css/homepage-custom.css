@@ -1,0 +1,17 @@
+/* Estilos personalizados específicos para Homepage */
+body {
+  background-color: #bb9467 !important;
+}
+
+.card {
+  background-color: white !important;
+  border: 1px solid #e0e0e0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.product-card {
+  background-color: white !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

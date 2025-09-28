@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/styleslogin.css">
+    <link rel="stylesheet" href="../css/styleslogin.css">
     <title>Iniciar Sesión - Panadería</title>
 </head>
 <body>
     <div class="login-container">
         <div class="logo animated-logo">
-                <img src="../files/img/logoprincipal.jpg" alt="Logo Panadería" class="logo-img">
+                <img src="../images/logoprincipal.jpg" alt="Logo Panadería" class="logo-img">
         </div>
         <h1>Iniciar Sesión</h1>
         

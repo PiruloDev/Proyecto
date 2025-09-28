@@ -61,10 +61,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="css/styleadmindst.css">
+    <link rel="stylesheet" href="../css/styleadmindst.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/dashboard-empleado-custom.css">
+    <link rel="stylesheet" href="../css/dashboard-empleado-custom.css">
 
     <title>Dashboard Empleado - El Castillo del Pan</title>
 </head>
@@ -73,7 +73,7 @@
         <div class="sidebar-header">
             <div class="logo-container">
                 <a href="homepage.php" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
-                    <img src="../files/img/logoprincipal.jpg" alt="Logo" class="logo-img">
+                    <img src="../images/logoprincipal.jpg" alt="Logo" class="logo-img">
                     <h4 class="logo-text">El Castillo del Pan</h4>
                 </a>
             </div>

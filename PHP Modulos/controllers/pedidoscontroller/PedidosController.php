@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Modelo/PedidosService.php';
+require_once __DIR__ . '/../../services/pedidoservices/PedidosService.php';
 
 class PedidosController {
 
@@ -44,7 +44,7 @@ class PedidosController {
         
         $pedidos = $this->pedidosService->obtenerPedidos();
 
-        require __DIR__ . '/../Vista/index.php';
+        require __DIR__ . '/../../views/pedidosviews/index.php';
     }
     
     private function getPostData(array $keys) {

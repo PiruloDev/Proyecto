@@ -1,8 +1,14 @@
 <?php
 
+require_once __DIR__ . '/../../config/configPedidos.php';
+
 class PedidosProveedoresService {
 
-    private $apiUrl = "http://localhost:8080/pedidosproveedores";
+    private $apiUrl;
+
+    public function __construct() {
+        $this->apiUrl = API_BASE_URL . ENDPOINT_PEDIDOS_PROVEEDORES;
+    }
 
     /**
      * Método privado para ejecutar cualquier petición cURL (GET, POST, PUT, DELETE).

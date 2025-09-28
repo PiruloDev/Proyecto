@@ -1,8 +1,14 @@
 <?php
 
+require_once __DIR__ . '/../../config/configPedidos.php';
+
 class PedidosService {
 
-    private $apiUrl = "http://localhost:8080/pedidos";
+    private $apiUrl;
+
+    public function __construct() {
+        $this->apiUrl = API_BASE_URL . ENDPOINT_PEDIDOS;
+    }
 
     private function executeCurlRequest(string $url, string $method = "GET", array $data = []): array {
         $ch = curl_init($url);

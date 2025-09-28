@@ -20,9 +20,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="css/stylehomepage.css">
-    <link rel="stylesheet" href="css/stylemenu.css">
-    <link rel="stylesheet" href="css/pedidos-custom.css">
+    <link rel="stylesheet" href="../css/stylehomepage.css">
+    <link rel="stylesheet" href="../css/stylemenu.css">
+    <link rel="stylesheet" href="../css/pedidos-custom.css">
 </head>
 <body>
     <!-- Header -->
@@ -30,7 +30,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center logo" href="Homepage.php">
-                    <img src="../files/img/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+                    <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
                     <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
@@ -88,7 +88,7 @@
                                     <div class="cart-item" data-producto-id="<?php echo $item['id']; ?>">
                                         <div class="row align-items-center">
                                             <div class="col-md-2">
-                                                <img src="img/pan-rtzqhi1ok4k1bxlo.jpg" alt="<?php echo htmlspecialchars($item['nombre']); ?>" class="cart-item-image">
+                                                <img src="../images/pan-rtzqhi1ok4k1bxlo.jpg" alt="<?php echo htmlspecialchars($item['nombre']); ?>" class="cart-item-image">
                                             </div>
                                             <div class="col-md-4">
                                                 <h5 class="text-marron fw-bold mb-1"><?php echo htmlspecialchars($item['nombre']); ?></h5>

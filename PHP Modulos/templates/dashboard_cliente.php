@@ -9,7 +9,7 @@
     <title>Dashboard Cliente - Panadería</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/styleclienteds.css">
+    <link rel="stylesheet" href="../css/styleclienteds.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -18,7 +18,7 @@
             <nav class="col-md-3 col-lg-2 d-md-block sidebar">
                 <div class="sidebar-content">
                     <div class="sidebar-brand">
-                        <img src="img/logoprincipal.jpg" alt="Logo Panadería" class="sidebar-logo">
+                        <img src="../images/logoprincipal.jpg" alt="Logo Panadería" class="sidebar-logo">
                         <h5>Portal Cliente</h5>
                     </div>
                     <!-- Botón Explorar Productos debajo del logo -->
@@ -184,7 +184,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/navigation-system.js"></script>
+    <script src="../js/navigation-system.js"></script>
 
     <script>
         // Navegación del sidebar
