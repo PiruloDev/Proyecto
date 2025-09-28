@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../service/categoriaService.php';
+require_once __DIR__ . '../../../services/ingredienteservices/categoriaService.php';
 
 class CategoriaController {
     private $service;
@@ -12,7 +12,7 @@ class CategoriaController {
         switch ($accion) {
             case 'listar':
                 $categorias = $this->service->obtenerCategorias();
-                include __DIR__ . '/../vista/categoriaView.php';
+                include __DIR__ . '../../../views/ingredienteviews/categoriaView.php';
                 break;
 
             case 'agregar':
@@ -21,7 +21,7 @@ class CategoriaController {
                     $mensaje = $this->service->crearCategoria($nombre);
                 }
                 $categorias = $this->service->obtenerCategorias();
-                include __DIR__ . '/../vista/categoriaView.php';
+                include __DIR__ . '../../../views/ingredienteviews/categoriaView.php';
                 break;
 
             case 'editar':
@@ -31,7 +31,7 @@ class CategoriaController {
                     $mensaje = $this->service->editarCategoria($id, $nombre);
                 }
                 $categorias = $this->service->obtenerCategorias();
-                include __DIR__ . '/../vista/categoriaView.php';
+                include __DIR__ . '../../../views/ingredienteviews/categoriaView.php';
                 break;
 
             case 'eliminar':
@@ -40,12 +40,12 @@ class CategoriaController {
                     $mensaje = $this->service->eliminarCategoria($id);
                 }
                 $categorias = $this->service->obtenerCategorias();
-                include __DIR__ . '/../vista/categoriaView.php';
+                include __DIR__ . '../../../views/ingredienteviews/categoriaView.php';
                 break;
 
             default:
                 $categorias = $this->service->obtenerCategorias();
-                include __DIR__ . '/../vista/categoriaView.php';
+                include __DIR__ . '../../../views/ingredienteviews/categoriaView.php';
                 break;
         }
     }

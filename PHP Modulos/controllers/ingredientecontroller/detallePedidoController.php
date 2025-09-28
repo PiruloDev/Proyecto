@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../service/detallePedidosService.php';
+require_once __DIR__ . '../../../services/ingredienteservices/detallePedidosService.php';
 
 class DetallePedidosController {
     private $service;
@@ -12,11 +12,6 @@ class DetallePedidosController {
         $accion = $_POST['accion'] ?? $_GET['accion'] ?? 'listar';
 
         switch ($accion) {
-            case 'listar':
-                $detalles = $this->service->obtenerDetalles();
-                include __DIR__ . '/../vista/detallePedidosView.php';
-                break;
-
             case 'crear':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->service->agregarDetalle(
@@ -27,9 +22,10 @@ class DetallePedidosController {
                         $_POST['subtotal']
                     );
                 }
-                header("Location: index.php?modulo=detallePedidos&accion=listar");
-                break;
-
+                // CORREGIDO: Redirección usando Ingredienteindex.php
+                header("Location: Ingredienteindex.php?modulo=detallePedidos&accion=listar");
+                exit; 
+            
             case 'actualizar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->service->actualizarDetalle(
@@ -41,19 +37,23 @@ class DetallePedidosController {
                         $_POST['subtotal']
                     );
                 }
-                header("Location: index.php?modulo=detallePedidos&accion=listar");
-                break;
+                // CORREGIDO: Redirección usando Ingredienteindex.php
+                header("Location: Ingredienteindex.php?modulo=detallePedidos&accion=listar");
+                exit;
 
             case 'eliminar':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->service->eliminarDetalle($_POST['idDetalle']);
                 }
-                header("Location: index.php?modulo=detallePedidos&accion=listar");
-                break;
+                // CORREGIDO: Redirección usando Ingredienteindex.php
+                header("Location: Ingredienteindex.php?modulo=detallePedidos&accion=listar");
+                exit;
 
+            case 'listar':
             default:
                 $detalles = $this->service->obtenerDetalles();
-                include __DIR__ . '/../vista/detallePedidosView.php';
+                // Se mantiene la ruta de inclusión de la vista que ya corregimos antes.
+                include __DIR__ . '/../../views/ingredienteviews/detallePedidosView.php';
                 break;
         }
     }

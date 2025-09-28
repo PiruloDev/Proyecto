@@ -8,32 +8,6 @@ $ingredientes = $ingredientes ?? [];
 <head>
     <meta charset="UTF-8">
     <title>Ingredientes</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .ingrediente-item { 
-            border: 1px solid #ddd; 
-            padding: 10px; 
-            margin: 5px 0; 
-            border-radius: 5px; 
-        }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="number"], input[type="date"] { 
-            width: 300px; 
-            padding: 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-        }
-        input[type="submit"] { 
-            background-color: #007bff; 
-            color: white; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-        }
-        input[type="submit"]:hover { background-color: #0056b3; }
-    </style>
 </head>
 <body>
     <h1>Lista de Ingredientes</h1>
@@ -90,43 +64,43 @@ $ingredientes = $ingredientes ?? [];
     
     <!-- Formulario para agregar ingrediente -->
     <h2>Agregar Nuevo Ingrediente</h2>
-    <form method="POST">
-        <div class="form-group">
-            <label for="idProveedor">ID del Proveedor:</label>
-            <input type="number" name="idProveedor" id="idProveedor" min="1" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="idCategoria">ID de la Categoría:</label>
-            <input type="number" name="idCategoria" id="idCategoria" min="1" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="nombreIngrediente">Nombre del Ingrediente:</label>
-            <input type="text" name="nombreIngrediente" id="nombreIngrediente" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="cantidadIngrediente">Cantidad:</label>
-            <input type="number" name="cantidadIngrediente" id="cantidadIngrediente" min="0" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="fechaVencimiento">Fecha de Vencimiento:</label>
-            <input type="date" name="fechaVencimiento" id="fechaVencimiento" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="referenciaIngrediente">Referencia:</label>
-            <input type="text" name="referenciaIngrediente" id="referenciaIngrediente" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="fechaEntregaIngrediente">Fecha de Entrega:</label>
-            <input type="date" name="fechaEntregaIngrediente" id="fechaEntregaIngrediente" required>
-        </div>
-        
-        <input type="submit" value="Agregar Ingrediente">
-    </form>
+<form method="POST" action="Ingredienteindex.php?modulo=ingredientes&accion=agregar">
+    <div class="form-group">
+        <label for="idProveedor">ID del Proveedor:</label>
+        <input type="number" name="idProveedor" id="idProveedor" min="1" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="idCategoria">ID de la Categoría:</label>
+        <input type="number" name="idCategoria" id="idCategoria" min="1" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="nombreIngrediente">Nombre del Ingrediente:</label>
+        <input type="text" name="nombreIngrediente" id="nombreIngrediente" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="cantidadIngrediente">Cantidad:</label>
+        <input type="number" name="cantidadIngrediente" id="cantidadIngrediente" min="0" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+        <input type="date" name="fechaVencimiento" id="fechaVencimiento" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="referenciaIngrediente">Referencia:</label>
+        <input type="text" name="referenciaIngrediente" id="referenciaIngrediente" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="fechaEntregaIngrediente">Fecha de Entrega:</label>
+        <input type="date" name="fechaEntregaIngrediente" id="fechaEntregaIngrediente" required>
+    </div>
+    
+    <input type="submit" value="Agregar Ingrediente">
+</form>
 </body>
 </html>
