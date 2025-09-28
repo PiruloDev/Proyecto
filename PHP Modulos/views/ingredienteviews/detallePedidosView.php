@@ -27,7 +27,7 @@
 
 <!-- Crear -->
 <h2>Crear Detalle</h2>
-<form method="POST" action="index.php?modulo=detallePedidos&accion=crear">
+<form method="POST" action="Ingredienteindex.php?modulo=detallePedidos&accion=crear">
     <label>ID Pedido:</label><input type="number" name="idPedido" required><br>
     <label>ID Producto:</label><input type="number" name="idProducto" required><br>
     <label>Cantidad:</label><input type="number" name="cantidadProducto" required><br>
@@ -40,7 +40,7 @@
 
 <!-- Actualizar -->
 <h2>Actualizar Detalle</h2>
-<form method="POST" action="index.php?modulo=detallePedidos&accion=actualizar">
+<form method="POST" action="Ingredienteindex.php?modulo=detallePedidos&accion=actualizar">
     <label>ID Detalle:</label><input type="number" name="idDetalle" required><br>
     <label>ID Pedido:</label><input type="number" name="idPedido" required><br>
     <label>ID Producto:</label><input type="number" name="idProducto" required><br>
@@ -54,7 +54,7 @@
 
 <!-- Eliminar -->
 <h2>Eliminar Detalle</h2>
-<form method="POST" action="index.php?modulo=detallePedidos&accion=eliminar">
+<form method="POST" action="Ingredienteindex.php?modulo=detallePedidos&accion=eliminar">
     <label>ID Detalle:</label><input type="number" name="idDetalle" required><br>
     <button type="submit">Eliminar</button>
 </form>

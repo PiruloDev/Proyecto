@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../service/ingredientesService.php'; // Corregido: ruta y nombre
+require_once __DIR__ . '/../../services/ingredienteservices/ingredientesService.php'; 
 
 class ingredientesController {
     private $ingredientesService;
@@ -27,7 +27,7 @@ class ingredientesController {
                 break;
             case 'listar':
             default:
-                // Solo mostrar la lista
+                
                 break;
         }
         
@@ -35,7 +35,7 @@ class ingredientesController {
         $ingredientes = $this->ingredientesService->obtenerIngredientes();
         
         // Pasar datos a la vista
-        require __DIR__ . '/../vista/view.php';
+        require __DIR__ . '/../../views/ingredienteviews/ingredientesview.php';
     }
     
     private function procesarAgregar() {
@@ -146,7 +146,7 @@ class ingredientesController {
             return "<p style='color:green;'>Cantidad actualizada correctamente.</p>";
         } else {
             return "<p style='color:red;'>Error al actualizar cantidad: " . 
-                   ($resultado["error"] ?? 'Error desconocido') . "</p>";
+                ($resultado["error"] ?? 'Error desconocido') . "</p>";
         }
     }
     

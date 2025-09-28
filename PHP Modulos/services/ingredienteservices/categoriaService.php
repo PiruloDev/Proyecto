@@ -1,17 +1,33 @@
 <?php
-class CategoriaService {
-    private $baseUrl = "http://localhost:8080";
+// Asegúrate de que esta ruta sea correcta para incluir tu archivo de configuración
+require_once __DIR__ .  '../../../config/configIngredientes.php'; 
 
-    // Obtener todas las categorías (GET)
+class CategoriaService {
+    
+    // La propiedad $baseUrl ya no es necesaria, ya que se usa la configuración.
+
+    /**
+     * Obtener todas las categorías (GET)
+     * Usa: endpointGet::API_GET_CATEGORIAS_INGREDIENTES
+     */
     public function obtenerCategorias() {
-        $url = $this->baseUrl . "/categorias/ingredientes";
-        $response = file_get_contents($url);
-        return json_decode($response, true);
+        // Usamos la constante GET definida en la configuración
+        $url = endpointGet::API_GET_CATEGORIAS_INGREDIENTES; 
+        
+        $response = @file_get_contents($url);
+
+        // Se mantiene la lógica original de manejo de respuesta
+        return $response ? json_decode($response, true) : false;
     }
 
-    // Crear una categoría (POST)
+    /**
+     * Crear una categoría (POST)
+     * Usa: endpointPost::API_CREAR_CATEGORIA_INGREDIENTE
+     */
     public function crearCategoria($nombreCategoria) {
-        $url = $this->baseUrl . "/nuevacategoriaingrediente";
+        // Usamos la constante POST definida en la configuración
+        $url = endpointPost::API_CREAR_CATEGORIA_INGREDIENTE;
+        
         $data = ["nombreCategoria" => $nombreCategoria];
         
         $options = [
@@ -22,12 +38,18 @@ class CategoriaService {
             ]
         ];
         $context  = stream_context_create($options);
-        return file_get_contents($url, false, $context);
+        
+        return @file_get_contents($url, false, $context);
     }
 
-    // Editar una categoría (PUT)
+    /**
+     * Editar una categoría (PUT)
+     * Usa: endpointPut::categoriaIngrediente($id)
+     */
     public function editarCategoria($id, $nombreCategoria) {
-        $url = $this->baseUrl . "/categoriaingrediente/" . $id;
+        // Usamos el método estático PUT para construir la URL con el ID
+        $url = endpointPut::categoriaIngrediente($id);
+        
         $data = ["nombreCategoria" => $nombreCategoria];
         
         $options = [
@@ -38,12 +60,17 @@ class CategoriaService {
             ]
         ];
         $context  = stream_context_create($options);
-        return file_get_contents($url, false, $context);
+        
+        return @file_get_contents($url, false, $context);
     }
 
-    // Eliminar una categoría (DELETE)
+    /**
+     * Eliminar una categoría (DELETE)
+     * Usa: endpointDelete::categoriaIngrediente($id)
+     */
     public function eliminarCategoria($id) {
-        $url = $this->baseUrl . "/eliminarcategoria/" . $id;
+        // Usamos el método estático DELETE para construir la URL con el ID
+        $url = endpointDelete::categoriaIngrediente($id);
 
         $options = [
             "http" => [
@@ -51,6 +78,8 @@ class CategoriaService {
             ]
         ];
         $context  = stream_context_create($options);
-        return file_get_contents($url, false, $context);
+        
+        return @file_get_contents($url, false, $context);
     }
 }
+?>

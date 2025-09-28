@@ -1,48 +1,63 @@
 <?php
+
+// Asume que el archivo de configuración se llama 'EndpointConfig.php'
+// y que contiene las clases endpointBase, endpointGet, endpointPost, etc.
+require_once __DIR__ . '/../../config/configIngredientes.php';
+
 class ingredientesService {
     
-    // URLs corregidas según los endpoints de tu controller
-    private $apiUrlGet  = "http://localhost:8080/ingredientes/lista";
-    private $apiUrlPost = "http://localhost:8080/crearingrediente"; // Corregido
-    private $apiUrlPut  = "http://localhost:8080/ingrediente/"; // Para actualizaciones
-    private $apiUrlPatch = "http://localhost:8080/"; // Para actualizar cantidad
-    private $apiUrlDelete = "http://localhost:8080/ingrediente/"; // Para eliminar
+    // Las URLs ya NO se definen como propiedades privadas, 
+    // ya que se obtendrán directamente del archivo de configuración.
     
+    /**
+     * Obtiene una lista de todos los ingredientes.
+     * Utiliza la configuración: endpointGet::API_GET_INGREDIENTES_LISTA
+     */
     public function obtenerIngredientes() {
-    $proceso = curl_init($this->apiUrlGet);
-    curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
-    $respuesta = curl_exec($proceso);
-    $http_code = curl_getinfo($proceso, CURLINFO_HTTP_CODE);
+        // Usamos la constante del archivo de configuración
+        $apiUrl = endpointGet::API_GET_INGREDIENTES_LISTA;
 
-    if (curl_errno($proceso)) {
+        $proceso = curl_init($apiUrl);
+        curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
+        $respuesta = curl_exec($proceso);
+        $http_code = curl_getinfo($proceso, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($proceso)) {
+            curl_close($proceso);
+            return false;
+        }
         curl_close($proceso);
-        return false;
+
+        return ($http_code === 200) ? json_decode($respuesta, true) : false;
     }
-    curl_close($proceso);
 
-    return ($http_code === 200) ? json_decode($respuesta, true) : false;
-}
-
+    /**
+     * Agrega un nuevo ingrediente (POST).
+     * Utiliza la configuración: endpointPost::API_CREAR_INGREDIENTE
+     */
     public function agregarIngredientes(
-        $idProveedor,           // Corregido: sin guión bajo
-        $idCategoria,           // Agregado: faltaba este campo
-        $nombreIngrediente,     // Corregido: sin guión bajo
-        $cantidadIngrediente,   // Corregido: sin guión bajo
-        $fechaVencimiento,      // Corregido: sin guión bajo
-        $referenciaIngrediente, // Corregido: nombre completo
-        $fechaEntregaIngrediente // Corregido: nombre completo y sin coma final
+        $idProveedor,           
+        $idCategoria,           
+        $nombreIngrediente,     
+        $cantidadIngrediente,   
+        $fechaVencimiento,      
+        $referenciaIngrediente, 
+        $fechaEntregaIngrediente 
     ) {
+        // Usamos la constante del archivo de configuración
+        $apiUrl = endpointPost::API_CREAR_INGREDIENTE;
+
         $data_json = json_encode([
-            "idProveedor"     => $idProveedor,           // Nombres corregidos
-            "idCategoria"     => $idCategoria,           // Agregado
-            "nombreIngrediente" => $nombreIngrediente,
-            "cantidadIngrediente" => $cantidadIngrediente,
-            "fechaVencimiento" => $fechaVencimiento,
+            "idProveedor"           => $idProveedor,           
+            "idCategoria"           => $idCategoria,           
+            "nombreIngrediente"     => $nombreIngrediente,
+            "cantidadIngrediente"   => $cantidadIngrediente,
+            "fechaVencimiento"      => $fechaVencimiento,
             "referenciaIngrediente" => $referenciaIngrediente,
             "fechaEntregaIngrediente" => $fechaEntregaIngrediente
-        ], JSON_UNESCAPED_UNICODE); // Corregido: sin flags:
+        ], JSON_UNESCAPED_UNICODE); 
         
-        $proceso = curl_init($this->apiUrlPost);
+        $proceso = curl_init($apiUrl);
         curl_setopt($proceso, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($proceso, CURLOPT_POSTFIELDS, $data_json);
         curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
@@ -68,7 +83,10 @@ class ingredientesService {
         }
     }
     
-    // Método adicional para actualizar ingrediente completo (PUT)
+    /**
+     * Método para actualizar ingrediente completo (PUT).
+     * Utiliza la configuración: endpointPut::ingrediente($id)
+     */
     public function actualizarIngrediente(
         $id,
         $idProveedor,
@@ -79,17 +97,20 @@ class ingredientesService {
         $referenciaIngrediente,
         $fechaEntregaIngrediente
     ) {
+        // Usamos la función estática para construir la URL con el ID
+        $apiUrl = endpointPut::ingrediente($id); 
+
         $data_json = json_encode([
-            "idProveedor"     => $idProveedor,
-            "idCategoria"     => $idCategoria,
-            "nombreIngrediente" => $nombreIngrediente,
-            "cantidadIngrediente" => $cantidadIngrediente,
-            "fechaVencimiento" => $fechaVencimiento,
+            "idProveedor"           => $idProveedor,
+            "idCategoria"           => $idCategoria,
+            "nombreIngrediente"     => $nombreIngrediente,
+            "cantidadIngrediente"   => $cantidadIngrediente,
+            "fechaVencimiento"      => $fechaVencimiento,
             "referenciaIngrediente" => $referenciaIngrediente,
             "fechaEntregaIngrediente" => $fechaEntregaIngrediente
         ], JSON_UNESCAPED_UNICODE);
         
-        $proceso = curl_init($this->apiUrlPut . $id);
+        $proceso = curl_init($apiUrl);
         curl_setopt($proceso, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_setopt($proceso, CURLOPT_POSTFIELDS, $data_json);
         curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
@@ -115,13 +136,19 @@ class ingredientesService {
         ];
     }
     
-    // Método para actualizar solo la cantidad (PATCH)
+    /**
+     * Método para actualizar solo la cantidad (PATCH).
+     * Utiliza la configuración: endpointPatch::cantidadIngrediente($id)
+     */
     public function actualizarCantidad($id, $cantidadIngrediente) {
+        // Usamos la función estática para construir la URL con el ID
+        $apiUrl = endpointPatch::cantidadIngrediente($id);
+        
         $data_json = json_encode([
             "cantidadIngrediente" => $cantidadIngrediente
         ], JSON_UNESCAPED_UNICODE);
         
-        $proceso = curl_init($this->apiUrlPatch . $id . "/cantidad");
+        $proceso = curl_init($apiUrl);
         curl_setopt($proceso, CURLOPT_CUSTOMREQUEST, "PATCH");
         curl_setopt($proceso, CURLOPT_POSTFIELDS, $data_json);
         curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
@@ -147,9 +174,15 @@ class ingredientesService {
         ];
     }
     
-    // Método para eliminar ingrediente (DELETE)
+    /**
+     * Método para eliminar ingrediente (DELETE).
+     * Utiliza la configuración: endpointDelete::ingrediente($id)
+     */
     public function eliminarIngrediente($id) {
-        $proceso = curl_init($this->apiUrlDelete . $id);
+        // Usamos la función estática para construir la URL con el ID
+        $apiUrl = endpointDelete::ingrediente($id);
+
+        $proceso = curl_init($apiUrl);
         curl_setopt($proceso, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_setopt($proceso, CURLOPT_RETURNTRANSFER, true);
         
@@ -171,4 +204,3 @@ class ingredientesService {
         ];
     }
 }
-?>

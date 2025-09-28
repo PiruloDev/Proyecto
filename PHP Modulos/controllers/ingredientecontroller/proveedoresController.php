@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../service/proveedoresService.php';
+require_once __DIR__ . '../../../services/ingredienteservices/proveedoresService.php';
 
 class proveedoresController {
     private $proveedoresService;
@@ -32,7 +32,7 @@ class proveedoresController {
         $proveedores = $this->proveedoresService->obtenerProveedores();
 
         // Cargar vista
-        require __DIR__ . '/../vista/proveedoresView.php';
+        require __DIR__ . '../../../views/ingredienteviews/proveedoresView.php';
     }
 
     private function procesarAgregar() {
@@ -50,7 +50,7 @@ class proveedoresController {
             return "<p style='color:red;'>El nombre y teléfono son obligatorios.</p>";
         }
 
-        $this->proveedoresService->crearProveedor($nombre, $telefono, $activo, $email, $direccion);
+        $this->proveedoresService->agregarProveedor($nombre, $telefono, $activo, $email, $direccion);
         return "<p style='color:green;'>Proveedor agregado correctamente.</p>";
     }
 
