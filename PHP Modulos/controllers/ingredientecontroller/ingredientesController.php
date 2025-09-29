@@ -119,7 +119,7 @@ class ingredientesController {
             return "<p style='color:green;'>Ingrediente actualizado correctamente.</p>";
         } else {
             return "<p style='color:red;'>Error al actualizar ingrediente: " . 
-                   ($resultado["error"] ?? 'Error desconocido') . "</p>";
+                ($resultado["error"] ?? 'Error desconocido') . "</p>";
         }
     }
     
