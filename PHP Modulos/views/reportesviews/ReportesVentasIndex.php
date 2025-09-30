@@ -18,6 +18,13 @@
             --border-radius: 12px;
         }
 
+        .navbar {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 30px;
+        }
+
         body {
             background-image: url('https://www.revistamag.com/wp-content/uploads/2024/05/Pan-Freepik.jpg');
             background-size: cover;
@@ -93,14 +100,53 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(6px);
             z-index: 0;
         }
         .contenedor-central {
-            max-width: 900px;
+            max-width: 1000px; 
             margin: 0 auto;
             padding: 20px;
+        }
+
+        /* Estilos para el modal */
+        .modal-content {
+            background: var(--container-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .detail-value {
+            color: var(--text-dark);
+        }
+
+        .btn-info {
+            background-color: #5A8CB3;
+            border-color: #5A8CB3;
+        }
+
+        .btn-info:hover {
+            background-color: #4A7CA3;
+            border-color: #4A7CA3;
         }
     </style>
 </head>
@@ -110,6 +156,16 @@
 
 <div class="contenedor-central py-4" style="position: relative; z-index: 1;">
     <h1 class="text-center">Gestión de Ventas</h1>
+
+    <nav class="navbar navbar-expand-lg" style="background: var(--container-bg);">
+        <div class="container">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="?">Dashboard</a>
+                <a class="nav-link" href="?route=productos">Productos Top</a>
+                <a class="nav-link" href="?route=ventas">Usuarios</a>
+            </div>
+        </div>
+    </nav>
 
     <?php if (!empty($mensaje)): ?>
         <div class="alert alert-info text-center">
@@ -140,7 +196,7 @@
                 <div class="col-md-4">
                     <input type="number" step="0.01" name="totalFactura" class="form-control" placeholder="Total Factura" required>
                 </div>
-                <div class="col-md-8 text-end">
+                <div class="class=btn btn-danger btn-sm">
                     <button type="submit" class="btn w-100">Agregar Venta</button>
                 </div>
             </form>
@@ -167,33 +223,57 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($ventas as $venta): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($venta['idFactura']) ?></td>
-                            <td><?= htmlspecialchars($venta['idCliente']) ?></td>
-                            <td><?= htmlspecialchars($venta['idPedido']) ?></td>
-                            <td><?= htmlspecialchars($venta['fechaFacturacion']) ?></td>
-                            <td>
-                                <form method="POST" class="d-flex">
-                                    <input type="hidden" name="accion" value="actualizar">
-                                    <input type="hidden" name="id" value="<?= $venta['idFactura'] ?>">
-                                    <input type="number" step="0.01" name="totalFactura"
-                                           value="<?= htmlspecialchars($venta['totalFactura']) ?>"
-                                           class="form-control me-2" required>
-                                    <button type="submit" class="btn btn-sm">Actualizar</button>
-                                </form>
-                            </td>
-                            <td class="text-center">
-                                <a href="?eliminar=<?= $venta['idFactura'] ?>"
-                                   class="btn btn-sm"
-                                   style="background-color: var(--danger-color);"
-                                   onclick="return confirm('¿Seguro que deseas eliminar esta venta?');">
-                                   <button type="submit" class="btn btn-sm">Eliminar</button>
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        </tbody>
+    <?php foreach ($ventas as $venta): ?>
+    <tr>
+        <td><?= htmlspecialchars($venta['idFactura']) ?></td>
+        <td>
+            <input type="number" 
+                   id="cliente-<?= $venta['idFactura'] ?>" 
+                   value="<?= htmlspecialchars($venta['idCliente']) ?>" 
+                   class="form-control form-control-sm" 
+                   style="max-width: 80px;">
+        </td>
+        <td>
+            <input type="number" 
+                   id="pedido-<?= $venta['idFactura'] ?>" 
+                   value="<?= htmlspecialchars($venta['idPedido']) ?>" 
+                   class="form-control form-control-sm" 
+                   style="max-width: 80px;">
+        </td>
+        <td>
+            <input type="datetime-local" 
+                   id="fecha-<?= $venta['idFactura'] ?>" 
+                   value="<?= date('Y-m-d\TH:i', strtotime($venta['fechaFacturacion'])) ?>" 
+                   class="form-control form-control-sm" 
+                   style="min-width: 200px;">
+        </td>
+        <td>
+    <input type="number" 
+           step="0.01" 
+           id="total-<?= $venta['idFactura'] ?>" 
+           value="<?= htmlspecialchars($venta['totalFactura']) ?>" 
+           class="form-control form-control-sm" 
+           style="min-width: 85px; width: 100%;">
+</td>
+        <td class="text-center" style="min-width: 250px;">
+            <div class="d-flex justify-content-center gap-2 flex-nowrap">
+                <button type="button" class="btn btn-danger btn-sm" 
+                        onclick="verFactura(<?= htmlspecialchars(json_encode($venta)) ?>)">
+                    Ver
+                </button>
+                <button type="button" class="btn btn-danger btn-sm"
+                        onclick="actualizarVenta(<?= $venta['idFactura'] ?>)">
+                    Actualizar
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" 
+                        onclick="eliminarVenta(<?= $venta['idFactura'] ?>)">
+                    Eliminar
+                </button>
+            </div>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
                     </table>
                 </div>
             <?php else: ?>
@@ -203,6 +283,112 @@
     </div>
 </div>
 
+<!-- Modal para ver detalles de la factura -->
+<div class="modal fade" id="modalVerFactura" tabindex="-1" aria-labelledby="modalVerFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalVerFacturaLabel">Detalles de la Factura</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">ID Factura:</span>
+                    <span class="detail-value" id="detalle-idFactura"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">ID Cliente:</span>
+                    <span class="detail-value" id="detalle-idCliente"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">ID Pedido:</span>
+                    <span class="detail-value" id="detalle-idPedido"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fecha de Facturación:</span>
+                    <span class="detail-value" id="detalle-fechaFacturacion"></span>
+                </div>
+                <div class="detail-row" style="border-bottom: none;">
+                    <span class="detail-label">Total Factura:</span>
+                    <span class="detail-value" id="detalle-totalFactura" style="font-size: 1.2em; font-weight: bold;"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function actualizarVenta(idFactura) {
+    const cliente = document.getElementById('cliente-' + idFactura).value;
+    const pedido = document.getElementById('pedido-' + idFactura).value;
+    const fecha = document.getElementById('fecha-' + idFactura).value;
+    const total = document.getElementById('total-' + idFactura).value;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    
+    const inputs = {
+        'accion': 'actualizar',
+        'id': idFactura,
+        'idCliente': cliente,
+        'idPedido': pedido,
+        'fechaFacturacion': fecha.replace('T', ' ') + ':00',
+        'totalFactura': total
+    };
+    
+    for (const [name, value] of Object.entries(inputs)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function eliminarVenta(idFactura) {
+    if (!confirm('¿Seguro que deseas eliminar esta venta?')) {
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    
+    const accionInput = document.createElement('input');
+    accionInput.type = 'hidden';
+    accionInput.name = 'accion';
+    accionInput.value = 'eliminar';
+    
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'id';
+    idInput.value = idFactura;
+    
+    form.appendChild(accionInput);
+    form.appendChild(idInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function verFactura(venta) {
+    document.getElementById('detalle-idFactura').textContent = venta.idFactura;
+    document.getElementById('detalle-idCliente').textContent = venta.idCliente;
+    document.getElementById('detalle-idPedido').textContent = venta.idPedido;
+    document.getElementById('detalle-fechaFacturacion').textContent = venta.fechaFacturacion;
+    document.getElementById('detalle-totalFactura').textContent = '$' + parseFloat(venta.totalFactura).toFixed(2);
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalVerFactura'));
+    modal.show();
+}
+
+</script>
 </body>
 </html>
