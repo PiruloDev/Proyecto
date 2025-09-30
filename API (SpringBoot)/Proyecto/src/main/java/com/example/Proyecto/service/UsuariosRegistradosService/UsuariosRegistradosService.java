@@ -1,7 +1,8 @@
-package com.example.Proyecto.service.UsuariosRegistradosService;
+package com.example.demoJava1.UsuariosRegistrados.Service;
 
-import com.example.Proyecto.dto.UsuariosRegistradosDTO;
+import com.example.demoJava1.UsuariosRegistrados.UsuariosRegistradosDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +53,6 @@ public class UsuariosRegistradosService {
 
                 return usuariosRegistrados;
         }
+
 }
 
