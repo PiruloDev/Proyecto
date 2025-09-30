@@ -111,6 +111,16 @@
 <div class="contenedor-central py-4" style="position: relative; z-index: 1;">
     <h1 class="text-center">Gestión de Ventas</h1>
 
+    <nav class="navbar navbar-expand-lg" style="background: var(--container-bg);">
+        <div class="container">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="?">Dashboard</a>
+                <a class="nav-link" href="?route=productos">Productos Top</a>
+                <a class="nav-link" href="?route=usuarios">Usuarios</a>
+            </div>
+        </div>
+    </nav>
+
     <?php if (!empty($mensaje)): ?>
         <div class="alert alert-info text-center">
             <?= $mensaje ?>
@@ -184,11 +194,10 @@
                                 </form>
                             </td>
                             <td class="text-center">
-                                <a href="?eliminar=<?= $venta['idFactura'] ?>"
-                                   class="btn btn-sm"
-                                   style="background-color: var(--danger-color);"
+                                <a href="ReportesVentasController.php?eliminar=<?= $venta['idFactura'] ?>" 
+                                   class="btn btn-danger btn-sm" 
                                    onclick="return confirm('¿Seguro que deseas eliminar esta venta?');">
-                                   <button type="submit" class="btn btn-sm">Eliminar</button>
+                                   Eliminar
                                 </a>
                             </td>
                         </tr>
