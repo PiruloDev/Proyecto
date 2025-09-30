@@ -1,7 +1,7 @@
-package com.example.demoJava1.Productos.Services.Controllers;
+package com.example.Proyecto.controller;
 
-import com.example.demoJava1.Productos.Services.Controllers.PojoProductos;
-import com.example.demoJava1.Productos.Services.Controllers.ProductosServices;
+import com.example.Proyecto.model.PojoProductos;
+import com.example.Proyecto.service.Productos.ProductosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,29 +13,32 @@ import java.util.Map;
 @RequestMapping("/")
 @RestController
 public class ProductosController {
+
     @Autowired
-    private ProductosServices productosServices;
+    private ProductosService productosService;
 
     // ----> Productos GET
     @GetMapping("/detalle/producto")
     public List<Map<String, Object>> obtenerDetallesProductos() {
-        return productosServices.obtenerDetallesProducto();
+        return productosService.obtenerDetallesProducto();
     }
+
     // ----> Productos POST
     @PostMapping("/crear/producto")
     public String crearProducto(@RequestBody PojoProductos pojoProductos) {
-        boolean creado = productosServices.crearProducto(pojoProductos);
+        boolean creado = productosService.crearProducto(pojoProductos);
         if (creado) {
             return "Nuevo Producto creado e ingresado exitosamente";
         } else {
             return "Error al crear un nuevo Producto";
         }
     }
+
     @PatchMapping("/actualizar/producto/{id}")
     public ResponseEntity<String> actualizarProducto(@PathVariable("id") Long id, @RequestBody PojoProductos pojoProductos) {
         try {
             pojoProductos.setId(id.intValue());
-            boolean actualizado = productosServices.actualizarProducto(pojoProductos);
+            boolean actualizado = productosService.actualizarProducto(pojoProductos);
             if (actualizado) {
                 return ResponseEntity.ok("El producto " + pojoProductos.getNombreProducto() + " ha sido actualizado correctamente");
             } else {
@@ -52,11 +55,11 @@ public class ProductosController {
     @DeleteMapping("/eliminar/producto/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable("id") int id) {
         try {
-            boolean eliminado = productosServices.eliminarProducto(id);
+            boolean eliminado = productosService.eliminarProducto(id);
             if (eliminado) {
                 return ResponseEntity.ok("Producto con ID " + id + " eliminado correctamente");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontro producto con ID" + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontro producto con ID " + id);
             }
         } catch (Exception e) {
             e.printStackTrace();

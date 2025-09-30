@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="dd6a7946-e3ed-473d-b0e7-b13a2aec7468" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Proyecto/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Proyecto/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proyecto/src/main/java/com/example/Proyecto/service/Clientes/ConexionClienteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Proyecto/src/main/java/com/example/Proyecto/service/Clientes/ConexionClienteService.java" afterDir="false" />
-    </list>
+    <list default="true" id="dd6a7946-e3ed-473d-b0e7-b13a2aec7468" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +13,15 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="33FWzSJXWy7yBPP7HNBvVoMKTFl" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,7 +31,11 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/Dayanna/Desktop/Proyecto/Proyecto/API (SpringBoot)"
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Ambiente/Downloads/Proyecto-pre-produccion/Proyecto-pre-produccion/API (SpringBoot)/Proyecto",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -35,5 +48,21 @@
       <updated>1758913562884</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Proyecto/src/test/java/com/example/Proyecto/ProyectoApplicationTests.java</url>
+          <line>12</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Proyecto/src/main/java/com/example/Proyecto/ProyectoApplication.java</url>
+          <line>10</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -1,9 +1,12 @@
-package com.example.demoJava1.Productos.Services.Controllers;
+package com.example.Proyecto.service.Productos;
+
+import com.example.Proyecto.model.PojoProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -11,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ProductosServices {
+public class ProductosService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -36,7 +39,12 @@ public class ProductosServices {
     public boolean crearProducto(PojoProductos pojoProductos) {
         String sql = "INSERT INTO Productos (NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA) VALUES (?, ?, ?, ?, ?)";
         try {
-            int result = jdbcTemplate.update(sql, pojoProductos.getNombreProducto(), pojoProductos.getStockMinimo(), pojoProductos.getPrecio(), java.sql.Date.valueOf(pojoProductos.getFechaVencimiento()), pojoProductos.getMarcaProducto()
+            int result = jdbcTemplate.update(sql,
+                    pojoProductos.getNombreProducto(),
+                    pojoProductos.getStockMinimo(),
+                    pojoProductos.getPrecio(),
+                    java.sql.Date.valueOf(pojoProductos.getFechaVencimiento()),
+                    pojoProductos.getMarcaProducto()
             );
             return result > 0;
         } catch (DataAccessException e) {
@@ -48,13 +56,21 @@ public class ProductosServices {
     public boolean actualizarProducto(PojoProductos pojoProductos) {
         String sql = "UPDATE productos SET NOMBRE_PRODUCTO = ?, PRODUCTO_STOCK_MIN = ?, PRECIO_PRODUCTO = ?, FECHA_VENCIMIENTO_PRODUCTO = ?, TIPO_PRODUCTO_MARCA = ? WHERE ID_PRODUCTO = ?";
         try {
-            int result = jdbcTemplate.update(sql, pojoProductos.getNombreProducto(), pojoProductos.getStockMinimo(), pojoProductos.getPrecio(), java.sql.Date.valueOf(pojoProductos.getFechaVencimiento()), pojoProductos.getMarcaProducto(), pojoProductos.getId());
+            int result = jdbcTemplate.update(sql,
+                    pojoProductos.getNombreProducto(),
+                    pojoProductos.getStockMinimo(),
+                    pojoProductos.getPrecio(),
+                    java.sql.Date.valueOf(pojoProductos.getFechaVencimiento()),
+                    pojoProductos.getMarcaProducto(),
+                    pojoProductos.getId()
+            );
             return result > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();
             return false;
         }
     }
+
     public boolean eliminarProducto(int id) {
         String sql = "DELETE FROM Productos WHERE ID_PRODUCTO = ?";
         try {
