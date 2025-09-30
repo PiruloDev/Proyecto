@@ -9,30 +9,8 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <style>
-        body {
-            background-color: #f0f2f5;
-        }
-        .container {
-            margin-top: 30px;
-        }
-        .card-header {
-            background-color: #fd910dff;
-            color: white;
-        }
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        /* Clases personalizadas */
-        .bg-gris-oscuro {
-            background-color: #343a40;
-        }
-        .text-dorado {
-            color: #fd910dff !important;
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/pedidos-custom.css">
+
 </head>
 <body>
 

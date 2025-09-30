@@ -11,34 +11,9 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
-    <!-- Estilos personalizados -->
-    <style>
-        body {
-            background-color: #f0f2f5;
-        }
-        .container {
-            margin-top: 30px;
-        }
-        .card-header {
-            background-color: #fd910dff;
-            color: white;
-        }
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        /* ✅ Tus clases personalizadas */
-        .bg-gris-oscuro {
-            background-color: #343a40 !important; /* gris oscuro bootstrap */
-        }
-        .text-dorado {
-            color: #fd910dff !important; /* dorado */
-        }
-        .text-dorado:hover {
-            color: #e07c0c !important; /* tono más oscuro al pasar el mouse */
-        }
-    </style>
+    <!-- Tu CSS personalizado -->
+    <link rel="stylesheet" href="../../css/pedidos-custom.css">
+    
 </head>
 <body>
 
