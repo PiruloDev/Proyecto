@@ -25,7 +25,7 @@
                     <h5 class="mb-0">El Castillo del Pan</h5>
                 </div>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="menu.php"><i class="fas fa-home"></i> Dashboard</a> 
+                    <a class="nav-link active" href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php"><i class="fas fa-home"></i> Dashboard</a> 
                     
                     <a class="nav-link" href="Ingredienteindex.php?modulo=ingredientes&accion=listar"><i class="fas fa-cheese"></i> Ingredientes</a>
                     <a class="nav-link" href="Ingredienteindex.php?modulo=categoria&accion=listar"><i class="fas fa-list-alt"></i> Categorías</a>
@@ -40,7 +40,7 @@
             
             <nav class="navbar navbar-expand-lg top-navbar">
                 <div class="container-fluid">
-                    <a class="navbar-brand d-md-none" href="menu.php">Menú</a>
+                    <a class="navbar-brand d-md-none" href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php">Menú</a>
                     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -69,7 +69,7 @@
             <div class="welcome-section">
                 <h1>Bienvenido al Panel de Control</h1>
                 <p class="lead" style="color: var(--text-light);">Usa el menú lateral para navegar entre los módulos de gestión.</p>
-                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -25,7 +25,7 @@
           <h5 class="mb-0">El Castillo del Pan</h5>
         </div>
         <nav class="nav flex-column">
-          <a class="nav-link" href="views\ingredienteviews\menu.php"><i class="fas fa-home"></i> Dashboard</a>
+          <a class="nav-link" href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php"><i class="fas fa-home"></i> Dashboard</a>
           <a class="nav-link" href="Ingredienteindex.php?modulo=ingredientes&accion=listar"><i class="fas fa-cheese"></i> Ingredientes</a>
           <a class="nav-link active" href="Ingredienteindex.php?modulo=categoria&accion=listar"><i class="fas fa-list-alt"></i> Categorías</a>
           <a class="nav-link" href="Ingredienteindex.php?modulo=proveedores&accion=listar"><i class="fas fa-truck"></i> Proveedores</a>
@@ -40,7 +40,7 @@
       <!-- Top Navbar -->
       <nav class="navbar navbar-expand-lg top-navbar">
         <div class="container-fluid">
-          <a class="navbar-brand d-md-none" href="menu.php">Menú</a>
+          <a class="navbar-brand d-md-none" href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php">Menú</a>
           <div class="collapse navbar-collapse justify-content-end">
             <div class="navbar-nav">
               <div class="nav-item dropdown">
