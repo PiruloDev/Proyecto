@@ -7,7 +7,7 @@
 </head>
 <body>
     <a href="../index.php">Volver al Menu Principal</a>
-    <a href="/PHP%20Modulos/empleadoindex.php">Gestión de Empleados</a>
+    <a href="/PHP%20Modulos/Empleadoindex.php">Gestión de Empleados</a>
     
     <h1>Gestión de Usuarios</h1>
     <?php if (!empty($mensaje)): ?>
