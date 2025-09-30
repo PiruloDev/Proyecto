@@ -1,43 +1,25 @@
-package com.example.Proyecto.model;
+package com.example.demoJava1.Ordenes_salida;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ordenes_salida")
 public class Ordenes_salida {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_FACTURA")
-    private int idFactura;   // ID_FACTURA
-    
-    @Column(name = "ID_CLIENTE")
-    private Long idCliente;   // ID_CLIENTE
-    
-    @Column(name = "ID_PEDIDO")
-    private Long idPedido;    // ID_PEDIDO
-    
-    @Column(name = "FECHA_FACTURACION")
-    private LocalDate fechaFacturacion; // FECHA_FACTURACION
-    
-    @Column(name = "TOTAL_FACTURA")
-    private double totalFactura; // TOTAL_FACTURA
+    private int idFactura;
 
-    // Constructor vacío requerido por JPA
-    public Ordenes_salida() {}
+    private int idCliente;
+    private int idPedido;
+    private LocalDateTime fechaFacturacion;
+    private double totalFactura;
 
-    // Constructor
-    public Ordenes_salida(int idFactura, Long idCliente, Long idPedido, LocalDate fechaFacturacion, double totalFactura) {
-        this.idFactura = idFactura;
-        this.idCliente = idCliente;
-        this.idPedido = idPedido;
-        this.fechaFacturacion = fechaFacturacion;
-        this.totalFactura = totalFactura;
-    }
-
-    // METODOS
+    // Getters y Setters
     public int getIdFactura() {
         return idFactura;
     }
@@ -46,27 +28,27 @@ public class Ordenes_salida {
         this.idFactura = idFactura;
     }
 
-    public Long getIdCliente() {
+    public int getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(Long idCliente) {
+    public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
     }
 
-    public Long getIdPedido() {
+    public int getIdPedido() {
         return idPedido;
     }
 
-    public void setIdPedido(Long idPedido) {
+    public void setIdPedido(int idPedido) {
         this.idPedido = idPedido;
     }
 
-    public LocalDate getFechaFacturacion() {
+    public LocalDateTime getFechaFacturacion() {
         return fechaFacturacion;
     }
 
-    public void setFechaFacturacion(LocalDate fechaFacturacion) {
+    public void setFechaFacturacion(LocalDateTime fechaFacturacion) {
         this.fechaFacturacion = fechaFacturacion;
     }
 
@@ -78,3 +60,6 @@ public class Ordenes_salida {
         this.totalFactura = totalFactura;
     }
 }
+
+
+
