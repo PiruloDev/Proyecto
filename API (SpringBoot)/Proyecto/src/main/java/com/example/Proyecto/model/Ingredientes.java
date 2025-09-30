@@ -1,5 +1,6 @@
 package com.example.Proyecto.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Ingredientes {
@@ -7,7 +8,7 @@ public class Ingredientes {
     private int idProveedor;
     private int idCategoria;
     private String nombreIngrediente;
-    private int cantidadIngrediente;
+    private BigDecimal cantidadIngrediente;
     private Date fechaVencimiento;
     private String referenciaIngrediente;
     private Date fechaEntregaIngrediente;
@@ -20,7 +21,7 @@ public class Ingredientes {
                         int idProveedor,
                         int idCategoria,
                         String nombreIngrediente,
-                        int cantidadIngrediente,
+                        BigDecimal cantidadIngrediente,
                         Date fechaVencimiento,
                         String referenciaIngrediente,
                         Date fechaEntregaIngrediente) {
@@ -47,8 +48,8 @@ public class Ingredientes {
     public String getNombreIngrediente() { return nombreIngrediente; }
     public void setNombreIngrediente(String nombreIngrediente) { this.nombreIngrediente = nombreIngrediente; }
 
-    public int getCantidadIngrediente() { return cantidadIngrediente; }
-    public void setCantidadIngrediente(int cantidadIngrediente) { this.cantidadIngrediente = cantidadIngrediente; }
+    public BigDecimal getCantidadIngrediente() { return cantidadIngrediente; }
+    public void setCantidadIngrediente(BigDecimal cantidadIngrediente) { this.cantidadIngrediente = cantidadIngrediente; }
 
     public Date getFechaVencimiento() { return fechaVencimiento; }
     public void setFechaVencimiento(Date fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }

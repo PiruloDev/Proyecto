@@ -1,7 +1,5 @@
 <?php
 
-// Asume que el archivo de configuración se llama 'EndpointConfig.php'
-// y que contiene las clases endpointBase, endpointGet, endpointPost, etc.
 require_once __DIR__ . '/../../config/configIngredientes.php';
 
 class ingredientesService {

@@ -5,43 +5,53 @@ import java.util.Date;
 
 public class Pedidos {
 
-    private long ID_CLIENTE;
-    private long ID_EMPLEADO;
-    private long ID_ESTADO_PEDIDO;
+    private Long ID_PEDIDO; // <<-- ¡NUEVO CAMPO CRÍTICO!
+    private Long ID_CLIENTE; // Cambiado a Long
+    private Long ID_EMPLEADO; // Cambiado a Long
+    private Long ID_ESTADO_PEDIDO; // Cambiado a Long
     private Date FECHA_INGRESO;
     private Date FECHA_ENTREGA;
     private BigDecimal TOTAL_PRODUCTO;
 
-    public Pedidos() {
+    // Constructor vacío
+    public Pedidos() {}
+
+    // --------------------------------------------------
+    // Getters y Setters para ID_PEDIDO
+    // --------------------------------------------------
+    public Long getID_PEDIDO() {
+        return ID_PEDIDO;
+    }
+
+    public void setID_PEDIDO(Long ID_PEDIDO) {
+        this.ID_PEDIDO = ID_PEDIDO;
+    }
+
+    // --------------------------------------------------
+    // Getters y Setters: Ahora devuelven Long, no int.
+    // --------------------------------------------------
+
+    public Long getID_CLIENTE() {
+        return ID_CLIENTE;
+    }
+
+    public void setID_CLIENTE(Long ID_CLIENTE) {
         this.ID_CLIENTE = ID_CLIENTE;
-        this.ID_EMPLEADO = ID_EMPLEADO;
-        this.ID_ESTADO_PEDIDO = ID_ESTADO_PEDIDO;
-        this.FECHA_INGRESO = FECHA_INGRESO;
-        this.FECHA_ENTREGA = FECHA_ENTREGA;
-        this.TOTAL_PRODUCTO = TOTAL_PRODUCTO;
     }
 
-    public int getID_CLIENTE() {
-        return (int) ID_CLIENTE;
+    public Long getID_EMPLEADO() {
+        return ID_EMPLEADO;
     }
 
-    public void setID_CLIENTE(long ID_CLIENTE) {
-        this.ID_CLIENTE = ID_CLIENTE;
-    }
-
-    public int getID_EMPLEADO() {
-        return (int) ID_EMPLEADO;
-    }
-
-    public void setID_EMPLEADO(long ID_EMPLEADO) {
+    public void setID_EMPLEADO(Long ID_EMPLEADO) {
         this.ID_EMPLEADO = ID_EMPLEADO;
     }
 
-    public int getID_ESTADO_PEDIDO() {
-        return (int) ID_ESTADO_PEDIDO;
+    public Long getID_ESTADO_PEDIDO() {
+        return ID_ESTADO_PEDIDO;
     }
 
-    public void setID_ESTADO_PEDIDO(long ID_ESTADO_PEDIDO) {
+    public void setID_ESTADO_PEDIDO(Long ID_ESTADO_PEDIDO) {
         this.ID_ESTADO_PEDIDO = ID_ESTADO_PEDIDO;
     }
 
@@ -69,5 +79,3 @@ public class Pedidos {
         this.TOTAL_PRODUCTO = TOTAL_PRODUCTO;
     }
 }
-
-
