@@ -1,16 +1,30 @@
 <?php
-class DetallePedidosService {
-    private $apiUrlBase = "http://localhost:8080/detalles-pedidos";
+// Asegúrate de que esta ruta sea correcta para incluir tu archivo de configuración
+require_once __DIR__ . '../../../config/configIngredientes.php'; 
 
-    // GET - Obtener todos los detalles
+class DetallePedidosService {
+    
+    // La propiedad $apiUrlBase ya no es necesaria, se usará la configuración.
+
+    /**
+     * GET - Obtener todos los detalles de pedidos.
+     */
     public function obtenerDetalles() {
-        $respuesta = @file_get_contents($this->apiUrlBase);
+        // Usa la constante GET del config
+        $url = endpointGet::API_GET_DETALLES_PEDIDOS;
+
+        $respuesta = @file_get_contents($url);
         if ($respuesta === false) return [];
         return json_decode($respuesta, true);
     }
 
-    // POST - Crear nuevo detalle
+    /**
+     * POST 
+     */
     public function agregarDetalle($idPedido, $idProducto, $cantidadProducto, $precioUnitario, $subtotal) {
+        // Usa la constante POST del config
+        $url = endpointPost::API_CREAR_DETALLE_PEDIDO;
+
         $data_json = json_encode([
             "idPedido" => $idPedido,
             "idProducto" => $idProducto,
@@ -19,7 +33,7 @@ class DetallePedidosService {
             "subtotal" => $subtotal
         ], JSON_UNESCAPED_UNICODE);
 
-        $ch = curl_init($this->apiUrlBase);
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -31,8 +45,13 @@ class DetallePedidosService {
         return ["success" => ($http_code === 200 || $http_code === 201), "response" => $respuesta];
     }
 
-    // PUT - Actualizar detalle
+    /**
+     * PUT 
+     */
     public function actualizarDetalle($id, $idPedido, $idProducto, $cantidadProducto, $precioUnitario, $subtotal) {
+        // Usa el método estático PUT del config para construir la URL con el ID
+        $url = endpointPut::detallePedido($id); 
+
         $data_json = json_encode([
             "idPedido" => $idPedido,
             "idProducto" => $idProducto,
@@ -41,7 +60,7 @@ class DetallePedidosService {
             "subtotal" => $subtotal
         ], JSON_UNESCAPED_UNICODE);
 
-        $ch = curl_init($this->apiUrlBase . "/" . $id);
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -53,9 +72,14 @@ class DetallePedidosService {
         return ["success" => ($http_code === 200), "response" => $respuesta];
     }
 
-    // DELETE - Eliminar detalle
+    /**
+     * DELETE 
+     */
     public function eliminarDetalle($id) {
-        $ch = curl_init($this->apiUrlBase . "/" . $id);
+        // Usa el método estático DELETE del config para construir la URL con el ID
+        $url = endpointDelete::detallePedido($id);
+        
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $respuesta = curl_exec($ch);

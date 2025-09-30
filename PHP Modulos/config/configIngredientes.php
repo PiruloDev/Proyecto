@@ -1,72 +1,119 @@
 <?php
 
-class endpointBase {
-    protected const API_BASE_URL = 'http://localhost:8080';
+
+class endpointGet {
+    // Ingredientes
+    const API_GET_INGREDIENTES_LISTA = 'http://localhost:8080/ingredientes/lista';
+    // Proveedores
+    const API_GET_PROVEEDORES = 'http://localhost:8080/proveedores';
+    // Categorías
+    const API_GET_CATEGORIAS_INGREDIENTES = 'http://localhost:8080/categorias/ingredientes';
+    // Detalles de Pedidos
+    const API_GET_DETALLES_PEDIDOS = 'http://localhost:8080/detalles-pedidos';
 }
 
-class endpointGet extends endpointBase {
-    // Endpoints para obtener detalles
-    const API_GET_INGREDIENTES = self::API_BASE_URL . '/ingredientes';
-    const API_GET_INGREDIENTES_LISTA = self::API_BASE_URL . '/ingredientes/lista';
-    const API_GET_PROVEEDORES = self::API_BASE_URL . '/proveedores';
-    const API_GET_CATEGORIAS = self::API_BASE_URL . '/categorias/ingredientes';
+// --------------------------------------------------------------------------------------------------
 
-    
+
+class endpointPost {
+    // Ingredientes
+    const API_CREAR_INGREDIENTE = 'http://localhost:8080/crearingrediente';
+    // Proveedores
+    const API_CREAR_PROVEEDOR = 'http://localhost:8080/proveedores';
+    // Categorías
+    const API_CREAR_CATEGORIA_INGREDIENTE = 'http://localhost:8080/nuevacategoriaingrediente';
+    // Detalles de Pedidos
+    const API_CREAR_DETALLE_PEDIDO = 'http://localhost:8080/detalles-pedidos';
 }
 
-class endpointPost extends endpointBase {
-    // Endpoints para crear recursos
-    const API_CREAR_INGREDIENTE = self::API_BASE_URL . '/crearingrediente';
-    const API_CREAR_PROVEEDOR = self::API_BASE_URL . '/proveedores';
-    const API_CREAR_CATEGORIA = self::API_BASE_URL . '/nuevacategoriaingrediente';
+// --------------------------------------------------------------------------------------------------
 
-}
 
-class endpointPut extends endpointBase {
-    // Endpoints base para actualizar, requieren un ID
-    const API_ACTUALIZAR_INGREDIENTE = self::API_BASE_URL . '/ingrediente';
-    const API_ACTUALIZAR_PROVEEDOR = self::API_BASE_URL . '/proveedores';
-    const API_ACTUALIZAR_CATEGORIA = self::API_BASE_URL . '/categoriaingrediente';
+class endpointPut {
+    // Bases de ruta definidas directamente
+    private const BASE_INGREDIENTE_PUT = 'http://localhost:8080/ingrediente';
+    private const BASE_PROVEEDOR_PUT = 'http://localhost:8080/proveedores';
+    private const BASE_CATEGORIA_PUT = 'http://localhost:8080/categoriaingrediente';
+    private const BASE_DETALLE_PEDIDO_PUT = 'http://localhost:8080/detalles-pedidos';
 
+    /**
+     * Obtiene el endpoint para actualizar un ingrediente.
+     */
     public static function ingrediente(int $id): string {
-        return self::API_ACTUALIZAR_INGREDIENTE . "/{$id}";
+        return self::BASE_INGREDIENTE_PUT . "/{$id}";
     }
     
+    /**
+     * Obtiene el endpoint para actualizar un proveedor.
+     */
     public static function proveedor(int $id): string {
-        return self::API_ACTUALIZAR_PROVEEDOR . "/{$id}";
+        return self::BASE_PROVEEDOR_PUT . "/{$id}";
     }
 
-    public static function categoria(int $id): string {
-        return self::API_ACTUALIZAR_CATEGORIA . "/{$id}";
+    /**
+     * Obtiene el endpoint para actualizar una categoría de ingrediente.
+     */
+    public static function categoriaIngrediente(int $id): string {
+        return self::BASE_CATEGORIA_PUT . "/{$id}";
     }
-
-
+    
+    /**
+     * Obtiene el endpoint para actualizar un detalle de pedido.
+     */
+    public static function detallePedido(int $id): string {
+        return self::BASE_DETALLE_PEDIDO_PUT . "/{$id}";
+    }
 }
 
-class endpointPatch extends endpointBase {
-    const API_ACTUALIZAR_CANTIDAD_INGREDIENTE = self::API_BASE_URL;
+/**
+ * Endpoints para operaciones de actualización parcial (PATCH).
+ */
+class endpointPatch {
+    // Base de ruta para actualizar la cantidad del ingrediente (requiere ID)
+    private const BASE_INGREDIENTE_PATCH = 'http://localhost:8080';
 
+    /**
+     * Obtiene el endpoint para actualizar solo la cantidad de un ingrediente.
+     */
     public static function cantidadIngrediente(int $id): string {
-        return self::API_ACTUALIZAR_CANTIDAD_INGREDIENTE . "/{$id}/cantidad";
+        return self::BASE_INGREDIENTE_PATCH . "/{$id}/cantidad";
     }
-
 }
 
-class endpointDelete extends endpointBase {
-    // Endpoints base para eliminar, requieren un ID
-    const API_ELIMINAR_INGREDIENTE = self::API_BASE_URL . '/ingrediente';
-    const API_ELIMINAR_PROVEEDOR = self::API_BASE_URL . '/proveedores';
-    const API_ELIMINAR_CATEGORIA = self::API_BASE_URL . '/eliminarcategoria';
 
+class endpointDelete {
+    // Bases de ruta definidas directamente
+    private const BASE_INGREDIENTE_DELETE = 'http://localhost:8080/ingrediente';
+    private const BASE_PROVEEDOR_DELETE = 'http://localhost:8080/proveedores';
+    private const BASE_CATEGORIA_DELETE = 'http://localhost:8080/eliminarcategoria';
+    private const BASE_DETALLE_PEDIDO_DELETE = 'http://localhost:8080/detalles-pedidos';
+
+
+    /**
+     * Obtiene el endpoint para eliminar un ingrediente.
+     */
     public static function ingrediente(int $id): string {
-        return self::API_ELIMINAR_INGREDIENTE . "/{$id}";
+        return self::BASE_INGREDIENTE_DELETE . "/{$id}";
     }
 
+    /**
+     * Obtiene el endpoint para eliminar un proveedor.
+     */
     public static function proveedor(int $id): string {
-        return self::API_ELIMINAR_PROVEEDOR . "/{$id}";
+        return self::BASE_PROVEEDOR_DELETE . "/{$id}";
     }
 
-    public static function categoria(int $id): string {
-        return self::API_ELIMINAR_CATEGORIA . "/{$id}";
+    /**
+     * Obtiene el endpoint para eliminar una categoría de ingrediente.
+     */
+    public static function categoriaIngrediente(int $id): string {
+        return self::BASE_CATEGORIA_DELETE . "/{$id}";
+    }
+
+    /**
+     * Obtiene el endpoint para eliminar un detalle de pedido.
+     */
+    public static function detallePedido(int $id): string {
+        return self::BASE_DETALLE_PEDIDO_DELETE . "/{$id}";
     }
 }

@@ -1,42 +1,4 @@
 
-    }
-    
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Productos WHERE ACTIVO = 1");
-    if ($stmt) {
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result) {
-            $productos_activos = $result->fetch_assoc()['total'];
-        }
-    }
-    
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Empleados WHERE ACTIVO_EMPLEADO = 1");
-    if ($stmt) {
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result) {
-            $empleados_activos = $result->fetch_assoc()['total'];
-        }
-    }
-    
-    // Contar clientes activos
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Clientes WHERE ACTIVO_CLI = 1");
-    if ($stmt) {
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result) {
-            $clientes_activos = $result->fetch_assoc()['total'];
-        }
-    }
-    
-    // Contar pedidos del día
-    $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM Pedidos WHERE DATE(FECHA_INGRESO) = CURDATE()");
-    if ($stmt) {
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result) {
-            $pedidos_hoy = $result->fetch_assoc()['total'];
-        }
 <!DOCTYPE html>
 <html lang="es">
 <head>

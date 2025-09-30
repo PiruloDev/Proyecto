@@ -94,7 +94,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="abrirModalInventario()">
+                    <a class="nav-link" href="PHP Modulos\views\ingredienteviews\ingredientesview.php" onclick="abrirModalInventario()">
                         <i class="fas fa-box"></i>
                         <span>Ver Inventario</span>
                     </a>
