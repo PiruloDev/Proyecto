@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/categoria")
+@RequestMapping("/productos/categorias")
 @RestController
 public class CategoriaProductosController {
     @Autowired
     private CategoriaProductosService categoriaProductosService;
 
-    // ----> Categorías GET
-    @GetMapping("/detalle/categoria")
+    // GET
+    @GetMapping
     public List<Map<String, Object>> obtenerCategorias() {
         return categoriaProductosService.obtenerCategorias();
     }
 
-    // ----> Categorías POST
+    // POST
     @PostMapping("/crear")
     public String crearCategoria(@RequestBody PojoCategoria_Productos categoria) {
         boolean creado = categoriaProductosService.crearCategoria(categoria);
@@ -33,7 +33,7 @@ public class CategoriaProductosController {
         }
     }
 
-    // ----> Categorías PATCH
+    // PATCH
     @PatchMapping("/actualizar/{id}")
     public ResponseEntity<String> actualizarCategoria(@PathVariable("id") int id, @RequestBody PojoCategoria_Productos categoria) {
         try {
@@ -50,7 +50,7 @@ public class CategoriaProductosController {
         }
     }
 
-    // ----> Categorías DELETE
+    // DELETE
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarCategoria(@PathVariable("id") int id) {
         try {
