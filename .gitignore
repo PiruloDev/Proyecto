@@ -1,0 +1,26 @@
+### IntelliJ IDEA ###
+.idea/
+*.iml
+out/
+*.iws
+
+### Compilados ###
+target/
+build/
+
+### Logs ###
+*.log
+
+### Sistema operativo ###
+.DS_Store
+Thumbs.db
+
+### Dependencias descargadas ###
+/.gradle/
+/mvnw
+/mvnw.cmd
+/.mvn/
+
+### Archivos temporales ###
+*.tmp
+*.swp
