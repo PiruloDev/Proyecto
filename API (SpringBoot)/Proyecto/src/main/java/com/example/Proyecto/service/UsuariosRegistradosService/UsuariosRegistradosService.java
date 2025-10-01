@@ -1,6 +1,6 @@
 package com.example.Proyecto.service.UsuariosRegistradosService;
 
-import com.example.Proyecto.dto.UsuariosRegistradosDTO;
+import com.example.Proyecto.model.UsuariosRegistradosDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -52,5 +52,6 @@ public class UsuariosRegistradosService {
 
                 return usuariosRegistrados;
         }
+
 }
 

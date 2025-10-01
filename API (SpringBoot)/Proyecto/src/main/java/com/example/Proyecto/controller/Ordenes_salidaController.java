@@ -1,8 +1,8 @@
 package com.example.Proyecto.controller;
+
 import com.example.Proyecto.model.Ordenes_salida;
 import com.example.Proyecto.service.Ordenes_salida.Ordenes_salidaService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,8 +14,28 @@ public class Ordenes_salidaController {
         this.ordenes_salidaService = ordenes_salidaService;
     }
 
-    @GetMapping("/ventas")
+    @GetMapping("/reporte/ventas")
     public List<Ordenes_salida>obtenerOrdenesSalida() {
         return ordenes_salidaService.obtenerOrdenesSalida();
+    }
+    @PostMapping("/agregar/venta")
+    public String agregarVenta(@RequestBody Ordenes_salida ordenesSalida) {
+        boolean creado = ordenes_salidaService.agregarVenta(ordenesSalida);
+        if (creado) {
+            return "Nueva venta agregada exitosamente";
+        } else {
+            return "Error al agregar una nueva venta";
+        }
+    }
+    @PatchMapping("/actualizar/venta/{id}")
+    public String actualizarVenta(@PathVariable int id, @RequestBody Ordenes_salida ordenesSalida) {
+        ordenesSalida.setIdFactura(id);
+        int result = ordenes_salidaService.actualizarVenta(ordenesSalida);
+        return result > 0 ? "Venta actualizada." : "Error al actualizar.";
+    }
+    @DeleteMapping("/eliminar/venta/{id}")
+    public String eliminarVenta(@PathVariable int id) {
+        int result = ordenes_salidaService.eliminarVenta(id);
+        return result > 0 ? "Venta eliminada." : "Error al eliminar la venta.";
     }
 }
