@@ -2,77 +2,49 @@ package com.example.Proyecto.service.CategoriaProductos;
 
 import com.example.Proyecto.model.PojoCategoria_Productos;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CategoriaProductosService {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Obtener todas las categorías
-    public List<Map<String, Object>> obtenerCategorias() {
-        String sql = "SELECT ID_CATEGORIA, NOMBRE_CATEGORIA, DESCRIPCION_CATEGORIA FROM Categorias";
-        return jdbcTemplate.query(sql, new RowMapper<Map<String, Object>>() {
+    //Todas las categorías
+    public List<PojoCategoria_Productos> obtenerCategorias() {
+        String sql = "SELECT ID_CATEGORIA_PRODUCTO, NOMBRE_CATEGORIAPRODUCTO FROM Categoria_Productos";
+        return jdbcTemplate.query(sql, new RowMapper<PojoCategoria_Productos>() {
             @Override
-            public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Map<String, Object> categoria = new HashMap<>();
-                categoria.put("Id Categoria:", rs.getInt("ID_CATEGORIA"));
-                categoria.put("Nombre Categoria:", rs.getString("NOMBRE_CATEGORIA"));
-                categoria.put("Descripcion:", rs.getString("DESCRIPCION_CATEGORIA"));
-                return categoria;
+            public PojoCategoria_Productos mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new PojoCategoria_Productos(
+                        rs.getInt("ID_CATEGORIA_PRODUCTO"),
+                        rs.getString("NOMBRE_CATEGORIAPRODUCTO")
+                );
             }
         });
     }
 
-    // Crear nueva categoría
-    public boolean crearCategoria(PojoCategoria_Productos categoria) {
-        String sql = "INSERT INTO Categorias (NOMBRE_CATEGORIA, DESCRIPCION_CATEGORIA) VALUES (?, ?)";
-        try {
-            int result = jdbcTemplate.update(sql,
-                    categoria.getNombreCategoria(),
-                    categoria.getDescripcionCategoria()
-            );
-            return result > 0;
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-            return false;
-        }
+    // Crear categoría
+    public int agregarCategoria(PojoCategoria_Productos categoria) {
+        String sql = "INSERT INTO Categoria_Productos (NOMBRE_CATEGORIAPRODUCTO) VALUES (?)";
+        return jdbcTemplate.update(sql, categoria.getNombreCategoriaProducto());
     }
 
     // Actualizar categoría
-    public boolean actualizarCategoria(PojoCategoria_Productos categoria) {
-        String sql = "UPDATE Categorias SET NOMBRE_CATEGORIA = ?, DESCRIPCION_CATEGORIA = ? WHERE ID_CATEGORIA = ?";
-        try {
-            int result = jdbcTemplate.update(sql,
-                    categoria.getNombreCategoria(),
-                    categoria.getDescripcionCategoria(),
-                    categoria.getIdCategoria()
-            );
-            return result > 0;
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public int actualizarCategoria(PojoCategoria_Productos categoria) {
+        String sql = "UPDATE Categoria_Productos SET NOMBRE_CATEGORIAPRODUCTO = ? WHERE ID_CATEGORIA_PRODUCTO = ?";
+        return jdbcTemplate.update(sql, categoria.getNombreCategoriaProducto(), categoria.getIdCategoriaProducto());
     }
 
     // Eliminar categoría
-    public boolean eliminarCategoria(int id) {
-        String sql = "DELETE FROM Categorias WHERE ID_CATEGORIA = ?";
-        try {
-            int result = jdbcTemplate.update(sql, id);
-            return result > 0;
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public int eliminarCategoria(int id) {
+        String sql = "DELETE FROM Categoria_Productos WHERE ID_CATEGORIA_PRODUCTO = ?";
+        return jdbcTemplate.update(sql, id);
     }
 }
