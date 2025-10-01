@@ -1,127 +1,100 @@
-<?php 
-// /app/Views/produccion/produccion_form.php
+<h2>Gestión de Producción</h2>
 
-// Recuperar mensajes de sesión (si usas sesiones en tu MVC)
-$success = $_SESSION['success'] ?? '';
-$error = $_SESSION['error'] ?? '';
-unset($_SESSION['success'], $_SESSION['error']);
-?>
+<!-- Formulario para consultar receta -->
+<form method="GET" action="">
+    <label for="idProducto">ID Producto:</label>
+    <input type="number" name="idProducto" required>
+    <button type="submit" name="accion" value="verReceta">Ver Receta</button>
+</form>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <title>Registro de Producción</title>
-</head>
-<body>
+<hr>
 
-    <h2>Registro de Producción</h2>
+<?php if (isset($receta) && is_array($receta) && count($receta) > 0): ?>
+    <h3>Receta del producto <?= htmlspecialchars($idProducto) ?>:</h3>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <tr>
+            <th>ID Ingrediente</th>
+            <th>Cantidad Requerida</th>
+            <th>Unidad de Medida</th>
+        </tr>
+        <?php foreach ($receta as $ingrediente): ?>
+            <tr>
+                <td><?= htmlspecialchars($ingrediente['idIngrediente']) ?></td>
+                <td><?= htmlspecialchars($ingrediente['cantidadRequerida']) ?></td>
+                <td><?= htmlspecialchars($ingrediente['unidadMedida']) ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 
-    <?php if ($success): ?><p style='color: green;'><?php echo $success; ?></p><?php endif; ?>
-    <?php if ($error): ?><p style='color: red;'><?php echo $error; ?></p><?php endif; ?>
+    <hr>
 
-    <form id="form-produccion" method="POST" action="/produccion/registrar">
-        
-        <label for="id_producto">Producto a Producir:</label>
-        <select name="id_producto" id="id_producto" required onchange="cargarReceta()" oninput="calcularIngredientes()">
-            <option value="">-- Seleccione un producto --</option>
-            <?php foreach ($productos as $producto): // $productos viene del controlador ?>
-                <option value="<?php echo $producto['id']; ?>">
-                    <?php echo htmlspecialchars($producto['nombre']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <br><br>
-        
-        <label for="cantidad_producida">Cantidad a Producir (Unidades):</label>
-        <input type="number" id="cantidad_producida" name="cantidad_producida" min="1" value="1" required oninput="calcularIngredientes()">
-        
-        <h3>Ingredientes Requeridos (Cálculo Automático)</h3>
-        <p>Asegúrese de que el listado es correcto antes de registrar.</p>
+    <!-- POST: Registrar producción -->
+    <h3>Registrar Producción</h3>
+    <form method="POST" action="?modulo=produccion&accion=registrar">
+        <input type="hidden" name="idProducto" value="<?= htmlspecialchars($idProducto) ?>">
+        <label for="cantidad">Cantidad a producir:</label>
+        <input type="number" name="cantidad" required><br><br>
 
-        <div id="ingredientes_listado">
-            <p>Seleccione un producto e ingrese la cantidad a producir.</p>
-        </div>
-        
-        <br>
-        <button type="submit" id="btn-registrar" disabled>Registrar Producción</button>
+        <?php foreach ($receta as $ingrediente): ?>
+            <input type="hidden" 
+                   name="ingredientesDescontados[<?= $ingrediente['idIngrediente'] ?>]" 
+                   value="<?= htmlspecialchars($ingrediente['cantidadRequerida']) ?>">
+        <?php endforeach; ?>
+
+        <button type="submit">Registrar Producción</button>
     </form>
+<?php elseif (isset($idProducto)): ?>
+    <p style="color:red;">No se encontró receta para el producto <?= htmlspecialchars($idProducto) ?>.</p>
+<?php endif; ?>
 
-<script>
-    // Almacenará la receta del producto seleccionado (Cant. Requerida por unidad)
-    let recetaActual = [];
+<hr>
 
-    /**
-     * 1. Llama al controlador PHP para obtener la receta de la API de Spring Boot.
-     */
-    function cargarReceta() {
-        const idProducto = document.getElementById('id_producto').value;
-        const listadoDiv = document.getElementById('ingredientes_listado');
-        listadoDiv.innerHTML = '<p>Cargando receta...</p>';
-        recetaActual = [];
-        
-        if (!idProducto) {
-            listadoDiv.innerHTML = '<p>Seleccione un producto.</p>';
-            document.getElementById('btn-registrar').disabled = true;
-            return;
-        }
+<!-- PUT: Actualizar producción completa -->
+<h3>Actualizar Producción (PUT)</h3>
+<form method="POST" action="?modulo=produccion&accion=actualizar">
+    <input type="hidden" name="_method" value="PUT">
+    <label for="idProduccion">ID Producción:</label>
+    <input type="number" name="idProduccion" required><br><br>
 
-        // Llamada AJAX al método getReceta del controlador PHP
-        fetch(`/produccion/getReceta?id_producto=${idProducto}`) // Ajusta la ruta a tu framework
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('No se pudo obtener la receta del servidor.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Los datos contienen la lista de RecetaProducto de Spring Boot
-                recetaActual = data;
-                calcularIngredientes(); // Una vez cargada la receta, realiza el cálculo inicial
-            })
-            .catch(error => {
-                listadoDiv.innerHTML = `<p style='color: red;'>Error: ${error.message}</p>`;
-                document.getElementById('btn-registrar').disabled = true;
-            });
-    }
+    <label for="idProducto">Nuevo ID Producto:</label>
+    <input type="number" name="idProducto" required><br><br>
 
-    /**
-     * 2. Calcula la cantidad total de ingredientes y actualiza la vista.
-     */
-    function calcularIngredientes() {
-        const cantidadProducida = parseInt(document.getElementById('cantidad_producida').value);
-        const listadoDiv = document.getElementById('ingredientes_listado');
-        let html = '';
-        let esValido = true;
+    <label for="cantidad">Nueva Cantidad:</label>
+    <input type="number" name="cantidad" required><br><br>
 
-        if (recetaActual.length === 0 || isNaN(cantidadProducida) || cantidadProducida <= 0) {
-            listadoDiv.innerHTML = (recetaActual.length === 0 && document.getElementById('id_producto').value !== '') 
-                ? '<p>Receta cargada, ingrese la cantidad a producir.</p>'
-                : '<p>Seleccione un producto y la cantidad a producir.</p>';
-            document.getElementById('btn-registrar').disabled = true;
-            return;
-        }
+    <button type="submit">Actualizar Producción</button>
+</form>
 
-        recetaActual.forEach(ingrediente => {
-            // Cálculo: Cantidad Total = Cantidad Requerida * Cantidad Producida
-            const cantidadTotal = parseFloat(ingrediente.cantidadRequerida) * cantidadProducida;
-            
-            // Genera los campos de input ocultos que se enviarán al controlador PHP
-            html += `
-                <div style="padding: 5px 0;">
-                    <strong>${ingrediente.nombreIngrediente || 'Ingrediente ID ' + ingrediente.idIngrediente}:</strong> 
-                    ${cantidadTotal.toFixed(3)} ${ingrediente.unidadMedida}
-                    
-                    <input type="hidden" name="ingredientes[${ingrediente.idIngrediente}]" value="${cantidadTotal.toFixed(3)}">
-                </div>
-            `;
-        });
+<hr>
 
-        listadoDiv.innerHTML = html;
-        document.getElementById('btn-registrar').disabled = !esValido;
-    }
+<!-- PATCH: Actualizar parcialmente -->
+<h3>Actualizar Parcialmente Producción (PATCH)</h3>
+<form method="POST" action="?modulo=produccion&accion=parcial">
+    <input type="hidden" name="_method" value="PATCH">
+    <label for="idProduccion">ID Producción:</label>
+    <input type="number" name="idProduccion" required><br><br>
 
-    // Llama a cargarReceta al inicio si el formulario tiene un valor preseleccionado
-    document.addEventListener('DOMContentLoaded', cargarReceta);
-</script>
-</body>
-</html>
+    <label for="cantidad">Nueva Cantidad (opcional):</label>
+    <input type="number" name="cantidad"><br><br>
+
+    <button type="submit">Actualizar Parcial</button>
+</form>
+
+<hr>
+
+<!-- DELETE: Eliminar producción -->
+<h3>Eliminar Producción</h3>
+<form method="POST" action="?modulo=produccion&accion=eliminar">
+    <input type="hidden" name="_method" value="DELETE">
+    <label for="idProduccion">ID Producción:</label>
+    <input type="number" name="idProduccion" required><br><br>
+
+    <button type="submit" style="color:red;">Eliminar</button>
+</form>
+
+<hr>
+
+<?php if (isset($mensaje)): ?>
+    <h3>Resultado:</h3>
+    <p><?= htmlspecialchars($mensaje) ?></p>
+<?php endif; ?>

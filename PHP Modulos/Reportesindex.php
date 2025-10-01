@@ -6,15 +6,15 @@ $route = $_GET['route'] ?? 'dashboard';
 $routes = [
     'usuarios' => [
         'controller' => 'ReportesUsuariosController',
-        'file' => 'Controlador/ReportesUsuariosController.php'
+        'file' => 'controllers/ReportesUsuariosController.php'
     ],
     'ventas' => [
         'controller' => 'ReportesVentasController',
-        'file' => 'Controlador/ReportesVentasController.php'
+        'file' => 'controllers/ReportesVentasController.php'
     ],
     'productos' => [
         'controller' => 'ReportesProductosMasVendidosController',
-        'file' => 'Controlador/ReportesProductosMasVendidosController.php'
+        'file' => 'controllers/ReportesProductosMasVendidosController.php'
     ]
 ];
 
