@@ -1,5 +1,7 @@
-package com.example.demoJava1.ProductosMasVendidos;
+package com.example.Proyecto.controller;
 
+import com.example.Proyecto.model.ProductosMasVendidos;
+import com.example.Proyecto.service.ProductosMasVendidosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

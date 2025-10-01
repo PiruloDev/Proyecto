@@ -1,4 +1,4 @@
-package com.example.demoJava1.ProductosMasVendidos;
+package com.example.Proyecto.model;
 
 import java.math.BigDecimal;
 
