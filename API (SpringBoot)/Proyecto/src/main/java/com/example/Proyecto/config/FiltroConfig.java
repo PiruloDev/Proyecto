@@ -20,7 +20,6 @@ public class FiltroConfig {
         jwtFiltro.setJwtUtilidad(jwtUtilidad);
         registroFiltro.setFilter(jwtFiltro);
         registroFiltro.addUrlPatterns("/usuarios/*");
-        registroFiltro.addUrlPatterns("/productos/*");
         return registroFiltro;
     }
 }
