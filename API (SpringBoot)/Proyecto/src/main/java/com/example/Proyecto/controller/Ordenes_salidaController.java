@@ -1,7 +1,7 @@
-package com.example.demoJava1.Ordenes_salida.Ordenes_salidaController;
+package com.example.Proyecto.controller;
 
-import com.example.demoJava1.Ordenes_salida.Ordenes_salida;
-import com.example.demoJava1.Ordenes_salida.Service.Ordenes_salidaService;
+import com.example.Proyecto.model.Ordenes_salida;
+import com.example.Proyecto.service.Ordenes_salida.Ordenes_salidaService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

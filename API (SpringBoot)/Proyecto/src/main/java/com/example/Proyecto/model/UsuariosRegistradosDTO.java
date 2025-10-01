@@ -1,4 +1,4 @@
-package com.example.demoJava1.UsuariosRegistrados;
+package com.example.Proyecto.model;
 
 public class UsuariosRegistradosDTO {
         private String nombre;

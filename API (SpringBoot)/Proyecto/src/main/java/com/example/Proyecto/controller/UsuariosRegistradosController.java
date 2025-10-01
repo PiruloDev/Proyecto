@@ -1,7 +1,7 @@
-package com.example.demoJava1.UsuariosRegistrados.Controller;
+package com.example.Proyecto.controller;
 
-import com.example.demoJava1.UsuariosRegistrados.UsuariosRegistradosDTO;
-import com.example.demoJava1.UsuariosRegistrados.Service.UsuariosRegistradosService;
+import com.example.Proyecto.model.UsuariosRegistradosDTO;
+import com.example.Proyecto.service.UsuariosRegistradosService.UsuariosRegistradosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

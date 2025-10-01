@@ -1,4 +1,4 @@
-package com.example.demoJava1.Ordenes_salida;
+package com.example.Proyecto.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

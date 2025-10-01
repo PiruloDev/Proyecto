@@ -1,15 +1,15 @@
-package com.example.demoJava1.ProductosMasVendidos;
+package com.example.Proyecto.model;
 
 import java.math.BigDecimal;
 
 public class ProductosMasVendidos {
-        private Long idProducto;
-        private String nombreProducto;
-        private String descripcionProducto;
-        private BigDecimal precioProducto;
-        private Integer stockMin;
-        private Long cantidadVendida;
-        // getters y setters
+    private Long idProducto;
+    private String nombreProducto;
+    private String descripcionProducto;
+    private BigDecimal precioProducto;
+    private Integer stockMin;
+    private Long cantidadVendida;
+    // getters y setters
 
     // Constructor
     public ProductosMasVendidos(Long idProducto, String nombreProducto, String descripcionProducto,
@@ -41,4 +41,3 @@ public class ProductosMasVendidos {
     public Long getCantidadVendida() { return cantidadVendida; }
     public void setCantidadVendida(Long cantidadVendida) { this.cantidadVendida = cantidadVendida; }
 }
-

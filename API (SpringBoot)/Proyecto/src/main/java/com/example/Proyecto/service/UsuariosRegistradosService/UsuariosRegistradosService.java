@@ -1,8 +1,7 @@
-package com.example.demoJava1.UsuariosRegistrados.Service;
+package com.example.Proyecto.service.UsuariosRegistradosService;
 
-import com.example.demoJava1.UsuariosRegistrados.UsuariosRegistradosDTO;
+import com.example.Proyecto.model.UsuariosRegistradosDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 

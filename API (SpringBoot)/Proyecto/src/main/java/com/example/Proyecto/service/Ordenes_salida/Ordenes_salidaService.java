@@ -1,12 +1,11 @@
-package com.example.demoJava1.Ordenes_salida.Service;
+package com.example.Proyecto.service.Ordenes_salida;
 
-import com.example.demoJava1.Ordenes_salida.Ordenes_salida;
+import com.example.Proyecto.model.Ordenes_salida;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
