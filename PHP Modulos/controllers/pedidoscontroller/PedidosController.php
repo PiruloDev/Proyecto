@@ -22,7 +22,7 @@ class PedidosController {
 
         switch ($action) {
             case "POST":
-              
+            
                 $mensaje = $this->handleCreate();
                 break;
 
@@ -45,7 +45,7 @@ class PedidosController {
         $pedidos = $this->pedidosService->obtenerPedidos();
 
         require __DIR__ . '/../../views/pedidosviews/index.php';
-    }
+    }   
     
     private function getPostData(array $keys) {
         $data = [];

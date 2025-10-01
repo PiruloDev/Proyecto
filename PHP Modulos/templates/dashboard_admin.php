@@ -200,24 +200,22 @@
                     </div>
 
                     <div class="action-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-cubes me-2"></i>Gestión de Ingredientes</h3>
-                        </div>
-                        <div class="card-body">
-    <!-- Ver Ingredientes y Proveedores -->
-    <a href="Ingredienteindex.php?modulo=ingredientes&accion=listar" class="action-btn">
-        <i class="fas fa-list-ul me-2"></i>Ver Ingredientes y Proveedores
-    </a>
+    <div class="card-header">
+        <h3><i class="fas fa-cubes me-2"></i>Gestión de Ingredientes</h3>
+    </div>
+    <div class="card-body">
+        <a href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php?modulo=ingredientes&accion=listar" class="action-btn">
+            <i class="fas fa-list-ul me-2"></i>Gestionar Categoria Ingredientes, Ingredientes y Proveedores
+        </a>
 
-    <!-- Agregar Ingrediente -->
-    <a href="Ingredienteindex.php?modulo=ingredientes&accion=agregar" class="action-btn">
-        <i class="fas fa-plus me-2"></i>Agregar Ingrediente
-    </a>
+        <a href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php?modulo=ingredientes&accion=agregar" class="action-btn">
+            <i class="fas fa-plus me-2"></i>Agregar Ingrediente
+        </a>
 
-    <!-- Gestionar Proveedores -->
-    <a href="Ingredienteindex.php?modulo=proveedores&accion=listar" class="action-btn">
-        <i class="fas fa-truck me-2"></i>Gestionar Proveedores
-    </a>
+        <a href="/pre-produccion/PHP%20Modulos/Ingredienteindex.php?modulo=proveedores&accion=listar" class="action-btn">
+            <i class="fas fa-truck me-2"></i>Gestionar Proveedores
+        </a>
+    </div>
 </div>
 
                     </div>
