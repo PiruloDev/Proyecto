@@ -1,12 +1,12 @@
 /* 🔶 Reglas adicionales que tenías en el <style> */
 body {
-    background-color: #f0f2f5;
+    background-color: #bb9467;
 }
 .container {
     margin-top: 30px;
 }
 .card-header {
-    background-color: #fd910dff;
+    background-color: #bb9467;
     color: white;
 }
 .list-group-item {
@@ -19,8 +19,8 @@ body {
     background-color: #343a40 !important; /* gris oscuro bootstrap */
 }
 .text-dorado {
-    color: #fd910dff !important; /* dorado */
+    color: #bb9467 !important; /* dorado */
 }
 .text-dorado:hover {
-    color: #e07c0c !important; /* tono más oscuro al pasar el mouse */
+    color: #bb9467 !important; /* tono más oscuro al pasar el mouse */
 }
