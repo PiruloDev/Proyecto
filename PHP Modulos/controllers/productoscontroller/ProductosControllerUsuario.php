@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../services/productosservices/ProductosService.php';
 
-class ProductosController_usuario {
+class ProductosControllerUsuario {
     private $service;
 
     public function __construct() {

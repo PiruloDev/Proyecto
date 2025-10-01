@@ -1,55 +1,76 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin - Productos</title>
-</head>
-<body>
-    <h1>Gestión de Productos (Administrador)</h1>
+<?php include __DIR__ . '/../../templates/header.php'; ?>
 
-    <?= $mensaje ?? '' ?>
+<div class="container py-4">
+  <h1 class="mb-4 text-center">Gestión de Productos (Administrador)</h1>
 
+  <?= $mensaje ?? '' ?>
+
+  <!-- Lista de productos -->
+  <div class="mb-5">
     <h2>Lista de productos</h2>
-    <ul>
-        <?php foreach ($productos as $p): ?>
-            <li>
-                <?= $p["nombreProducto"] ?> |
-                Precio: <?= $p["precio"] ?> |
-                Stock: <?= $p["stockMinimo"] ?> |
-                Marca: <?= $p["marcaProducto"] ?> |
-                Vence: <?= $p["fechaVencimiento"] ?>
-            </li>
-        <?php endforeach; ?>
-    </ul>
+    <div class="list-group">
+      <?php foreach ($productos as $p): ?>
+        <div class="list-group-item">
+          <strong><?= $p["nombreProducto"] ?></strong> |
+          Precio: <?= $p["precio"] ?> |
+          Stock: <?= $p["stockMinimo"] ?> |
+          Marca: <?= $p["marcaProducto"] ?> |
+          Vence: <?= $p["fechaVencimiento"] ?>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
 
-    <h2>Agregar producto</h2>
-    <form method="POST">
+  <!-- Crear producto -->
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">Agregar producto</div>
+    <div class="card-body">
+      <form method="POST">
         <input type="hidden" name="accion" value="crear">
-        Nombre: <input type="text" name="nombre" required><br>
-        Precio: <input type="number" step="0.01" name="precio" required><br>
-        Stock: <input type="number" name="stockMinimo" required><br>
-        Marca: <input type="text" name="marca" required><br>
-        Fecha vencimiento: <input type="date" name="fechaVencimiento" required><br>
-        <input type="submit" value="Agregar">
-    </form>
+        <div class="row g-3">
+          <div class="col-md-6"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+          <div class="col-md-6"><input type="number" step="0.01" name="precio" class="form-control" placeholder="Precio" required></div>
+          <div class="col-md-6"><input type="number" name="stockMinimo" class="form-control" placeholder="Stock mínimo" required></div>
+          <div class="col-md-6"><input type="text" name="marca" class="form-control" placeholder="Marca" required></div>
+          <div class="col-md-6"><input type="date" name="fechaVencimiento" class="form-control" required></div>
+          <div class="col-12"><button type="submit" class="btn btn-success w-100">Agregar</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    <h2>Actualizar producto</h2>
-    <form method="POST">
+  <!-- Actualizar producto -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">Actualizar producto</div>
+    <div class="card-body">
+      <form method="POST">
         <input type="hidden" name="accion" value="actualizar">
-        ID: <input type="number" name="id" required><br>
-        Nombre: <input type="text" name="nombre" required><br>
-        Precio: <input type="number" step="0.01" name="precio" required><br>
-        Stock: <input type="number" name="stockMinimo" required><br>
-        Marca: <input type="text" name="marca" required><br>
-        Fecha vencimiento: <input type="date" name="fechaVencimiento" required><br>
-        <input type="submit" value="Actualizar">
-    </form>
+        <div class="row g-3">
+          <div class="col-md-4"><input type="number" name="id" class="form-control" placeholder="ID" required></div>
+          <div class="col-md-4"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+          <div class="col-md-4"><input type="number" step="0.01" name="precio" class="form-control" placeholder="Precio" required></div>
+          <div class="col-md-4"><input type="number" name="stockMinimo" class="form-control" placeholder="Stock mínimo" required></div>
+          <div class="col-md-4"><input type="text" name="marca" class="form-control" placeholder="Marca" required></div>
+          <div class="col-md-4"><input type="date" name="fechaVencimiento" class="form-control" required></div>
+          <div class="col-12"><button type="submit" class="btn btn-primary w-100">Actualizar</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    <h2>Eliminar producto</h2>
-    <form method="POST">
+  <!-- Eliminar producto -->
+  <div class="card mb-4">
+    <div class="card-header bg-danger text-white">Eliminar producto</div>
+    <div class="card-body">
+      <form method="POST">
         <input type="hidden" name="accion" value="eliminar">
-        ID: <input type="number" name="id" required><br>
-        <input type="submit" value="Eliminar">
-    </form>
-</body>
-</html>
+        <div class="row g-3">
+          <div class="col-md-6"><input type="number" name="id" class="form-control" placeholder="ID del producto" required></div>
+          <div class="col-md-6"><button type="submit" class="btn btn-danger w-100">Eliminar</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<?php include __DIR__ . '/../templates/footer.php'; ?>

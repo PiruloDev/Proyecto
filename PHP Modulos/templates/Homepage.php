@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../services/productosservices/CategoriaProductosService.php';
+$service = new CategoriaProductosService();
+$categorias = $service->listarCategorias();
+?>
+
 <!DOCTYPE html>
 <html lang="es-CO">
 <head>
@@ -105,6 +111,45 @@
         </button>
       </div>
     </section>
+
+    <!-- Categorías Section -->
+<section class="container my-5">
+  <h2 class="text-center text-marron mb-4 animate__animated animate__fadeInUp">
+    Categorías de Productos
+  </h2>
+  <div class="row">
+    <?php if (!empty($categorias)): ?>
+      <?php foreach ($categorias as $cat): ?>
+        <?php 
+          // Normalizamos el nombre de la categoría a nombre de archivo
+          $nombreArchivo = strtolower(str_replace(' ', '-', $cat['nombre'])) . ".jpg";
+          $rutaImagen = "../images/categoria/" . $nombreArchivo;
+        ?>
+        <div class="col-6 col-md-4 col-lg-3 mb-4 animate__animated animate__fadeInUp">
+          <div class="card h-100 shadow-sm rounded-3">
+            <!-- Imagen de categoría -->
+            <img src="<?= $rutaImagen ?>"
+                 class="card-img-top card-img-custom rounded-top-3"
+                 alt="<?= htmlspecialchars($cat['nombre']) ?>"
+                 onerror="this.src='../images/categoria/default.jpg'">
+            <!-- Contenido -->
+            <div class="card-body text-center">
+              <h5 class="card-title text-marron fw-bold"><?= htmlspecialchars($cat['nombre']) ?></h5>
+              <a href="productosindex.php?cat=<?= $cat['id'] ?>" class="btn btn-primary btn-sm mt-2">
+                Ver productos
+              </a>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <div class="col-12">
+        <div class="alert alert-info text-center">No hay categorías disponibles.</div>
+      </div>
+    <?php endif; ?>
+  </div>
+</section>
+
 
     <!-- Products Section -->
     <section class="container my-5">
