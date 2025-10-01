@@ -1,32 +1,31 @@
 package com.example.Proyecto.model;
 
 public class PojoCategoria_Productos {
-    private int idCategoria;
-    private String nombreCategoria;
-    private String descripcionCategoria;
 
-    public int getIdCategoria() {
-        return idCategoria;
+    private int idCategoriaProducto;
+    private String nombreCategoriaProducto;
+
+    public PojoCategoria_Productos() {
     }
 
-    public void setIdCategoria(int idCategoria) {
-        this.idCategoria = idCategoria;
+    public PojoCategoria_Productos(int idCategoriaProducto, String nombreCategoriaProducto) {
+        this.idCategoriaProducto = idCategoriaProducto;
+        this.nombreCategoriaProducto = nombreCategoriaProducto;
     }
 
-    public String getNombreCategoria() {
-        return nombreCategoria;
+    public int getIdCategoriaProducto() {
+        return idCategoriaProducto;
     }
 
-    public void setNombreCategoria(String nombreCategoria) {
-        this.nombreCategoria = nombreCategoria;
+    public void setIdCategoriaProducto(int idCategoriaProducto) {
+        this.idCategoriaProducto = idCategoriaProducto;
     }
 
-    public String getDescripcionCategoria() {
-        return descripcionCategoria;
+    public String getNombreCategoriaProducto() {
+        return nombreCategoriaProducto;
     }
 
-    public void setDescripcionCategoria(String descripcionCategoria) {
-        this.descripcionCategoria = descripcionCategoria;
+    public void setNombreCategoriaProducto(String nombreCategoriaProducto) {
+        this.nombreCategoriaProducto = nombreCategoriaProducto;
     }
 }
-

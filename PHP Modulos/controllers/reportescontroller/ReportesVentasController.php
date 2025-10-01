@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../Modelo/ReportesVentasService.php';
+require_once __DIR__ . '/../services/ReportesVentasService.php';
 
 class ReportesVentasController {
     private $reportesVentasService;
@@ -91,6 +91,6 @@ class ReportesVentasController {
         $ventas = $this->reportesVentasService->obtenerVentas();
 
         // ----- CARGAR VISTA -----
-        require __DIR__ . '/../Vista/ReportesVentasIndex.php';
+        require __DIR__ . '/../views/ReportesVentasIndex.php';
     }
 }

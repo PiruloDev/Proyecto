@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../Modelo/ReportesProductosMasVendidosService.php';
+require_once __DIR__ . '/../services/ReportesProductosMasVendidosService.php';
 
 class ReportesProductosMasVendidosController {
     private $reportesProductosMasVendidosService;
@@ -16,7 +16,7 @@ class ReportesProductosMasVendidosController {
         $productos = $this->reportesProductosMasVendidosService->obtenerProductosMasVendidos($limite);
         
         // Cargar vista
-        require __DIR__ . '/../Vista/ReportesProductosMasVendidosIndex.php';
+        require __DIR__ . '/../views/ReportesProductosMasVendidosIndex.php';
     }
 }
 ?>
