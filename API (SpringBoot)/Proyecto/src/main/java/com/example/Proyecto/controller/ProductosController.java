@@ -24,6 +24,22 @@ public class ProductosController {
         return productosService.obtenerDetallesProducto();
     }
 
+    // ----> Productos por Categoría
+    @GetMapping("/categoria/{idCategoria}")
+    public ResponseEntity<List<Map<String, Object>>> obtenerProductosPorCategoria(@PathVariable int idCategoria) {
+        try {
+            List<Map<String, Object>> productos = productosService.obtenerProductosPorCategoria(idCategoria);
+            if (productos != null && !productos.isEmpty()) {
+                return ResponseEntity.ok(productos);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(productos);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     // ----> Producto GET por ID
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> obtenerProductoPorId(@PathVariable int id) {

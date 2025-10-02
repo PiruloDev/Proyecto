@@ -1,24 +1,78 @@
 <?php
-class endpointDetalles {
-    const API_DETALLE_PRODUCTO = 'http://localhost:8080/detalle/producto';
-}
 
-class endpointCreacion {
-    const API_CREAR_PRODUCTO = 'http://localhost:8080/crear/producto';
-}
+define('API_BASE_URL', 'http://localhost:8080');
 
-class endpointActualizacion {
-    const API_ACTUALIZAR_PRODUCTO = 'http://localhost:8080/actualizar/producto';
+class EndpointsProductos {
+    const LISTAR   = API_BASE_URL . '/productos';
+    const CREAR    = API_BASE_URL . '/productos';
 
-    public static function producto($id): string {
-        return self::API_ACTUALIZAR_PRODUCTO . "/$id";
+    public static function actualizar($id) {
+        return API_BASE_URL . "/productos/$id";
+    }
+
+    public static function eliminar($id) {
+        return API_BASE_URL . "/productos/$id";
     }
 }
 
-class endpointEliminacion {
-    const API_ELIMINAR_PRODUCTO = 'http://localhost:8080/eliminar/producto';
+//GET
+function consumirGET_Productos($url) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Content-Type: application/json",
+            "Accept: application/json"
+        ]
+    ]);
 
-    public static function producto($id): string {
-        return self::API_ELIMINAR_PRODUCTO . "/$id";
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($curl)) {
+        echo "Error cURL: " . curl_error($curl);
+        curl_close($curl);
+        return [];
     }
+
+    curl_close($curl);
+
+    if ($httpCode !== 200) {
+        echo "Error HTTP: $httpCode";
+        return [];
+    }
+
+    return json_decode($response, true);
+}
+
+//POST, PUT y DELETE
+function consumirAPI_Productos($url, $method, $data = []) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_HTTPHEADER => [
+            "Content-Type: application/json",
+            "Accept: application/json"
+        ],
+        CURLOPT_POSTFIELDS => !empty($data) ? json_encode($data) : null
+    ]);
+
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($curl)) {
+        echo "Error cURL: " . curl_error($curl);
+        curl_close($curl);
+        return ["codigo" => 0, "respuesta" => "Error de conexión"];
+    }
+
+    curl_close($curl);
+
+    return [
+        "codigo" => $httpCode,
+        "respuesta" => json_decode($response, true)
+    ];
 }

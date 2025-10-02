@@ -8,8 +8,11 @@ class ProductosControllerUsuario {
         $this->service = new ProductosService();
     }
 
-    public function manejarPeticion() {
-        $productos = $this->service->obtener();
-        require __DIR__ . '/../Vistas/ProductosIndex_usuario.php';
+    public function obtenerProductos() {
+        return $this->service->obtener();
+    }
+
+    public function obtenerProductoPorId($id) {
+        return $this->service->obtenerPorId($id);
     }
 }

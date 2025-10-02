@@ -2,24 +2,19 @@
 require_once __DIR__ . '/../../config/configCategoriaProductos.php';
 
 class CategoriaProductosService {
-
     public function listarCategorias() {
-        return consumirGET('/categorias');  
+        return consumirGET_Categorias(EndpointsCategorias::LISTAR);
     }
 
-    public function crearCategoria($nombre) {
-        return consumirAPI('/categorias', 'POST', [
-            'nombre' => $nombre
-        ]);
+    public function crearCategoria($data) {
+        return consumirAPI_Categorias(EndpointsCategorias::CREAR, "POST", $data);
     }
 
-    public function actualizarCategoria($id, $nombre) {
-        return consumirAPI("/categorias/$id", 'PUT', [
-            'nombre' => $nombre
-        ]);
+    public function actualizarCategoria($id, $data) {
+        return consumirAPI_Categorias(EndpointsCategorias::actualizar($id), "PUT", $data);
     }
 
     public function eliminarCategoria($id) {
-        return consumirAPI("/categorias/$id", 'DELETE');
+        return consumirAPI_Categorias(EndpointsCategorias::eliminar($id), "DELETE");
     }
 }

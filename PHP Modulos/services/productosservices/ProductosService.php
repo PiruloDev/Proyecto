@@ -1,36 +1,33 @@
 <?php
-require_once __DIR__ . '/../../config/ConfigProductos.php';
+require_once __DIR__ . "/../../config/configProductos.php";
 
 class ProductosService {
+
     public function obtener() {
-        $res = file_get_contents(endpointDetalles::API_DETALLE_PRODUCTO);
-        return $res ? json_decode($res, true) : [];
+        $productos = consumirGET_Productos(EndpointsProductos::LISTAR);
+
+        // Normalizamos los nombres de las claves
+        return array_map(function($p) {
+            return [
+                'idProducto'          => $p['Id Producto:'] ?? null,
+                'idCategoriaProducto' => $p['Id Categoria Producto:'] ?? null,
+                'nombreProducto'      => $p['Nombre Producto:'] ?? null,
+                'precio'              => $p['Precio:'] ?? null,
+                'marcaProducto'       => $p['Marca Producto:'] ?? null,
+                'stockMinimo'         => $p['Stock Minímo:'] ?? null,
+            ];
+        }, $productos);
     }
 
     public function crear($data) {
-        return $this->request(endpointCreacion::API_CREAR_PRODUCTO, "POST", $data);
+        return consumirAPI_Productos(EndpointsProductos::CREAR, "POST", $data);
     }
 
     public function actualizar($id, $data) {
-        return $this->request(endpointActualizacion::producto($id), "PATCH", $data);
+        return consumirAPI_Productos(EndpointsProductos::actualizar($id), "PUT", $data);
     }
 
     public function eliminar($id) {
-        return $this->request(endpointEliminacion::producto($id), "DELETE");
-    }
-
-    private function request($url, $method, $data = null) {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        if ($data) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $res = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        return ($code >= 200 && $code < 300) 
-            ? ["success" => true, "body" => $res] 
-            : ["success" => false, "error" => "HTTP $code", "body" => $res];
+        return consumirAPI_Productos(EndpointsProductos::eliminar($id), "DELETE");
     }
 }

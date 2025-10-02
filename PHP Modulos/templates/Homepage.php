@@ -112,44 +112,66 @@ $categorias = $service->listarCategorias();
       </div>
     </section>
 
-    <!-- Categorías Section -->
+    <!-- Categorías de Productos -->
 <section class="container my-5">
-  <h2 class="text-center text-marron mb-4 animate__animated animate__fadeInUp">
+  <h2 class="text-center text-gris-oscuro mb-4 animate__animated animate__fadeInUp">
     Categorías de Productos
   </h2>
-  <div class="row">
+  <p class="text-center text-cafe-oscuro mb-5 animate__animated animate__fadeInUp animate__delay-1s">
+    Descubre nuestras categorías principales para que encuentres tu producto favorito.
+  </p>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
     <?php if (!empty($categorias)): ?>
-      <?php foreach ($categorias as $cat): ?>
-        <?php 
-          // Normalizamos el nombre de la categoría a nombre de archivo
-          $nombreArchivo = strtolower(str_replace(' ', '-', $cat['nombre'])) . ".jpg";
-          $rutaImagen = "../images/categoria/" . $nombreArchivo;
+      <?php
+        $imagenesCategorias = [
+          "Tortas Tres Leches" => "../images/categoria/torta tres leches.jpeg",
+          "Tortas Milyway" => "../images/categoria/torta chocolate.jpeg",
+          "Tortas por Encargo" => "../images/categoria/torta zanahoria.jpeg",
+          "Pan Grande" => "../images/categoria/pan campesino.jpeg",
+          "Pan Pequeño" => "../images/categoria/pandebono.jpeg",
+          "Postres" => "../images/categoria/flan de caramelo.jpeg",
+          "Galletas" => "../images/categoria/galleta chocolate.jpeg",
+          "Tamales" => "../images/categoria/tamal tolimense.jpeg",
+          "Yogures" => "../images/categoria/merengon.jpeg",
+          "Pasteles Pollo" => "../images/categoria/pastel carne.jpeg"
+        ];
+      ?>
+
+      <?php foreach ($categorias as $categoria): ?>
+        <?php
+          $nombreCategoria = $categoria['nombreCategoriaProducto'];
+          $imgCategoria = $imagenesCategorias[$nombreCategoria] ?? "../images/categoria/default.jpg";
         ?>
-        <div class="col-6 col-md-4 col-lg-3 mb-4 animate__animated animate__fadeInUp">
-          <div class="card h-100 shadow-sm rounded-3">
-            <!-- Imagen de categoría -->
-            <img src="<?= $rutaImagen ?>"
-                 class="card-img-top card-img-custom rounded-top-3"
-                 alt="<?= htmlspecialchars($cat['nombre']) ?>"
+        <div class="col animate__animated animate__fadeInUp">
+          <div class="card h-100 rounded-3 shadow-sm">
+            <img src="<?php echo $imgCategoria; ?>" 
+                 class="card-img-top rounded-top-3 card-img-custom" 
+                 alt="<?php echo htmlspecialchars($nombreCategoria); ?>"
                  onerror="this.src='../images/categoria/default.jpg'">
-            <!-- Contenido -->
-            <div class="card-body text-center">
-              <h5 class="card-title text-marron fw-bold"><?= htmlspecialchars($cat['nombre']) ?></h5>
-              <a href="productosindex.php?cat=<?= $cat['id'] ?>" class="btn btn-primary btn-sm mt-2">
-                Ver productos
-              </a>
+            <div class="card-body">
+              <h5 class="card-title text-marron fw-bold"><?php echo htmlspecialchars($nombreCategoria); ?></h5>
+              <p class="card-text text-gris-oscuro">Explora nuestros productos de esta categoría.</p>
+            </div>
+            <div class="card-overlay">
+              <h5><?php echo htmlspecialchars($nombreCategoria); ?></h5>
+              <p>Encuentra lo mejor en <?php echo htmlspecialchars($nombreCategoria); ?>.</p>
+              <a href="menu.php?categoria=<?php echo $categoria['idCategoriaProducto']; ?>" 
+                 class="btn btn-primary btn-sm mt-2">Ver productos</a>
             </div>
           </div>
         </div>
       <?php endforeach; ?>
     <?php else: ?>
-      <div class="col-12">
-        <div class="alert alert-info text-center">No hay categorías disponibles.</div>
+      <div class="col-12 text-center">
+        <div class="alert alert-info">
+          <h5 class="alert-heading">¡No hay categorías!</h5>
+          <p>Actualmente no tenemos categorías disponibles. Intenta más tarde.</p>
+        </div>
       </div>
     <?php endif; ?>
   </div>
 </section>
-
 
     <!-- Products Section -->
     <section class="container my-5">

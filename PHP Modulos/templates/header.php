@@ -1,3 +1,9 @@
+<?php
+// Importar el servicio de categorías
+require_once __DIR__ . '/../controllers/productoscontroller/CategoriaProductosController.php';
+$service = new CategoriaProductosService();
+$categorias = $service->listarCategorias();
+?>
 <!DOCTYPE html>
 <html lang="es-CO">
 <head>
@@ -37,9 +43,27 @@
             <li class="nav-item">
               <a class="nav-link text-marron fw-semibold" href="../views/homepage.php">Inicio</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link text-marron fw-semibold" href="../views/productosviews/categoriaProductosIndex.php">Categorías</a>
+
+            <!-- Menú dinámico de categorías -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-marron fw-semibold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                ¡Explorar!
+              </a>
+              <ul class="dropdown-menu bg-crema shadow rounded-3 border-0 mt-2">
+                <?php if (!empty($categorias)): ?>
+                  <?php foreach ($categorias as $cat): ?>
+                    <li>
+                      <a class="dropdown-item text-marron fw-semibold py-2" href="../templates/menu.php?categoria=<?= $cat['id'] ?>">
+                        <?= htmlspecialchars($cat['nombre']) ?>
+                      </a>
+                    </li>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <li><span class="dropdown-item text-muted">No hay categorías</span></li>
+                <?php endif; ?>
+              </ul>
             </li>
+
             <li class="nav-item">
               <a class="nav-link text-marron fw-semibold" href="../productosindex.php">Productos</a>
             </li>

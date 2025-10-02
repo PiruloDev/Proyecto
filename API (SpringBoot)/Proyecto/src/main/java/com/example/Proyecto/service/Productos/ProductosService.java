@@ -18,13 +18,35 @@ public class ProductosService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    public List<Map<String, Object>> obtenerProductosPorCategoria(int idCategoria) {
+        String sql = "SELECT ID_PRODUCTO, ID_CATEGORIA_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, PRECIO_PRODUCTO, TIPO_PRODUCTO_MARCA " +
+                "FROM Productos WHERE ID_CATEGORIA_PRODUCTO = ?";
+        return jdbcTemplate.query(sql, new Object[]{idCategoria}, new RowMapper<Map<String, Object>>() {
+            @Override
+            public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Map<String, Object> producto = new HashMap<>();
+                producto.put("idProducto", rs.getInt("ID_PRODUCTO"));
+                producto.put("idCategoriaProducto", rs.getInt("ID_CATEGORIA_PRODUCTO"));
+                producto.put("nombreProducto", rs.getString("NOMBRE_PRODUCTO"));
+                producto.put("stockMinimo", rs.getInt("PRODUCTO_STOCK_MIN"));
+                producto.put("precio", rs.getBigDecimal("PRECIO_PRODUCTO"));
+                producto.put("marcaProducto", rs.getString("TIPO_PRODUCTO_MARCA"));
+                return producto;
+            }
+        });
+    }
+
     public List<Map<String, Object>> obtenerDetallesProducto() {
-        String sql = "SELECT ID_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, FECHA_ULTIMA_MODIFICACION FROM Productos";
+        String sql = "SELECT ID_PRODUCTO, ID_CATEGORIA_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, " +
+                "PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, FECHA_ULTIMA_MODIFICACION " +
+                "FROM Productos";
+
         return jdbcTemplate.query(sql, new RowMapper<Map<String, Object>>() {
             @Override
             public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Map<String, Object> producto = new HashMap<>();
                 producto.put("Id Producto:", rs.getInt("ID_PRODUCTO"));
+                producto.put("Id Categoria Producto:", rs.getInt("ID_CATEGORIA_PRODUCTO")); // 👈 AÑADIDO
                 producto.put("Nombre Producto:", rs.getString("NOMBRE_PRODUCTO"));
                 producto.put("Stock Minímo:", rs.getString("PRODUCTO_STOCK_MIN"));
                 producto.put("Precio:", rs.getString("PRECIO_PRODUCTO"));
@@ -37,13 +59,17 @@ public class ProductosService {
     }
 
     public Map<String, Object> obtenerProductoPorId(int id) {
-        String sql = "SELECT ID_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, FECHA_ULTIMA_MODIFICACION FROM Productos WHERE ID_PRODUCTO = ?";
+        String sql = "SELECT ID_PRODUCTO, ID_CATEGORIA_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, " +
+                "PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, FECHA_ULTIMA_MODIFICACION " +
+                "FROM Productos WHERE ID_PRODUCTO = ?";
+
         try {
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
                 public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
                     Map<String, Object> producto = new HashMap<>();
                     producto.put("Id Producto:", rs.getInt("ID_PRODUCTO"));
+                    producto.put("Id Categoria Producto:", rs.getInt("ID_CATEGORIA_PRODUCTO"));
                     producto.put("Nombre Producto:", rs.getString("NOMBRE_PRODUCTO"));
                     producto.put("Stock Minímo:", rs.getString("PRODUCTO_STOCK_MIN"));
                     producto.put("Precio:", rs.getString("PRECIO_PRODUCTO"));

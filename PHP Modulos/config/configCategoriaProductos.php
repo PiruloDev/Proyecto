@@ -1,19 +1,28 @@
 <?php
-// Base URL de tu API en Spring Boot
-define('API_BASE_URL', 'http://localhost:8080'); 
+define('API_BASE_URL', 'http://localhost:8080');
 
-// 🔹 Función para consumir un GET
-function consumirGET($endpoint) {
-    $url = API_BASE_URL . $endpoint;
+class EndpointsCategorias {
+    const LISTAR   = API_BASE_URL . '/categorias';
+    const CREAR    = API_BASE_URL . '/categorias';
 
+    public static function actualizar($id) {
+        return API_BASE_URL . "/categorias/$id";
+    }
+
+    public static function eliminar($id) {
+        return API_BASE_URL . "/categorias/$id";
+    }
+}
+
+//GET
+function consumirGET_Categorias($url) {
     $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30,
         CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Accept: application/json'
+            "Content-Type: application/json",
+            "Accept: application/json"
         ]
     ]);
 
@@ -36,30 +45,19 @@ function consumirGET($endpoint) {
     return json_decode($response, true);
 }
 
-// 🔹 Función para consumir POST, PUT y DELETE
-function consumirAPI($endpoint, $method, $data = []) {
-    $url = API_BASE_URL . $endpoint;
-
+//POST, PUT y DELETE
+function consumirAPI_Categorias($url, $method, $data = []) {
     $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30,
+        CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ]
+            "Content-Type: application/json",
+            "Accept: application/json"
+        ],
+        CURLOPT_POSTFIELDS => !empty($data) ? json_encode($data) : null
     ]);
-
-    if ($method === 'POST') {
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-    } elseif ($method === 'PUT') {
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-    } elseif ($method === 'DELETE') {
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
-    }
 
     $response = curl_exec($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -67,16 +65,13 @@ function consumirAPI($endpoint, $method, $data = []) {
     if (curl_errno($curl)) {
         echo "Error cURL: " . curl_error($curl);
         curl_close($curl);
-        return [
-            'codigo' => 0,
-            'respuesta' => 'Error de conexión'
-        ];
+        return ["codigo" => 0, "respuesta" => "Error de conexión"];
     }
 
     curl_close($curl);
 
     return [
-        'codigo' => $httpCode,
-        'respuesta' => $response
+        "codigo" => $httpCode,
+        "respuesta" => json_decode($response, true)
     ];
 }
