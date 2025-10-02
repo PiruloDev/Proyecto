@@ -32,20 +32,20 @@ class PedidosController {
                 break;
 
             case "DELETE":
-               
+                
                 $mensaje = $this->handleDelete();
                 break;
 
             case "GET":
             default:
-           
+            
                 break;
         }
         
         $pedidos = $this->pedidosService->obtenerPedidos();
 
         require __DIR__ . '/../../views/pedidosviews/pedidos.php'; 
-    }   
+    } 
     
     private function getPostData(array $keys) {
         $data = [];
@@ -64,8 +64,10 @@ class PedidosController {
             $data['id_EMPLEADO'] = (int)$data['id_EMPLEADO'];
             $data['id_ESTADO_PEDIDO'] = (int)$data['id_ESTADO_PEDIDO'];
             $data['total_PRODUCTO'] = (float)$data['total_PRODUCTO'];
-            $data['fecha_INGRESO'] = date("c");
-            $data['fecha_ENTREGA'] = date("c");
+            
+            // ✅ CORRECCIÓN: Solo se registra la fecha de INGRESO al crear.
+            $data['fecha_INGRESO'] = date("c"); 
+            // ❌ ELIMINADO: $data['fecha_ENTREGA'] = date("c"); 
 
             $resultado = $this->pedidosService->agregarPedido($data);
 
@@ -83,13 +85,22 @@ class PedidosController {
 
         if (!empty($id) && !empty($data['id_CLIENTE']) && !empty($data['id_EMPLEADO']) && !empty($data['id_ESTADO_PEDIDO']) && !empty($data['total_PRODUCTO'])) {
             
+            // 1. ✅ PASO CRÍTICO: Recuperar el pedido original para obtener las fechas.
+            $pedido_original = $this->pedidosService->obtenerPedidoPorId($id);
+
+            if (!$pedido_original) {
+                 return "<p style='color:red;'> Error: No se encontró el pedido con ID {$id} para actualizar.</p>";
+            }
+
             $datos_pedido = [
                 "id_CLIENTE" => (int)$data['id_CLIENTE'],
                 "id_EMPLEADO" => (int)$data['id_EMPLEADO'],
                 "id_ESTADO_PEDIDO" => (int)$data['id_ESTADO_PEDIDO'],
                 "total_PRODUCTO" => (float)$data['total_PRODUCTO'],
-                "fecha_INGRESO" => date("c"),
-                "fecha_ENTREGA" => date("c")
+                // 2. ✅ Mantener la fecha de ingreso original.
+                "fecha_INGRESO" => $pedido_original['fecha_INGRESO'], 
+                // 3. ✅ Mantener la fecha de entrega original (podrías agregar lógica aquí para actualizarla si el nuevo estado es "Entregado")
+                "fecha_ENTREGA" => $pedido_original['fecha_ENTREGA'] 
             ];
 
             $resultado = $this->pedidosService->actualizarPedido($id, $datos_pedido);

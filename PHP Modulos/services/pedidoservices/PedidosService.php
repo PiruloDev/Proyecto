@@ -50,11 +50,24 @@ class PedidosService {
         }
     }
 
+    // --- NUEVO MÉTODO PARA RECUPERAR UN SOLO PEDIDO ---
+    public function obtenerPedidoPorId(int $id): ?array {
+        $url = $this->apiUrl . '/' . $id;
+        $resultado = $this->executeCurlRequest($url, "GET");
+
+        if (!$resultado['success'] || !isset($resultado['data']) || empty($resultado['data'])) {
+            return null;
+        }
+
+        // Asumiendo que la API devuelve un objeto/array de pedido directamente.
+        return $resultado['data']; 
+    }
+    // ---------------------------------------------------
+
     public function obtenerPedidos(): array {
         $resultado = $this->executeCurlRequest($this->apiUrl, "GET");
 
         if (!$resultado['success']) {
-       
             return [];
         }
 
