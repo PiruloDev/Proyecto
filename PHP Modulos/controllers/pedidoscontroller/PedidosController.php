@@ -44,7 +44,7 @@ class PedidosController {
         
         $pedidos = $this->pedidosService->obtenerPedidos();
 
-        require __DIR__ . '/../views/pedidosviews/pedidos.php';
+        require __DIR__ . '/../views/pedidosviews/pedidos.php'; 
     }   
     
     private function getPostData(array $keys) {
