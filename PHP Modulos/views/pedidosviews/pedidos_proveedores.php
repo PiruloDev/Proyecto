@@ -9,7 +9,7 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <link rel="stylesheet" href="../css/stylepedidos.css">
+    <link rel="stylesheet" href="/Proyecto/PHP%20Modulos/css/stylepedidos.css"> 
 
 </head>
 <body>
