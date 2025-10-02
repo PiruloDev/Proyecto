@@ -115,42 +115,47 @@ $productos_data = $productos_filtrados;
     <div class="row" id="product-container">
       <?php if (!empty($productos_data)): ?>
         <?php foreach ($productos_data as $producto): ?>
-  <?php
-    $nombre = $producto['nombreProducto'] ?? 'Producto sin nombre';
-    $precio = $producto['precio'] ?? '0';
-    $marca  = $producto['marcaProducto'] ?? 'Genérico';
-    $stock  = $producto['stockMinimo'] ?? '0';
-    $id     = $producto['idProducto'] ?? 0;
-  ?>
-  <div class="col-lg-4 col-md-6 mb-4 product-card-item" data-nombre="<?php echo strtolower($nombre); ?>">
-    <div class="product-card card h-100 shadow-sm border-0 card-hover">
-      <div class="card-img-container position-relative">
-        <img src="../images/categoria/default.jpg" 
-             class="card-img-top product-image" 
-             alt="<?php echo $nombre; ?>"> 
-        <div class="price-badge">$<?php echo number_format((float)$precio, 0); ?></div>
-      </div>
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title text-marron fw-bold mb-2"><?php echo $nombre; ?></h5>
-        <p class="card-text text-muted flex-grow-1"><?php echo $marca; ?></p>
-        <div class="product-info mb-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="availability-badge"><i class="fas fa-check-circle me-1"></i>Disponible</span>
-            <small class="text-muted stock-info">Stock: <?php echo $stock; ?></small>
+          <?php
+            $nombre = $producto['nombreProducto'] ?? 'Producto sin nombre';
+            $precio = $producto['precio'] ?? '0';
+            $marca  = $producto['marcaProducto'] ?? 'Genérico';
+            $stock  = $producto['stockMinimo'] ?? '0';
+            $id     = $producto['idProducto'] ?? 0;
+
+            // Nombre de imagen basado en producto
+            $imagen_nombre = strtolower(str_replace(" ", "_", $nombre)) . ".jpeg";
+            $ruta_imagen = "../images/categoria/" . $imagen_nombre;
+          ?>
+          <div class="col-lg-4 col-md-6 mb-4 product-card-item" data-nombre="<?php echo strtolower($nombre); ?>">
+            <div class="product-card card h-100 shadow-sm border-0 card-hover">
+              <div class="card-img-container position-relative">
+                <img src="<?php echo $ruta_imagen; ?>" 
+                     class="card-img-top product-image" 
+                     alt="<?php echo $nombre; ?>" 
+                     onerror="this.onerror=null;this.src='../images/categoria/default.jpg';"> 
+                <div class="price-badge">$<?php echo number_format((float)$precio, 0); ?></div>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-marron fw-bold mb-2"><?php echo $nombre; ?></h5>
+                <p class="card-text text-muted flex-grow-1"><?php echo $marca; ?></p>
+                <div class="product-info mb-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="availability-badge"><i class="fas fa-check-circle me-1"></i>Disponible</span>
+                    <small class="text-muted stock-info">Stock: <?php echo $stock; ?></small>
+                  </div>
+                </div>
+                <div class="d-grid">
+                  <button class="btn btn-agregar-pedido" 
+                          data-producto-id="<?php echo $id; ?>"
+                          data-producto-nombre="<?php echo $nombre; ?>"
+                          data-producto-precio="<?php echo $precio; ?>">
+                    <i class="fas fa-plus-circle me-2"></i>Agregar pedido
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="d-grid">
-          <button class="btn btn-agregar-pedido" 
-                  data-producto-id="<?php echo $id; ?>"
-                  data-producto-nombre="<?php echo $nombre; ?>"
-                  data-producto-precio="<?php echo $precio; ?>">
-            <i class="fas fa-plus-circle me-2"></i>Agregar pedido
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-<?php endforeach; ?>
+        <?php endforeach; ?>
       <?php else: ?>
         <div class="col-12 text-center">
           <div class="alert alert-info">

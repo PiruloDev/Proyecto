@@ -1,18 +1,21 @@
 <?php
-session_start();
+require_once __DIR__ . '/controllers/productoscontroller/ProductosControllerAdmin.php';
+require_once __DIR__ . '/controllers/productoscontroller/CategoriaProductosController.php';
 
-if (!isset($_SESSION['rol'])) {
-    $_SESSION['rol'] = 'usuario'; 
-}
+$seccion = $_GET['seccion'] ?? 'productos';
 
-$rol = $_SESSION['rol'];
+include __DIR__ . '/templates/header_admin.php';
 
-if ($rol === 'admin') {
-    require_once __DIR__ . '/controllers/productoscontroller/ProductosController_admin.php';
+if ($seccion === 'productos') {
     $controller = new ProductosControllerAdmin();
-} else {
-    require_once __DIR__ . '/controllers/productoscontroller/ProductosController_usuario.php';
-    $controller = new ProductosControllerUsuario();
+    $productos = $controller->obtenerProductos();
+    include __DIR__ . '/views/productosviews/listar_productos_admin.php';
+    include __DIR__ . '/views/productosviews/form_producto.php';
+} elseif ($seccion === 'categorias') {
+    $controller = new CategoriaProductosController();
+    $categorias = $controller->listarCategorias();
+    include __DIR__ . '/views/productosviews/listar_categorias_admin.php';
+    include __DIR__ . '/views/productosviews/form_categoria.php';
 }
 
-$controller->manejarPeticion();
+include __DIR__ . '/templates/footer_admin.php';

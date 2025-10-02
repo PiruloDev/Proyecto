@@ -1,5 +1,7 @@
 <?php
-define('API_BASE_URL', 'http://localhost:8080');
+if (!defined('API_BASE_URL')) {
+    define('API_BASE_URL', 'http://localhost:8080');
+}
 
 class EndpointsCategorias {
     const LISTAR   = API_BASE_URL . '/categorias';

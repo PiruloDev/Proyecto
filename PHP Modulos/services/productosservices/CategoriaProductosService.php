@@ -7,14 +7,15 @@ class CategoriaProductosService {
     }
 
     public function crearCategoria($data) {
-        return consumirAPI_Categorias(EndpointsCategorias::CREAR, "POST", $data);
+        return consumirAPI_Categorias(EndpointsCategorias::CREAR, 'POST', $data);
     }
 
     public function actualizarCategoria($id, $data) {
-        return consumirAPI_Categorias(EndpointsCategorias::actualizar($id), "PUT", $data);
+        return consumirAPI_Categorias(EndpointsCategorias::actualizar($id), 'PUT', $data);
     }
 
     public function eliminarCategoria($id) {
-        return consumirAPI_Categorias(EndpointsCategorias::eliminar($id), "DELETE");
+        return consumirAPI_Categorias(EndpointsCategorias::eliminar($id), 'DELETE');
     }
 }
+?>

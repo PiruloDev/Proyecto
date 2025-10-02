@@ -1,23 +1,37 @@
 <?php
 require_once __DIR__ . '/../../services/productosservices/CategoriaProductosService.php';
 
-$service = new CategoriaProductosService();
+class CategoriaProductosController {
+    private $service;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['accion']) && $_POST['accion'] === 'crear') {
-        $data = [
-            "nombre" => $_POST['nombre']
-        ];
-        $service->crearCategoria($data);
-        header("Location: ../../CategoriaProductosindex.php");
-        exit;
+    public function __construct() {
+        $this->service = new CategoriaProductosService();
     }
-    if (isset($_POST['accion']) && $_POST['accion'] === 'eliminar') {
-        $id = $_POST['id'];
-        $service->eliminarCategoria($id);
-        header("Location: ../../CategoriaProductosindex.php");
-        exit;
+
+    public function listarCategorias() {
+        $categorias = $this->service->listarCategorias();
+        require __DIR__ . '/../../views/admin/listar_categorias_admin.php';
+    }
+
+    public function crear($nombre) {
+        if ($nombre) {
+            $this->service->crearCategoria(['nombre' => $nombre]);
+        }
+        $this->listarCategorias();
+    }
+
+    public function actualizar($id, $nombre) {
+        if ($id && $nombre) {
+            $this->service->actualizarCategoria($id, ['nombre' => $nombre]);
+        }
+        $this->listarCategorias();
+    }
+
+    public function eliminar($id) {
+        if ($id) {
+            $this->service->eliminarCategoria($id);
+        }
+        $this->listarCategorias();
     }
 }
-
-$categorias = $service->obtenerCategorias();
+?>
