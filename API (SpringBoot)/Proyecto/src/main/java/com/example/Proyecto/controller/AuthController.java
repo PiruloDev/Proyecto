@@ -50,6 +50,7 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         
         try {
+            // Usuario administrador hardcodeado
             if ("admin".equals(usuario.getUsername()) && "password".equals(usuario.getPassword())) {
                 Map<String, Object> adminInfo = new HashMap<>();
                 adminInfo.put("id", 1);
@@ -61,6 +62,22 @@ public class AuthController {
                 String token = jwtUtilidad.generarToken(adminInfo);
                 response.put("token", token);
                 response.put("usuario", adminInfo);
+                response.put("mensaje", "Login exitoso");
+                return ResponseEntity.ok(response);
+            }
+            
+            // Usuario cliente hardcodeado para pruebas
+            if ("cliente".equals(usuario.getUsername()) && "123456".equals(usuario.getPassword())) {
+                Map<String, Object> clienteInfo = new HashMap<>();
+                clienteInfo.put("id", 2);
+                clienteInfo.put("nombre", "Cliente Prueba");
+                clienteInfo.put("email", "cliente@test.com");
+                clienteInfo.put("tipoUsuario", "CLIENTE");
+                clienteInfo.put("rol", "CLIENTE");
+                
+                String token = jwtUtilidad.generarToken(clienteInfo);
+                response.put("token", token);
+                response.put("usuario", clienteInfo);
                 response.put("mensaje", "Login exitoso");
                 return ResponseEntity.ok(response);
             }
