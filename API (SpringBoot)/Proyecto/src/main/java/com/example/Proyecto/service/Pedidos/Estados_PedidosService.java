@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -27,7 +26,7 @@ public class Estados_PedidosService {
 
         return jdbcTemplate.query(sql, new RowMapper<Estado_Pedidos>() {
             @Override
-            public Estado_Pedidos mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
+            public Estado_Pedidos mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Estado_Pedidos estadoPedidos = new Estado_Pedidos();
                 // Se agrega el mapeo para el ID
                 estadoPedidos.setID_ESTADO_PEDIDO(rs.getLong("ID_ESTADO_PEDIDO"));
@@ -37,7 +36,7 @@ public class Estados_PedidosService {
         });
     }
 
-    // Metodo para crear Estados Pedido (POST)
+    // Método para crear Estados Pedido (POST)
     public Long crearEstadoPedido(Estado_Pedidos estado) {
         String sql = "INSERT INTO Estado_Pedidos (NOMBRE_ESTADO) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -49,17 +48,16 @@ public class Estados_PedidosService {
         }, keyHolder);
 
         // Se devuelve un Long para evitar posibles desbordamientos
-        Number key = keyHolder.getKey();
-        return key != null ? key.longValue() : -1L;
+        return keyHolder.getKey().longValue();
     }
 
-    // Metodo para Actualizar Estados Pedido (PUT)
+    // Método para Actualizar Estados Pedido (PUT)
     public void actualizarEstado(Long id, Estado_Pedidos estado) {
         String sql = "UPDATE Estado_Pedidos SET NOMBRE_ESTADO = ? WHERE ID_ESTADO_PEDIDO = ?";
         jdbcTemplate.update(sql, estado.getNOMBRE_ESTADO(), id);
     }
 
-    // Metodo para Eliminar Estados Pedido (DELETE)
+    // Método para Eliminar Estados Pedido (DELETE)
     public void eliminarestadoPedido(Long id) {
         // Se corrige el nombre de la columna para que coincida con la tabla
         String sql = "DELETE FROM Estado_Pedidos WHERE ID_ESTADO_PEDIDO = ?";
