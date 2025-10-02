@@ -14,7 +14,7 @@ CREATE TABLE Clientes (
     TELEFONO_CLI VARCHAR(20),
     ACTIVO_CLI BOOLEAN DEFAULT TRUE,    
     EMAIL_CLI VARCHAR(100),
-    CONTRASEÑA_CLI VARCHAR(255),
+    CONTRASENA_CLI VARCHAR(255),
     FECHA_ULTIMA_MODIFICACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
@@ -24,7 +24,7 @@ CREATE TABLE Empleados (
     NOMBRE_EMPLEADO VARCHAR(100) NOT NULL,
     EMAIL_EMPLEADO VARCHAR(100),
     ACTIVO_EMPLEADO BOOLEAN DEFAULT TRUE,
-    CONTRASEÑA_EMPLEADO VARCHAR(255),
+    CONTRASENA_EMPLEADO VARCHAR(255),
     FECHA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FECHA_ULTIMA_MODIFICACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -32,10 +32,10 @@ CREATE TABLE Empleados (
 -- Tabla: Administradores
 CREATE TABLE Administradores (
     ID_ADMIN INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE_ADMIN VARCHAR(100) NOT NULL,    
-    TELEFONO_ADMIN VARCHAR(20),            
+    NOMBRE_ADMIN VARCHAR(100) NOT NULL,     
+    TELEFONO_ADMIN VARCHAR(20),             
     EMAIL_ADMIN VARCHAR(100),
-    CONTRASEÑA_ADMIN VARCHAR(255)
+    CONTRASENA_ADMIN VARCHAR(255)
 );
 
 -- Tabla: Proveedores
@@ -98,10 +98,10 @@ CREATE TABLE Productos (
     ID_PRODUCTO INT PRIMARY KEY AUTO_INCREMENT,
     ID_ADMIN INT,
     ID_CATEGORIA_PRODUCTO INT,
-    NOMBRE_PRODUCTO VARCHAR(100) NOT NULL,   
+    NOMBRE_PRODUCTO VARCHAR(100) NOT NULL,    
     DESCRIPCION_PRODUCTO TEXT,
     PRODUCTO_STOCK_MIN INT,
-    PRECIO_PRODUCTO DECIMAL(10,2) NOT NULL,    
+    PRECIO_PRODUCTO DECIMAL(10,2) NOT NULL,     
     FECHA_VENCIMIENTO_PRODUCTO DATE,
     FECHA_INGRESO_PRODUCTO DATE,
     TIPO_PRODUCTO_MARCA VARCHAR(100),
@@ -172,22 +172,36 @@ DELIMITER ;
 -- DML (DATA MANIPULATION LANGUAGE) - INSERCIÓN DE DATOS
 -- ==================================================================
 
--- Clientes
-INSERT INTO Clientes (NOMBRE_CLI, TELEFONO_CLI, EMAIL_CLI) VALUES
-('Ana Pérez', '3101234567', 'ana.p@mail.com'),
-('Luis Gómez', '3209876543', 'luis.g@mail.com'),
-('Maria Rodriguez', '3001122334', 'maria.r@mail.com');
+-- Inserción en tabla: Clientes
+INSERT INTO Clientes (NOMBRE_CLI, TELEFONO_CLI, EMAIL_CLI, CONTRASENA_CLI) VALUES
+('Ana Pérez', '3101234567', 'ana.p@mail.com', HashPassword('cliente123')), 
+('Luis Gómez', '3209876543', 'luis.g@mail.com', HashPassword('cliente456')),
+('Maria Rodriguez', '3001122334', 'maria.r@mail.com', HashPassword('cliente789')),
+('Damian Cliente', '3001234567', 'damian@cliente.com', HashPassword('123456'));
 
--- Empleados
-INSERT INTO Empleados (NOMBRE_EMPLEADO) VALUES
-('Andres Alkaeda'),('Damian Avila'),('Brayan Jimenez'),('Ana Goyeneche'),
-('Sharyt Zamora'),('Carlos Mendoza'),('Sofia Rodriguez'),('Miguel Torres'),
-('Valentina Castro'),('Diego Herrera'),('Camila Vargas'),('Alejandro Morales'),
-('Isabella Gutierrez'),('Sebastian Ramirez'),('Natalia Delgado');
+-- Inserción en tabla: Empleados 
+INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES
+('Andres Alkaeda', 'andres@panaderia.com', HashPassword('empleado123')),
+('Damian Avila', 'damian@panaderia.com', HashPassword('empleado123')),
+('Brayan Jimenez', 'brayan@panaderia.com', HashPassword('empleado123')),
+('Ana Goyeneche', 'ana@panaderia.com', HashPassword('empleado123')),
+('Sharyt Zamora', 'sharyt@panaderia.com', HashPassword('empleado123')),
+('Carlos Mendoza', 'carlos@panaderia.com', HashPassword('empleado123')),
+('Sofia Rodriguez', 'sofia@panaderia.com', HashPassword('empleado123')),
+('Miguel Torres', 'miguel@panaderia.com', HashPassword('empleado123')),
+('Valentina Castro', 'valentina@panaderia.com', HashPassword('empleado123')),
+('Diego Herrera', 'diego@panaderia.com', HashPassword('empleado123')),
+('Camila Vargas', 'camila@panaderia.com', HashPassword('empleado123')),
+('Alejandro Morales', 'alejandro@panaderia.com', HashPassword('empleado123')),
+('Isabella Gutierrez', 'isabella@panaderia.com', HashPassword('empleado123')),
+('Sebastian Ramirez', 'sebastian@panaderia.com', HashPassword('empleado123')),
+('Natalia Delgado', 'natalia@panaderia.com', HashPassword('empleado123'));
 
--- Administradores
-INSERT INTO Administradores (NOMBRE_ADMIN, TELEFONO_ADMIN, EMAIL_ADMIN) VALUES
-('Admin Uno', '3005550101', 'admin1@store.com');
+-- Inserción en tabla: Administradores 
+INSERT INTO Administradores (NOMBRE_ADMIN, TELEFONO_ADMIN, EMAIL_ADMIN, CONTRASENA_ADMIN) VALUES
+('Admin Principal', '3005550101', 'admin@panaderia.com', HashPassword('admin123')),
+('Admin Secundario', '3005550102', 'admin2@panaderia.com', HashPassword('admin123'));
+
 
 -- Proveedores
 INSERT INTO Proveedores (ID_PROVEEDOR, NOMBRE_PROV, TELEFONO_PROV, EMAIL_PROV) VALUES

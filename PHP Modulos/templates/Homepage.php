@@ -28,11 +28,24 @@ $categorias = $service->listarCategorias();
 </head>
 
 <body class="bg-blanco-cálido">
+  <?php
+  // Verificar si hay una sesión de cliente activa
+  session_start();
+  $clienteLogueado = false;
+  $nombreCliente = '';
+  
+  if (isset($_SESSION['sesion_activa']) && $_SESSION['sesion_activa'] && 
+      isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'CLIENTE') {
+      $clienteLogueado = true;
+      $nombreCliente = $_SESSION['usuario_nombre'] ?? 'Cliente';
+  }
+  ?>
+  
   <!-- Header -->
   <header>
     <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
       <div class="container">
-        <a class="navbar-brand d-flex align-items-center logo" href="index1.php">
+        <a class="navbar-brand d-flex align-items-center logo" href="Homepage.php">
           <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
           <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
         </a>
@@ -56,7 +69,18 @@ $categorias = $service->listarCategorias();
               <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
             </li>
           </ul>
-          <a href="login.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
+          <?php if ($clienteLogueado): ?>
+            <div class="dropdown">
+              <button class="btn btn-primary btn-rounded fw-bold ms-3 dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <?php echo htmlspecialchars($nombreCliente); ?>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="../logout.php">Cerrar Sesión</a></li>
+              </ul>
+            </div>
+          <?php else: ?>
+            <a href="../loginusers.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
+          <?php endif; ?>
         </div>
       </div>
     </nav>

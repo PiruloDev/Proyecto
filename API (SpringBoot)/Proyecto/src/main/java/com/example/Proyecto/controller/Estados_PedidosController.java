@@ -1,4 +1,5 @@
 package com.example.Proyecto.controller;
+
 import com.example.Proyecto.model.Estado_Pedidos;
 import com.example.Proyecto.service.Pedidos.Estados_PedidosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,19 +10,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/estadosPedidos")
 public class Estados_PedidosController {
 
     @Autowired
     private Estados_PedidosService estados_PedidosService;
 
-    @GetMapping("/estadosPedidos")
+    @GetMapping
     public ResponseEntity<List<Estado_Pedidos>> obtenerTodosLosEstados_Pedidos() {
         List<Estado_Pedidos> estadoPedidos = estados_PedidosService.obtenerEstado_Pedidos();
         return new ResponseEntity<>(estadoPedidos, HttpStatus.OK);
     }
 
-    @PostMapping("/estadosPedidos")
+    @PostMapping
     public ResponseEntity<String> crearEstadoPedido(@RequestBody Estado_Pedidos estado) {
         Long estadoId = estados_PedidosService.crearEstadoPedido(estado);
         return new ResponseEntity<>("Estado de pedido " + estadoId + " creado con éxito.", HttpStatus.CREATED);
