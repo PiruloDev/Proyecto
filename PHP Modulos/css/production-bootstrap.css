@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #8C5A37;
+    --primary-hover: #6E462A;
+    --text-dark: #3D2C21;
+    --text-light: #6B5B51;
+    --border-color: #D3C5BC;
+    --container-bg: rgba(255, 255, 255, 0.75);
+    --crema: #f5f5dc;
+    --bg-light: #FEFEF8;
+    --success: #4CAF50;
+    --warning: #FF9800;
+    --danger: #F44336;
+    --info: #2196F3;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #FFF8E1;
+    background-image: linear-gradient(135deg, #FFF8E1 0%, #F5F5DC 100%);
+}
+
+.container-main {
+    max-width: 1200px;
+    background: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-color);
+}
+
+h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--text-dark);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(140, 90, 55, 0.3);
+}
+
+.section-card {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(140, 90, 55, 0.1);
+}
+
+input[type="number"] {
+    border: 2px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+input[type="number"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(140, 90, 55, 0.1);
+}
+
+.table-row:hover {
+    background-color: var(--crema);
+}
+
+.modal-backdrop {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+/* Estilos adicionales que usan variables en línea para mantener la modularidad: */
+
+/* Botón de Receta (Ver Receta) */
+.btn-warning-custom {
+    background-color: var(--warning);
+}
+
+/* Contenedor de Receta */
+#recetaResult {
+    background-color: white; 
+    border: 2px solid var(--border-color);
+}
+
+#recetaContent {
+    background-color: var(--crema); 
+    color: var(--text-dark);
+}
+
+/* Tablas */
+#historialContainer table thead {
+    background-color: var(--crema);
+}
+#historialContainer table tbody {
+    background-color: white; 
+    border-color: var(--border-color);
+}
+
+/* Modal: PUT Form */
+#formPut {
+    background-color: #E3F2FD; 
+    border-color: var(--info);
+}
+
+/* Modal: PATCH Form */
+#formPatch {
+    background-color: #F3E5F5; 
+    border-color: #9C27B0;
+}
+
+/* Modal: Botón Cerrar */
+#editModal button[onclick="closeModal()"] {
+    background-color: var(--border-color); 
+    color: var(--text-dark);
+}
