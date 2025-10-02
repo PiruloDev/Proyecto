@@ -1,6 +1,7 @@
 package com.example.Proyecto.controller;
 
 import com.example.Proyecto.dto.ProduccionRequest;
+import com.example.Proyecto.model.Produccion;
 import com.example.Proyecto.service.Inventario.ProduccionService;
 import com.example.Proyecto.service.Inventario.RecetasService;
 import com.example.Proyecto.model.RecetaProducto;
@@ -23,10 +24,30 @@ public class InventarioController {
     @Autowired
     private ProduccionService produccionService;
 
-    // 1. GET: Endpoint para que el frontend obtenga los ingredientes necesarios (el desplegable)
+    // ==========================================================
+    // MÉTODO AGREGADO PARA EL LISTADO (GET)
+    // SOLUCIÓN AL ERROR 405
+    // ==========================================================
+    /**
+     * Responde a: GET http://localhost:8080/inventario/produccion
+     * Obtiene todos los registros del historial de producción.
+     */
+    @GetMapping
+    public ResponseEntity<List<Produccion>> obtenerTodoElHistorial() {
+        // Llama al método que debe estar implementado en ProduccionService
+        List<Produccion> historial = produccionService.obtenerTodoElHistorial();
+
+        // Retorna el historial de producción (lista de objetos Produccion)
+        return ResponseEntity.ok(historial);
+    }
+    // ==========================================================
+    // MÉTODOS EXISTENTES (POST, PUT, PATCH, DELETE, GET /receta)
+    // ==========================================================
+
+    // 1. GET: Endpoint para que el frontend obtenga los ingredientes de un producto (receta)
     @GetMapping("/receta/{idProducto}")
     public ResponseEntity<List<RecetaProducto>> obtenerReceta(@PathVariable int idProducto) {
-        List<RecetaProducto> receta = recetasService.obtenerRecetaPorProducto(idProducto);
+        List<RecetaProducto> receta = recetasService.obtenerRecetaPorProducto((long) idProducto);
 
         if (receta.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -34,30 +55,108 @@ public class InventarioController {
         return ResponseEntity.ok(receta);
     }
 
-    // 2. POST: Endpoint para registrar la producción y descontar el inventario
+    // 2. POST: Registrar la producción y actualizar inventario
     @PostMapping
     public ResponseEntity<Map<String, Object>> registrarProduccion(@RequestBody ProduccionRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        if (request.getIdProducto() <= 0 || request.getCantidadProducida() <= 0 || request.getIngredientesDescontados() == null || request.getIngredientesDescontados().isEmpty()) {
-            response.put("error", "Faltan datos obligatorios para registrar la producción.");
+        // Validaciones mínimas
+        if (request.getIdProducto() == null || request.getIdProducto() <= 0 ||
+                request.getCantidadProducida() == null || request.getCantidadProducida() <= 0) {
+            response.put("error", "Faltan datos obligatorios: idProducto y cantidadProducida.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         try {
             produccionService.registrarProduccion(request);
 
-            response.put("mensaje", "Producción de " + request.getCantidadProducida() + " unidades registrada con éxito.");
+            response.put("mensaje", "Producción de " + request.getCantidadProducida() +
+                    " unidades registrada con éxito.");
+            response.put("status", HttpStatus.CREATED.value()); // Usar 201 CREATED
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            response.put("error", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+        } catch (Exception e) {
+            response.put("error", "Error inesperado: " + e.getMessage());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // PUT: actualizar producción completa (Cambio de cantidad, por ejemplo)
+    @PutMapping("/{idProduccion}")
+    public ResponseEntity<Map<String, Object>> actualizarProduccion(
+            @PathVariable Long idProduccion,
+            @RequestBody ProduccionRequest request) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            produccionService.actualizarProduccion(idProduccion, request);
+            response.put("mensaje", "Producción con ID " + idProduccion + " actualizada correctamente.");
             response.put("status", HttpStatus.OK.value());
             return ResponseEntity.ok(response);
 
-        } catch (RuntimeException e) {
-            // Captura los errores lanzados en el servicio (falta stock, ID incorrecto, etc.)
-            response.put("error", "Error en la transacción de inventario: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+        } catch (Exception e) {
+            response.put("error", "Error inesperado: " + e.getMessage());
             response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // PATCH: actualizar solo ciertos campos (ej: cantidad producida)
+    @PatchMapping("/{idProduccion}")
+    public ResponseEntity<Map<String, Object>> actualizarParcial(
+            @PathVariable Long idProduccion,
+            @RequestBody Map<String, Object> updates) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            produccionService.actualizarParcial(idProduccion, updates);
+            response.put("mensaje", "Producción con ID " + idProduccion + " modificada parcialmente.");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
         } catch (Exception e) {
-            response.put("error", "Error inesperado al registrar la producción: " + e.getMessage());
+            response.put("error", "Error inesperado: " + e.getMessage());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // DELETE: eliminar producción (Revierte el inventario)
+    @DeleteMapping("/{idProduccion}")
+    public ResponseEntity<Map<String, Object>> eliminarProduccion(@PathVariable Long idProduccion) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            produccionService.eliminarProduccion(idProduccion);
+            // Si es un DELETE exitoso, el estándar es devolver 204 No Content
+            return ResponseEntity.noContent().build();
+
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+        } catch (Exception e) {
+            response.put("error", "Error inesperado: " + e.getMessage());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
