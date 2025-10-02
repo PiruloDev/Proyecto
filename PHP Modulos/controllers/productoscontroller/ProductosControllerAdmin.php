@@ -8,48 +8,55 @@ class ProductosControllerAdmin {
         $this->service = new ProductosService();
     }
 
+    // Devuelve array de productos
     public function obtenerProductos() {
         $productos = $this->service->obtener();
-        require __DIR__ . '/../../views/productosviews/listar_productos_admin.php';
+        if (!is_array($productos)) return [];
+        return $productos;
     }
 
+    // Maneja POST para crear/actualizar/eliminar y devuelve un mensaje string (HTML with alert)
     public function manejarPeticion() {
-        $accion = $_GET['action'] ?? $_POST['accion'] ?? null;
+        $accion = $_POST['accion'] ?? null;
         $mensaje = '';
 
         if ($accion === 'crear') {
             $data = [
-                "nombreProducto" => $_POST["nombre"],
-                "precio" => $_POST["precio"],
-                "stockMinimo" => $_POST["stockMinimo"],
-                "marcaProducto" => $_POST["marca"],
-                "fechaVencimiento" => $_POST["fechaVencimiento"]
+                "ID_CATEGORIA_PRODUCTO" => $_POST["categoriaId"] ?? null,
+                "NOMBRE_PRODUCTO" => $_POST["nombre"] ?? '',
+                "DESCRIPCION_PRODUCTO" => $_POST["descripcion"] ?? '',
+                "PRODUCTO_STOCK_MIN" => $_POST["stockMinimo"] ?? 0,
+                "PRECIO_PRODUCTO" => $_POST["precio"] ?? 0,
+                "FECHA_VENCIMIENTO_PRODUCTO" => $_POST["fechaVencimiento"] ?? null,
+                "TIPO_PRODUCTO_MARCA" => $_POST["marca"] ?? '',
+                "ACTIVO" => isset($_POST['activo']) ? 1 : 0
             ];
             $resultado = $this->service->crear($data);
-            $mensaje = $resultado["success"] ? "✔ Producto creado" : "Error";
+            $mensaje = (isset($resultado['success']) && $resultado['success']) ? "<div class='alert alert-success'>✔ Producto creado</div>" : "<div class='alert alert-danger'>Error al crear producto</div>";
         }
 
         if ($accion === 'actualizar') {
-            $id = $_POST["id"];
+            $id = $_POST["id"] ?? null;
             $data = [
-                "nombreProducto" => $_POST["nombre"],
-                "precio" => $_POST["precio"],
-                "stockMinimo" => $_POST["stockMinimo"],
-                "marcaProducto" => $_POST["marca"],
-                "fechaVencimiento" => $_POST["fechaVencimiento"]
+                "ID_CATEGORIA_PRODUCTO" => $_POST["categoriaId"] ?? null,
+                "NOMBRE_PRODUCTO" => $_POST["nombre"] ?? '',
+                "DESCRIPCION_PRODUCTO" => $_POST["descripcion"] ?? '',
+                "PRODUCTO_STOCK_MIN" => $_POST["stockMinimo"] ?? 0,
+                "PRECIO_PRODUCTO" => $_POST["precio"] ?? 0,
+                "FECHA_VENCIMIENTO_PRODUCTO" => $_POST["fechaVencimiento"] ?? null,
+                "TIPO_PRODUCTO_MARCA" => $_POST["marca"] ?? '',
+                "ACTIVO" => isset($_POST['activo']) ? 1 : 0
             ];
             $resultado = $this->service->actualizar($id, $data);
-            $mensaje = $resultado["success"] ? "✔ Producto actualizado" : "Error";
+            $mensaje = (isset($resultado['success']) && $resultado['success']) ? "<div class='alert alert-success'>✔ Producto actualizado</div>" : "<div class='alert alert-danger'>Error al actualizar producto</div>";
         }
 
         if ($accion === 'eliminar') {
-            $id = $_POST["id"];
+            $id = $_POST["id"] ?? null;
             $resultado = $this->service->eliminar($id);
-            $mensaje = $resultado["success"] ? "✔ Producto eliminado" : "Error";
+            $mensaje = (isset($resultado['success']) && $resultado['success']) ? "<div class='alert alert-success'>✔ Producto eliminado</div>" : "<div class='alert alert-danger'>Error al eliminar producto</div>";
         }
 
-        $productos = $this->service->obtener();
-        require __DIR__ . '/../../views/productosviews/listar_productos_admin.php';
+        return $mensaje;
     }
 }
-?>

@@ -673,3 +673,20 @@ body {
     border-color: var(--danger-red);
     box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.25);
 }
+
+/* Corrección de clases que se están usando pero no existen */
+.bg-gris-oscuro {
+    background-color: var(--text-dark);
+}
+
+.text-marron {
+    color: var(--primary-color);
+}
+
+.text-light {
+    color: var(--text-light) !important;
+}
+
+.text-white {
+    color: #fff !important;
+}

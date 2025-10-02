@@ -145,12 +145,14 @@ $productos_data = $productos_filtrados;
                   </div>
                 </div>
                 <div class="d-grid">
-                  <button class="btn btn-agregar-pedido" 
-                          data-producto-id="<?php echo $id; ?>"
-                          data-producto-nombre="<?php echo $nombre; ?>"
-                          data-producto-precio="<?php echo $precio; ?>">
-                    <i class="fas fa-plus-circle me-2"></i>Agregar pedido
-                  </button>
+                  <form method="POST" action="procesar_carrito.php">
+                        <input type="hidden" name="accion" value="agregar">
+                        <input type="hidden" name="producto_id" value="<?php echo $id; ?>">
+                        <input type="hidden" name="cantidad" value="1"> 
+                        <button type="submit" class="btn btn-agregar-pedido">
+                          <i class="fas fa-plus-circle me-2"></i>Agregar pedido
+                      </button>
+                  </form>
                 </div>
               </div>
             </div>

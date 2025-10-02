@@ -9,29 +9,34 @@ class CategoriaProductosController {
     }
 
     public function listarCategorias() {
-        $categorias = $this->service->listarCategorias();
-        require __DIR__ . '/../../views/admin/listar_categorias_admin.php';
+        $cats = $this->service->listarCategorias(); // <-- Método real en tu service
+        if (!is_array($cats)) return [];
+        return $cats;
     }
 
-    public function crear($nombre) {
-        if ($nombre) {
-            $this->service->crearCategoria(['nombre' => $nombre]);
-        }
-        $this->listarCategorias();
-    }
+    public function manejarPeticion() {
+        $accion = $_POST['accion'] ?? null;
+        $mensaje = '';
 
-    public function actualizar($id, $nombre) {
-        if ($id && $nombre) {
-            $this->service->actualizarCategoria($id, ['nombre' => $nombre]);
+        if ($accion === 'crear') {
+            $nombre = $_POST['nombre'] ?? '';
+            $res = $this->service->crearCategoria(['nombre' => $nombre]); // usar el método correcto
+            $mensaje = $res ? "<div class='alert alert-success'>✔ Categoría creada</div>" : "<div class='alert alert-danger'>Error al crear categoría</div>";
         }
-        $this->listarCategorias();
-    }
 
-    public function eliminar($id) {
-        if ($id) {
-            $this->service->eliminarCategoria($id);
+        if ($accion === 'actualizar') {
+            $id = $_POST['id'] ?? null;
+            $nombre = $_POST['nombre'] ?? '';
+            $res = $this->service->actualizarCategoria($id, ['nombre' => $nombre]);
+            $mensaje = $res ? "<div class='alert alert-success'>✔ Categoría actualizada</div>" : "<div class='alert alert-danger'>Error al actualizar categoría</div>";
         }
-        $this->listarCategorias();
+
+        if ($accion === 'eliminar') {
+            $id = $_POST['id'] ?? null;
+            $res = $this->service->eliminarCategoria($id);
+            $mensaje = $res ? "<div class='alert alert-success'>✔ Categoría eliminada</div>" : "<div class='alert alert-danger'>Error al eliminar categoría</div>";
+        }
+
+        return $mensaje;
     }
 }
-?>

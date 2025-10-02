@@ -28,43 +28,48 @@
     <!-- Header -->
     <header>
         <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center logo" href="Homepage.php">
-                    <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
-                    <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center logo" href="Homepage.php">
+            <img src="../images/logoprincipal.jpg" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
+            <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link text-marron fw-semibold" href="Homepage.php">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-marron fw-semibold" href="menu.php">Menú</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-marron fw-semibold active" href="pedidos.php">Mis Pedidos</a>
+                </li>
+            </ul>
+
+            <?php if (isset($user_name)): ?>
+            <div class="dropdown">
+                <a class="btn btn-user-glass dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($user_name); ?>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link text-marron fw-semibold" href="Homepage.php">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-marron fw-semibold" href="menu.php">Menú</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-marron fw-semibold active" href="pedidos.php">Mis Pedidos</a>
-                        </li>
-                    </ul>
-                    <div class="dropdown">
-                        <a class="btn btn-user-glass dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($user_name); ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-glass">
-                            <li><a class="dropdown-item" href="dashboard_cliente.php">
-                                <i class="fas fa-user-circle me-2"></i>Mi Perfil
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                            </a></li>
-                        </ul>
-                    </div>
-                </div>
+                <ul class="dropdown-menu dropdown-menu-glass">
+                    <li><a class="dropdown-item" href="dashboard_cliente.php">
+                        <i class="fas fa-user-circle me-2"></i>Mi Perfil
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="logout.php">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a></li>
+                </ul>
             </div>
-        </nav>
+            <?php else: ?>
+            <a href="login.php" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
+            <?php endif; ?>
+            </div>
+    </div>
+</nav>
     </header>
 
     <!-- Contenido Principal -->

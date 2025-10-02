@@ -1,21 +1,22 @@
+<?php
+$isAdmin = $isAdmin ?? false;
+?>
+
+<?php if (!$isAdmin): ?>
   </main>
-  <!-- Footer -->
   <footer class="py-5 bg-gris-oscuro text-white mt-5">
     <div class="container">
       <div class="row">
         <div class="col-lg-4 mb-4">
           <h5 class="fw-bold mb-3">El Castillo del Pan</h5>
-          <p class="text-light">
-            Panadería artesanal con más de 10 años de experiencia, 
-            ofreciendo productos frescos y de la más alta calidad.
-          </p>
+          <p class="text-light">Panadería artesanal con más de 10 años de experiencia, ofreciendo productos frescos y de la más alta calidad.</p>
         </div>
         <div class="col-lg-2 mb-4">
           <h6 class="fw-bold mb-3">Enlaces</h6>
           <ul class="list-unstyled">
-            <li><a href="../views/homepage.php" class="text-light text-decoration-none">Inicio</a></li>
-            <li><a href="../views/productosviews/categoriaProductosIndex.php" class="text-light text-decoration-none">Categorías</a></li>
-            <li><a href="../productosindex.php" class="text-light text-decoration-none">Productos</a></li>
+            <li><a href="/GITHUB%20REPO/PHP%20Modulos/views/homepage.php" class="text-light text-decoration-none">Inicio</a></li>
+            <li><a href="/GITHUB%20REPO/PHP%20Modulos/views/productosviews/categoriaProductosIndex.php" class="text-light text-decoration-none">Categorías</a></li>
+            <li><a href="/GITHUB%20REPO/PHP%20Modulos/productosindex.php" class="text-light text-decoration-none">Productos</a></li>
           </ul>
         </div>
         <div class="col-lg-3 mb-4">
@@ -42,8 +43,14 @@
       </div>
     </div>
   </footer>
+<?php else: ?>
+  </main>
+  <footer class="py-3 bg-light text-center border-top">
+    <small class="text-muted">&copy; 2025 El Castillo del Pan - Panel de administración</small>
+  </footer>
+<?php endif; ?>
 
-  <!-- Bootstrap JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JavaScript (al final para que cargue después del DOM) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
