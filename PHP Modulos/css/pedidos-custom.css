@@ -145,30 +145,3 @@ body {
 .spinner-border {
     color: #bb9467;
 }
-
-/* 🔶 Reglas adicionales que tenías en el <style> */
-body {
-    background-color: #f0f2f5;
-}
-.container {
-    margin-top: 30px;
-}
-.card-header {
-    background-color: #fd910dff;
-    color: white;
-}
-.list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-/* ✅ Tus clases personalizadas */
-.bg-gris-oscuro {
-    background-color: #343a40 !important; /* gris oscuro bootstrap */
-}
-.text-dorado {
-    color: #fd910dff !important; /* dorado */
-}
-.text-dorado:hover {
-    color: #e07c0c !important; /* tono más oscuro al pasar el mouse */
-}
