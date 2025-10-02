@@ -1,96 +1,65 @@
-    <?php
-    // services/inventarioservices/RecetasService.php
+<?php
+// C:\xampp\htdocs\REbase\PHP Modulos\services\inventarioservices\RecetasService.php
 
-    // Inclusión del archivo de configuración (2 niveles arriba para llegar a 'config/')
-    require_once __DIR__ . '/../../config/configRecetas.php'; 
+// Asegúrate de que esta ruta sea correcta para tu configRecetas.php
+require_once __DIR__ . '/../../../config/configRecetas.php'; 
 
-    class RecetasService {
-        
-        // Función centralizada de utilidades para realizar peticiones CURL a la API Java
-        private function realizarPeticionApi(string $url, string $method, array $data = null) {
-            $ch = curl_init($url);
-            
-            // Configuración básica
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                // Añade aquí headers de Autorización si son necesarios
-            ]);
+class RecetasService {
 
-            if ($data) {
-                $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
-            }
-            
-            $respuesta = curl_exec($ch);
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-            curl_close($ch);
+    /**
+     * Función utilitaria para realizar llamadas REST usando cURL.
+     */
+    private function callApi(string $url, string $method = 'GET', array $data = null): array {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 
-            if ($error) {
-                return ["success" => false, "error" => "Error de conexión cURL: " . $error];
-            }
-            
-            $decoded_response = json_decode($respuesta, true);
-
-            // Los códigos 2xx son éxito (200 OK, 201 Created, 204 No Content)
-            if ($http_code >= 200 && $http_code < 300) {
-                return ["success" => true, "response" => $decoded_response ?: $respuesta, "http_code" => $http_code];
-            } else {
-                // Error de API (4xx, 5xx)
-                $error_msg = $decoded_response['error'] ?? $decoded_response['message'] ?? "Error HTTP $http_code en la API Java.";
-                return ["success" => false, "error" => $error_msg, "http_code" => $http_code];
-            }
+        if ($data !== null) {
+            $json_data = json_encode($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
         }
 
-        /**
-         * Obtiene todas las recetas (GET).
-         */
-        public function listarRecetas() {
-            // Uso del config: endpointGetRecetas
-            $apiUrl = endpointGetRecetas::API_GET_RECETAS_LISTA;
-            $resultado = $this->realizarPeticionApi($apiUrl, "GET");
-            
-            return $resultado; // Retorna array con success, response, o error
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return ['success' => false, 'error' => "Error de conexión con el backend: " . $error];
+        }
+
+        $responseData = json_decode($response, true);
+        
+        // Manejo de errores HTTP 4xx/5xx (que el backend reporta como JSON)
+        if ($http_code >= 400) {
+            // El backend Java devuelve 'error' o 'mensaje' en caso de fallo
+            $errorMessage = $responseData['error'] ?? $responseData['mensaje'] ?? 'Error desconocido del servidor.';
+            return ['success' => false, 'error' => "API Error ({$http_code}): " . $errorMessage];
         }
         
-        /**
-         * Obtiene una receta específica por ID de producto (GET /{id}).
-         */
-        public function obtenerRecetaPorProducto(int $id) {
-            // Uso del config: endpointGetRecetas::recetaPorProducto(id)
-            $apiUrl = endpointGetRecetas::recetaPorProducto($id);
-            $resultado = $this->realizarPeticionApi($apiUrl, "GET");
-            
-            return $resultado;
-        }
-
-        /**
-         * Crea una nueva receta (POST).
-         */
-        public function crearReceta(array $recetaData) {
-            // Uso del config: endpointPostRecetas
-            $apiUrl = endpointPostRecetas::API_CREAR_RECETA;
-            return $this->realizarPeticionApi($apiUrl, "POST", $recetaData);
-        }
-
-        /**
-         * Actualiza (reemplaza) una receta (PUT /{id}).
-         */
-        public function actualizarReceta(int $idProducto, array $recetaData) {
-            // Uso del config: endpointPutRecetas::receta(id)
-            $apiUrl = endpointPutRecetas::receta($idProducto); 
-            return $this->realizarPeticionApi($apiUrl, "PUT", $recetaData);
-        }
-        
-        /**
-         * Elimina una receta (DELETE /{id}).
-         */
-        public function eliminarReceta(int $idProducto) {
-            // Uso del config: endpointDeleteRecetas::receta(id)
-            $apiUrl = endpointDeleteRecetas::receta($idProducto);
-            // Petición DELETE sin cuerpo (body)
-            return $this->realizarPeticionApi($apiUrl, "DELETE");
-        }
+        // Éxito
+        return ['success' => true, 'response' => $responseData, 'http_code' => $http_code];
     }
+
+    // --- Métodos CRUD para el Controlador ---
+
+    public function listarRecetas(): array {
+        return $this->callApi(endpointGetRecetas::API_GET_RECETAS_LISTA, 'GET');
+    }
+
+    public function crearReceta(array $data): array {
+        return $this->callApi(endpointPostRecetas::API_CREAR_RECETA, 'POST', $data);
+    }
+
+    public function eliminarReceta(int $idProducto): array {
+        $url = endpointDeleteRecetas::receta($idProducto);
+        return $this->callApi($url, 'DELETE');
+    }
+
+    // Nota: El método actualizarReceta se mantiene aquí si lo necesitas en el futuro
+    public function actualizarReceta(int $idProducto, array $data): array {
+        $url = endpointPutRecetas::receta($idProducto);
+        return $this->callApi($url, 'PUT', $data);
+    }
+}

@@ -1,7 +1,7 @@
-<?php
-session_start();
+    <?php
+    session_start();
 
-require_once __DIR__ . '/controllers/inventariocontroller/ProduccionController.php';
+    require_once __DIR__ . '/controllers/inventariocontroller/ProduccionController.php';
 
-$controller = new ProduccionController();
-$controller->manejarPeticion();
+    $controller = new ProduccionController();
+    $controller->manejarPeticion();
