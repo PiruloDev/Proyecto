@@ -36,7 +36,7 @@ public class ConexionAdminService {
     }
 
     public boolean crearAdmin(PojoAdmin pojoAdmin) {
-        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASEÑA_ADMIN) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, ?)";
         try {
             if (pojoAdmin.getContrasena() == null || pojoAdmin.getContrasena().trim().isEmpty()) {
                 System.out.println("Error: La contraseña no puede ser nula o vacía");

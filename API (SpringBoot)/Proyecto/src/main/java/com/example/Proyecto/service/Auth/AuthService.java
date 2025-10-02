@@ -55,7 +55,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarAdmin(String email, String contrasena) {
-        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM Administradores WHERE EMAIL_ADMIN = ? AND CONTRASEÑA_ADMIN = SHA2(?, 256)";
+        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM Administradores WHERE EMAIL_ADMIN = ? AND CONTRASENA_ADMIN = SHA2(?, 256)";
         try {
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
@@ -74,7 +74,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarEmpleado(String email, String contrasena) {
-        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM Empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASEÑA_EMPLEADO = SHA2(?, 256) AND ACTIVO_EMPLEADO = TRUE";
+        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM Empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASENA_EMPLEADO = SHA2(?, 256) AND ACTIVO_EMPLEADO = TRUE";
         try {
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
@@ -92,7 +92,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarCliente(String email, String contrasena) {
-        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM Clientes WHERE EMAIL_CLI = ? AND CONTRASEÑA_CLI = SHA2(?, 256) AND ACTIVO_CLI = TRUE";
+        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM Clientes WHERE EMAIL_CLI = ? AND CONTRASENA_CLI = SHA2(?, 256) AND ACTIVO_CLI = TRUE";
         try {
             System.out.println("=== DEBUG AUTENTICACIÓN CLIENTE ===");
             System.out.println("Email: " + email);
@@ -122,7 +122,7 @@ public class AuthService {
      * Registra un nuevo administrador
      */
     public boolean registrarAdmin(PojoAdmin admin) {
-        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASEÑA_ADMIN) VALUES (?, ?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, SHA2(?, 256))";
         try {
             int result = jdbcTemplate.update(sql, admin.getNombre(), admin.getEmail(), admin.getTelefono(), admin.getContrasena());
             return result > 0;
@@ -136,7 +136,7 @@ public class AuthService {
      * Registra un nuevo empleado
      */
     public boolean registrarEmpleado(PojoEmpleado empleado) {
-        String sql = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASEÑA_EMPLEADO) VALUES (?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES (?, ?, SHA2(?, 256))";
         try {
             int result = jdbcTemplate.update(sql, empleado.getNombre(), empleado.getEmail(), empleado.getContrasena());
             return result > 0;
@@ -150,7 +150,7 @@ public class AuthService {
      * Registra un nuevo cliente
      */
     public boolean registrarCliente(PojoCliente cliente) {
-        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASEÑA_CLI) VALUES (?, ?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, SHA2(?, 256))";
         try {
             System.out.println("=== DEBUG REGISTRO CLIENTE ===");
             System.out.println("Nombre: " + cliente.getNombre());
