@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - El Castillo del Pan</title>
+</head>
+<body>
+    <h1>Prueba de Login</h1>
+    
+    <form method="POST" action="../../controllers/userscontroller/AuthController.php?action=login">
+        <div>
+            <label for="email">Email (usar: ana@admin.com):</label><br>
+            <input type="email" id="email" name="email" value="ana@admin.com" required>
+        </div>
+        <br>
+        
+        <div>
+            <label for="contrasena">Contraseña (usar: admin321):</label><br>
+            <input type="password" id="contrasena" name="contrasena" value="admin321" required>
+        </div>
+        <br>
+        
+        <div>
+            <button type="submit">Probar Login</button>
+        </div>
+    </form>
+    
+    <hr>
+    <h2>URLs de Prueba:</h2>
+    <ul>
+        <li><a href="../../controllers/userscontroller/AuthController.php?action=login">Login</a></li>
+        <li><a href="../../controllers/userscontroller/AuthController.php?action=registro">Registro</a></li>
+        <li><a href="dashboard_admin.php">Dashboard Admin (requiere login)</a></li>
+        <li><a href="dashboard_empleado.php">Dashboard Empleado (requiere login)</a></li>
+    </ul>
+    
+    <hr>
+    <h2>Información de Debug:</h2>
+    <p>Datos que se enviarán al backend:</p>
+    <pre>
+{
+  "username": "ana@admin.com",
+  "password": "admin321"
+}
+    </pre>
+    
+    <p>Endpoint del backend: <code>http://localhost:8080/auth/login</code></p>
+</body>
+</html>
