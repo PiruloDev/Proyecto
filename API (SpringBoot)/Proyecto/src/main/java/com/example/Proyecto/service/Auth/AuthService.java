@@ -12,12 +12,35 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class AuthService {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    /**
+     * Método helper para hashear contraseñas usando SHA-256
+     */
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al hashear contraseña", e);
+        }
+    }
 
     public Map<String, Object> autenticarUsuario(String email, String contrasena) {
         System.out.println("=== AUTENTICACIÓN ===");
@@ -55,8 +78,9 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarAdmin(String email, String contrasena) {
-        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM Administradores WHERE EMAIL_ADMIN = ? AND CONTRASENA_ADMIN = SHA2(?, 256)";
+        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM Administradores WHERE EMAIL_ADMIN = ? AND CONTRASENA_ADMIN = ?";
         try {
+            String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
                 public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -67,15 +91,16 @@ public class AuthService {
                     admin.put("telefono", rs.getString("TELEFONO_ADMIN"));
                     return admin;
                 }
-            }, email, contrasena);
+            }, email, contrasenaHasheada);
         } catch (DataAccessException e) {
             return null;
         }
     }
     
     private Map<String, Object> autenticarEmpleado(String email, String contrasena) {
-        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM Empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASENA_EMPLEADO = SHA2(?, 256) AND ACTIVO_EMPLEADO = TRUE";
+        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM Empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASENA_EMPLEADO = ? AND ACTIVO_EMPLEADO = TRUE";
         try {
+            String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
                 public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -85,20 +110,16 @@ public class AuthService {
                     empleado.put("email", rs.getString("EMAIL_EMPLEADO"));
                     return empleado;
                 }
-            }, email, contrasena);
+            }, email, contrasenaHasheada);
         } catch (DataAccessException e) {
             return null;
         }
     }
     
     private Map<String, Object> autenticarCliente(String email, String contrasena) {
-        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM Clientes WHERE EMAIL_CLI = ? AND CONTRASENA_CLI = SHA2(?, 256) AND ACTIVO_CLI = TRUE";
+        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM Clientes WHERE EMAIL_CLI = ? AND CONTRASENA_CLI = ? AND ACTIVO_CLI = TRUE";
         try {
-            System.out.println("=== DEBUG AUTENTICACIÓN CLIENTE ===");
-            System.out.println("Email: " + email);
-            System.out.println("Contraseña (texto plano): " + contrasena);
-            System.out.println("SQL: " + sql);
-            
+            String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
                 @Override
                 public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -107,13 +128,10 @@ public class AuthService {
                     cliente.put("nombre", rs.getString("NOMBRE_CLI"));
                     cliente.put("email", rs.getString("EMAIL_CLI"));
                     cliente.put("telefono", rs.getString("TELEFONO_CLI"));
-                    System.out.println("Cliente encontrado: " + rs.getString("NOMBRE_CLI"));
                     return cliente;
                 }
-            }, email, contrasena);
+            }, email, contrasenaHasheada);
         } catch (DataAccessException e) {
-            System.out.println("No se encontró cliente con email: " + email);
-            System.out.println("Error: " + e.getMessage());
             return null;
         }
     }
@@ -122,9 +140,10 @@ public class AuthService {
      * Registra un nuevo administrador
      */
     public boolean registrarAdmin(PojoAdmin admin) {
-        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, ?)";
         try {
-            int result = jdbcTemplate.update(sql, admin.getNombre(), admin.getEmail(), admin.getTelefono(), admin.getContrasena());
+            String contrasenaHasheada = hashPassword(admin.getContrasena());
+            int result = jdbcTemplate.update(sql, admin.getNombre(), admin.getEmail(), admin.getTelefono(), contrasenaHasheada);
             return result > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();
@@ -136,9 +155,10 @@ public class AuthService {
      * Registra un nuevo empleado
      */
     public boolean registrarEmpleado(PojoEmpleado empleado) {
-        String sql = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES (?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES (?, ?, ?)";
         try {
-            int result = jdbcTemplate.update(sql, empleado.getNombre(), empleado.getEmail(), empleado.getContrasena());
+            String contrasenaHasheada = hashPassword(empleado.getContrasena());
+            int result = jdbcTemplate.update(sql, empleado.getNombre(), empleado.getEmail(), contrasenaHasheada);
             return result > 0;
         } catch (DataAccessException e) {
             e.printStackTrace();
@@ -150,20 +170,12 @@ public class AuthService {
      * Registra un nuevo cliente
      */
     public boolean registrarCliente(PojoCliente cliente) {
-        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, SHA2(?, 256))";
+        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, ?)";
         try {
-            System.out.println("=== DEBUG REGISTRO CLIENTE ===");
-            System.out.println("Nombre: " + cliente.getNombre());
-            System.out.println("Email: " + cliente.getEmail());
-            System.out.println("Teléfono: " + cliente.getTelefono());
-            System.out.println("Contraseña (texto plano): " + cliente.getContrasena());
-            System.out.println("SQL: " + sql);
-            
-            int result = jdbcTemplate.update(sql, cliente.getNombre(), cliente.getEmail(), cliente.getTelefono(), cliente.getContrasena());
-            System.out.println("Filas insertadas: " + result);
+            String contrasenaHasheada = hashPassword(cliente.getContrasena());
+            int result = jdbcTemplate.update(sql, cliente.getNombre(), cliente.getEmail(), cliente.getTelefono(), contrasenaHasheada);
             return result > 0;
         } catch (DataAccessException e) {
-            System.out.println("Error al registrar cliente: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
