@@ -409,8 +409,84 @@ $categorias = $service->listarCategorias();
         });
       });
       
-      // Logout confirmation
-      const logoutLinks = document.querySelectorAll('a[href="logout.php"]');
+      // Verificación y manejo de autenticación JWT
+      function verificarAutenticacionJWT() {
+          const token = localStorage.getItem('authToken');
+          if (token) {
+              // Verificar token con el backend
+              fetch('http://localhost:8080/auth/validar', {
+                  method: 'POST',
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                  }
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.valido && data.usuario.tipoUsuario === 'CLIENTE') {
+                      // Usuario autenticado como cliente
+                      mostrarUsuarioAutenticado(data.usuario);
+                  } else {
+                      // Token inválido o no es cliente
+                      limpiarAutenticacion();
+                  }
+              })
+              .catch(error => {
+                  console.log('Error verificando token:', error);
+                  // En caso de error, mantener estado actual sin token
+              });
+          }
+      }
+      
+      function mostrarUsuarioAutenticado(usuario) {
+          const botonAcceder = document.querySelector('a[href="../loginusuarios.php"]');
+          if (botonAcceder) {
+              // Crear dropdown de usuario
+              const userDropdown = document.createElement('div');
+              userDropdown.className = 'dropdown';
+              userDropdown.innerHTML = `
+                  <button class="btn btn-primary btn-rounded fw-bold ms-3 dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      ${usuario.nombre || 'Cliente'}
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                      <li><a class="dropdown-item" href="#" onclick="cerrarSesion()">Cerrar Sesión</a></li>
+                  </ul>
+              `;
+              
+              // Reemplazar botón "Acceder" con dropdown de usuario
+              botonAcceder.parentNode.replaceChild(userDropdown, botonAcceder);
+          }
+      }
+      
+      function limpiarAutenticacion() {
+          localStorage.removeItem('authToken');
+          // Restaurar botón "Acceder" si no existe
+          const userDropdown = document.querySelector('#userDropdown');
+          if (userDropdown) {
+              const botonAcceder = document.createElement('a');
+              botonAcceder.href = '../loginusuarios.php';
+              botonAcceder.className = 'btn btn-primary btn-rounded fw-bold ms-3';
+              botonAcceder.textContent = 'Acceder';
+              userDropdown.parentNode.parentNode.replaceChild(botonAcceder, userDropdown.parentNode);
+          }
+      }
+      
+      // Función global para cerrar sesión
+      window.cerrarSesion = function() {
+          if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+              localStorage.removeItem('authToken');
+              // Recargar página para mostrar estado no autenticado
+              window.location.reload();
+          }
+      }
+      
+      // Verificar autenticación al cargar la página
+      document.addEventListener('DOMContentLoaded', function() {
+          verificarAutenticacionJWT();
+      });
+      
+      // Logout confirmation para enlaces PHP tradicionales
+      const logoutLinks = document.querySelectorAll('a[href="logout.php"], a[href="../logout.php"]');
       logoutLinks.forEach(link => {
         link.addEventListener('click', function(e) {
           e.preventDefault();
