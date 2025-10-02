@@ -261,32 +261,34 @@ DELIMITER ;
 -- ==================================================================
 
 -- Inserción en tabla: Clientes
-INSERT INTO Clientes (NOMBRE_CLI, TELEFONO_CLI, EMAIL_CLI) VALUES
-('Ana Pérez', '3101234567', 'ana.p@mail.com'),
-('Luis Gómez', '3209876543', 'luis.g@mail.com'),
-('Maria Rodriguez', '3001122334', 'maria.r@mail.com');
+INSERT INTO Clientes (NOMBRE_CLI, TELEFONO_CLI, EMAIL_CLI, CONTRASENA_CLI) VALUES
+('Ana Pérez', '3101234567', 'ana.p@mail.com', SHA2('123456', 256)),
+('Luis Gómez', '3209876543', 'luis.g@mail.com', SHA2('123456', 256)),
+('Maria Rodriguez', '3001122334', 'maria.r@mail.com', SHA2('123456', 256)),
+('Damian Cliente', '3001234567', 'damian@cliente.com', SHA2('123456', 256));
 
 -- Inserción en tabla: Empleados 
-INSERT INTO Empleados (NOMBRE_EMPLEADO) VALUES
-('Andres Alkaeda'),
-('Damian Avila'),
-('Brayan Jimenez'),
-('Ana Goyeneche'),
-('Sharyt Zamora'),
-('Carlos Mendoza'),
-('Sofia Rodriguez'),
-('Miguel Torres'),
-('Valentina Castro'),
-('Diego Herrera'),
-('Camila Vargas'),
-('Alejandro Morales'),
-('Isabella Gutierrez'),
-('Sebastian Ramirez'),
-('Natalia Delgado');
+INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES
+('Andres Alkaeda', 'andres@panaderia.com', SHA2('empleado123', 256)),
+('Damian Avila', 'damian@panaderia.com', SHA2('empleado123', 256)),
+('Brayan Jimenez', 'brayan@panaderia.com', SHA2('empleado123', 256)),
+('Ana Goyeneche', 'ana@panaderia.com', SHA2('empleado123', 256)),
+('Sharyt Zamora', 'sharyt@panaderia.com', SHA2('empleado123', 256)),
+('Carlos Mendoza', 'carlos@panaderia.com', SHA2('empleado123', 256)),
+('Sofia Rodriguez', 'sofia@panaderia.com', SHA2('empleado123', 256)),
+('Miguel Torres', 'miguel@panaderia.com', SHA2('empleado123', 256)),
+('Valentina Castro', 'valentina@panaderia.com', SHA2('empleado123', 256)),
+('Diego Herrera', 'diego@panaderia.com', SHA2('empleado123', 256)),
+('Camila Vargas', 'camila@panaderia.com', SHA2('empleado123', 256)),
+('Alejandro Morales', 'alejandro@panaderia.com', SHA2('empleado123', 256)),
+('Isabella Gutierrez', 'isabella@panaderia.com', SHA2('empleado123', 256)),
+('Sebastian Ramirez', 'sebastian@panaderia.com', SHA2('empleado123', 256)),
+('Natalia Delgado', 'natalia@panaderia.com', SHA2('empleado123', 256));
 
 -- Inserción en tabla: Administradores 
-INSERT INTO Administradores (NOMBRE_ADMIN, TELEFONO_ADMIN, EMAIL_ADMIN) VALUES
-('Admin Uno', '3005550101', 'admin1@store.com');
+INSERT INTO Administradores (NOMBRE_ADMIN, TELEFONO_ADMIN, EMAIL_ADMIN, CONTRASENA_ADMIN) VALUES
+('Admin Principal', '3005550101', 'admin@panaderia.com', SHA2('admin123', 256)),
+('Admin Secundario', '3005550102', 'admin2@panaderia.com', SHA2('admin123', 256));
 
 -- Inserción en tabla: Proveedores
 INSERT INTO Proveedores (ID_PROVEEDOR, NOMBRE_PROV, TELEFONO_PROV, EMAIL_PROV) VALUES

@@ -24,22 +24,14 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    /**
+        /**
      * Endpoint de prueba para verificar que el controlador funciona
      */
     @GetMapping("/test")
     public ResponseEntity<Map<String, Object>> test() {
         Map<String, Object> response = new HashMap<>();
         response.put("mensaje", "AuthController funcionando correctamente");
-        response.put("timestamp", java.time.LocalDateTime.now().toString());
-        response.put("rutas_disponibles", java.util.Arrays.asList(
-            "GET /auth/test",
-            "POST /auth/login", 
-            "POST /auth/registro/admin",
-            "POST /auth/registro/empleado", 
-            "POST /auth/registro/cliente",
-            "POST /auth/validar"
-        ));
+        response.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(response);
     }
     /**
