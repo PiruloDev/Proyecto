@@ -24,14 +24,6 @@ public class InventarioController {
     @Autowired
     private ProduccionService produccionService;
 
-    // ==========================================================
-    // MÉTODO AGREGADO PARA EL LISTADO (GET)
-    // SOLUCIÓN AL ERROR 405
-    // ==========================================================
-    /**
-     * Responde a: GET http://localhost:8080/inventario/produccion
-     * Obtiene todos los registros del historial de producción.
-     */
     @GetMapping
     public ResponseEntity<List<Produccion>> obtenerTodoElHistorial() {
         // Llama al método que debe estar implementado en ProduccionService

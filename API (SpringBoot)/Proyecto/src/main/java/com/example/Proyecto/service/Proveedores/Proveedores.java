@@ -1,4 +1,3 @@
-// Archivo: Proveedores.java
 package com.example.Proyecto.service.Proveedores;
 
 public class Proveedores {

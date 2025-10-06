@@ -17,7 +17,6 @@ public class ProductosMasVendidosService {
     private JdbcTemplate jdbcTemplate;
 
     public List<ProductosMasVendidos> obtenerProductosMasVendidos(int limite) {
-        // Como no tienes tabla de ventas, mostraremos todos los productos ordenados por stock
         String sql = """
             SELECT 
                 p.ID_PRODUCTO,

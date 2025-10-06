@@ -26,10 +26,7 @@ public class ProduccionService {
 
     @Autowired
     private IngredientesService ingredientesService;
-
-    // ==========================================================
-    // 1. ROW MAPPER PARA CONVERTIR FILAS DE BD A OBJETO PRODUCCION
-    // ==========================================================
+    
     /**
      * Mapea una fila de la tabla 'produccion' al objeto Produccion.
      * Asumimos que las columnas de la tabla son: ID_PRODUCCION, ID_PRODUCTO, CANTIDAD_PRODUCIDA, FECHA_PRODUCCION.

@@ -63,7 +63,7 @@ public class ProductosController {
     }
 
     // ----> Productos POST
-    @PostMapping
+    @PostMapping("/crear/productos")
     public ResponseEntity<Map<String, Object>> crearProducto(@RequestBody PojoProductos pojoProductos) {
         Map<String, Object> response = new HashMap<>();
         

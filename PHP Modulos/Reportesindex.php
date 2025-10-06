@@ -28,7 +28,7 @@ if (isset($routes[$route])) {
         $controllerClass = $routeConfig['controller'];
         if (class_exists($controllerClass)) {
             $controller = new $controllerClass();
-            $controller->manejarPeticion();
+            $controller ->manejarPeticion();
         } else {
             echo "Error: Controlador no encontrado";
         }
