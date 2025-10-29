@@ -19,7 +19,7 @@ public class FiltroConfig {
         JwtFiltro jwtFiltro = new JwtFiltro();
         jwtFiltro.setJwtUtilidad(jwtUtilidad);
         registroFiltro.setFilter(jwtFiltro);
-        registroFiltro.addUrlPatterns("/usuarios/*");
+        registroFiltro.addUrlPatterns("");
         return registroFiltro;
     }
 }
