@@ -5,7 +5,7 @@ import java.util.List;
 public class ProduccionRequest {
     private Long idProducto;
     private Integer cantidadProducida;
-    private List<IngredienteDescontado> ingredientesDescontados; // 👈 nuevo campo
+    private List<IngredienteDescontado> ingredientesDescontados;
 
     // ====== Getters y Setters ======
     public Long getIdProducto() { return idProducto; }
