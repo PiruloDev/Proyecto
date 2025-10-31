@@ -1,12 +1,12 @@
-package com.example.pancode.Navigation
+package com.example.pancode.Navigation.NavigationUsers;
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.pancode.Screens.AppScreens
-import com.example.pancode.Screens.FirstScreen
-import com.example.pancode.Screens.SecondScreen
+import com.example.pancode.Screens.Users.AppScreens
+import com.example.pancode.Screens.Users.FirstScreen
+import com.example.pancode.Screens.Users.SecondScreen
 
 @Composable
 fun AppNavigation() {

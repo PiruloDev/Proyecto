@@ -5,18 +5,6 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="MyTexts">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="PreviewMyTexts">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="PreviewComponent">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="MainActivity">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
     </selectionStates>
   </component>
 </project>
