@@ -55,9 +55,9 @@ public class ConexionControllerUsers {
     }
 
     // ----> Clientes GET
-    @GetMapping("/detalle/cliente")
-    public List<Map<String, Object>> obtenerDetallesCliente() {
-        return conexionClienteService.obtenerDetallesCliente();
+    @GetMapping("/detalle/cliente/{id}")
+    public List<Map<String, Object>> obtenerDetallesCliente(@PathVariable Long id) {
+        return conexionClienteService.obtenerDetallesCliente(id);
     }
 
     // ----> Clientes POST

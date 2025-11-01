@@ -37,16 +37,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.pancode.Api.PersonaAPI
+import com.example.pancode.Api.ApiUsuarios.PersonaAPI
 import com.example.pancode.Api.RetrofitInstance
 import com.example.pancode.R
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun FirstScreen(navController: NavController) {
+fun FirstScreenUsers(navController: NavController) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
@@ -179,7 +181,7 @@ fun FirstScreen(navController: NavController) {
                                 "¡Registro exitoso! Bienvenido $nombre",
                                 Toast.LENGTH_LONG
                             ).show()
-                            navController.navigate(AppScreens.SecondScreen.route)
+                            navController.navigate(AppScreens.SecondScreenUsers.route)
                         } else {
                             Toast.makeText(
                                 context,
@@ -217,7 +219,7 @@ fun FirstScreen(navController: NavController) {
 }
 
 @Composable
-private fun MyTexts(){
+fun MyTexts(){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -229,9 +231,8 @@ private fun MyTexts(){
         )
     }
 }
-
 @Composable
-private fun MyImage(){
+fun MyImage(){
     Image(
         painterResource(R.drawable.logoprincipal),
         "imagen principal",

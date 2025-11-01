@@ -2,7 +2,6 @@ package com.example.pancode.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pancode.Api.PersonaAPI
 import com.example.pancode.Api.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
