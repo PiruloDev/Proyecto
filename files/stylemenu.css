@@ -1,0 +1,19 @@
+
+.product-card-item {
+    display: block; /* Asegura que la tarjeta sea visible por defecto */
+}
+.product-card-item.hidden {
+    display: none; /* Oculta la tarjeta */
+}
+.btn-agregar-pedido {
+    background-color: #E2725B; /* Tono terracota */
+    color: white;
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: bold;
+}
+.btn-agregar-pedido:hover {
+    background-color: #C66049; /* Tono terracota más oscuro */
+    color: white;
+    transform: translateY(-2px);
+}
