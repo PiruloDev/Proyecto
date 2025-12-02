@@ -15,8 +15,18 @@ Route::get('/', function () {
 // Menú de productos
 Route::get('/menu', function () {
     $productos = []; // Aquí se cargarán productos desde la BD
-    return view('menu', compact('productos'));
+    return view('menu.menu', compact('productos'));
 })->name('menu');
+Route::get('/', function () {
+    try {
+        $categorias = \App\Models\CategoriaProducto::with(['productosActivos'])
+            ->get();
+        
+        dd($categorias); // Esto mostrará las categorías en pantalla
+    } catch (\Exception $e) {
+        dd('Error: ' . $e->getMessage());
+    }
+});
 
 // ============================================
 // AUTENTICACIÓN

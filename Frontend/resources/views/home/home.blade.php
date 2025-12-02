@@ -19,6 +19,85 @@
         visibility: visible !important;
         opacity: 1 !important;
     }
+
+    /* Estilos para la sección de categorías */
+    .categories-section {
+        background: linear-gradient(135deg, #f5ede4 0%, #ffffff 100%);
+        padding: 4rem 0;
+        margin: 3rem 0;
+    }
+
+    .category-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+    }
+
+    .category-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(139, 111, 71, 0.2);
+        border-color: #bb9467;
+    }
+
+    .category-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #bb9467 0%, #8b6f47 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .category-card:hover .category-icon-wrapper {
+        transform: rotate(360deg);
+    }
+
+    .category-icon-wrapper i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .category-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #8b6f47;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-count {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #8b6f47;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #bb9467, transparent);
+    }
 </style>
 @endpush
 
@@ -128,6 +207,61 @@
             </button>
         </div>
     </section>
+
+    <!-- ========== NUEVA SECCIÓN: CATEGORÍAS ========== -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Explora Nuestras Categorías</h2>
+                <p class="text-muted mt-3">Descubre la variedad de productos que tenemos para ti</p>
+            </div>
+
+            <div class="row g-4">
+                @php
+                    $iconos = [
+                        'fas fa-birthday-cake',
+                        'fas fa-bread-slice',
+                        'fas fa-cookie-bite',
+                        'fas fa-ice-cream',
+                        'fas fa-pizza-slice',
+                        'fas fa-cheese',
+                        'fas fa-candy-cane',
+                        'fas fa-mug-hot',
+                        'fas fa-drumstick-bite',
+                        'fas fa-hamburger'
+                    ];
+                @endphp
+
+                @if(isset($categorias) && $categorias->count() > 0)
+                    @foreach($categorias as $index => $categoria)
+                        <div class="col-lg-3 col-md-4 col-sm-6 animate__animated animate__fadeInUp" style="animation-delay: {{ $index * 0.1 }}s">
+                            <a href="{{ route('menu') }}#categoria-{{ $categoria->ID_CATEGORIA_PRODUCTO }}" class="category-card">
+                                <div class="category-icon-wrapper">
+                                    <i class="{{ $iconos[$index % count($iconos)] }}"></i>
+                                </div>
+                                <h3 class="category-name">{{ $categoria->NOMBRE_CATEGORIAPRODUCTO }}</h3>
+                                <p class="category-count">
+                                    {{ $categoria->productosActivos->count() }} 
+                                    {{ $categoria->productosActivos->count() == 1 ? 'producto' : 'productos' }}
+                                </p>
+                            </a>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Cargando categorías...</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ route('menu') }}" class="btn btn-primary btn-rounded btn-lg">
+                    <i class="fas fa-shopping-basket me-2"></i>Ver Todo el Menú
+                </a>
+            </div>
+        </div>
+    </section>
+    <!-- ========== FIN SECCIÓN CATEGORÍAS ========== -->
 
     <!-- Products Section -->
     <section class="container my-5">
