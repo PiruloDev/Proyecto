@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InventarioController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -8,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', function () {
-    return view('home');
+    return view('home.home  ');
 })->name('home');
 
 // Menú de productos
@@ -90,5 +91,55 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboards.admin', compact('totalProductos', 'productosActivos', 'empleadosActivos', 'clientesActivos', 'pedidosHoy'));
     })->name('dashboard.admin');
 });
+
+// ============================================
+// MÓDULO DE INVENTARIO: GESTIÓN DE INVENTARIO
+// ============================================
+
+
+// routes/web.php
+Route::get('/dashboard/inventario', function () {
+    // Renderiza la vista que acabas de crear
+    return view('inventarioviews.indexinventario'); 
+})->name('dashboard.inventario');
+
+// Rutas de Categorías 
+Route::prefix('/dashboard/inventario/categorias')->group(function () {
+    Route::get('/', [InventarioController::class, 'indexCategorias'])->name('categorias.index'); 
+    // Aquí irán las rutas 'store', 'update', 'destroy' de categorías
+});
+
+// Rutas de Proveedores <-- ¡NUEVO BLOQUE!
+Route::prefix('/dashboard/inventario/proveedores')->group(function () {
+    Route::get('/', [InventarioController::class, 'indexProveedores'])->name('proveedores.index'); 
+    // Aquí irán las rutas 'store', 'update', 'destroy' de proveedores
+});
+
+// Rutas de Detalle de Pedidos <-- ¡NUEVO BLOQUE!
+Route::prefix('/dashboard/inventario/detalle-pedidos')->group(function () {
+    Route::get('/', [InventarioController::class, 'indexDetallePedidos'])->name('detallePedidos.index'); 
+    // Aquí irán las rutas 'show', 'update', 'delete' de pedidos
+    });
+
+
+Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
+    // Listar ingredientes (GET /ingredientes) -> Referenciado como 'ingredientes.index'
+    Route::get('/', [InventarioController::class, 'index'])->name('ingredientes.index');
+
+    // Agregar nuevo ingrediente (POST /ingredientes) -> Referenciado como 'ingredientes.store'
+    Route::post('/', [InventarioController::class, 'store'])->name('ingredientes.store');
+
+    // Actualizar ingrediente completo (POST /ingredientes/update)
+    Route::post('/update', [InventarioController::class, 'update'])->name('ingredientes.update');
+
+    // Actualizar cantidad (POST /ingredientes/cantidad)
+    Route::post('/cantidad', [InventarioController::class, 'updateCantidad'])->name('ingredientes.updateCantidad');
+
+    // Eliminar ingrediente (POST /ingredientes/delete)
+    Route::post('/delete', [InventarioController::class, 'destroy'])->name('ingredientes.destroy');
+});
+
+
+
 
 require __DIR__.'/settings.php';
