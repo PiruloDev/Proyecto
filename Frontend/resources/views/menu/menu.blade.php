@@ -116,53 +116,65 @@
         </div>
 
         <!-- Contenedor de Productos -->
-        <div class="row" id="product-container">
-            @forelse($productos ?? [] as $producto)
-                <div class="col-lg-4 col-md-6 mb-4 product-card-item" data-nombre="{{ strtolower($producto->nombre) }}">
-                    <div class="product-card card h-100 shadow-sm border-0 card-hover">
-                        <div class="card-img-container position-relative">
-                            <img src="{{ asset('images/' . $producto->imagen) }}" class="card-img-top product-image" alt="{{ $producto->nombre }}" onerror="this.onerror=null;this.src='{{ asset('images/pan-rtzqhi1ok4k1bxlo.jpg') }}';">
-                            <div class="price-badge">
-                                ${{ number_format($producto->precio, 0) }}
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-marron fw-bold mb-2">
-                                {{ $producto->nombre }}
-                            </h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                {{ $producto->descripcion }}
-                            </p>
-                            <div class="product-info mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="availability-badge">
-                                        <i class="fas fa-check-circle me-1"></i>Disponible
-                                    </span>
-                                    <small class="text-muted stock-info">Stock: {{ $producto->stock }}</small>
-                                </div>
-                            </div>
-                            <div class="d-grid">
-                                <button class="btn btn-agregar-pedido" 
-                                        data-producto-id="{{ $producto->id }}"
-                                        data-producto-nombre="{{ $producto->nombre }}"
-                                        data-producto-precio="{{ $producto->precio }}">
-                                    <i class="fas fa-plus-circle me-2"></i>Agregar pedido
-                                </button>
-                            </div>
-                        </div>
+<div class="row" id="product-container">
+    @forelse($productos ?? [] as $producto)
+        <div class="col-lg-4 col-md-6 mb-4 product-card-item" 
+             data-nombre="{{ strtolower($producto->NOMBRE_PRODUCTO) }}">
+
+            <div class="product-card card h-100 shadow-sm border-0 card-hover">
+                <div class="card-img-container position-relative">
+
+                    <img src="{{ asset('images/' . $producto->imagen) }}" 
+                         class="card-img-top product-image" 
+                         alt="{{ $producto->NOMBRE_PRODUCTO }}"
+                         onerror="this.onerror=null;this.src='{{ asset('images/pan-rtzqhi1ok4k1bxlo.jpg') }}';">
+
+                    <div class="price-badge">
+                        ${{ number_format($producto->PRECIO_PRODUCTO, 0) }}
                     </div>
                 </div>
-            @empty
-                <div class="col-12 text-center">
-                    <div class="alert alert-info">
-                        <h4 class="alert-heading">¡No hay productos!</h4>
-                        <p>Actualmente no tenemos productos disponibles en el menú. Por favor, vuelve a intentarlo más tarde.</p>
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-marron fw-bold mb-2">
+                        {{ $producto->NOMBRE_PRODUCTO }}
+                    </h5>
+
+                    <p class="card-text text-muted flex-grow-1">
+                        {{ $producto->DESCRIPCION_PRODUCTO ?? 'Producto fresco y delicioso' }}
+                    </p>
+
+                    <div class="product-info mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="availability-badge">
+                                <i class="fas fa-check-circle me-1"></i>Disponible
+                            </span>
+                            <small class="text-muted stock-info">
+                                Stock: {{ $producto->STOCK_ACTUAL }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-agregar-pedido"
+                                data-producto-id="{{ $producto->ID_PRODUCTO }}"
+                                data-producto-nombre="{{ $producto->NOMBRE_PRODUCTO }}"
+                                data-producto-precio="{{ $producto->PRECIO_PRODUCTO }}">
+
+                            <i class="fas fa-plus-circle me-2"></i>Agregar pedido
+                        </button>
                     </div>
                 </div>
-            @endforelse
+            </div>
         </div>
-    </div>
-</section>
+    @empty
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <h4 class="alert-heading">¡No hay productos!</h4>
+                <p>Actualmente no tenemos productos disponibles en el menú. Por favor, vuelve a intentarlo más tarde.</p>
+            </div>
+        </div>
+    @endforelse
+</div>
 
 <!-- Sección de Llamada a la Acción -->
 <section class="py-5 bg-marron text-white">

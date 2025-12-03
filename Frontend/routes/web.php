@@ -5,7 +5,8 @@ use App\Http\Controllers\Inventario\IngredientesController;
 use App\Http\Controllers\Inventario\CategoriaController;
 use App\Http\Controllers\Inventario\ProveedoresController;
 use App\Http\Controllers\Inventario\DetallePedidosController;
-
+use App\Http\Controllers\Productos\Categoriaproductos;
+use App\Http\Controllers\Productos\Menuproductos;
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
@@ -20,6 +21,9 @@ Route::get('/menu', function () {
     $productos = []; // Aquí se cargarán productos desde la BD
     return view('menu.menu', compact('productos'));
 })->name('menu');
+
+Route::get('/', [Categoriaproductos::class, 'index'])->name('home');
+Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
 
 
 // ============================================
