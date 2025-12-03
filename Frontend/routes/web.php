@@ -5,6 +5,8 @@ use App\Http\Controllers\Inventario\IngredientesController;
 use App\Http\Controllers\Inventario\CategoriaController;
 use App\Http\Controllers\Inventario\ProveedoresController;
 use App\Http\Controllers\Inventario\DetallePedidosController;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\PedidosController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -12,7 +14,7 @@ use App\Http\Controllers\Inventario\DetallePedidosController;
 
 // Homepage
 Route::get('/', function () {
-    return view('home.home  ');
+    return view('home.home');
 })->name('home');
 
 // Menú de productos
@@ -20,7 +22,6 @@ Route::get('/menu', function () {
     $productos = []; // Aquí se cargarán productos desde la BD
     return view('menu.menu', compact('productos'));
 })->name('menu');
-
 
 // ============================================
 // AUTENTICACIÓN
@@ -151,8 +152,8 @@ Route::prefix('/dashboard/inventario/detalle-pedidos')->group(function () {
 // ============================================
 // INGREDIENTES - CRUD COMPLETO
 // ============================================
-
-Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
+// **CORRECCIÓN:** La sintaxis de group(function) () {} ha sido corregida a group(function () {})
+Route::prefix('/dashboard/inventario/ingredientes')->group(function () { 
 
     // Listar ingredientes
     Route::get('/', [IngredientesController::class, 'index'])
@@ -173,6 +174,20 @@ Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
     // Eliminar ingrediente
     Route::post('/delete/{id}', [IngredientesController::class, 'destroy'])
         ->name('ingredientes.destroy');
+}); // <-- CIERRE DEL GRUPO DE INGREDIENTES QUE FALTABA
+
+// ============================================
+// PEDIDOS CLIENTES - CRUD COMPLETO
+// ============================================
+Route::prefix('pedidos')->group(function () {
+    Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
+    Route::get('/create', [PedidosController::class, 'create'])->name('pedidos.create');
+    Route::post('/', [PedidosController::class, 'store'])->name('pedidos.store');
+
+    Route::get('/edit/{id}', [PedidosController::class, 'edit'])->name('pedidos.edit');
+    Route::put('/{id}', [PedidosController::class, 'update'])->name('pedidos.update');
+
+    Route::delete('/{id}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
 });
 
 require __DIR__.'/settings.php';

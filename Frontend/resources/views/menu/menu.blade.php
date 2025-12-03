@@ -46,7 +46,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-marron fw-semibold" href="#">Pedidos</a>
+            <a class="nav-link text-marron fw-semibold" href="{{ route('pedidos') }}">Pedidos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
