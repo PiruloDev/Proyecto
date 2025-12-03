@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\Inventario\IngredientesController;
+use App\Http\Controllers\Inventario\CategoriaController;
+use App\Http\Controllers\Inventario\ProveedoresController;
+use App\Http\Controllers\Inventario\DetallePedidosController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -94,53 +97,82 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ============================================
-// MÓDULO DE INVENTARIO: GESTIÓN DE INVENTARIO
+// MÓDULO DE INVENTARIO (COMPLETAMENTE MODULAR)
 // ============================================
 
-
-// routes/web.php
+// Vista principal
 Route::get('/dashboard/inventario', function () {
-    // Renderiza la vista que acabas de crear
-    return view('inventarioviews.indexinventario'); 
+    return view('inventarioviews.indexinventario');
 })->name('dashboard.inventario');
 
-// Rutas de Categorías 
+
 Route::prefix('/dashboard/inventario/categorias')->group(function () {
-    Route::get('/', [InventarioController::class, 'indexCategorias'])->name('categorias.index'); 
-    // Aquí irán las rutas 'store', 'update', 'destroy' de categorías
+    Route::get('/', [CategoriaController::class, 'index'])->name('categorias.index');
+    Route::post('/store', [CategoriaController::class, 'store'])->name('categorias.store');
+    Route::post('/update', [CategoriaController::class, 'update'])->name('categorias.update');
+    Route::post('/delete', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
 });
 
-// Rutas de Proveedores <-- ¡NUEVO BLOQUE!
-Route::prefix('/dashboard/inventario/proveedores')->group(function () {
-    Route::get('/', [InventarioController::class, 'indexProveedores'])->name('proveedores.index'); 
-    // Aquí irán las rutas 'store', 'update', 'destroy' de proveedores
+
+Route::prefix('/dashboard/inventario/proveedores')->group(function() {
+
+    Route::get('/', [ProveedoresController::class, 'index'])->name('proveedores.index');
+
+    Route::post('/store', [ProveedoresController::class, 'store'])->name('proveedores.store');
+
+    Route::put('/update/{id}', [ProveedoresController::class, 'update'])->name('proveedores.update');
+
+    Route::delete('/delete/{id}', [ProveedoresController::class, 'destroy'])->name('proveedores.destroy');
+
 });
 
-// Rutas de Detalle de Pedidos <-- ¡NUEVO BLOQUE!
+
+// -------------- DETALLE PEDIDOS --------------
 Route::prefix('/dashboard/inventario/detalle-pedidos')->group(function () {
-    Route::get('/', [InventarioController::class, 'indexDetallePedidos'])->name('detallePedidos.index'); 
-    // Aquí irán las rutas 'show', 'update', 'delete' de pedidos
-    });
 
+    // Listar detalles de pedidos
+    Route::get('/', [DetallePedidosController::class, 'index'])
+        ->name('detallePedidos.index');
+
+    // Crear un nuevo detalle de pedido
+    Route::post('/store', [DetallePedidosController::class, 'store'])
+        ->name('detallePedidos.store');
+
+    // Actualizar un detalle de pedido existente
+    Route::put('/update/{id}', [DetallePedidosController::class, 'update'])
+        ->name('detallePedidos.update');
+
+    // Eliminar un detalle de pedido
+    Route::delete('/delete/{id}', [DetallePedidosController::class, 'destroy'])
+        ->name('detallePedidos.destroy');
+});
+
+
+// ============================================
+// INGREDIENTES - CRUD COMPLETO
+// ============================================
 
 Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
-    // Listar ingredientes (GET /ingredientes) -> Referenciado como 'ingredientes.index'
-    Route::get('/', [InventarioController::class, 'index'])->name('ingredientes.index');
 
-    // Agregar nuevo ingrediente (POST /ingredientes) -> Referenciado como 'ingredientes.store'
-    Route::post('/', [InventarioController::class, 'store'])->name('ingredientes.store');
+    // Listar ingredientes
+    Route::get('/', [IngredientesController::class, 'index'])
+        ->name('ingredientes.index');
 
-    // Actualizar ingrediente completo (POST /ingredientes/update)
-    Route::post('/update', [InventarioController::class, 'update'])->name('ingredientes.update');
+    // Crear ingrediente
+    Route::post('/store', [IngredientesController::class, 'store'])
+        ->name('ingredientes.store');
 
-    // Actualizar cantidad (POST /ingredientes/cantidad)
-    Route::post('/cantidad', [InventarioController::class, 'updateCantidad'])->name('ingredientes.updateCantidad');
+    // Actualizar ingrediente
+    Route::post('/update/{id}', [IngredientesController::class, 'update'])
+        ->name('ingredientes.update');
 
-    // Eliminar ingrediente (POST /ingredientes/delete)
-    Route::post('/delete', [InventarioController::class, 'destroy'])->name('ingredientes.destroy');
+    // Actualizar solo cantidad
+    Route::post('/update-cantidad/{id}', [IngredientesController::class, 'updateCantidad'])
+        ->name('ingredientes.updateCantidad');
+
+    // Eliminar ingrediente
+    Route::post('/delete/{id}', [IngredientesController::class, 'destroy'])
+        ->name('ingredientes.destroy');
 });
-
-
-
 
 require __DIR__.'/settings.php';

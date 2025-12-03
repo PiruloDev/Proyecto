@@ -1,167 +1,276 @@
-@extends('layouts.app') 
+{{-- resources/views/inventarioviews/ingredientes/index.blade.php --}}
 
-@section('title', 'Gestión de Ingredientes - Inventario')
+<!DOCTYPE html>
+<html lang="es">
 
-@push('styles')
-    {{-- Asegúrate de que este CSS esté accesible en la carpeta public/css/ --}}
-    <link rel="stylesheet" href="{{ asset('css/stylemoduloinv.css') }}">
-@endpush
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Ingredientes - El Castillo del Pan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-@section('content')
+    {{-- Tus estilos originales --}}
+    <link rel="stylesheet" href="/pre-produccion/PHP Modulos/css/stylemoduloinv.css">
 
-<div class="container-fluid">
-  <div class="row g-0">
-    
-    @include('partials.sidebar-inventario')
+    {{-- Bootstrap y estilos --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+</head>
 
-    <div class="col-md-9 col-lg-10 main-content">
-        
-        <header class="mb-5">
-            <h1 class="display-5">Gestión de Ingredientes</h1>
-            <p class="lead text-secondary">Controla el stock, añade nuevos insumos y gestiona los datos de inventario.</p>
-        </header>
+<body>
 
-        {{-- Mostrar Mensajes Flash (status) --}}
-        @if (session('status'))
-            <div class="alert alert-{{ session('status_type', 'success') }} alert-dismissible fade show" role="alert">
-                {{ session('status') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-        
-        <section id="agregar" class="mb-5 p-4 border rounded shadow-sm">
-          <h2>Agregar Nuevo Ingrediente</h2>
-          <form method="POST" action="{{ route('ingredientes.store') }}" class="row g-3">
-            @csrf {{-- Token de seguridad de Laravel --}}
-            
-            <div class="col-md-4">
-              <label class="form-label">ID Proveedor</label>
-              <input type="number" name="idProveedor" class="form-control" value="{{ old('idProveedor') }}" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">ID Categoría</label>
-              <input type="number" name="idCategoria" class="form-control" value="{{ old('idCategoria') }}" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Cantidad</label>
-              <input type="number" name="cantidadIngrediente" class="form-control" value="{{ old('cantidadIngrediente') }}" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Nombre</label>
-              <input type="text" name="nombreIngrediente" class="form-control" value="{{ old('nombreIngrediente') }}" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Referencia</label>
-              <input type="text" name="referenciaIngrediente" class="form-control" value="{{ old('referenciaIngrediente') }}" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Fecha Vencimiento</label>
-              <input type="date" name="fechaVencimiento" class="form-control" value="{{ old('fechaVencimiento') }}">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Fecha Entrega</label>
-              <input type="date" name="fechaEntregaIngrediente" class="form-control" value="{{ old('fechaEntregaIngrediente') }}">
-            </div>
+    <div class="container-fluid">
+        <div class="row g-0">
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            
-            <div class="col-12">
-              <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Agregar Ingrediente</button>
-            </div>
-          </form>
-        </section>
+            {{-- Sidebar ORIGINAL pero ahora traída con Laravel --}}
+            @include('partials.sidebar-inventario')
 
-        <section id="listado" class="mb-5">
-          <h2>Listado de Ingredientes</h2>
-          
-          @if (!is_array($ingredientes))
-              <div class="alert alert-danger">
-                  <strong>Error de Conexión:</strong> No se pudo obtener el listado de ingredientes. Por favor, asegúrate de que el microservicio (Spring Boot) esté corriendo y que `API_SPRING_URL` en tu `.env` sea correcto.
-              </div>
-          @else
-              <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nombre</th>
-                      <th>Cantidad</th>
-                      <th>Referencia</th>
-                      <th>Vencimiento</th>
-                      <th>Proveedor ID</th>
-                      <th>Categoría ID</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @forelse ($ingredientes as $ingrediente)
-                        <tr>
-                            {{-- CORRECCIÓN 1: Usar idIngrediente --}}
-                            <td>{{ $ingrediente['idIngrediente'] ?? 'N/A' }}</td>
-                            <td>{{ $ingrediente['nombreIngrediente'] ?? '' }}</td>
-                            <td>{{ $ingrediente['cantidadIngrediente'] ?? 0 }}</td>
-                            <td>{{ $ingrediente['referenciaIngrediente'] ?? '' }}</td>
-                            <td>{{ $ingrediente['fechaVencimiento'] ?? 'N/A' }}</td>
-                            <td>{{ $ingrediente['idProveedor'] ?? 'N/A' }}</td>
-                            <td>{{ $ingrediente['idCategoria'] ?? 'N/A' }}</td>
-                            <td>
-                                {{-- CORRECCIÓN 2: Usar idIngrediente en el modal target --}}
-                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal-{{ $ingrediente['idIngrediente'] }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('ingredientes.destroy') }}" method="POST" style="display:inline;">
+            {{-- CONTENIDO PRINCIPAL --}}
+            <div class="col-md-9 col-lg-10 main-content">
+
+                {{-- NAVBAR SUPERIOR ORIGINAL --}}
+                <nav class="navbar navbar-expand-lg top-navbar">
+                    <div class="container-fluid">
+                        <a class="navbar-brand d-md-none" href="#">Menú</a>
+                        <div class="collapse navbar-collapse justify-content-end">
+                            <div class="navbar-nav">
+                                <div class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                        data-bs-toggle="dropdown">
+                                        <span class="me-2 text-dark d-none d-sm-inline">Administrador</span>
+                                        <div class="profile-icon-wrapper"><i class="fas fa-user"></i></div>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>
+                                                Configuración</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>
+                                                Cerrar Sesión</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <h1 class="mt-3">Gestión de Ingredientes</h1>
+
+                {{-- MENSAJES --}}
+                @if (session('success'))
+                    <div class="alert alert-success my-3">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger my-3">{{ session('error') }}</div>
+                @endif
+
+                {{-- =============== LISTADO ================= --}}
+                <section id="listado" class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2>Listado de Ingredientes</h2>
+
+                        <a href="{{ route('ingredientes.index') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sync"></i> Recargar
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Proveedor</th>
+                                    <th>Categoría</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Vencimiento</th>
+                                    <th>Referencia</th>
+                                    <th>Entrega</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse($ingredientes as $ing)
+                                    <tr>
+                                        <td>{{ $ing['idIngrediente'] }}</td>
+                                        <td>{{ $ing['idProveedor'] }}</td>
+                                        <td>{{ $ing['idCategoria'] }}</td>
+                                        <td>{{ $ing['nombreIngrediente'] }}</td>
+                                        <td>{{ $ing['cantidadIngrediente'] }}</td>
+                                        <td>{{ $ing['fechaVencimiento'] }}</td>
+                                        <td>{{ $ing['referenciaIngrediente'] }}</td>
+                                        <td>{{ $ing['fechaEntregaIngrediente'] ?? 'N/A' }}</td>
+
+                                        <td>
+                                            {{-- BOTÓN EDITAR (Modal) --}}
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editModal-{{ $ing['idIngrediente'] }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+
+                                            {{-- BOTÓN ELIMINAR --}}
+                                            <form method="POST"
+                                                action="{{ route('ingredientes.destroy', $ing['idIngrediente']) }}"
+                                                class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('¿Eliminar este ingrediente?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                    {{-- ================== MODAL EDITAR ================== --}}
+                                    <div class="modal fade" id="editModal-{{ $ing['idIngrediente'] }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Editar Ingrediente</h5>
+                                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+
+                                                <form method="POST"
+                                                    action="{{ route('ingredientes.update', $ing['idIngrediente']) }}"
+                                                    class="row g-3 p-3">
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Nombre</label>
+                                                        <input type="text" name="nombreIngrediente"
+                                                            class="form-control"
+                                                            value="{{ $ing['nombreIngrediente'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Cantidad</label>
+                                                        <input type="number" name="cantidadIngrediente"
+                                                            class="form-control"
+                                                            value="{{ $ing['cantidadIngrediente'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Fecha Vencimiento</label>
+                                                        <input type="date" name="fechaVencimiento"
+                                                            class="form-control"
+                                                            value="{{ $ing['fechaVencimiento'] }}">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Proveedor</label>
+                                                        <input type="number" name="idProveedor" class="form-control"
+                                                            value="{{ $ing['idProveedor'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Categoría</label>
+                                                        <input type="number" name="idCategoria" class="form-control"
+                                                            value="{{ $ing['idCategoria'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Referencia</label>
+                                                        <input type="text" name="referenciaIngrediente"
+                                                            class="form-control"
+                                                            value="{{ $ing['referenciaIngrediente'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <button type="submit" class="btn btn-warning w-100">
+                                                            Guardar Cambios
+                                                        </button>
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center">No hay ingredientes registrados.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                {{-- MODAL CREAR INGREDIENTE --}}
+                <section class="mb-5">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
+                        <i class="fas fa-plus"></i> Agregar Ingrediente
+                    </button>
+
+                    <div class="modal fade" id="crearModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content p-3">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Agregar Nuevo Ingrediente</h5>
+                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <form method="POST" action="{{ route('ingredientes.store') }}" class="row g-3 p-3">
                                     @csrf
-                                    {{-- CORRECCIÓN 3: Usar idIngrediente en el input hidden --}}
-                                    <input type="hidden" name="id" value="{{ $ingrediente['idIngrediente'] }}">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este ingrediente?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Proveedor</label>
+                                        <input type="number" name="idProveedor" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Categoría</label>
+                                        <input type="number" name="idCategoria" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" name="nombreIngrediente" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Cantidad</label>
+                                        <input type="number" name="cantidadIngrediente" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Fecha Vencimiento</label>
+                                        <input type="date" name="fechaVencimiento" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Referencia</label>
+                                        <input type="text" name="referenciaIngrediente" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            Guardar
+                                        </button>
+                                    </div>
                                 </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center">No hay ingredientes registrados en el sistema.</td>
-                        </tr>
-                    @endforelse
-                  </tbody>
-                </table>
-              </div>
-          @endif
-        </section>
 
-        <section id="actualizarCantidad" class="mb-5 p-4 border rounded shadow-sm">
-          <h2>Actualizar Cantidad (Rápido)</h2>
-          <form method="POST" action="{{ route('ingredientes.updateCantidad') }}" class="row g-3">
-            @csrf
-            <div class="col-md-6">
-              <label class="form-label">ID Ingrediente</label>
-              <input type="number" name="id" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Nueva Cantidad</label>
-              <input type="number" name="cantidadIngrediente" class="form-control" required>
-            </div>
-            <div class="col-12">
-              <button type="submit" class="btn btn-info text-white"><i class="fas fa-sync"></i> Actualizar Cantidad</button>
-            </div>
-          </form>
-        </section>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
+            </div>
+
+        </div>
     </div>
-  </div>
-</div>
 
-@endsection
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-@push('scripts')
-    {{-- Scripts adicionales si los necesitas --}}
-@endpush
+</body>
+
+</html>
