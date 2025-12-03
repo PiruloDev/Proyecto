@@ -14,9 +14,12 @@ use App\Http\Controllers\PedidosController;
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
 
+// ============================================
+// MODULO PRODUCTOS 
+// ============================================
+
 // Homepage
 Route::get('/', [Categoriaproductos::class, 'index'])->name('home');
-
 // Menú de productos
 Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
 
