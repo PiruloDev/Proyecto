@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers; 
+namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 
@@ -11,7 +11,7 @@ class InventarioService
     public function __construct()
     {
         // Obtiene la URL base de tu microservicio desde el archivo .env de Laravel
-        $this->baseUrl = env('API_SPRING_URL'); 
+        $this->baseUrl = env('API_SPRING_URL');
         // Ejemplo: $this->baseUrl podría ser http://localhost:8080
     }
 
@@ -21,12 +21,12 @@ class InventarioService
 
     public function obtenerIngredientes()
     {
-        $response = Http::get("{$this->baseUrl}/ingredientes/lista"); 
+        $response = Http::get("{$this->baseUrl}/ingredientes/lista");
 
         if ($response->successful()) {
             return $response->json();
         }
-        return []; 
+        return [];
     }
 
 
@@ -41,8 +41,8 @@ class InventarioService
             return ["success" => false, "error" => $response->body() ?? "HTTP {$response->status()}"];
         }
     }
-    
-   
+
+
     public function actualizarIngrediente(int $id, array $data)
     {
         $response = Http::put("{$this->baseUrl}/ingrediente/{$id}", $data);
@@ -58,15 +58,15 @@ class InventarioService
     public function actualizarCantidadIngrediente(int $id, array $data)
     {
         // Usamos PATCH con la ruta raíz del Spring Boot
-        $response = Http::patch("{$this->baseUrl}/{$id}/cantidad", $data); 
-        
+        $response = Http::patch("{$this->baseUrl}/{$id}/cantidad", $data);
+
         if ($response->successful()) {
             return ["success" => true, "response" => $response->body()];
         } else {
             return ["success" => false, "error" => $response->body() ?? "HTTP {$response->status()}"];
         }
     }
-    
+
 
     public function eliminarIngrediente(int $id)
     {
