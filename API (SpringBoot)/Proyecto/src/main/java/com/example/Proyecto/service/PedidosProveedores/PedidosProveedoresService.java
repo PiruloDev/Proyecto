@@ -1,14 +1,21 @@
-// Archivo: PedidosProveedoresService.java
 package com.example.Proyecto.service.PedidosProveedores;
 
-import com.example.Proyecto.service.PedidosProveedores.PedidosProveedores;
+import com.example.Proyecto.model.PedidosProveedores;
+import com.example.Proyecto.model.DetallePedidoProveedores;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 @Service
@@ -17,30 +24,151 @@ public class PedidosProveedoresService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Archivo: PedidosProveedoresService.java
+    // RowMapper para PedidosProveedores (Encabezado)
+    private final RowMapper<PedidosProveedores> pedidosProveedoresRowMapper = new RowMapper<PedidosProveedores>() {
+        @Override
+        public PedidosProveedores mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
+            PedidosProveedores pedido = new PedidosProveedores();
+            // Mapeo utilizando los nombres exactos de las columnas de la tabla Pedidos_Proveedores
+            pedido.setIdPedidoProv(rs.getInt("ID_PEDIDO_PROV"));
+            pedido.setIdProveedor(rs.getInt("ID_PROVEEDOR"));
+            pedido.setNumeroPedido(rs.getInt("NUMERO_PEDIDO"));
+            pedido.setFechaPedido(rs.getDate("FECHA_PEDIDO"));
+            pedido.setEstadoPedido(rs.getString("ESTADO_PEDIDO"));
+            return pedido;
+        }
+    };
 
-// ...
+    // RowMapper para DetallePedidoProveedores con el nombre del ingrediente
+    private final RowMapper<DetallePedidoProveedores> detallePedidoProveedoresRowMapper = new RowMapper<DetallePedidoProveedores>() {
+        @Override
+        public DetallePedidoProveedores mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
+            DetallePedidoProveedores detalle = new DetallePedidoProveedores();
+            detalle.setIdDetalleProv(rs.getInt("ID_DETALLE_PROV"));
+            detalle.setIdPedidoProv(rs.getInt("ID_PEDIDO_PROV"));
+            detalle.setIdIngrediente(rs.getInt("ID_INGREDIENTE"));
 
-    // Obtener todos los pedidos de proveedores
-    public List<PedidosProveedores> obtenerTodosLosPedidosProveedores() {
-        String sql = "SELECT * FROM Pedidos_Proveedores";
-        return jdbcTemplate.query(sql, new RowMapper<PedidosProveedores>() {
-            @Override
-            public PedidosProveedores mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
-                PedidosProveedores pedido = new PedidosProveedores();
-                pedido.setIdPedidoProv(rs.getInt("ID_PEDIDO_PROV"));
-                pedido.setIdProveedor(rs.getInt("ID_PROVEEDOR"));
-                pedido.setNumeroPedido(rs.getInt("NUMERO_PEDIDO")); // <-- CORRECCIÓN: Usar getInt
-                pedido.setFechaPedido(rs.getDate("FECHA_PEDIDO"));
-                pedido.setEstadoPedido(rs.getString("ESTADO_PEDIDO"));
-                return pedido;
+            // Obtiene el nombre del ingrediente de la tabla Ingredientes (gracias al JOIN)
+            detalle.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+
+            // *** CORRECCIÓN CRÍTICA DE LECTURA (AJUSTADO A LA BD) ***
+            // Mapea la columna real: CANTIDAD_ORDENADA
+            detalle.setCantidad(rs.getInt("CANTIDAD_ORDENADA"));
+            // Mapea la columna real: PRECIO_COMPRA
+            detalle.setPrecioUnitario(rs.getBigDecimal("PRECIO_COMPRA"));
+
+            // La columna SUBTOTAL NO existe en la BD. Se calcula en la aplicación.
+            if (detalle.getPrecioUnitario() != null) {
+                // Multiplica el precio por la cantidad para obtener el subtotal
+                detalle.setSubtotal(detalle.getPrecioUnitario().multiply(new java.math.BigDecimal(detalle.getCantidad())));
+            } else {
+                detalle.setSubtotal(BigDecimal.ZERO);
             }
-        });
+
+            return detalle;
+        }
+    };
+
+    /**
+     * Inserta un detalle de pedido de proveedor. Es una función auxiliar interna.
+     */
+    private void insertarDetallePedidoProveedor(int idPedidoProv, DetallePedidoProveedores detalle) {
+        // *** CORRECCIÓN CRÍTICA DE ESCRITURA (AJUSTADO A LA BD) ***
+        // 1. Nombre de la tabla: Detalle_Pedido_Proveedores -> detalle_pedidos_proveedores (usando minúsculas)
+        // 2. Columnas: Se cambiaron CANTIDAD_INGREDIENTE, PRECIO_UNITARIO por CANTIDAD_ORDENADA, PRECIO_COMPRA
+        // 3. Se eliminó 'SUBTOTAL' ya que NO existe en la tabla SQL
+        String sql = "INSERT INTO detalle_pedidos_proveedores (ID_PEDIDO_PROV, ID_INGREDIENTE, CANTIDAD_ORDENADA, PRECIO_COMPRA) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql,
+                idPedidoProv,
+                detalle.getIdIngrediente(),
+                detalle.getCantidad(), // Este valor proviene del objeto Java
+                detalle.getPrecioUnitario()
+                // Se eliminó detalle.getSubtotal() de los parámetros
+        );
     }
 
-    // Crear un nuevo pedido de proveedor (POST)
+    /**
+     * Crea un pedido de proveedor completo (encabezado y detalles) de forma transaccional.
+     * @param pedido El objeto de PedidosProveedores que contiene el encabezado y la lista de detalles.
+     * @return El ID del pedido recién creado.
+     */
+    @Transactional // Asegura que si falla la inserción de detalles, el encabezado se revierta (rollback)
+    public int crearPedidoProveedorCompleto(PedidosProveedores pedido) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        // 1. Insertar Encabezado y obtener el ID generado (ID_PEDIDO_PROV)
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sqlHeader = "INSERT INTO pedidos_proveedores (ID_PROVEEDOR, NUMERO_PEDIDO, FECHA_PEDIDO, ESTADO_PEDIDO) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(connection -> {
+            java.sql.PreparedStatement ps = connection.prepareStatement(sqlHeader, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, pedido.getIdProveedor());
+            ps.setInt(2, pedido.getNumeroPedido());
+            // Conversión de java.util.Date a java.sql.Date para la inserción
+            ps.setDate(3, new java.sql.Date(pedido.getFechaPedido().getTime()));
+            ps.setString(4, pedido.getEstadoPedido());
+            return ps;
+        }, keyHolder);
+
+        // Obtener el ID generado (clave primaria)
+        int idPedidoProv = keyHolder.getKey().intValue();
+
+        // 2. Insertar Detalles
+        if (pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
+            for (DetallePedidoProveedores detalle : pedido.getDetalles()) {
+                // Llama al método auxiliar para insertar cada detalle
+                insertarDetallePedidoProveedor(idPedidoProv, detalle);
+            }
+        }
+
+        return idPedidoProv;
+    }
+
+
+    /**
+     * Obtiene el encabezado de un pedido de proveedor y carga sus detalles de ingredientes.
+     * @param idPedidoProv ID del pedido de proveedor.
+     * @return PedidosProveedores con su lista de detalles o null si no se encuentra.
+     */
+    public PedidosProveedores obtenerPedidoConDetalles(int idPedidoProv) {
+        // 1. Obtener el encabezado
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sqlEncabezado = "SELECT * FROM pedidos_proveedores WHERE ID_PEDIDO_PROV = ?";
+        PedidosProveedores pedido;
+        try {
+            pedido = jdbcTemplate.queryForObject(sqlEncabezado, pedidosProveedoresRowMapper, idPedidoProv);
+        } catch (EmptyResultDataAccessException e) {
+            return null; // El pedido no existe
+        }
+
+        // 2. Obtener los detalles del pedido, haciendo JOIN con la tabla de ingredientes para mostrar el nombre
+        // CORRECCIÓN: Nombre de tabla ajustado a la BD real (detalle_pedidos_proveedores)
+        String sqlDetalles = "SELECT dp.*, i.NOMBRE_INGREDIENTE FROM detalle_pedidos_proveedores dp " +
+                "JOIN Ingredientes i ON dp.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                "WHERE dp.ID_PEDIDO_PROV = ?";
+
+        List<DetallePedidoProveedores> detalles = jdbcTemplate.query(
+                sqlDetalles,
+                detallePedidoProveedoresRowMapper,
+                idPedidoProv
+        );
+
+        // 3. Establecer los detalles en el encabezado
+        pedido.setDetalles(detalles);
+
+        return pedido;
+    }
+
+    // GET - Obtener todos los pedidos de proveedores
+    public List<PedidosProveedores> obtenerTodosLosPedidosProveedores() {
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sql = "SELECT * FROM pedidos_proveedores";
+        return jdbcTemplate.query(sql, pedidosProveedoresRowMapper);
+    }
+
+    // Este método ya no es usado por el controlador, pero se mantiene para compatibilidad
     public void crearPedidoProveedor(PedidosProveedores pedido) {
-        String sql = "INSERT INTO Pedidos_Proveedores (ID_PROVEEDOR, NUMERO_PEDIDO, FECHA_PEDIDO, ESTADO_PEDIDO) VALUES (?, ?, ?, ?)";
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sql = "INSERT INTO pedidos_proveedores (ID_PROVEEDOR, NUMERO_PEDIDO, FECHA_PEDIDO, ESTADO_PEDIDO) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 pedido.getIdProveedor(),
                 pedido.getNumeroPedido(),
@@ -49,9 +177,10 @@ public class PedidosProveedoresService {
         );
     }
 
-    // Actualizar un pedido de proveedor (PUT)
+    // PUT - Actualizar un pedido de proveedor existente
     public int editarPedidoProveedor(PedidosProveedores pedido) {
-        String sql = "UPDATE Pedidos_Proveedores SET ID_PROVEEDOR=?, NUMERO_PEDIDO=?, FECHA_PEDIDO=?, ESTADO_PEDIDO=? WHERE ID_PEDIDO_PROV=?";
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sql = "UPDATE pedidos_proveedores SET ID_PROVEEDOR=?, NUMERO_PEDIDO=?, FECHA_PEDIDO=?, ESTADO_PEDIDO=? WHERE ID_PEDIDO_PROV=?";
         return jdbcTemplate.update(sql,
                 pedido.getIdProveedor(),
                 pedido.getNumeroPedido(),
@@ -61,9 +190,11 @@ public class PedidosProveedoresService {
         );
     }
 
-    // Eliminar un pedido de proveedor (DELETE)
+    // DELETE - Eliminar un pedido de proveedor por ID
     public int eliminarPedidoProveedor(int idPedidoProv) {
-        String sql = "DELETE FROM Pedidos_Proveedores WHERE ID_PEDIDO_PROV = ?";
+        // En un escenario real, también se debería eliminar los detalles asociados aquí o mediante CASCADE.
+        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
+        String sql = "DELETE FROM pedidos_proveedores WHERE ID_PEDIDO_PROV = ?";
         return jdbcTemplate.update(sql, idPedidoProv);
     }
 }

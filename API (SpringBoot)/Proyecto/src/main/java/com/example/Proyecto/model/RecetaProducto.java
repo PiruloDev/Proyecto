@@ -2,39 +2,51 @@ package com.example.Proyecto.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Clase de modelo que representa un ingrediente individual
+ * dentro de la receta de un producto, mapeando las columnas
+ * de la tabla RECETAS_DETALLE.
+ */
 public class RecetaProducto {
 
-    private int idReceta;
-    private int idProducto;
-    private int idIngrediente;
+    // IDs cambiados a Long para máxima compatibilidad con Spring y la base de datos
+    private Long idReceta;
+    private Long idProducto; // Útil si la consulta hace un JOIN con RECETAS
+    private Long idIngrediente;
+
     private BigDecimal cantidadRequerida; // Usamos BigDecimal para precisión en cantidades
-    private String unidadMedida;
+
+    // CORRECCIÓN CLAVE: Usamos el ID de la unidad en lugar del nombre
+    private Long idUnidad;
 
     // Constructor vacío
     public RecetaProducto() {}
 
+    // ==========================================================
     // Getters y Setters
-    public int getIdReceta() {
+    // ==========================================================
+
+    public Long getIdReceta() {
         return idReceta;
     }
 
-    public void setIdReceta(int idReceta) {
+    public void setIdReceta(Long idReceta) {
         this.idReceta = idReceta;
     }
 
-    public int getIdProducto() {
+    public Long getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(int idProducto) {
+    public void setIdProducto(Long idProducto) {
         this.idProducto = idProducto;
     }
 
-    public int getIdIngrediente() {
+    public Long getIdIngrediente() {
         return idIngrediente;
     }
 
-    public void setIdIngrediente(int idIngrediente) {
+    public void setIdIngrediente(Long idIngrediente) {
         this.idIngrediente = idIngrediente;
     }
 
@@ -46,11 +58,11 @@ public class RecetaProducto {
         this.cantidadRequerida = cantidadRequerida;
     }
 
-    public String getUnidadMedida() {
-        return unidadMedida;
+    public Long getIdUnidad() {
+        return idUnidad;
     }
 
-    public void setUnidadMedida(String unidadMedida) {
-        this.unidadMedida = unidadMedida;
+    public void setIdUnidad(Long idUnidad) {
+        this.idUnidad = idUnidad;
     }
 }

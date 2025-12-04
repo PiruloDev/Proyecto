@@ -4,16 +4,22 @@ import com.example.Proyecto.dto.ProduccionRequest;
 import com.example.Proyecto.model.Produccion;
 import com.example.Proyecto.model.RecetaProducto;
 import com.example.Proyecto.service.Ingredientes.IngredientesService;
+import com.example.Proyecto.service.Productos.ProductosService; // <--- INYECCIÓN CLAVE
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper; // Necesario para mapear resultados
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime; // Necesario para la fecha/hora
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class ProduccionService {
@@ -27,116 +33,115 @@ public class ProduccionService {
     @Autowired
     private IngredientesService ingredientesService;
 
-    // ==========================================================
-    // 1. ROW MAPPER PARA CONVERTIR FILAS DE BD A OBJETO PRODUCCION
-    // ==========================================================
-    /**
-     * Mapea una fila de la tabla 'produccion' al objeto Produccion.
-     * Asumimos que las columnas de la tabla son: ID_PRODUCCION, ID_PRODUCTO, CANTIDAD_PRODUCIDA, FECHA_PRODUCCION.
-     */
+    @Autowired
+    private ProductosService productosService;
+
     private final RowMapper<Produccion> produccionRowMapper = (rs, rowNum) -> {
         Produccion produccion = new Produccion();
-
-        // Mapeo de la clave primaria
         produccion.setIdProduccion(rs.getLong("ID_PRODUCCION"));
-
-        // Mapeo de la clave foránea
         produccion.setIdProducto(rs.getLong("ID_PRODUCTO"));
-
-        // Mapeo de cantidad (usamos BigDecimal)
         produccion.setCantidadProducida(rs.getBigDecimal("CANTIDAD_PRODUCIDA"));
-
-        // Mapeo de la fecha (Convertir Timestamp de SQL a LocalDateTime de Java)
         produccion.setFechaProduccion(rs.getTimestamp("FECHA_PRODUCCION").toLocalDateTime());
-
         return produccion;
     };
 
-    // ==========================================================
-    // 2. MÉTODO DE LISTADO (CORREGIDO)
-    // ==========================================================
-    /**
-     * Obtiene todos los registros del historial de producción de la tabla 'produccion'.
-     */
+
     public List<Produccion> obtenerTodoElHistorial() {
         String sql = "SELECT * FROM produccion ORDER BY FECHA_PRODUCCION DESC";
-        // Aquí se usa el RowMapper para que cada fila se convierta en un objeto Produccion
         return jdbcTemplate.query(sql, produccionRowMapper);
     }
 
-    // === CREATE (MEJORADO Y CORREGIDO) ===
-    /**
-     * Registra la producción de un producto de forma robusta.
-     */
-    @Transactional
-    public void registrarProduccion(ProduccionRequest request) {
-        // CORREGIDO: Se usa el Long directamente desde el request
-        Long idProducto = request.getIdProducto();
-        int cantidadProducida = request.getCantidadProducida();
 
-        // 1. Obtener la receta para el producto
-        // La llamada ya no falla porque obtenerRecetaPorProducto ahora acepta Long
-        List<RecetaProducto> receta = recetasService.obtenerRecetaPorProducto(idProducto);
+    @Transactional
+    public Long registrarProduccion(ProduccionRequest request) {
+        Long idProducto = request.getIdProducto();
+        BigDecimal cantidadProducida = request.getCantidadProducida();
+
+        List<RecetaProducto> receta = recetasService.obtenerRecetaPorIdProducto(idProducto);
 
         if (receta.isEmpty()) {
             throw new IllegalArgumentException("No se encontró receta para el producto ID " + idProducto);
         }
 
-        // 2. Descontar cada ingrediente según la cantidad total producida
-        for (RecetaProducto item : receta) {
-            BigDecimal consumoTotal = item.getCantidadRequerida().multiply(BigDecimal.valueOf(cantidadProducida));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String sqlInsert = "INSERT INTO produccion (ID_PRODUCTO, CANTIDAD_PRODUCIDA, FECHA_PRODUCCION) VALUES (?, ?, ?)";
 
-            try {
-                // NOTA: asumimos que getIdIngrediente() de RecetaProducto retorna un int
-                int updated = ingredientesService.descontarStock(item.getIdIngrediente(), consumoTotal);
-                if (updated == 0) {
-                    // Esto indica que o el ingrediente no existe o el stock era insuficiente.
-                    throw new IllegalStateException("Stock insuficiente o ingrediente no encontrado (ID: " + item.getIdIngrediente() + ")");
-                }
-            } catch (IllegalStateException e) {
-                // Re-lanza con un mensaje más claro para el frontend
-                throw new IllegalStateException("Error de inventario: " + e.getMessage());
-            }
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sqlInsert, new String[] {"ID_PRODUCCION"});
+            ps.setLong(1, idProducto);
+            ps.setBigDecimal(2, cantidadProducida);
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            return ps;
+        }, keyHolder);
+
+        Long idProduccion = Objects.requireNonNull(keyHolder.getKey()).longValue();
+
+
+        for (RecetaProducto detalle : receta) {
+            BigDecimal consumoTotal = detalle.getCantidadRequerida().multiply(cantidadProducida);
+
+            ingredientesService.actualizarStock(detalle.getIdIngrediente(), consumoTotal.negate());
         }
 
-        // 3. aumentar stock del producto terminado
-        String sqlUpdateProducto = "UPDATE productos SET STOCK_ACTUAL = STOCK_ACTUAL + ? WHERE ID_PRODUCTO = ?";
-        int updated = jdbcTemplate.update(sqlUpdateProducto, cantidadProducida, idProducto);
+        productosService.actualizarStockProducto(idProducto, cantidadProducida);
 
-        if (updated == 0) {
-            throw new IllegalArgumentException("No se encontró producto con ID " + idProducto);
-        }
-
-        // 4. registrar en tabla produccion
-        // Usamos la constante NOW() de MySQL para la fecha
-        String sqlInsert = "INSERT INTO produccion (ID_PRODUCTO, CANTIDAD_PRODUCIDA, FECHA_PRODUCCION) VALUES (?, ?, NOW())";
-        jdbcTemplate.update(sqlInsert, idProducto, cantidadProducida);
+        return idProduccion;
     }
 
-    // === UPDATE (PUT) ===
-    // (Omitidos para brevedad, no se modificaron)
     @Transactional
-    public void actualizarProduccion(Long idProduccion, ProduccionRequest request) {
-        String sql = "UPDATE produccion SET ID_PRODUCTO = ?, CANTIDAD_PRODUCIDA = ? WHERE ID_PRODUCCION = ?";
-        int rows = jdbcTemplate.update(sql, request.getIdProducto(), request.getCantidadProducida(), idProduccion);
-
-        if (rows == 0) {
+    public void eliminarProduccion(Long idProduccion) {
+        // 1. Obtener el registro de producción (para saber qué revertir)
+        String sqlSelect = "SELECT * FROM produccion WHERE ID_PRODUCCION = ?";
+        Produccion produccion;
+        try {
+            produccion = jdbcTemplate.queryForObject(sqlSelect, produccionRowMapper, idProduccion);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
             throw new IllegalArgumentException("Producción con ID " + idProduccion + " no encontrada.");
         }
+
+        Long idProducto = produccion.getIdProducto();
+        BigDecimal cantidadProducida = produccion.getCantidadProducida();
+
+        List<RecetaProducto> receta = recetasService.obtenerRecetaPorIdProducto(idProducto);
+        if (receta.isEmpty()) {
+            throw new IllegalStateException("No se encontró receta para el producto ID " + idProducto + ". No se puede revertir el inventario.");
+        }
+
+
+        // 3a. Reponer ingredientes
+        for (RecetaProducto detalle : receta) {
+            // Cantidad total a reponer = Cantidad_Requerida_por_Receta * Cantidad_Producida
+            BigDecimal reposicionTotal = detalle.getCantidadRequerida().multiply(cantidadProducida);
+
+            // Llamada al servicio de ingredientes (usa cantidad positiva para reponer)
+            ingredientesService.actualizarStock(detalle.getIdIngrediente(), reposicionTotal);
+        }
+
+        // 3b. Disminuir stock del producto terminado
+        productosService.actualizarStockProducto(idProducto, cantidadProducida.negate());
+
+        // 4. Eliminar el registro de producción
+        String sqlDelete = "DELETE FROM produccion WHERE ID_PRODUCCION = ?";
+        int rows = jdbcTemplate.update(sqlDelete, idProduccion);
+
+        if (rows == 0) {
+            throw new IllegalArgumentException("Error al eliminar el registro de producción ID " + idProduccion);
+        }
     }
 
-    // === PATCH (actualización parcial) ===
-    // (Omitidos para brevedad, no se modificaron)
     @Transactional
     public void actualizarParcial(Long idProduccion, Map<String, Object> updates) {
+        // Implementación simplificada (se asume que existe)
         StringBuilder sql = new StringBuilder("UPDATE produccion SET ");
         boolean first = true;
+
 
         if (updates.containsKey("cantidadProducida")) {
             if (!first) sql.append(", ");
             sql.append("CANTIDAD_PRODUCIDA = ").append(updates.get("cantidadProducida"));
             first = false;
         }
+
         if (updates.containsKey("idProducto")) {
             if (!first) sql.append(", ");
             sql.append("ID_PRODUCTO = ").append(updates.get("idProducto"));
@@ -146,18 +151,6 @@ public class ProduccionService {
         sql.append(" WHERE ID_PRODUCCION = ").append(idProduccion);
 
         int rows = jdbcTemplate.update(sql.toString());
-        if (rows == 0) {
-            throw new IllegalArgumentException("Producción con ID " + idProduccion + " no encontrada.");
-        }
-    }
-
-    // === DELETE (Lógica de reversión omitida, solo la eliminación) ===
-    // En un sistema real, antes de eliminar, deberías revertir el inventario.
-    @Transactional
-    public void eliminarProduccion(Long idProduccion) {
-        String sql = "DELETE FROM produccion WHERE ID_PRODUCCION = ?";
-        int rows = jdbcTemplate.update(sql, idProduccion);
-
         if (rows == 0) {
             throw new IllegalArgumentException("Producción con ID " + idProduccion + " no encontrada.");
         }

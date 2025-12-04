@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Inventario\IngredientesService;
+use Illuminate\Support\Facades\Redirect; // Importar Redirect
 
 class IngredientesController extends Controller
 {
@@ -15,19 +16,38 @@ class IngredientesController extends Controller
         $this->ingredientesService = $ingredientesService;
     }
 
-    // ============================================================
-    // LISTAR INGREDIENTES
-    // ============================================================
+    // ===========================================================
+    // LISTAR INGREDIENTES (CORREGIDO)
+    // ===========================================================
 
     public function index()
     {
-        $ingredientes = $this->ingredientesService->obtenerIngredientes();
+        // 1. Llama al servicio, que devuelve el array ['success' => bool, 'data' => array|null, 'error' => string|null]
+        $response = $this->ingredientesService->obtenerIngredientes();
+
+        // 2. Verifica si la operación fue exitosa
+        if (!$response['success']) {
+            // Manejar el error: redirigir y mostrar un mensaje de alerta.
+            $errorMessage = $response['error'] ?? 'Error desconocido al obtener ingredientes.';
+            // Retorna una redirección a la página anterior con el error.
+            return Redirect::back()->with(['error' => $errorMessage]); 
+        }
+
+        // 3. Si es exitosa, extrae *solamente* el array de ingredientes (la clave 'data')
+        $ingredientes = $response['data'] ?? [];
+        
+        // Se asegura de que sea un array para evitar cualquier error de tipo si la API devolvió nulo o un objeto simple
+        if (!is_array($ingredientes)) {
+            $ingredientes = [];
+        }
+        
+        // Pasa SOLAMENTE la lista de ingredientes a la vista
         return view('inventarioviews.ingredientes.index', compact('ingredientes'));
     }
 
-    // ============================================================
+    // ===========================================================
     // CREAR INGREDIENTE
-    // ============================================================
+    // ===========================================================
 
     public function store(Request $request)
     {
@@ -38,20 +58,21 @@ class IngredientesController extends Controller
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
             'referenciaIngrediente' => 'required|string|max:50',
+            // Asegúrate de incluir fechaEntregaIngrediente si es requerido
         ]);
 
         $response = $this->ingredientesService->agregarIngredientes($validated);
 
         if ($response['success']) {
-            return back()->with('success', 'Ingrediente creado correctamente.');
+            return back()->with('success', 'Ingrediente agregado correctamente.');
         }
 
         return back()->with('error', 'Error al crear ingrediente: '.$response['error']);
     }
 
-    // ============================================================
+    // ===========================================================
     // ACTUALIZAR INGREDIENTE
-    // ============================================================
+    // ===========================================================
 
     public function update($id, Request $request)
     {

@@ -1,12 +1,14 @@
 package com.example.Proyecto.service.Productos;
 
 import com.example.Proyecto.model.PojoProductos;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -189,4 +191,17 @@ public class ProductosService {
             return false;
         }
     }
+
+    @Transactional
+    public int actualizarStockProducto(Long idProducto, BigDecimal cantidadAjuste) {
+        String sqlUpdate = "UPDATE PRODUCTOS SET STOCK_ACTUAL = STOCK_ACTUAL + ? WHERE ID_PRODUCTO = ?";
+
+        int rows = jdbcTemplate.update(sqlUpdate, cantidadAjuste, idProducto);
+
+        if (rows == 0) {
+            throw new IllegalArgumentException("Producto con ID " + idProducto + " no encontrado para actualizar stock.");
+        }
+        return rows;
+    }
+
 }

@@ -25,9 +25,9 @@
                <i class="fas fa-truck"></i> Proveedores
             </a>
             
-            <a class="nav-link @if(request()->routeIs('detallePedidos.index')) active @endif" 
-               href="{{ route('detallePedidos.index') }}">
-               <i class="fas fa-receipt"></i> Detalle Pedidos
+            <a class="nav-link @if(request()->routeIs('pedidoproveedores.index')) active @endif" 
+               href="{{ route('pedidoproveedores.index') }}">
+               <i class="fas fa-receipt"></i> Pedido a Proveedores
             </a>
         </nav>
     </div>

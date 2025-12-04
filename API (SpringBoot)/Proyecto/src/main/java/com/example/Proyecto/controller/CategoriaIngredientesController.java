@@ -15,20 +15,17 @@ public class CategoriaIngredientesController {
     @Autowired
     private CategoriaIngredientesService categoriaIngredientesService;
 
-    // GET - Obtener todas las categorías de ingredientes
     @GetMapping("/categorias/ingredientes")
     public List<CategoriaIngredientes> obtenerTodasLasCategoriasIngredientes() {
         return categoriaIngredientesService.obtenerTodasLasCategoriasIngredientes();
     }
 
-    // POST - Crear una nueva categoría de ingrediente
     @PostMapping("/nuevacategoriaingrediente")
     public ResponseEntity<String> crearCategoriaIngrediente(@RequestBody CategoriaIngredientes categoria) {
         categoriaIngredientesService.crearCategoriaIngrediente(categoria);
         return ResponseEntity.ok("Categoría " + categoria.getNombreCategoria() + " creada con éxito.");
     }
 
-    // PUT - Actualizar una categoría existente
     @PutMapping("categoriaingrediente/{id}")
     public ResponseEntity<String> editarCategoriaIngrediente(@PathVariable int id, @RequestBody CategoriaIngredientes categoria) {
         categoria.setIdCategoriaIngrediente(id);
@@ -40,7 +37,6 @@ public class CategoriaIngredientesController {
         }
     }
 
-    // DELETE - Eliminar una categoría por ID
     @DeleteMapping("eliminarcategoria/{id}")
     public ResponseEntity<String> eliminarCategoriaIngrediente(@PathVariable int id) {
         int filas = categoriaIngredientesService.eliminarCategoriaIngrediente(id);

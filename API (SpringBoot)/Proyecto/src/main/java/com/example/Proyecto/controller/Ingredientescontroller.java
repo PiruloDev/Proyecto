@@ -1,11 +1,15 @@
 package com.example.Proyecto.controller;
 
 import com.example.Proyecto.model.Ingredientes;
+import com.example.Proyecto.dto.IngresoStockRequest;
 import com.example.Proyecto.service.Ingredientes.IngredientesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 @RestController
 public class Ingredientescontroller {
@@ -13,7 +17,6 @@ public class Ingredientescontroller {
     @Autowired
     private IngredientesService ingredientesService;
 
-    // GET → obtener todos los ingredientes
     @GetMapping("/ingredientes")
     public List<String> obtenerIngredientes() {
         return ingredientesService.obtenerIngredientes();
@@ -24,7 +27,6 @@ public class Ingredientescontroller {
         return ingredientesService.obtenerTodosLosIngredientes();
     }
 
-    // Metodo post  crear un nuevo ingrediente
     @PostMapping("/crearingrediente")
     public String crearIngrediente(@RequestBody Ingredientes ingrediente) {
         ingredientesService.crearIngrediente(ingrediente);
@@ -32,10 +34,9 @@ public class Ingredientescontroller {
         return "Ingrediente " + ingrediente.getNombreIngrediente() + " creado con éxito.";
     }
 
-    // PUT → editar un ingrediente existente
     @PutMapping("ingrediente/{id}")
-    public String editarIngrediente(@PathVariable int id, @RequestBody Ingredientes ingrediente) {
-        ingrediente.setIdIngrediente(id); // asigna el ID de la URL al objeto
+    public String editarIngrediente(@PathVariable Long id, @RequestBody Ingredientes ingrediente) {
+        ingrediente.setIdIngrediente(id);
 
         int filas = ingredientesService.editarIngrediente(ingrediente);
 
@@ -46,21 +47,42 @@ public class Ingredientescontroller {
         }
     }
 
-    // Metodo PATCH
+    /**
+     * MÉTODO CORREGIDO: Maneja la conversión segura a BigDecimal y excepciones.
+     */
     @PatchMapping("/{id}/cantidad")
-    public String patchCantidad(@PathVariable int id, @RequestBody Map<String, Object> updates) {
+    public String patchCantidad(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         if (updates.containsKey("cantidadIngrediente")) {
-            int cantidad = (int) updates.get("cantidadIngrediente");
-            int filas = ingredientesService.actualizarCantidad(id, cantidad);
-            return filas > 0 ? "Cantidad actualizada" : "Ingrediente no encontrado";
+            try {
+                Object cantidadObj = updates.get("cantidadIngrediente");
+                BigDecimal cantidadDecimal;
+
+                // 1. Conversión segura del JSON a BigDecimal
+                if (cantidadObj instanceof Number) {
+                    cantidadDecimal = new BigDecimal(cantidadObj.toString());
+                } else if (cantidadObj instanceof String) {
+                    cantidadDecimal = new BigDecimal((String) cantidadObj);
+                } else {
+                    return "Error de formato: La cantidad enviada no es un número válido.";
+                }
+
+                // 2. Llamada al servicio con el tipo de dato corregido (BigDecimal)
+                int filas = ingredientesService.actualizarCantidad(id, cantidadDecimal);
+
+                return filas > 0 ? "Cantidad actualizada" : "No se encontró el ingrediente con ID " + id;
+
+            } catch (Exception e) {
+                // Captura y registra la excepción no controlada que causaba el 500
+                System.err.println("Error al actualizar cantidad para ID " + id + ": " + e.getMessage());
+                return "Error interno del servidor al procesar la actualización de cantidad.";
+            }
         }
         return "No se envió la cantidad";
     }
 
 
-    // DELETE → eliminar un ingrediente por ID
     @DeleteMapping("ingrediente/{id}")
-    public String eliminarIngrediente(@PathVariable int id) {
+    public String eliminarIngrediente(@PathVariable Long id) {
         int filas = ingredientesService.eliminarIngrediente(id);
         if (filas > 0) {
             return "Ingrediente con ID " + id + " eliminado correctamente.";
@@ -70,8 +92,22 @@ public class Ingredientescontroller {
     }
 
 
+    @PostMapping("ingredientes/{id}/ingreso")
+    public ResponseEntity<String> ingresarStock(@PathVariable Long id, @RequestBody IngresoStockRequest request) {
+        try {
+            if (request.getCantidadIngresada() == null || request.getCantidadIngresada().compareTo(BigDecimal.ZERO) <= 0) {
+                return ResponseEntity.badRequest().body("La cantidad a ingresar debe ser positiva.");
+            }
 
+            int filas = ingredientesService.reponerStock(id, request.getCantidadIngresada());
 
-
-
+            if (filas > 0) {
+                return ResponseEntity.ok("Ingreso de stock de " + request.getCantidadIngresada() + " unidades para ID " + id + " registrado con éxito.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ingrediente con ID " + id + " no encontrado.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al ingresar stock: " + e.getMessage());
+        }
+    }
 }

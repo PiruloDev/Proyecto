@@ -4,22 +4,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Ingredientes {
-    private int idIngrediente;
-    private int idProveedor;
-    private int idCategoria;
+    private Long idIngrediente;
+    private Long idProveedor;
+    private Long idCategoria;
     private String nombreIngrediente;
     private BigDecimal cantidadIngrediente;
     private Date fechaVencimiento;
     private String referenciaIngrediente;
     private Date fechaEntregaIngrediente;
-
-    // Constructor vacío
     public Ingredientes() {}
 
-    // Constructor con parámetros
-    public Ingredientes(int idIngrediente,
-                        int idProveedor,
-                        int idCategoria,
+    public Ingredientes(Long idIngrediente,
+                        Long idProveedor,
+                        Long idCategoria,
                         String nombreIngrediente,
                         BigDecimal cantidadIngrediente,
                         Date fechaVencimiento,
@@ -36,14 +33,14 @@ public class Ingredientes {
     }
 
     // Getters y Setters
-    public int getIdIngrediente() { return idIngrediente; }
-    public void setIdIngrediente(int idIngrediente) { this.idIngrediente = idIngrediente; }
+    public Long getIdIngrediente() { return idIngrediente; }
+    public void setIdIngrediente(Long idIngrediente) { this.idIngrediente = idIngrediente; }
 
-    public int getIdProveedor() { return idProveedor; }
-    public void setIdProveedor(int idProveedor) { this.idProveedor = idProveedor; }
+    public Long getIdProveedor() { return idProveedor; }
+    public void setIdProveedor(Long idProveedor) { this.idProveedor = idProveedor; }
 
-    public int getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
+    public Long getIdCategoria() { return idCategoria; }
+    public void setIdCategoria(Long idCategoria) { this.idCategoria = idCategoria; }
 
     public String getNombreIngrediente() { return nombreIngrediente; }
     public void setNombreIngrediente(String nombreIngrediente) { this.nombreIngrediente = nombreIngrediente; }

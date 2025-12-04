@@ -1,16 +1,23 @@
 package com.example.Proyecto.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * DTO utilizado para recibir los datos de una nueva receta o una actualización.
+ * Contiene el ID del producto y la lista de ingredientes requeridos.
+ */
 public class RecetaRequest {
 
-    // 1. Campo principal: El ID del producto al que pertenece la receta
+    // El ID del producto al que pertenece la receta
     private Long idProducto;
 
-    // 2. Campo complejo: La lista de ingredientes y cantidades
+    // La lista de ingredientes y sus cantidades
     private List<IngredienteReceta> ingredientes;
 
-    // ====== Getters y Setters de RecetaRequest ======
+    // ==========================================================
+    // Getters y Setters de RecetaRequest
+    // ==========================================================
 
     public Long getIdProducto() {
         return idProducto;
@@ -28,40 +35,45 @@ public class RecetaRequest {
         this.ingredientes = ingredientes;
     }
 
-    // ====== Clase interna DTO para los Ingredientes de la Receta ======
+    // ==========================================================
+    // Clase interna DTO: IngredienteReceta
+    // ==========================================================
 
     /**
      * DTO interno que representa un solo ingrediente dentro de la lista de la receta.
-     * Mapea el objeto complejo 'ingredientes' del JSON.
      */
     public static class IngredienteReceta {
-        private Long idIngrediente;
-        private Double cantidadNecesaria;
-        private String unidadMedida; // <-- ¡NUEVO CAMPO!
 
+        private Long idIngrediente;
+        // Se usa BigDecimal para evitar errores de precisión con la cantidad
+        private BigDecimal cantidadNecesaria;
+        // Se usa el ID de la unidad (Long), consistente con la DB
+        private Long idUnidad;
+
+        // Getters
         public Long getIdIngrediente() {
             return idIngrediente;
         }
 
+        public BigDecimal getCantidadNecesaria() {
+            return cantidadNecesaria;
+        }
+
+        public Long getIdUnidad() {
+            return idUnidad;
+        }
+
+        // Setters
         public void setIdIngrediente(Long idIngrediente) {
             this.idIngrediente = idIngrediente;
         }
 
-        public Double getCantidadNecesaria() {
-            return cantidadNecesaria;
-        }
-
-        public void setCantidadNecesaria(Double cantidadNecesaria) {
+        public void setCantidadNecesaria(BigDecimal cantidadNecesaria) {
             this.cantidadNecesaria = cantidadNecesaria;
         }
 
-        // NUEVOS Getters y Setters para unidadMedida
-        public String getUnidadMedida() {
-            return unidadMedida;
-        }
-
-        public void setUnidadMedida(String unidadMedida) {
-            this.unidadMedida = unidadMedida;
+        public void setIdUnidad(Long idUnidad) {
+            this.idUnidad = idUnidad;
         }
     }
 }
