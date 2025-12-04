@@ -15,8 +15,8 @@
                <i class="fas fa-cheese"></i> Ingredientes
             </a>
             
-            <a class="nav-link @if(request()->routeIs('categorias.index')) active @endif" 
-               href="{{ route('categorias.index') }}">
+            <a class="nav-link @if(request()->routeIs('categorias-ingredientes.index')) active @endif" 
+               href="{{ route('categorias-ingredientes.index') }}">
                <i class="fas fa-list-alt"></i> Categorías
             </a>
             

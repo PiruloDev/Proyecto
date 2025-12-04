@@ -2,6 +2,7 @@ package com.example.Proyecto.controller;
 
 import com.example.Proyecto.model.Ingredientes;
 import com.example.Proyecto.dto.IngresoStockRequest;
+import com.example.Proyecto.dto.IngredienteListadoDTO;
 import com.example.Proyecto.service.Ingredientes.IngredientesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
 @RestController
@@ -23,8 +25,11 @@ public class Ingredientescontroller {
     }
 
     @GetMapping("ingredientes/lista")
-    public List<Ingredientes> obtenerIngredientesListas() {
-        return ingredientesService.obtenerTodosLosIngredientes();
+    public List<IngredienteListadoDTO> obtenerIngredientesListas() {
+        List<Ingredientes> listaCompleta = ingredientesService.obtenerTodosLosIngredientes();
+        return listaCompleta.stream()
+                .map(IngredienteListadoDTO::new)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/crearingrediente")
@@ -36,10 +41,8 @@ public class Ingredientescontroller {
 
     @PutMapping("ingrediente/{id}")
     public String editarIngrediente(@PathVariable Long id, @RequestBody Ingredientes ingrediente) {
-        ingrediente.setIdIngrediente(id);
-
-        int filas = ingredientesService.editarIngrediente(ingrediente);
-
+        // El Service se encarga de que solo se actualicen los 4 campos principales.
+        int filas = ingredientesService.editarIngrediente(id, ingrediente);
         if (filas > 0) {
             return "Ingrediente con ID " + id + " actualizado correctamente.";
         } else {
@@ -47,9 +50,6 @@ public class Ingredientescontroller {
         }
     }
 
-    /**
-     * MÉTODO CORREGIDO: Maneja la conversión segura a BigDecimal y excepciones.
-     */
     @PatchMapping("/{id}/cantidad")
     public String patchCantidad(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         if (updates.containsKey("cantidadIngrediente")) {

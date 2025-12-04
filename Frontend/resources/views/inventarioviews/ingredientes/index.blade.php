@@ -67,7 +67,10 @@
                     <div class="alert alert-danger my-3">{{ session('error') }}</div>
                 @endif
 
-                {{-- =============== LISTADO ================= --}}
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
+                        <i class="fas fa-plus"></i> Agregar Ingrediente
+                    </button>
+                    
                 <section id="listado" class="mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h2>Listado de Ingredientes</h2>
@@ -81,14 +84,12 @@
                         <table class="table table-bordered table-striped align-middle">
                             <thead class="table-light">
                                 <tr>
+                                    {{-- SOLO LOS CAMPOS DE LA API LIGERA /ingredientes/lista --}}
                                     <th>ID</th>
-                                    <th>Proveedor</th>
-                                    <th>Categoría</th>
+                                    <th>Proveedor (ID)</th>
+                                    <th>Categoría (ID)</th>
                                     <th>Nombre</th>
-                                    <th>Cantidad</th>
-                                    <th>Vencimiento</th>
                                     <th>Referencia</th>
-                                    <th>Entrega</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -96,14 +97,12 @@
                             <tbody>
                                 @forelse($ingredientes as $ing)
                                     <tr>
+                                        {{-- DATOS DEL DTO --}}
                                         <td>{{ $ing['idIngrediente'] }}</td>
                                         <td>{{ $ing['idProveedor'] }}</td>
                                         <td>{{ $ing['idCategoria'] }}</td>
                                         <td>{{ $ing['nombreIngrediente'] }}</td>
-                                        <td>{{ $ing['cantidadIngrediente'] }}</td>
-                                        <td>{{ $ing['fechaVencimiento'] }}</td>
                                         <td>{{ $ing['referenciaIngrediente'] }}</td>
-                                        <td>{{ $ing['fechaEntregaIngrediente'] ?? 'N/A' }}</td>
 
                                         <td>
                                             {{-- BOTÓN EDITAR (Modal) --}}
@@ -126,7 +125,8 @@
                                         </td>
                                     </tr>
 
-                                    {{-- ================== MODAL EDITAR ================== --}}
+                                    {{-- ================== MODAL EDITAR (REFRACTORIZADO) ================== --}}
+                                    {{-- Solo incluimos los 4 campos que sí manejamos en el PUT --}}
                                     <div class="modal fade" id="editModal-{{ $ing['idIngrediente'] }}" tabindex="-1">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
@@ -150,37 +150,25 @@
                                                     </div>
 
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Cantidad</label>
-                                                        <input type="number" name="cantidadIngrediente"
-                                                            class="form-control"
-                                                            value="{{ $ing['cantidadIngrediente'] }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Fecha Vencimiento</label>
-                                                        <input type="date" name="fechaVencimiento"
-                                                            class="form-control"
-                                                            value="{{ $ing['fechaVencimiento'] }}">
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Proveedor</label>
-                                                        <input type="number" name="idProveedor" class="form-control"
-                                                            value="{{ $ing['idProveedor'] }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Categoría</label>
-                                                        <input type="number" name="idCategoria" class="form-control"
-                                                            value="{{ $ing['idCategoria'] }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
                                                         <label class="form-label">Referencia</label>
                                                         <input type="text" name="referenciaIngrediente"
                                                             class="form-control"
                                                             value="{{ $ing['referenciaIngrediente'] }}" required>
                                                     </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Proveedor (ID)</label>
+                                                        <input type="number" name="idProveedor" class="form-control"
+                                                            value="{{ $ing['idProveedor'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Categoría (ID)</label>
+                                                        <input type="number" name="idCategoria" class="form-control"
+                                                            value="{{ $ing['idCategoria'] }}" required>
+                                                    </div>
+
+                                                    {{-- ELIMINADOS: Cantidad, Vencimiento (porque se manejan en endpoints de ajuste de stock/movimiento) --}}
 
                                                     <div class="col-12">
                                                         <button type="submit" class="btn btn-warning w-100">
@@ -196,7 +184,7 @@
 
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">No hay ingredientes registrados.</td>
+                                        <td colspan="6" class="text-center">No hay ingredientes registrados.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -204,11 +192,9 @@
                     </div>
                 </section>
 
-                {{-- MODAL CREAR INGREDIENTE --}}
+                {{-- MODAL CREAR INGREDIENTE (REFRACTORIZADO) --}}
                 <section class="mb-5">
-                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
-                        <i class="fas fa-plus"></i> Agregar Ingrediente
-                    </button>
+                    
 
                     <div class="modal fade" id="crearModal" tabindex="-1">
                         <div class="modal-dialog modal-lg">
@@ -223,34 +209,27 @@
                                     @csrf
 
                                     <div class="col-md-6">
-                                        <label class="form-label">Proveedor</label>
-                                        <input type="number" name="idProveedor" class="form-control" required>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label">Categoría</label>
-                                        <input type="number" name="idCategoria" class="form-control" required>
-                                    </div>
-
-                                    <div class="col-md-6">
                                         <label class="form-label">Nombre</label>
                                         <input type="text" name="nombreIngrediente" class="form-control" required>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label">Cantidad</label>
-                                        <input type="number" name="cantidadIngrediente" class="form-control" required>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label">Fecha Vencimiento</label>
-                                        <input type="date" name="fechaVencimiento" class="form-control">
-                                    </div>
-
-                                    <div class="col-md-6">
                                         <label class="form-label">Referencia</label>
-                                        <input type="text" name="referenciaIngrediente" class="form-control" required>
+                                        <input type="text" name="referenciaIngrediente" class="form-control"
+                                            required>
                                     </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Proveedor (ID)</label>
+                                        <input type="number" name="idProveedor" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Categoría (ID)</label>
+                                        <input type="number" name="idCategoria" class="form-control" required>
+                                    </div>
+
+                                    {{-- ELIMINADOS: Cantidad, Fecha Vencimiento (porque se manejan en endpoints separados de ingreso/movimiento) --}}
 
                                     <div class="col-12">
                                         <button type="submit" class="btn btn-primary w-100">

@@ -1,275 +1,272 @@
-@extends('layouts.app')
+{{-- resources/views/inventarioviews/proveedores/index.blade.php --}}
 
-@section('content')
+<!DOCTYPE html>
+<html lang="es">
 
-<div class="container-fluid">
-    <div class="row">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Proveedores - El Castillo del Pan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        {{-- SIDEBAR --}}
-        @include('partials.sidebar-inventario')
+    {{-- Tus estilos originales --}}
+    <link rel="stylesheet" href="/pre-produccion/PHP Modulos/css/stylemoduloinv.css">
 
-        <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+    {{-- Bootstrap y estilos --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+</head>
 
-            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-                <h2 class="fw-bold">Gestión de Proveedores</h2>
+<body>
 
-                <!-- Botón para abrir modal de crear -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+    <div class="container-fluid">
+        <div class="row g-0">
+
+            {{-- Sidebar ORIGINAL pero ahora traída con Laravel --}}
+            @include('partials.sidebar-inventario')
+
+            {{-- CONTENIDO PRINCIPAL --}}
+            <div class="col-md-9 col-lg-10 main-content">
+
+                {{-- NAVBAR SUPERIOR ORIGINAL --}}
+                <nav class="navbar navbar-expand-lg top-navbar">
+                    <div class="container-fluid">
+                        <a class="navbar-brand d-md-none" href="#">Menú</a>
+                        <div class="collapse navbar-collapse justify-content-end">
+                            <div class="navbar-nav">
+                                <div class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                        data-bs-toggle="dropdown">
+                                        <span class="me-2 text-dark d-none d-sm-inline">Administrador</span>
+                                        <div class="profile-icon-wrapper"><i class="fas fa-user"></i></div>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>
+                                                Configuración</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>
+                                                Cerrar Sesión</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <h1 class="mt-3">Gestión de Proveedores</h1>
+
+                {{-- MENSAJES --}}
+                @if (session('success'))
+                    <div class="alert alert-success my-3">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger my-3">{{ session('error') }}</div>
+                @endif
+
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
                     <i class="fas fa-plus"></i> Agregar Proveedor
                 </button>
+                    
+                <section id="listado" class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2>Listado de Proveedores</h2>
+
+                        <a href="{{ route('proveedores.index') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sync"></i> Recargar
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
+                                    <th>Dirección</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse($proveedores as $prov)
+                                    <tr>
+                                        <td>{{ $prov['idProveedor'] }}</td>
+                                        <td>{{ $prov['nombreProv'] }}</td>
+                                        <td>{{ $prov['telefonoProv'] }}</td>
+                                        <td>{{ $prov['emailProv'] }}</td>
+                                        <td>{{ $prov['direccionProv'] ?? 'N/A' }}</td>
+                                        <td>
+                                            @if($prov['activoProv'])
+                                                <span class="badge bg-success">Activo</span>
+                                            @else
+                                                <span class="badge bg-danger">Inactivo</span>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            {{-- BOTÓN EDITAR (Modal) --}}
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editModal-{{ $prov['idProveedor'] }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+
+                                            {{-- BOTÓN ELIMINAR --}}
+                                            <form method="POST"
+                                                action="{{ route('proveedores.destroy', $prov['idProveedor']) }}"
+                                                class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('¿Eliminar este proveedor?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                    {{-- ================== MODAL EDITAR ================== --}}
+                                    <div class="modal fade" id="editModal-{{ $prov['idProveedor'] }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Editar Proveedor</h5>
+                                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+
+                                                <form method="POST"
+                                                    action="{{ route('proveedores.update', $prov['idProveedor']) }}"
+                                                    class="row g-3 p-3">
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Nombre del Proveedor</label>
+                                                        <input type="text" name="nombreProv"
+                                                            class="form-control"
+                                                            value="{{ $prov['nombreProv'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Teléfono</label>
+                                                        <input type="text" name="telefonoProv"
+                                                            class="form-control"
+                                                            value="{{ $prov['telefonoProv'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Email</label>
+                                                        <input type="email" name="emailProv" class="form-control"
+                                                            value="{{ $prov['emailProv'] }}" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Estado</label>
+                                                        <select name="activoProv" class="form-select" required>
+                                                            <option value="1" {{ $prov['activoProv'] ? 'selected' : '' }}>Activo</option>
+                                                            <option value="0" {{ !$prov['activoProv'] ? 'selected' : '' }}>Inactivo</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <label class="form-label">Dirección</label>
+                                                        <textarea name="direccionProv" class="form-control" rows="2" required>{{ $prov['direccionProv'] }}</textarea>
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <button type="submit" class="btn btn-warning w-100">
+                                                            Guardar Cambios
+                                                        </button>
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">No hay proveedores registrados.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                {{-- MODAL CREAR PROVEEDOR --}}
+                <section class="mb-5">
+                    <div class="modal fade" id="crearModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content p-3">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Agregar Nuevo Proveedor</h5>
+                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <form method="POST" action="{{ route('proveedores.store') }}" class="row g-3 p-3">
+                                    @csrf
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre del Proveedor</label>
+                                        <input type="text" name="nombreProv" class="form-control" 
+                                               placeholder="Ej: Distribuidora XYZ" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="text" name="telefonoProv" class="form-control"
+                                               placeholder="Ej: +57 300 123 4567" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="emailProv" class="form-control"
+                                               placeholder="proveedor@ejemplo.com" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Estado</label>
+                                        <select name="activoProv" class="form-select" required>
+                                            <option value="1" selected>Activo</option>
+                                            <option value="0">Inactivo</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Dirección (Opcional)</label>
+                                        <textarea name="direccionProv" class="form-control" rows="2" 
+                                                  placeholder="Dirección completa del proveedor"></textarea>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
 
-            {{-- MENSAJES --}}
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-
-            {{-- TABLA DE PROVEEDORES --}}
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Email</th>
-                                <th>Estado</th>
-                                <th width="150">Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach($proveedores as $p)
-                            <tr>
-                                <td>{{ $p['idProveedor'] }}</td>
-                                <td>{{ $p['nombreProv'] }}</td>
-                                <td>{{ $p['telefonoProv'] ?? '—' }}</td>
-                                <td>{{ $p['emailProv'] ?? '—' }}</td>
-
-                                <td>
-                                    @if($p['activoProv'])
-                                        <span class="badge bg-success">Activo</span>
-                                    @else
-                                        <span class="badge bg-secondary">Inactivo</span>
-                                    @endif
-                                </td>
-
-                                <td>
-                                    {{-- BOTÓN EDITAR --}}
-                                    <button class="btn btn-warning btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEditar"
-                                        data-id="{{ $p['idProveedor'] }}"
-                                        data-nombre="{{ $p['nombreProv'] }}"
-                                        data-telefono="{{ $p['telefonoProv'] }}"
-                                        data-email="{{ $p['emailProv'] }}"
-                                        data-activo="{{ $p['activoProv'] }}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                    {{-- BOTÓN ELIMINAR --}}
-                                    <button class="btn btn-danger btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEliminar"
-                                        data-id="{{ $p['idProveedor'] }}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-
-                    </table>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
-</div>
 
-{{-- ======================================================
-                        MODAL CREAR
-====================================================== --}}
-<div class="modal fade" id="modalCrear" tabindex="-1">
-    <div class="modal-dialog">
-        <form class="modal-content" action="{{ route('proveedores.store') }}" method="POST">
-            @csrf
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Agregar Proveedor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+</body>
 
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" name="nombreProv" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Teléfono</label>
-                    <input type="text" name="telefonoProv" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="emailProv" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Activo</label>
-                    <select name="activoProv" class="form-control">
-                        <option value="1">Activo</option>
-                        <option value="0">Inactivo</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary">Guardar</button>
-            </div>
-
-        </form>
-    </div>
-</div>
-
-{{-- ======================================================
-                        MODAL EDITAR
-====================================================== --}}
-<div class="modal fade" id="modalEditar" tabindex="-1">
-    <div class="modal-dialog">
-        <form class="modal-content" id="formEditar" method="POST">
-            @csrf
-            @method('PUT')
-
-            <input type="hidden" name="idProveedor" id="edit-id">
-
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title">Editar Proveedor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="mb-3">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" name="nombreProv" id="edit-nombre" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Teléfono</label>
-                    <input type="text" name="telefonoProv" id="edit-telefono" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="emailProv" id="edit-email" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Activo</label>
-                    <select name="activoProv" id="edit-activo" class="form-control">
-                        <option value="1">Activo</option>
-                        <option value="0">Inactivo</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-warning">Actualizar</button>
-            </div>
-
-        </form>
-    </div>
-</div>
-
-{{-- ======================================================
-                        MODAL ELIMINAR
-====================================================== --}}
-<div class="modal fade" id="modalEliminar" tabindex="-1">
-    <div class="modal-dialog">
-        <form class="modal-content" id="formEliminar" method="POST">
-            @csrf
-            @method('DELETE')
-
-            <input type="hidden" name="idProveedor" id="delete-id">
-
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Eliminar Proveedor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                ¿Está seguro que desea eliminar este proveedor?
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-danger">Eliminar</button>
-            </div>
-
-        </form>
-    </div>
-</div>
-
-@endsection
-
-
-{{-- ======================================================
-                SCRIPT PARA EDITAR Y ELIMINAR
-====================================================== --}}
-@section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    /* ============================
-         MODAL EDITAR
-    ============================ */
-    const modalEditar = document.getElementById('modalEditar');
-
-    modalEditar.addEventListener('show.bs.modal', function (event) {
-
-        const button = event.relatedTarget;
-
-        const id = button.getAttribute('data-id');
-        const nombre = button.getAttribute('data-nombre');
-        const telefono = button.getAttribute('data-telefono');
-        const email = button.getAttribute('data-email');
-        const activo = button.getAttribute('data-activo');
-
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-nombre').value = nombre;
-        document.getElementById('edit-telefono').value = telefono;
-        document.getElementById('edit-email').value = email;
-        document.getElementById('edit-activo').value = activo == 1 ? "1" : "0";
-
-        // Ruta dinámica
-        const form = document.getElementById('formEditar');
-        form.action = `/dashboard/inventario/proveedores/update/${id}`;
-    });
-
-    /* ============================
-         MODAL ELIMINAR
-    ============================ */
-    const modalEliminar = document.getElementById('modalEliminar');
-
-    modalEliminar.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const id = button.getAttribute('data-id');
-
-        document.getElementById('delete-id').value = id;
-
-        const form = document.getElementById('formEliminar');
-        form.action = `/dashboard/inventario/proveedores/delete/${id}`;
-    });
-
-});
-</script>
-@endsection
+</html>

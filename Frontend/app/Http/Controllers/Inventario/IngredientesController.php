@@ -5,129 +5,133 @@ namespace App\Http\Controllers\Inventario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Inventario\IngredientesService;
-use Illuminate\Support\Facades\Redirect; // Importar Redirect
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Log; 
 
 class IngredientesController extends Controller
 {
     protected $ingredientesService;
 
-    public function __construct(IngredientesService $ingredientesService)
+
+    public function __construct(IngredientesService $ingredientesService /*, ProveedorService $proveedorService, CategoriaService $categoriaService */)
     {
         $this->ingredientesService = $ingredientesService;
+
     }
 
-    // ===========================================================
-    // LISTAR INGREDIENTES (CORREGIDO)
-    // ===========================================================
-
+ 
     public function index()
     {
-        // 1. Llama al servicio, que devuelve el array ['success' => bool, 'data' => array|null, 'error' => string|null]
         $response = $this->ingredientesService->obtenerIngredientes();
 
-        // 2. Verifica si la operación fue exitosa
         if (!$response['success']) {
-            // Manejar el error: redirigir y mostrar un mensaje de alerta.
             $errorMessage = $response['error'] ?? 'Error desconocido al obtener ingredientes.';
-            // Retorna una redirección a la página anterior con el error.
-            return Redirect::back()->with(['error' => $errorMessage]); 
+            // Retorna a la vista con un mensaje de error
+            return view('inventarioviews.ingredientes.index', ['ingredientes' => []])
+                   ->with('error', 'Error al cargar ingredientes: ' . $errorMessage);
         }
-
-        // 3. Si es exitosa, extrae *solamente* el array de ingredientes (la clave 'data')
+        
         $ingredientes = $response['data'] ?? [];
         
-        // Se asegura de que sea un array para evitar cualquier error de tipo si la API devolvió nulo o un objeto simple
-        if (!is_array($ingredientes)) {
-            $ingredientes = [];
-        }
-        
-        // Pasa SOLAMENTE la lista de ingredientes a la vista
+        // La vista utiliza la variable $ingredientes para el bucle @forelse
         return view('inventarioviews.ingredientes.index', compact('ingredientes'));
     }
 
-    // ===========================================================
-    // CREAR INGREDIENTE
-    // ===========================================================
-
+    /**
+     * Muestra el formulario para crear un nuevo ingrediente.
+     */
+    public function create()
+    {
+        // Pasar listas de Proveedores y Categorías si son necesarias para select boxes
+        return view('inventarioviews.ingredientes.create');
+    }
+    
+    /**
+     * Almacena un ingrediente nuevo. (CREATE)
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombreIngrediente' => 'required|string|max:100',
-            'cantidadIngrediente' => 'required|numeric',
-            'fechaVencimiento' => 'required|date',
+        $request->validate([
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
-            'referenciaIngrediente' => 'required|string|max:50',
-            // Asegúrate de incluir fechaEntregaIngrediente si es requerido
-        ]);
-
-        $response = $this->ingredientesService->agregarIngredientes($validated);
-
-        if ($response['success']) {
-            return back()->with('success', 'Ingrediente agregado correctamente.');
-        }
-
-        return back()->with('error', 'Error al crear ingrediente: '.$response['error']);
-    }
-
-    // ===========================================================
-    // ACTUALIZAR INGREDIENTE
-    // ===========================================================
-
-    public function update($id, Request $request)
-    {
-        $validated = $request->validate([
-            'nombreIngrediente' => 'required|string|max:100',
-            'cantidadIngrediente' => 'required|numeric',
-            'fechaVencimiento' => 'required|date',
-            'idProveedor' => 'required|integer',
-            'idCategoria' => 'required|integer',
+            'nombreIngrediente' => 'required|string|max:255',
             'referenciaIngrediente' => 'required|string|max:50',
         ]);
 
-        $response = $this->ingredientesService->actualizarIngrediente($id, $validated);
-
-        if ($response['success']) {
-            return back()->with('success', 'Ingrediente actualizado correctamente.');
-        }
-
-        return back()->with('error', 'Error al actualizar: '.$response['error']);
-    }
-
-    // ============================================================
-    // ACTUALIZAR SOLO CANTIDAD
-    // ============================================================
-
-    public function updateCantidad($id, Request $request)
-    {
-        $validated = $request->validate([
-            'cantidadIngrediente' => 'required|numeric',
+        // Obtenemos solo los datos validados que necesita el service
+        $data = $request->only([
+            'idProveedor',
+            'idCategoria',
+            'nombreIngrediente',
+            'referenciaIngrediente',
         ]);
 
-        $response = $this->ingredientesService->actualizarCantidadIngrediente(
-            $id,
-            ['cantidadIngrediente' => $validated['cantidadIngrediente']]
-        );
+        $response = $this->ingredientesService->agregarIngredientes($data);
 
         if ($response['success']) {
-            return back()->with('success', 'Cantidad actualizada correctamente.');
+            return Redirect::route('ingredientes.index')->with('success', 'Ingrediente creado con éxito.');
         }
 
-        return back()->with('error', 'Error al actualizar cantidad: '.$response['error']);
+        // Si falla, regresa con los datos que ya se habían escrito y el mensaje de error
+        return Redirect::back()->withInput()->with('error', $response['error']);
     }
 
-    // ============================================================
-    // ELIMINAR INGREDIENTE
-    // ============================================================
+    /**
+     * Muestra un ingrediente específico (Opcional, se puede hacer con la misma lista si solo se usa el DTO).
+     * Si el backend tiene un endpoint GET /ingrediente/{id}, se implementaría aquí.
+     */
+    // public function show(int $id) {}
 
-    public function destroy($id)
+    /**
+     * Muestra el formulario para editar un ingrediente. (READ ONE for EDIT)
+     */
+    // public function edit(int $id) 
+    // { 
+        // Si el backend tiene un endpoint GET /ingrediente/{id}, se llama aquí 
+        // y se pasa el ingrediente a la vista de edición.
+    // }
+
+    /**
+     * Actualiza un ingrediente existente. (UPDATE)
+     */
+    public function update(Request $request, int $id)
+    {
+        // 🎯 VALIDACIÓN: Solo validamos los 4 campos del DTO
+        $request->validate([
+            'idProveedor' => 'required|integer',
+            'idCategoria' => 'required|integer',
+            'nombreIngrediente' => 'required|string|max:255',
+            'referenciaIngrediente' => 'required|string|max:50',
+        ]);
+        
+        // Obtenemos solo los datos validados que necesita el service
+        $data = $request->only([
+            'idProveedor',
+            'idCategoria',
+            'nombreIngrediente',
+            'referenciaIngrediente',
+        ]);
+
+        $response = $this->ingredientesService->actualizarIngrediente($id, $data);
+
+        if ($response['success']) {
+            return Redirect::route('ingredientes.index')->with('success', 'Ingrediente actualizado con éxito.');
+        }
+
+        return Redirect::back()->withInput()->with('error', $response['error']);
+    }
+
+    /**
+     * Elimina un ingrediente. (DELETE)
+     */
+    public function destroy(int $id)
     {
         $response = $this->ingredientesService->eliminarIngrediente($id);
 
         if ($response['success']) {
-            return back()->with('success', 'Ingrediente eliminado correctamente.');
+            return Redirect::route('ingredientes.index')->with('success', 'Ingrediente eliminado con éxito.');
         }
-
-        return back()->with('error', 'Error al eliminar: '.$response['error']);
+        
+        return Redirect::back()->with('error', $response['error']);
     }
 }

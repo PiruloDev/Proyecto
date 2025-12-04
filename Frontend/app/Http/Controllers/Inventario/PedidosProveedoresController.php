@@ -3,121 +3,136 @@
 namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
-use App\Services\Inventario\PedidosProveedoresService; // Usamos el nuevo nombre del servicio
 use Illuminate\Http\Request;
-    
-class PedidosProveedoresController extends Controller // Nuevo nombre de la clase
+use App\Services\Inventario\PedidosProveedoresService;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon; // Útil para formatear fechas
+
+class PedidosProveedoresController extends Controller
 {
     protected $service;
 
-    public function __construct(PedidosProveedoresService $service) // Inyección del nuevo servicio
+    public function __construct(PedidosProveedoresService $service)
     {
         $this->service = $service;
     }
 
     /**
-     * Listar todos los pedidos de proveedores (encabezados)
+     * Muestra el listado de todos los pedidos de proveedores.
      */
     public function index()
     {
-        $pedidos = $this->service->obtenerTodos(); // Nuevo método en el servicio
+        $response = $this->service->obtenerPedidos();
 
-        if (!$pedidos) {
-            return back()->with('error', 'No se pudieron obtener los pedidos de proveedores.');
+        if (!$response['success']) {
+            $errorMessage = $response['error'] ?? 'Error desconocido al obtener pedidos.';
+            return view('inventarioviews.pedidoproveedores.index', ['pedidos' => []])
+                   ->with('error', 'Error al cargar pedidos: ' . $errorMessage);
         }
-
-        // Cambiamos la vista para reflejar el nuevo nombre
-        return view('inventarioviews.pedidosproveedores.index', compact('pedidos'));
+        
+        $pedidos = $response['data'] ?? [];
+        
+        // Se asume que la vista se llamará 'inventarioviews.pedidoproveedores.index'
+        return view('inventarioviews.pedidoproveedores.index', compact('pedidos'));
     }
 
     /**
-     * Mostrar el formulario para crear un nuevo pedido (si es necesario)
-     */
-    public function create()
-    {
-        return view('inventarioviews.pedidosproveedores.create');
-    }
-
-    /**
-     * Almacenar un nuevo pedido completo (encabezado y detalles).
-     * Recibe el JSON complejo desde el frontend.
+     * Procesa la creación de un nuevo pedido, incluyendo sus detalles. (STORE)
+     * NOTA: Este método es complejo porque debe manejar el JSON del encabezado + los detalles.
+     * En una implementación real con Blade, los detalles se recogen con JavaScript/inputs dinámicos.
      */
     public function store(Request $request)
     {
-        // Validación del encabezado (la validación del array de detalles es compleja y se deja a la lógica de la vista/JavaScript para simplificar el controlador)
+        // 1. VALIDACIÓN DEL ENCABEZADO
         $request->validate([
-            'idProveedor' => 'required|integer|min:1',
-            'numeroPedido' => 'required|integer|min:1',
-            'fechaPedido' => 'required|date',
-            'estadoPedido' => 'required|string',
-            'detalles' => 'required|array|min:1', // Debe ser un array no vacío
+            'idProveedor' => 'required|integer|exists:proveedores,ID_PROVEEDOR', // Asume que tienes una tabla Proveedores
+            'numeroPedido' => 'required|integer|unique:pedidos_proveedores,NUMERO_PEDIDO', // Asume unicidad
+            'estadoPedido' => 'required|string|max:50',
+            // El campo fechaPedido se llenará automáticamente con la fecha actual del servidor.
+            
+            // 2. VALIDACIÓN DE DETALLES (se asume un formato de array)
+            'detalles' => 'required|array|min:1',
             'detalles.*.idIngrediente' => 'required|integer',
             'detalles.*.cantidad' => 'required|integer|min:1',
-            'detalles.*.precioUnitario' => 'required|numeric|min:0.01',
-            'detalles.*.subtotal' => 'nullable|numeric', // Es nullable porque el backend lo calcula
+            'detalles.*.precioUnitario' => 'required|numeric|min:0',
         ]);
         
-        $data = $request->all();
+        // 3. CONSTRUIR EL PAYLOAD PARA SPRING
+        // Spring espera el formato del modelo PedidosProveedores.java
+        $payload = [
+            'idProveedor' => (int)$request->input('idProveedor'),
+            'numeroPedido' => (int)$request->input('numeroPedido'),
+            // La fecha de pedido debe ser enviada como java.util.Date (timestamp o string ISO)
+            // Se usa la fecha actual de Laravel y se convierte a un formato que Spring pueda parsear,
+            // o simplemente se pasa el timestamp. Usaremos la fecha actual del servidor.
+            'fechaPedido' => Carbon::now()->getTimestampMs(), // Envía el timestamp en milisegundos (más seguro)
+            'estadoPedido' => $request->input('estadoPedido'),
+            'detalles' => $request->input('detalles') // Ya es un array de detalles
+        ];
 
-        $response = $this->service->crearPedidoCompleto($data); // Nuevo método
+        $response = $this->service->crearPedidoCompleto($payload);
 
-        if (!$response['success']) {
-            return back()->with('error', $response['error'] ?? 'Error desconocido al crear el pedido completo.');
+        if ($response['success']) {
+            return Redirect::route('pedidoproveedores.index')->with('success', $response['response']);
         }
 
-        return redirect()->route('pedidosproveedores.index')->with('success', 'Pedido de proveedor creado correctamente (ID: ' . json_decode($response['data']) . ').');
+        return Redirect::back()->withInput()->with('error', $response['error']);
     }
 
     /**
-     * Mostrar un pedido de proveedor con detalles
+     * Muestra los detalles de un pedido (útil para ver los ingredientes comprados).
      */
     public function show(int $id)
     {
-        $pedido = $this->service->obtenerPedidoCompleto($id);
-
-        if (!$pedido) {
-            return back()->with('error', 'No se pudo obtener el pedido de proveedor.');
+        $response = $this->service->obtenerPedidoConDetalles($id);
+        
+        if (!$response['success']) {
+            return Redirect::route('pedidoproveedores.index')->with('error', 'No se pudo cargar el detalle del pedido: ' . $response['error']);
         }
-
-        return view('inventarioviews.pedidosproveedores.show', compact('pedido'));
+        
+        $pedido = $response['data'];
+        
+        // Se asume que la vista se llamará 'inventarioviews.pedidoproveedores.show'
+        return view('inventarioviews.pedidoproveedores.show', compact('pedido'));
     }
 
     /**
-     * Editar un pedido de proveedor existente (solo encabezado)
+     * Actualiza el encabezado de un pedido. (UPDATE)
      */
     public function update(Request $request, int $id)
     {
-        // Validación del encabezado (solo se valida lo que se actualiza en el backend)
+        // Solo actualizamos el encabezado
         $request->validate([
-            'idProveedor' => 'required|integer|min:1',
-            'numeroPedido' => 'required|integer|min:1',
-            'fechaPedido' => 'required|date',
-            'estadoPedido' => 'required|string',
-            // No se valida 'detalles' aquí porque la ruta PUT solo actualiza el encabezado
+            'idProveedor' => 'required|integer',
+            'numeroPedido' => 'required|integer',
+            'estadoPedido' => 'required|string|max:50',
         ]);
         
-        $data = $request->all();
+        $payload = $request->only(['idProveedor', 'numeroPedido', 'estadoPedido']);
+        // La API de Spring requiere también la fecha, la usaremos del formulario (o la actual)
+        $payload['fechaPedido'] = Carbon::now()->getTimestampMs();
 
-        $response = $this->service->editarPedido($id, $data);
+        $response = $this->service->actualizarPedido($id, $payload);
 
-        if (!$response['success']) {
-            return back()->with('error', $response['error'] ?? 'Error desconocido al actualizar el pedido.');
+        if ($response['success']) {
+            return Redirect::route('pedidoproveedores.index')->with('success', $response['response']);
         }
 
-        return back()->with('success', 'Pedido de proveedor actualizado correctamente.');
+        return Redirect::back()->withInput()->with('error', $response['error']);
     }
 
     /**
-     * Eliminar un pedido de proveedor por ID
+     * Elimina un pedido. (DELETE)
      */
     public function destroy(int $id)
     {
-        $response = $this->service->eliminarPedido($id); // Nuevo método
+        $response = $this->service->eliminarPedido($id);
 
-        if (!$response['success']) {
-            return back()->with('error', $response['error'] ?? 'Error desconocido al eliminar el pedido.');
+        if ($response['success']) {
+            return Redirect::route('pedidoproveedores.index')->with('success', $response['response']);
         }
-
-        return redirect()->route('pedidosproveedores.index')->with('success', 'Pedido de proveedor eliminado correctamente.');
+        
+        return Redirect::back()->with('error', $response['error']);
     }
 }

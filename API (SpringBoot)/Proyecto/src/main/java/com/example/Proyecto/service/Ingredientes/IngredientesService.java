@@ -39,6 +39,22 @@ public class IngredientesService {
         }
     };
 
+    private RowMapper<Ingredientes> ingredienteListadoRowMapper = new RowMapper<Ingredientes>() {
+        @Override
+        public Ingredientes mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Ingredientes ingrediente = new Ingredientes();
+
+            // Solo mapea los campos que vamos a seleccionar en el SQL.
+            ingrediente.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+            ingrediente.setIdProveedor(rs.getLong("ID_PROVEEDOR"));
+            ingrediente.setIdCategoria(rs.getLong("ID_CATEGORIA"));
+            ingrediente.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+            ingrediente.setReferenciaIngrediente(rs.getString("REFERENCIA_INGREDIENTE"));
+
+            return ingrediente;
+        }
+    };
+
 
     public List<String> obtenerIngredientes() {
         String sql = "SELECT NOMBRE_INGREDIENTE FROM Ingredientes ORDER BY NOMBRE_INGREDIENTE";
@@ -50,36 +66,44 @@ public class IngredientesService {
         return jdbcTemplate.query(sql, ingredienteRowMapper);
     }
 
+    public List<Ingredientes> obtenerIngredientesParaListado() {
+        String sql = "SELECT ID_INGREDIENTE, ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, REFERENCIA_INGREDIENTE FROM Ingredientes";
+        return jdbcTemplate.query(sql, ingredienteListadoRowMapper);
+    }
+
     public void crearIngrediente(Ingredientes ingrediente) {
-        String sql = "INSERT INTO Ingredientes (ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, CANTIDAD_INGREDIENTE, FECHA_VENCIMIENTO, REFERENCIA_INGREDIENTE, FECHA_ENTREGA_INGREDIENTE) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Ingredientes (ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, REFERENCIA_INGREDIENTE, CANTIDAD_INGREDIENTE, FECHA_VENCIMIENTO, FECHA_ENTREGA_INGREDIENTE) " +
+                "VALUES (?, ?, ?, ?, ?, NULL, NULL)";
+
+        BigDecimal cantidadInicial = BigDecimal.ZERO;
+
         jdbcTemplate.update(sql,
                 ingrediente.getIdProveedor(),
                 ingrediente.getIdCategoria(),
                 ingrediente.getNombreIngrediente(),
-                ingrediente.getCantidadIngrediente(),
-                ingrediente.getFechaVencimiento(),
                 ingrediente.getReferenciaIngrediente(),
-                ingrediente.getFechaEntregaIngrediente()
+                cantidadInicial
         );
     }
 
-    public int editarIngrediente(Ingredientes ingrediente) {
-        String sql = "UPDATE Ingredientes SET ID_PROVEEDOR = ?, ID_CATEGORIA = ?, NOMBRE_INGREDIENTE = ?, CANTIDAD_INGREDIENTE = ?, FECHA_VENCIMIENTO = ?, REFERENCIA_INGREDIENTE = ?, FECHA_ENTREGA_INGREDIENTE = ? WHERE ID_INGREDIENTE = ?";
+    public int editarIngrediente(Long id, Ingredientes ingrediente) {
+        String sql = "UPDATE Ingredientes SET " +
+                "ID_PROVEEDOR = ?, " +
+                "ID_CATEGORIA = ?, " +
+                "NOMBRE_INGREDIENTE = ?, " +
+                "REFERENCIA_INGREDIENTE = ? " +
+                "WHERE ID_INGREDIENTE = ?";
+
         return jdbcTemplate.update(sql,
                 ingrediente.getIdProveedor(),
                 ingrediente.getIdCategoria(),
                 ingrediente.getNombreIngrediente(),
-                ingrediente.getCantidadIngrediente(),
-                ingrediente.getFechaVencimiento(),
                 ingrediente.getReferenciaIngrediente(),
-                ingrediente.getFechaEntregaIngrediente(),
-                ingrediente.getIdIngrediente()
+                id
         );
     }
 
-    /**
-     * CORRECCIÓN CLAVE: La cantidad ahora es BigDecimal para evitar el TypeMismatch con la DB.
-     */
+
     public int actualizarCantidad(Long id, BigDecimal cantidad) {
         String sql = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = ? WHERE ID_INGREDIENTE = ?";
         return jdbcTemplate.update(sql, cantidad, id);

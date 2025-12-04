@@ -1,211 +1,232 @@
-@extends('layouts.app')
+{{-- resources/views/inventarioviews/pedidoproveedores/index.blade.php --}}
 
-@section('title', 'Gestión de Detalles de Pedidos')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Pedidos a Proveedores - El Castillo del Pan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-@push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {{-- Asegúrate de incluir aquí tu CSS específico, como stylemoduloinv.css --}}
+</head>
 
-<link rel="stylesheet" href="{{ asset('css/stylemoduloinv.css') }}">
-@endpush
+<body>
+    <div class="container-fluid">
+        <div class="row g-0">
+            @include('partials.sidebar-inventario') {{-- Asegúrate de que el sidebar tenga el enlace activo --}}
 
-@section('content')
+            <div class="col-md-9 col-lg-10 main-content">
 
-<div class="container-fluid">
-<div class="row g-0">
+                {{-- NAVBAR (Copia de Ingredientes/index.blade.php) --}}
+                {{-- ... (Incluye el código de la navbar aquí para completar la estructura) ... --}}
 
-    {{-- Sidebar --}}
-    @include('partials.sidebar-inventario')
+                <h1 class="mt-3">Gestión de Pedidos a Proveedores</h1>
 
-    <div class="col-md-9 col-lg-10 main-content">
+                {{-- MENSAJES --}}
+                @if (session('success'))
+                    <div class="alert alert-success my-3">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger my-3">{{ session('error') }}</div>
+                @endif
+                
+                {{-- Aquí deberías tener un MODAL para crear el Pedido (es complejo por los detalles) --}}
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
+                    <i class="fas fa-plus"></i> Crear Nuevo Pedido
+                </button>
+                    
+                <section id="listado" class="mb-5">
+                    <h2>Listado de Pedidos</h2>
 
-        <h1 class="mb-3">Gestión de Detalles de Pedidos</h1>
-        <p class="lead">Administra los detalles de los pedidos registrados en el sistema.</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Pedido</th>
+                                    <th># Pedido</th>
+                                    <th>ID Proveedor</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
 
-        {{-- ALERTAS --}}
-        @if (session('status'))
-            <div class="alert alert-{{ session('status_type') }} mt-3">
-                {{ session('status') }}
-            </div>
-        @endif
+                            <tbody>
+                                @forelse($pedidos as $pedido)
+                                    <tr>
+                                        <td>{{ $pedido['idPedidoProv'] }}</td>
+                                        <td>{{ $pedido['numeroPedido'] }}</td>
+                                        <td>{{ $pedido['idProveedor'] }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($pedido['fechaPedido'])->format('Y-m-d') }}</td>
+                                        <td><span class="badge bg-primary">{{ $pedido['estadoPedido'] }}</span></td>
 
-        @if (session('error'))
-            <div class="alert alert-danger mt-3">
-                {{ session('error') }}
-            </div>
-        @endif
+                                        <td>
+                                            {{-- BOTÓN VER DETALLE --}}
+                                            <a href="{{ route('pedidoproveedores.show', $pedido['idPedidoProv']) }}" 
+                                               class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i> Detalles
+                                            </a>
 
-        {{-- BOTÓN CREAR --}}
-        <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modalCrear">
-            <i class="fas fa-plus"></i> Nuevo Detalle de Pedido
-        </button>
+                                            {{-- BOTÓN ELIMINAR --}}
+                                            <form method="POST"
+                                                action="{{ route('pedidoproveedores.destroy', $pedido['idPedidoProv']) }}"
+                                                class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('¿Eliminar este pedido?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">No hay pedidos registrados.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-        {{-- TABLA --}}
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID Detalle</th>
-                        <th>ID Pedido</th>
-                        <th>ID Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Subtotal</th>
-                        <th style="width: 180px">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($detalles as $d)
-                    <tr>
-                        <td>{{ $d['idDetalle'] ?? $d['ID_DETALLE'] }}</td>
-                        <td>{{ $d['idPedido'] ?? $d['ID_PEDIDO'] }}</td>
-                        <td>{{ $d['idProducto'] ?? $d['ID_PRODUCTO'] }}</td>
-                        <td>{{ $d['cantidadProducto'] ?? $d['CANTIDAD_PRODUCTO'] }}</td>
-                        <td>{{ $d['precioUnitario'] ?? $d['PRECIO_UNITARIO'] }}</td>
-                        <td>{{ $d['subtotal'] ?? $d['SUBTOTAL'] }}</td>
+                {{-- MODAL CREAR PEDIDO (Implementación avanzada con detalles) --}}
+                {{-- Nota: La creación de un pedido con detalles es compleja y requiere JS. 
+                     Aquí solo se pone la estructura básica del encabezado. --}}
+                <div class="modal fade" id="crearModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content p-3">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Crear Nuevo Pedido de Proveedor</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
 
-                        <td>
-                            {{-- Botón Editar --}}
-                            <button
-                                class="btn btn-warning btn-sm btnEditar"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditar"
-                                data-id="{{ $d['idDetalle'] ?? $d['ID_DETALLE'] }}"
-                                data-pedido="{{ $d['idPedido'] ?? $d['ID_PEDIDO'] }}"
-                                data-producto="{{ $d['idProducto'] ?? $d['ID_PRODUCTO'] }}"
-                                data-cantidad="{{ $d['cantidadProducto'] ?? $d['CANTIDAD_PRODUCTO'] }}"
-                                data-precio="{{ $d['precioUnitario'] ?? $d['PRECIO_UNITARIO'] }}"
-                                data-subtotal="{{ $d['subtotal'] ?? $d['SUBTOTAL'] }}"
-                            >
-                                <i class="fas fa-edit"></i>
-                            </button>
-
-                            {{-- Formulario Eliminar --}}
-                            <form action="{{ route('detallePedidos.destroy', ['id' => $d['idDetalle'] ?? $d['ID_DETALLE']]) }}" method="POST" class="d-inline">
+                            <form method="POST" action="{{ route('pedidoproveedores.store') }}" class="row g-3 p-3">
                                 @csrf
-                                @method('DELETE')
-                                <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('¿Eliminar este detalle de pedido?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+
+                                <h3>Encabezado del Pedido</h3>
+                                <div class="col-md-4">
+                                    <label class="form-label">Proveedor (ID)</label>
+                                    <input type="number" name="idProveedor" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Número de Pedido</label>
+                                    <input type="number" name="numeroPedido" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estado</label>
+                                    <select name="estadoPedido" class="form-select" required>
+                                        <option value="PENDIENTE">PENDIENTE</option>
+                                        <option value="COMPLETADO">COMPLETADO</option>
+                                        <option value="CANCELADO">CANCELADO</option>
+                                    </select>
+                                </div>
+                                
+                                <hr>
+                                
+                                <h3>Detalles del Pedido (Ingredientes)</h3>
+                                {{-- Esta sección requiere JavaScript para agregar dinámicamente filas de ingredientes --}}
+                                <div id="detalles-container">
+                                    <div class="row g-3 detalle-row mb-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Ingrediente ID</label>
+                                            <input type="number" name="detalles[0][idIngrediente]" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Cantidad</label>
+                                            <input type="number" name="detalles[0][cantidad]" class="form-control" required min="1">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Precio Unitario</label>
+                                            <input type="number" step="0.01" name="detalles[0][precioUnitario]" class="form-control" required min="0">
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-danger w-100 remove-detail-btn" disabled>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12 text-end">
+                                    <button type="button" id="add-detail-btn" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Agregar Ingrediente
+                                    </button>
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        Guardar Pedido Completo
+                                    </button>
+                                </div>
                             </form>
-                        </td>
-
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center">No hay detalles de pedidos registrados.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- ========================================================= --}}
-        {{--   MODAL CREAR DETALLE PEDIDO                              --}}
-        {{-- ========================================================= --}}
-        <div class="modal fade" id="modalCrear" tabindex="-1">
-            <div class="modal-dialog">
-                <form class="modal-content" method="POST" action="{{ route('detallePedidos.store') }}">
-                    @csrf
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Nuevo Detalle de Pedido</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
                     </div>
-                    <div class="modal-body">
-
-                        <label class="form-label">ID Pedido:</label>
-                        <input type="number" name="idPedido" class="form-control" required>
-
-                        <label class="form-label">ID Producto:</label>
-                        <input type="number" name="idProducto" class="form-control" required>
-
-                        <label class="form-label">Cantidad:</label>
-                        <input type="number" name="cantidadProducto" class="form-control" required>
-
-                        <label class="form-label">Precio Unitario:</label>
-                        <input type="number" step="0.01" name="precioUnitario" class="form-control" required>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-
-        {{-- ========================================================= --}}
-        {{--   MODAL EDITAR DETALLE PEDIDO                             --}}
-        {{-- ========================================================= --}}
-        <div class="modal fade" id="modalEditar" tabindex="-1">
-            <div class="modal-dialog">
-                <form class="modal-content" method="POST" action="{{ route('detallePedidos.update', ['id' => 0]) }}">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title">Editar Detalle de Pedido</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <input type="hidden" name="idDetalle" id="editId">
-
-                        <label class="form-label">ID Pedido:</label>
-                        <input type="number" name="idPedido" id="editPedido" class="form-control" required>
-
-                        <label class="form-label">ID Producto:</label>
-                        <input type="number" name="idProducto" id="editProducto" class="form-control" required>
-
-                        <label class="form-label">Cantidad:</label>
-                        <input type="number" name="cantidadProducto" id="editCantidad" class="form-control" required>
-
-                        <label class="form-label">Precio Unitario:</label>
-                        <input type="number" step="0.01" name="precioUnitario" id="editPrecio" class="form-control" required>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button class="btn btn-warning">Actualizar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
     </div>
-</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {{-- SCRIPT PARA MANEJAR CAMPOS DINÁMICOS DEL DETALLE --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let detailIndex = 1;
+            const container = document.getElementById('detalles-container');
+            const addButton = document.getElementById('add-detail-btn');
 
-</div>
+            function addDetailRow() {
+                const newRow = document.createElement('div');
+                newRow.className = 'row g-3 detail-row mb-2';
+                newRow.innerHTML = `
+                    <div class="col-md-4">
+                        <label class="form-label">Ingrediente ID</label>
+                        <input type="number" name="detalles[${detailIndex}][idIngrediente]" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" name="detalles[${detailIndex}][cantidad]" class="form-control" required min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Precio Unitario</label>
+                        <input type="number" step="0.01" name="detalles[${detailIndex}][precioUnitario]" class="form-control" required min="0">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger w-100 remove-detail-btn">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(newRow);
+                detailIndex++;
+                updateRemoveButtons();
+            }
 
-{{-- Script para cargar datos en el modal de editar --}}
+            function removeDetailRow(button) {
+                // Solo elimina si hay más de una fila
+                if (container.children.length > 1) {
+                    button.closest('.detail-row').remove();
+                    updateRemoveButtons();
+                }
+            }
+            
+            function updateRemoveButtons() {
+                const removeButtons = container.querySelectorAll('.remove-detail-btn');
+                removeButtons.forEach(btn => btn.disabled = (container.children.length === 1));
+            }
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-const modalEditar = document.getElementById("modalEditar");
-
-modalEditar.addEventListener(&quot;show.bs.modal&quot;, function (event) {
-    const button = event.relatedTarget;
-
-    const id = button.getAttribute(&quot;data-id&quot;);
-    const pedido = button.getAttribute(&quot;data-pedido&quot;);
-    const producto = button.getAttribute(&quot;data-producto&quot;);
-    const cantidad = button.getAttribute(&quot;data-cantidad&quot;);
-    const precio = button.getAttribute(&quot;data-precio&quot;);
-
-    document.getElementById(&quot;editId&quot;).value = id;
-    document.getElementById(&quot;editPedido&quot;).value = pedido;
-    document.getElementById(&quot;editProducto&quot;).value = producto;
-    document.getElementById(&quot;editCantidad&quot;).value = cantidad;
-    document.getElementById(&quot;editPrecio&quot;).value = precio;
-
-    // Actualizar action del formulario
-    // Nota: Asegúrate de que esta ruta &#39;/dashboard/inventario/detalle-pedidos/update/{id}&#39;
-    // esté correctamente definida en tus rutas de Laravel para el método PUT/PATCH.
-    modalEditar.querySelector(&quot;form&quot;).action = `/dashboard/inventario/detalle-pedidos/update/${id}`;
-});
-
-
-});
-</script>
-
-@endsection
+            addButton.addEventListener('click', addDetailRow);
+            container.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-detail-btn')) {
+                    removeDetailRow(e.target.closest('.remove-detail-btn'));
+                }
+            });
+            
+            updateRemoveButtons(); // Inicializar el estado de los botones
+        });
+    </script>
+</body>
+</html>

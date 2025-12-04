@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Inventario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Inventario\ProveedoresService;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Log;
 
 class ProveedoresController extends Controller
 {
@@ -15,81 +17,135 @@ class ProveedoresController extends Controller
         $this->proveedoresService = $proveedoresService;
     }
 
-    // ============================================================
-    // LISTAR PROVEEDORES
-    // ============================================================
-
+    /**
+     * Muestra el listado de todos los proveedores. (INDEX)
+     */
     public function index()
     {
         $response = $this->proveedoresService->obtenerProveedores();
 
         if (!$response['success']) {
-            return back()->with('error', $response['error']);
+            $errorMessage = $response['error'] ?? 'Error desconocido al obtener proveedores.';
+            return view('inventarioviews.proveedores.index', ['proveedores' => []])
+                   ->with('error', 'Error al cargar proveedores: ' . $errorMessage);
         }
-
-        $proveedores = $response['data'];
-
+        
+        $proveedores = $response['data'] ?? [];
+        
         return view('inventarioviews.proveedores.index', compact('proveedores'));
     }
 
-    // ============================================================
-    // CREAR PROVEEDOR
-    // ============================================================
-
+    /**
+     * Muestra el formulario para crear un nuevo proveedor. (CREATE FORM)
+     */
+    public function create()
+    {
+        return view('inventarioviews.proveedores.create');
+    }
+    
+    /**
+     * Almacena un nuevo proveedor. (STORE)
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombreProv' => 'required|string|max:100',
-            'telefonoProv' => 'nullable|string|max:20',
-            'emailProv' => 'nullable|email|max:100',
-            'activoProv' => 'required|boolean',
-            'direccionProv' => 'nullable|string|max:255',
+        // Validación - direccionProv es nullable
+        $request->validate([
+            'nombreProv' => 'required|string|max:255',
+            'telefonoProv' => 'required|string|max:20',
+            'activoProv' => 'required',
+            'emailProv' => 'required|email|max:255',
+            'direccionProv' => 'nullable|string|max:500',
         ]);
 
-        $response = $this->proveedoresService->agregarProveedor($validated);
-
-        if ($response['success']) {
-            return back()->with('success', 'Proveedor creado correctamente.');
-        }
-
-        return back()->with('error', 'Error al crear proveedor: '.$response['error']);
-    }
-
-    // ============================================================
-    // ACTUALIZAR PROVEEDOR
-    // ============================================================
-
-    public function update($id, Request $request)
-    {
-        $validated = $request->validate([
-            'nombreProv' => 'required|string|max:100',
-            'telefonoProv' => 'nullable|string|max:20',
-            'emailProv' => 'nullable|email|max:100',
-            'activoProv' => 'required|boolean',
-            'direccionProv' => 'nullable|string|max:255',
+        $data = $request->only([
+            'nombreProv',
+            'telefonoProv',
+            'activoProv',
+            'emailProv',
+            'direccionProv'
         ]);
 
-        $response = $this->proveedoresService->actualizarProveedor($id, $validated);
+        // Log para debugging
+        Log::info('Datos recibidos en store', $data);
+
+        $response = $this->proveedoresService->crearProveedor($data);
 
         if ($response['success']) {
-            return back()->with('success', 'Proveedor actualizado correctamente.');
+            return Redirect::route('proveedores.index')
+                           ->with('success', 'Proveedor creado con éxito.');
         }
 
-        return back()->with('error', 'Error al actualizar: '.$response['error']);
+        Log::error('Error en store de proveedor', ['error' => $response['error']]);
+        
+        return Redirect::back()
+                       ->withInput()
+                       ->with('error', $response['error']);
     }
 
-    // ============================================================
-    // ELIMINAR PROVEEDOR
-    // ============================================================
-
-    public function destroy($id)
+    /**
+     * Muestra un proveedor específico. (SHOW - Opcional)
+     */
+    public function show(int $id)
     {
+        // Si necesitas implementar vista de detalle individual
+    }
+
+    /**
+     * Actualiza un proveedor existente. (UPDATE)
+     */
+    public function update(Request $request, int $id)
+    {
+        // Validación - direccionProv es nullable
+        $request->validate([
+            'nombreProv' => 'required|string|max:255',
+            'telefonoProv' => 'required|string|max:20',
+            'activoProv' => 'required',
+            'emailProv' => 'required|email|max:255',
+            'direccionProv' => 'nullable|string|max:500',
+        ]);
+        
+        $data = $request->only([
+            'nombreProv',
+            'telefonoProv',
+            'activoProv',
+            'emailProv',
+            'direccionProv'
+        ]);
+
+        // Log para debugging
+        Log::info('Datos recibidos en update', ['id' => $id, 'data' => $data]);
+
+        $response = $this->proveedoresService->actualizarProveedor($id, $data);
+
+        if ($response['success']) {
+            return Redirect::route('proveedores.index')
+                           ->with('success', 'Proveedor actualizado con éxito.');
+        }
+
+        Log::error('Error en update de proveedor', ['id' => $id, 'error' => $response['error']]);
+
+        return Redirect::back()
+                       ->withInput()
+                       ->with('error', $response['error']);
+    }
+
+    /**
+     * Elimina un proveedor. (DELETE)
+     */
+    public function destroy(int $id)
+    {
+        Log::info('Intentando eliminar proveedor desde controller', ['id' => $id]);
+        
         $response = $this->proveedoresService->eliminarProveedor($id);
 
         if ($response['success']) {
-            return back()->with('success', 'Proveedor eliminado correctamente.');
+            return Redirect::route('proveedores.index')
+                           ->with('success', 'Proveedor eliminado con éxito.');
         }
 
-        return back()->with('error', 'Error al eliminar: '.$response['error']);
+        Log::error('Error en destroy de proveedor', ['id' => $id, 'error' => $response['error']]);
+        
+        return Redirect::back()
+                       ->with('error', $response['error']);
     }
 }
