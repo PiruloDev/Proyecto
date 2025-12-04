@@ -8,7 +8,7 @@ use App\Http\Controllers\Inventario\PedidosProveedoresController;
 use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\PedidosController;
+use App\Http\Controllers\Pedidos\PedidosController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
