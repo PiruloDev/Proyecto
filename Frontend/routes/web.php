@@ -5,8 +5,8 @@ use App\Http\Controllers\Inventario\IngredientesController;
 use App\Http\Controllers\Inventario\CategoriaController;
 use App\Http\Controllers\Inventario\ProveedoresController;
 use App\Http\Controllers\Inventario\DetallePedidosController;
-use App\Http\Controllers\Productos\Categoriaproductos;  
-use App\Http\Controllers\Productos\Menuproductos;      
+use App\Http\Controllers\Productos\Categoriaproductos;
+use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\PedidosController;
 
@@ -15,7 +15,7 @@ use App\Http\Controllers\PedidosController;
 // ============================================
 
 // ============================================
-// MODULO PRODUCTOS 
+// MODULO PRODUCTOS
 // ============================================
 
 // Homepage
@@ -51,7 +51,7 @@ Route::post('/register', function () {
 
 // Logout
 Route::post('/logout', function () {
-        // Auth::logout();   
+        // Auth::logout();
     return redirect()->route('home');
 })->name('logout');
 
@@ -66,38 +66,35 @@ Route::get('/cart', function () {
 })->name('cart');
 
 // ============================================
-// DASHBOARDS (requieren autenticación)
+// DASHBOARDS (sin autenticación por ahora)
 // ============================================
 
-Route::middleware(['auth'])->group(function () {
-    
-    // Dashboard Cliente
-    Route::get('/dashboard/client', function () {
-        $totalPedidos = 0;
-        $pedidosPendientes = 0;
-        $pedidosRecientes = [];
-        return view('dashboards.client', compact('totalPedidos', 'pedidosPendientes', 'pedidosRecientes'));
-    })->name('dashboard.client');
-    
-    // Dashboard Empleado
-    Route::get('/dashboard/employee', function () {
-        $pedidosHoy = 0;
-        $pedidosPendientes = 0;
-        $productosDisponibles = 0;
-        $totalPedidos = 0;
-        return view('dashboards.employee', compact('pedidosHoy', 'pedidosPendientes', 'productosDisponibles', 'totalPedidos'));
-    })->name('dashboard.employee');
-    
-    // Dashboard Admin
-    Route::get('/dashboard/admin', function () {
-        $totalProductos = 0;
-        $productosActivos = 0;
-        $empleadosActivos = 0;
-        $clientesActivos = 0;
-        $pedidosHoy = 0;
-        return view('dashboards.admin', compact('totalProductos', 'productosActivos', 'empleadosActivos', 'clientesActivos', 'pedidosHoy'));
-    })->name('dashboard.admin');
-});
+// Dashboard Cliente
+Route::get('/dashboardcliente', function () {
+    $totalPedidos = 0;
+    $pedidosPendientes = 0;
+    $pedidosRecientes = [];
+    return view('dashboards.client', compact('totalPedidos', 'pedidosPendientes', 'pedidosRecientes'));
+})->name('dashboard.client');
+
+// Dashboard Empleado
+Route::get('/dashboardempleado', function () {
+    $pedidosHoy = 0;
+    $pedidosPendientes = 0;
+    $productosDisponibles = 0;
+    $totalPedidos = 0;
+    return view('dashboards.employee', compact('pedidosHoy', 'pedidosPendientes', 'productosDisponibles', 'totalPedidos'));
+})->name('dashboard.employee');
+
+// Dashboard Admin
+Route::get('/dashboardadmin', function () {
+    $totalProductos = 0;
+    $productosActivos = 0;
+    $empleadosActivos = 0;
+    $clientesActivos = 0;
+    $pedidosHoy = 0;
+    return view('dashboards.admin', compact('totalProductos', 'productosActivos', 'empleadosActivos', 'clientesActivos', 'pedidosHoy'));
+})->name('dashboard.admin');
 
 // ============================================
 // MÓDULO DE INVENTARIO (COMPLETAMENTE MODULAR)
@@ -155,7 +152,7 @@ Route::prefix('/dashboard/inventario/detalle-pedidos')->group(function () {
 // INGREDIENTES - CRUD COMPLETO
 // ============================================
 // **CORRECCIÓN:** La sintaxis de group(function) () {} ha sido corregida a group(function () {})
-Route::prefix('/dashboard/inventario/ingredientes')->group(function () { 
+Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
 
     // Listar ingredientes
     Route::get('/', [IngredientesController::class, 'index'])
