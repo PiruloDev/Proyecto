@@ -6,40 +6,58 @@ use App\Models\Pedidos;
 
 class PedidosService
 {
+    /**
+     * Obtener todos los pedidos con su estado y cliente.
+     */
+    public function obtenerPedidosConEstadoYCliente()
+{
+    return Pedidos::with(['estado', 'cliente'])->get();
+}
+
+    /**
+     * Obtener todos los pedidos (usado por el index original).
+     */
     public function obtenerPedidos()
     {
-        return Pedidos::all();
+        return Pedidos::with(['estado', 'cliente'])->get();
     }
 
+    /**
+     * Obtener un pedido por ID.
+     */
     public function obtenerPedidoPorId($id)
     {
-        return Pedidos::find($id);
+        return Pedidos::with(['estado', 'cliente'])->find($id);
     }
 
-    public function agregarPedido(array $data)
+    /**
+     * Crear un pedido
+     */
+    public function agregarPedido($data)
     {
         return Pedidos::create($data);
     }
 
-    public function actualizarPedido($id, array $data)
+    /**
+     * Actualizar un pedido
+     */
+    public function actualizarPedido($id, $data)
     {
         $pedido = Pedidos::find($id);
-
-        if (!$pedido) {
-            return false;
+        if ($pedido) {
+            $pedido->update($data);
         }
-
-        return $pedido->update($data);
+        return $pedido;
     }
 
+    /**
+     * Eliminar un pedido
+     */
     public function eliminarPedido($id)
     {
         $pedido = Pedidos::find($id);
-
-        if (!$pedido) {
-            return false;
+        if ($pedido) {
+            $pedido->delete();
         }
-
-        return $pedido->delete();
     }
 }
