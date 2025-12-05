@@ -12,56 +12,85 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-2 d-md-block sidebar">
-            <div class="sidebar-content position-relative" style="min-height: 100vh;">
-                <div class="sidebar-brand mb-4">
-                    <h5>Bienvenido Administrador</h5>
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-brand">
+                    <img src="{{ asset('images/logoprincipal.jpg') }}" alt="Logo Panadería" class="sidebar-logo">
+                    <h5>Portal Administrador</h5>
                 </div>
-
+                
                 <div class="sidebar-divider"></div>
 
-                <ul class="nav flex-column mb-auto">
-                    <li class="nav-item">
+                <ul class="nav flex-column">
+                    <div class="nav-item">
                         <a class="nav-link active" href="{{ route('dashboard.admin') }}">
                             <i class="bi bi-house-door"></i>
                             Dashboard
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard.inventario') }}">
                             <i class="bi bi-boxes"></i>
                             Producción
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link" href="{{ route('pedidos.index') }}">
                             <i class="bi bi-cart-check"></i>
                             Pedidos
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="bi bi-people"></i>
                             Empleados
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="bi bi-graph-up"></i>
                             Estadísticas
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="bi bi-box-seam"></i>
                             Productos
                         </a>
-                    </li>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-gear"></i>
+                            Ajustes
+                        </a>
+                    </div>
                 </ul>
+
+                <div class="sidebar-divider"></div>
+
+                <div class="sidebar-user">
+                    <div class="user-info">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Administrador</span>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="logout-btn">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
             </div>
         </nav>
+
         <!-- Main Content -->
-        <main class="col-md-10 ms-sm-auto px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+            <!-- Mobile menu button -->
+            <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
+                <i class="bi bi-list"></i> Menú
+            </button>
+
             <div class="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Gestion de Panadería</h1>
             </div>

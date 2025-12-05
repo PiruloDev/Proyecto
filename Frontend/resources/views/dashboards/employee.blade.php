@@ -3,7 +3,8 @@
 @section('title', 'Dashboard Empleado - Panadería')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/stylempleado.css') }}">
+<link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+<link href="{{ asset('css/dashboard-employee.css') }}" rel="stylesheet">
 @endpush
 
 @section('body-class', '')
@@ -15,6 +16,7 @@
         <nav class="col-md-3 col-lg-2 d-md-block sidebar">
             <div class="sidebar-content">
                 <div class="sidebar-brand">
+                    <img src="{{ asset('images/logoprincipal.jpg') }}" alt="Logo Panadería" class="sidebar-logo">
                     <h5>Portal Empleado</h5>
                 </div>
                 <div class="sidebar-divider"></div>

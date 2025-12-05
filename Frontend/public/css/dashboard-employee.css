@@ -1,6 +1,6 @@
 /* ============================================
-   Dashboard Administrador - El Castillo del Pan
-   Usa variables CSS globales de app.css
+   Dashboard Empleado - El Castillo del Pan
+   Usa variables CSS globales de variables.css
    ============================================ */
 
 body {
@@ -145,6 +145,7 @@ html {
     transition: all var(--panaderia-transition-normal);
     font-family: var(--panaderia-font-primary);
     cursor: pointer;
+    text-decoration: none;
 }
 
 .logout-btn:hover {
@@ -160,127 +161,135 @@ html {
     padding: 2rem;
 }
 
-.settings-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: var(--panaderia-radius-sm);
+.welcome-section {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--panaderia-marron-principal), var(--panaderia-cafe-claro));
     color: white;
-    width: 100%;
-    transition: all var(--panaderia-transition-normal);
-    font-family: var(--panaderia-font-primary);
-    cursor: pointer;
+    border-radius: var(--panaderia-radius-xl);
+    margin-bottom: 2rem;
+    box-shadow: var(--panaderia-shadow-lg);
 }
 
-.settings-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+.welcome-section h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.welcome-section p {
+    margin-bottom: 0;
+    opacity: 0.9;
 }
 
 /* ============================================
-   Card Content
+   Stat Cards
    ============================================ */
-.glass-card .card-body {
+.stat-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    border-radius: var(--panaderia-radius-lg);
     padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--panaderia-transition-normal);
+    box-shadow: var(--panaderia-shadow-md);
 }
 
-.glass-card h5 {
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--panaderia-marron-principal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--panaderia-marron-principal);
+    font-family: var(--panaderia-font-primary);
+}
+
+.stat-label {
+    color: var(--panaderia-gris-texto);
+    font-size: 0.9rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+/* ============================================
+   Action Cards
+   ============================================ */
+.action-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    border-radius: var(--panaderia-radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all var(--panaderia-transition-normal);
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+.action-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+.action-card i {
+    font-size: 2.5rem;
+    color: var(--panaderia-marron-principal);
+    margin-bottom: 1rem;
+}
+
+.action-card h5 {
     font-weight: 700;
     color: var(--panaderia-gris-oscuro);
     margin-bottom: 1rem;
     font-family: var(--panaderia-font-primary);
 }
 
-.glass-card i {
-    font-size: 2rem;
-    color: var(--panaderia-marron-principal);
-    margin-bottom: 1rem;
+.action-card p {
+    color: var(--panaderia-gris-texto);
+    margin-bottom: 1.5rem;
 }
 
-.glass-card a {
-    color: var(--panaderia-marron-principal);
-    text-decoration: none;
-    font-weight: 600;
-    transition: all var(--panaderia-transition-fast);
-}
-
-.glass-card a:hover {
-    color: var(--panaderia-marron-hover);
-}
-
-.glass-card .btn {
+.btn-action {
+    background: var(--panaderia-marron-principal);
+    color: white;
+    border: none;
     padding: 0.6rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    line-height: 1;
-    vertical-align: middle;
-    text-align: center;
-    transition: all var(--panaderia-transition-normal);
     border-radius: var(--panaderia-radius-md);
+    font-weight: 600;
+    transition: all var(--panaderia-transition-normal);
     font-family: var(--panaderia-font-primary);
+    text-decoration: none;
+    display: inline-block;
 }
 
-.glass-card .btn:hover {
+.btn-action:hover {
+    background: var(--panaderia-marron-hover);
     transform: translateY(-2px);
     box-shadow: var(--panaderia-shadow-md);
-}
-
-.glass-card .btn i,
-.glass-card .btn .bi {
-    display: inline-block;
-    line-height: 1;
-    vertical-align: middle;
-    font-size: 1rem;
-    margin: 0;
-}
-
-/* ============================================
-   Product Table
-   ============================================ */
-.product-table {
-    width: 100%;
-    margin-top: 1rem;
-}
-
-.product-table th {
-    color: var(--panaderia-gris-oscuro);
-    font-weight: 600;
-    padding: 0.5rem;
-    border-bottom: 2px solid var(--panaderia-beige-oscuro);
-}
-
-.product-table td {
-    padding: 0.5rem;
-    border-bottom: 1px solid var(--panaderia-beige-claro);
-}
-
-.badge-stock {
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--panaderia-radius-md);
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.badge-high {
-    background: rgba(76, 175, 80, 0.2);
-    color: var(--panaderia-success);
-}
-
-.badge-low {
-    background: rgba(244, 67, 54, 0.2);
-    color: var(--panaderia-error);
-}
-
-.badge-medium {
-    background: rgba(255, 152, 0, 0.2);
-    color: var(--panaderia-warning);
+    color: white;
 }
 
 /* ============================================
@@ -296,5 +305,9 @@ html {
 
     .sidebar.show {
         left: 0;
+    }
+
+    .main-content {
+        padding: 1rem;
     }
 }
