@@ -51,10 +51,7 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link" href="#ingredientes">
-                            <i class="bi bi-basket"></i>
-                            Ingredientes
-                        </a>
+                        <a class="nav-link" href="{{ route('dashboard.inventario') }}"><i class="fas fa-home"></i> Inventario</a>
                     </div>
                     <div class="nav-item">
                         <a class="nav-link" href="#reportes">

@@ -5,6 +5,8 @@ use App\Http\Controllers\Inventario\IngredientesController;
 use App\Http\Controllers\Inventario\CategoriaIngredientesController;
 use App\Http\Controllers\Inventario\ProveedoresController;
 use App\Http\Controllers\Inventario\PedidosProveedoresController; 
+use App\Http\Controllers\Inventario\RecetasController;
+use App\Http\Controllers\Inventario\ProduccionController;
 use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\InventarioController;
@@ -246,6 +248,48 @@ Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
     
     // 6. Eliminar (Destroy)
     Route::delete('/delete/{id}', [IngredientesController::class, 'destroy'])->name('ingredientes.destroy');
+});
+
+// --------------------------------------------
+// RECETAS - CRUD
+// --------------------------------------------
+Route::prefix('/dashboard/inventario/recetas')->group(function () {
+    // 1. Listar todas las recetas (RecetasController.java: obtenerTodasLasRecetas)
+    Route::get('/', [RecetasController::class, 'index'])
+         ->name('recetas.index');
+    
+    // 2. Mostrar/Detalle de una receta por ID de Producto (RecetasController.java: obtenerRecetaPorProducto)
+    Route::get('/show/{idProducto}', [RecetasController::class, 'show'])
+         ->name('recetas.show');
+    
+    // 3. Crear Receta (RecetasController.java: crearReceta)
+    Route::post('/store', [RecetasController::class, 'store'])
+         ->name('recetas.store');
+    
+    // 4. Actualizar Receta por ID de Producto (RecetasController.java: actualizarReceta)
+    Route::put('/update/{idProducto}', [RecetasController::class, 'update'])
+         ->name('recetas.update');
+    
+    // 5. Eliminar Receta por ID de Producto (RecetasController.java: eliminarReceta)
+    Route::delete('/delete/{idProducto}', [RecetasController::class, 'destroy'])
+         ->name('recetas.destroy');
+});
+
+// --------------------------------------------
+// PRODUCCIÓN - CRUD
+// --------------------------------------------
+Route::prefix('/dashboard/inventario/produccion')->group(function () {
+    // 1. Listar Historial (Index)
+    Route::get('/', [ProduccionController::class, 'index'])
+         ->name('produccion.index');
+    
+    // 2. Registrar Producción (Store)
+    Route::post('/store', [ProduccionController::class, 'store'])
+         ->name('produccion.store');
+    
+    // 3. Eliminar Producción (Destroy)
+    Route::delete('/delete/{id}', [ProduccionController::class, 'destroy'])
+         ->name('produccion.destroy');
 });
 
 // ============================================

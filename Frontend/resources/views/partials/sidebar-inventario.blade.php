@@ -29,6 +29,11 @@
                href="{{ route('pedidoproveedores.index') }}">
                <i class="fas fa-receipt"></i> Pedido a Proveedores
             </a>
+
+            <a class="nav-link @if(request()->routeIs('dashboards.admin')) active @endif" 
+               href="{{ route('dashboard.admin') }}">
+               <i class="fas fa-receipt"></i> Pedido a Proveedores
+            </a>
         </nav>
     </div>
 </div>
