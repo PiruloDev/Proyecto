@@ -7,7 +7,10 @@
         </div>
         <nav class="nav flex-column">
             {{-- Usamos la función route() de Laravel para que sean rutas dinámicas --}}
-            <a class="nav-link" href="{{ route('dashboard.inventario') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a class="nav-link @if(request()->routeIs('dashboards.admin')) active @endif" 
+               href="{{ route('dashboard.admin') }}">
+               <i class="fas fa-receipt"></i>  Dashboard
+            </a>
             
             {{-- Puedes usar la función request()->routeIs() para marcar el enlace activo --}}
             <a class="nav-link @if(request()->routeIs('ingredientes.index')) active @endif" 
@@ -30,10 +33,17 @@
                <i class="fas fa-receipt"></i> Pedido a Proveedores
             </a>
 
-            <a class="nav-link @if(request()->routeIs('dashboards.admin')) active @endif" 
-               href="{{ route('dashboard.admin') }}">
-               <i class="fas fa-receipt"></i> Pedido a Proveedores
+            <a class="nav-link @if(request()->routeIs('recetas.index')) active @endif" 
+               href="{{ route('recetas.index') }}">
+               <i class="fas fa-receipt"></i>  Recetas
             </a>
+
+            <a class="nav-link @if(request()->routeIs('produccion.index')) active @endif" 
+               href="{{ route('produccion.index') }}">
+               <i class="fas fa-receipt"></i>  Produccion
+            </a>
+
+            
         </nav>
     </div>
 </div>
