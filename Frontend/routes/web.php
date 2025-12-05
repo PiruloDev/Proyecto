@@ -205,7 +205,6 @@ Route::prefix('/dashboard/inventario/pedidos-proveedores')->group(function () {
          ->name('pedidoproveedores.index');
 
     // 2. Almacenar (Store - POST)
-    // Usaremos una ruta POST genérica para la creación (que es compleja por los detalles)
     Route::post('/store', [PedidosProveedoresController::class, 'store'])
          ->name('pedidoproveedores.store');
 
