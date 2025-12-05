@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'springboot' => [
+        'base_url' => env('API_SPRING_URL', 'http://localhost:8080'),
+    ],
+
 ];

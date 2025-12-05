@@ -4,12 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Inventario\IngredientesController;
 use App\Http\Controllers\Inventario\CategoriaIngredientesController;
 use App\Http\Controllers\Inventario\ProveedoresController;
-use App\Http\Controllers\Inventario\PedidosProveedoresController; 
+use App\Http\Controllers\Inventario\PedidosProveedoresController;
 use App\Http\Controllers\Inventario\RecetasController;
 use App\Http\Controllers\Inventario\ProduccionController;
 use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
-use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\Pedidos\PedidosController;
 
 // ============================================
@@ -115,23 +114,23 @@ Route::prefix('/dashboard/inventario/categorias-ingredientes')->group(function (
     // 1. Listar/Index
     Route::get('/', [CategoriaIngredientesController::class, 'index'])
          ->name('categorias-ingredientes.index');
-    
+
     // 2. Formulario de Creación
     Route::get('/create', [CategoriaIngredientesController::class, 'create'])
          ->name('categorias-ingredientes.create');
-    
+
     // 3. Almacenar (Store)
     Route::post('/store', [CategoriaIngredientesController::class, 'store'])
          ->name('categorias-ingredientes.store');
-    
+
     // 4. Mostrar Detalle (Show) - Opcional
     Route::get('/show/{id}', [CategoriaIngredientesController::class, 'show'])
          ->name('categorias-ingredientes.show');
-    
+
     // 5. Actualizar (Update)
     Route::put('/update/{id}', [CategoriaIngredientesController::class, 'update'])
          ->name('categorias-ingredientes.update');
-    
+
     // 6. Eliminar (Destroy)
     Route::delete('/delete/{id}', [CategoriaIngredientesController::class, 'destroy'])
          ->name('categorias-ingredientes.destroy');
@@ -145,23 +144,23 @@ Route::prefix('/dashboard/inventario/categorias-ingredientes')->group(function (
     // 1. Listar/Index
     Route::get('/', [CategoriaIngredientesController::class, 'index'])
          ->name('categorias-ingredientes.index');
-    
+
     // 2. Formulario de Creación
     Route::get('/create', [CategoriaIngredientesController::class, 'create'])
          ->name('categorias-ingredientes.create');
-    
+
     // 3. Almacenar (Store)
     Route::post('/store', [CategoriaIngredientesController::class, 'store'])
          ->name('categorias-ingredientes.store');
-    
+
     // 4. Mostrar Detalle (Show) - Opcional
     Route::get('/show/{id}', [CategoriaIngredientesController::class, 'show'])
          ->name('categorias-ingredientes.show');
-    
+
     // 5. Actualizar (Update)
     Route::put('/update/{id}', [CategoriaIngredientesController::class, 'update'])
          ->name('categorias-ingredientes.update');
-    
+
     // 6. Eliminar (Destroy)
     Route::delete('/delete/{id}', [CategoriaIngredientesController::class, 'destroy'])
          ->name('categorias-ingredientes.destroy');
@@ -174,23 +173,23 @@ Route::prefix('/dashboard/inventario/proveedores')->group(function() {
     // 1. Listar/Index
     Route::get('/', [ProveedoresController::class, 'index'])
          ->name('proveedores.index');
-    
+
     // 2. Formulario de Creación
     Route::get('/create', [ProveedoresController::class, 'create'])
          ->name('proveedores.create');
-    
+
     // 3. Almacenar (Store)
     Route::post('/store', [ProveedoresController::class, 'store'])
          ->name('proveedores.store');
-    
+
     // 4. Mostrar Detalle (Show)
     Route::get('/show/{id}', [ProveedoresController::class, 'show'])
          ->name('proveedores.show');
-    
+
     // 5. Actualizar (Update)
     Route::put('/update/{id}', [ProveedoresController::class, 'update'])
          ->name('proveedores.update');
-    
+
     // 6. Eliminar (Destroy)
     Route::delete('/delete/{id}', [ProveedoresController::class, 'destroy'])
          ->name('proveedores.destroy');
@@ -204,20 +203,20 @@ Route::prefix('/dashboard/inventario/pedidos-proveedores')->group(function () {
     // 1. Listar/Index
     Route::get('/', [PedidosProveedoresController::class, 'index'])
          ->name('pedidoproveedores.index');
-    
+
     // 2. Almacenar (Store - POST)
     // Usaremos una ruta POST genérica para la creación (que es compleja por los detalles)
     Route::post('/store', [PedidosProveedoresController::class, 'store'])
          ->name('pedidoproveedores.store');
-    
+
     // 3. Mostrar Detalle (Show)
     Route::get('/show/{id}', [PedidosProveedoresController::class, 'show'])
          ->name('pedidoproveedores.show');
-    
+
     // 4. Actualizar (Update - PUT)
     Route::put('/update/{id}', [PedidosProveedoresController::class, 'update'])
          ->name('pedidoproveedores.update');
-    
+
     // 5. Eliminar (Destroy - DELETE)
     Route::delete('/delete/{id}', [PedidosProveedoresController::class, 'destroy'])
          ->name('pedidoproveedores.destroy');
@@ -230,22 +229,22 @@ Route::prefix('/dashboard/inventario/pedidos-proveedores')->group(function () {
 Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
     // 1. Listar/Index
     Route::get('/', [IngredientesController::class, 'index'])->name('ingredientes.index');
-    
+
     // 2. Formulario de Creación
     Route::get('/create', [IngredientesController::class, 'create'])->name('ingredientes.create');
-    
+
     // 3. Almacenar (Store)
     Route::post('/store', [IngredientesController::class, 'store'])->name('ingredientes.store');
-    
+
     // 4. Mostrar Detalle (Show)
     Route::get('/show/{id}', [IngredientesController::class, 'show'])->name('ingredientes.show');
-    
+
     // 5. Actualización (Update)
     Route::put('/update/{id}', [IngredientesController::class, 'update'])->name('ingredientes.update');
-    
+
     // 5b. Actualización Especial de Cantidad (Stock)
     Route::patch('/update-cantidad/{id}', [IngredientesController::class, 'updateCantidad'])->name('ingredientes.updateCantidad');
-    
+
     // 6. Eliminar (Destroy)
     Route::delete('/delete/{id}', [IngredientesController::class, 'destroy'])->name('ingredientes.destroy');
 });
@@ -257,19 +256,19 @@ Route::prefix('/dashboard/inventario/recetas')->group(function () {
     // 1. Listar todas las recetas (RecetasController.java: obtenerTodasLasRecetas)
     Route::get('/', [RecetasController::class, 'index'])
          ->name('recetas.index');
-    
+
     // 2. Mostrar/Detalle de una receta por ID de Producto (RecetasController.java: obtenerRecetaPorProducto)
     Route::get('/show/{idProducto}', [RecetasController::class, 'show'])
          ->name('recetas.show');
-    
+
     // 3. Crear Receta (RecetasController.java: crearReceta)
     Route::post('/store', [RecetasController::class, 'store'])
          ->name('recetas.store');
-    
+
     // 4. Actualizar Receta por ID de Producto (RecetasController.java: actualizarReceta)
     Route::put('/update/{idProducto}', [RecetasController::class, 'update'])
          ->name('recetas.update');
-    
+
     // 5. Eliminar Receta por ID de Producto (RecetasController.java: eliminarReceta)
     Route::delete('/delete/{idProducto}', [RecetasController::class, 'destroy'])
          ->name('recetas.destroy');
@@ -282,11 +281,11 @@ Route::prefix('/dashboard/inventario/produccion')->group(function () {
     // 1. Listar Historial (Index)
     Route::get('/', [ProduccionController::class, 'index'])
          ->name('produccion.index');
-    
+
     // 2. Registrar Producción (Store)
     Route::post('/store', [ProduccionController::class, 'store'])
          ->name('produccion.store');
-    
+
     // 3. Eliminar Producción (Destroy)
     Route::delete('/delete/{id}', [ProduccionController::class, 'destroy'])
          ->name('produccion.destroy');

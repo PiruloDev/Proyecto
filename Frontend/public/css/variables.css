@@ -1,0 +1,58 @@
+/* ============================================
+   Paleta de Colores Global - El Castillo del Pan
+   Variables CSS para estandarizar colores y estilos
+   ============================================ */
+
+:root {
+    /* Colores principales de la marca */
+    --panaderia-marron-principal: #8b6f47;
+    --panaderia-marron-hover: #6d5635;
+    --panaderia-cafe-claro: #bb9467;
+    --panaderia-cafe-medio: #a67c52;
+    --panaderia-beige-claro: #f5ede4;
+    --panaderia-beige-oscuro: #e8dfd5;
+    --panaderia-crema: #f5f5dc;
+    --panaderia-blanco-calido: #fffef7;
+
+    /* Colores de acento */
+    --panaderia-gris-texto: #5a5a5a;
+    --panaderia-gris-oscuro: #2c3e50;
+
+    /* Colores de estado */
+    --panaderia-success: #4caf50;
+    --panaderia-warning: #ff9800;
+    --panaderia-error: #f44336;
+    --panaderia-info: #2196f3;
+
+    /* Sombras */
+    --panaderia-shadow-sm: 0 2px 4px rgba(139, 111, 71, 0.1);
+    --panaderia-shadow-md: 0 4px 8px rgba(139, 111, 71, 0.15);
+    --panaderia-shadow-lg: 0 8px 16px rgba(139, 111, 71, 0.2);
+    --panaderia-shadow-xl: 0 12px 24px rgba(139, 111, 71, 0.25);
+
+    /* Tipografías */
+    --panaderia-font-primary: 'Quicksand', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --panaderia-font-secondary: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Transiciones */
+    --panaderia-transition-fast: 0.2s ease;
+    --panaderia-transition-normal: 0.3s ease;
+    --panaderia-transition-slow: 0.5s ease;
+
+    /* Border radius */
+    --panaderia-radius-sm: 8px;
+    --panaderia-radius-md: 12px;
+    --panaderia-radius-lg: 16px;
+    --panaderia-radius-xl: 20px;
+}
+
+/* Utilidades de color */
+.bg-marron-principal { background-color: var(--panaderia-marron-principal) !important; }
+.bg-cafe-claro { background-color: var(--panaderia-cafe-claro) !important; }
+.bg-beige-claro { background-color: var(--panaderia-beige-claro) !important; }
+.bg-blanco-calido { background-color: var(--panaderia-blanco-calido) !important; }
+
+.text-marron-principal { color: var(--panaderia-marron-principal) !important; }
+.text-cafe-claro { color: var(--panaderia-cafe-claro) !important; }
+.text-gris-texto { color: var(--panaderia-gris-texto) !important; }
+.text-gris-oscuro { color: var(--panaderia-gris-oscuro) !important; }

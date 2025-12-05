@@ -1,0 +1,245 @@
+/* ============================================
+   Dashboard Administrador - El Castillo del Pan
+   Usa variables CSS globales de app.css
+   ============================================ */
+
+body {
+    background: linear-gradient(135deg, var(--panaderia-beige-claro) 0%, var(--panaderia-blanco-calido) 100%);
+    min-height: 100vh;
+    font-family: var(--panaderia-font-primary);
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+.container-fluid {
+    overflow-x: hidden;
+}
+
+/* ============================================
+   Glassmorphism Effect
+   ============================================ */
+.glass-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    box-shadow: var(--panaderia-shadow-md);
+    transition: all var(--panaderia-transition-normal);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+/* ============================================
+   Sidebar Sticky (Sin scroll interno)
+   ============================================ */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: var(--panaderia-marron-principal);
+    color: white;
+    padding: 1.5rem 0;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-brand h5 {
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0;
+    font-family: var(--panaderia-font-primary);
+}
+
+.sidebar-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--panaderia-radius-sm);
+    margin: 0.25rem 0.5rem;
+    transition: all var(--panaderia-transition-normal);
+    display: flex;
+    align-items: center;
+    font-family: var(--panaderia-font-primary);
+}
+
+.nav-link:hover {
+    background: var(--panaderia-marron-hover);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: var(--panaderia-shadow-sm);
+}
+
+.nav-link.active {
+    background: var(--panaderia-cafe-claro);
+    color: white;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    padding: 0 1rem;
+}
+
+.settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--panaderia-radius-sm);
+    color: white;
+    width: 100%;
+    transition: all var(--panaderia-transition-normal);
+    font-family: var(--panaderia-font-primary);
+    cursor: pointer;
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   Card Content
+   ============================================ */
+.glass-card .card-body {
+    padding: 1.5rem;
+}
+
+.glass-card h5 {
+    font-weight: 700;
+    color: var(--panaderia-gris-oscuro);
+    margin-bottom: 1rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.glass-card i {
+    font-size: 2rem;
+    color: var(--panaderia-marron-principal);
+    margin-bottom: 1rem;
+}
+
+.glass-card a {
+    color: var(--panaderia-marron-principal);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--panaderia-transition-fast);
+}
+
+.glass-card a:hover {
+    color: var(--panaderia-marron-hover);
+}
+
+.glass-card .btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    line-height: 1;
+    vertical-align: middle;
+    text-align: center;
+    transition: all var(--panaderia-transition-normal);
+    border-radius: var(--panaderia-radius-md);
+    font-family: var(--panaderia-font-primary);
+}
+
+.glass-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+.glass-card .btn i,
+.glass-card .btn .bi {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ============================================
+   Product Table
+   ============================================ */
+.product-table {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.product-table th {
+    color: var(--panaderia-gris-oscuro);
+    font-weight: 600;
+    padding: 0.5rem;
+    border-bottom: 2px solid var(--panaderia-beige-oscuro);
+}
+
+.product-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--panaderia-beige-claro);
+}
+
+.badge-stock {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--panaderia-radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-high {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--panaderia-success);
+}
+
+.badge-low {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--panaderia-error);
+}
+
+.badge-medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: var(--panaderia-warning);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        transition: left var(--panaderia-transition-normal);
+        z-index: 1000;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+}
