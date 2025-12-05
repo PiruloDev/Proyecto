@@ -18,6 +18,9 @@
 
             <div class="col-md-9 col-lg-10 main-content">
 
+            {{-- NAVBAR SUPERIOR --}}
+                    @include('partials.topbarinventario')
+                    
                 <h1 class="mt-3">Gestión de Producción</h1>
 
                 {{-- MENSAJES --}}
@@ -217,10 +220,12 @@
             });
             
             // Mostrar modal si hubo errores de validación (para que los datos antiguos persistan)
-            @if($errors->any())
-                const modal = new bootstrap.Modal(document.getElementById('registrarModal'));
-                modal.show();
-            @endif
+            @php
+            if($errors->any()) {
+                echo "const modal = new bootstrap.Modal(document.getElementById('registrarModal'));\n";
+                echo "modal.show();\n";
+            }
+        @endphp
         });
     </script>
 </body>

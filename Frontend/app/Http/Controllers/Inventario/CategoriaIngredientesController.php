@@ -17,7 +17,7 @@ class CategoriaIngredientesController extends Controller
     }
 
     /**
-     * Muestra el listado de todas las categorías de ingredientes. (INDEX)
+     * Muestra el listado de todas las categorías de ingredientes
      */
     public function index()
     {
@@ -35,7 +35,7 @@ class CategoriaIngredientesController extends Controller
     }
 
     /**
-     * Muestra el formulario para crear una nueva categoría. (CREATE FORM)
+     * Muestra el formulario para crear una nueva categoría.
      */
     public function create()
     {
@@ -43,7 +43,7 @@ class CategoriaIngredientesController extends Controller
     }
     
     /**
-     * Almacena una nueva categoría. (STORE)
+     * Almacena una nueva categoría.
      */
     public function store(Request $request)
     {
@@ -64,12 +64,10 @@ class CategoriaIngredientesController extends Controller
     }
 
     /**
-     * Muestra una categoría específica. (SHOW - Opcional)
+     * Muestra una categoría específica. (nada que hacer )
      */
     public function show(int $id)
     {
-        // Si necesitas implementar vista de detalle individual
-        // puedes agregar lógica aquí
     }
 
     /**

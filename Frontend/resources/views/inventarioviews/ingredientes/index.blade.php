@@ -23,45 +23,22 @@
     <div class="container-fluid">
         <div class="row g-0">
 
-            {{-- Sidebar ORIGINAL pero ahora traída con Laravel --}}
+            {{-- Sidebar --}}
             @include('partials.sidebar-inventario')
 
             {{-- CONTENIDO PRINCIPAL --}}
             <div class="col-md-9 col-lg-10 main-content">
 
-                {{-- NAVBAR SUPERIOR ORIGINAL --}}
-                <nav class="navbar navbar-expand-lg top-navbar">
-                    <div class="container-fluid">
-                        <a class="navbar-brand d-md-none" href="#">Menú</a>
-                        <div class="collapse navbar-collapse justify-content-end">
-                            <div class="navbar-nav">
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                                        data-bs-toggle="dropdown">
-                                        <span class="me-2 text-dark d-none d-sm-inline">Administrador</span>
-                                        <div class="profile-icon-wrapper"><i class="fas fa-user"></i></div>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>
-                                                Configuración</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>
-                                                Cerrar Sesión</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
+                {{-- NAVBAR SUPERIOR --}}
+                {{-- NAVBAR SUPERIOR  --}}
+                @include('partials.topbarinventario')
 
                 <h1 class="mt-3">Gestión de Ingredientes</h1>
 
                 {{-- MENSAJES --}}
                 @if (session('success'))
                     <div class="alert alert-success my-3">{{ session('success') }}</div>
-                @endif
+                @endif  
 
                 @if (session('error'))
                     <div class="alert alert-danger my-3">{{ session('error') }}</div>
@@ -126,7 +103,6 @@
                                     </tr>
 
                                     {{-- ================== MODAL EDITAR (REFRACTORIZADO) ================== --}}
-                                    {{-- Solo incluimos los 4 campos que sí manejamos en el PUT --}}
                                     <div class="modal fade" id="editModal-{{ $ing['idIngrediente'] }}" tabindex="-1">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
@@ -192,10 +168,8 @@
                     </div>
                 </section>
 
-                {{-- MODAL CREAR INGREDIENTE (REFRACTORIZADO) --}}
+                {{-- MODAL CREAR INGREDIENTE --}}
                 <section class="mb-5">
-                    
-
                     <div class="modal fade" id="crearModal" tabindex="-1">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content p-3">

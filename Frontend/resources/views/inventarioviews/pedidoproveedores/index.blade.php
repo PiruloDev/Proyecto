@@ -19,8 +19,8 @@
 
             <div class="col-md-9 col-lg-10 main-content">
 
-                {{-- NAVBAR (Copia de Ingredientes/index.blade.php) --}}
-                {{-- ... (Incluye el código de la navbar aquí para completar la estructura) ... --}}
+                {{-- NAVBAR SUPERIOR --}}
+                    @include('partials.topbarinventario')
 
                 <h1 class="mt-3">Gestión de Pedidos a Proveedores</h1>
 
@@ -32,7 +32,7 @@
                     <div class="alert alert-danger my-3">{{ session('error') }}</div>
                 @endif
                 
-                {{-- Aquí deberías tener un MODAL para crear el Pedido (es complejo por los detalles) --}}
+                {{-- MODAL para crear el Pedido (es complejo y denso) --}}
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
                     <i class="fas fa-plus"></i> Crear Nuevo Pedido
                 </button>
@@ -93,8 +93,7 @@
                 </section>
 
                 {{-- MODAL CREAR PEDIDO (Implementación avanzada con detalles) --}}
-                {{-- Nota: La creación de un pedido con detalles es compleja y requiere JS. 
-                     Aquí solo se pone la estructura básica del encabezado. --}}
+                {{-- Nota: La creación de un pedido con detalles es compleja y requiere JS. Aquí solo se pone la estructura básica del encabezado. --}}
                 <div class="modal fade" id="crearModal" tabindex="-1">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content p-3">

@@ -1,136 +1,141 @@
-{{-- resources/views/inventarioviews/recetas/index.blade.php --}}
+@extends('layouts.app') 
+{{-- ⬆️ Asume un layout maestro que contiene el <html>, <head>, y <body>. --}}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Recetas - El Castillo del Pan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    {{-- Incluye tus estilos aquí --}}
-</head>
+@section('title', 'Gestión de Recetas')
 
-<body>
-    <div class="container-fluid">
-        <div class="row g-0">
-            @include('partials.sidebar-inventario')
+{{-- Si necesitas estilos adicionales, usa @push('styles') --}}
+@push('styles')
+    {{-- Por ejemplo: <link rel="stylesheet" href="{{ asset('css/stylemoduloinv.css') }}"> --}}
+@endpush
 
-            <div class="col-md-9 col-lg-10 main-content">
+@section('content')
 
-                <h1 class="mt-3">Gestión de Recetas</h1>
+<div class="container-fluid">
+    <div class="row g-0">
+        
+        {{-- Incluye la barra lateral --}}
+        @include('partials.sidebar-inventario')
 
-                {{-- MENSAJES --}}
-                @if (session('success'))
-                    <div class="alert alert-success my-3">{{ session('success') }}</div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger my-3">{{ session('error') }}</div>
-                @endif
+        {{-- Contenido Principal --}}
+        <div class="col-md-9 col-lg-10 main-content">
+
+        {{-- NAVBAR SUPERIOR --}}
+                    @include('partials.topbarinventario')
+
+            <h1 class="mt-3">Gestión de Recetas</h1>
+
+            {{-- MENSAJES DE SESIÓN --}}
+            @if (session('success'))
+                <div class="alert alert-success my-3">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger my-3">{{ session('error') }}</div>
+            @endif
+            
+            {{-- Botón para abrir el modal de creación --}}
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
+                <i class="fas fa-plus"></i> Crear Nueva Receta
+            </button>
                 
-                {{-- Botón para abrir el modal de creación --}}
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
-                    <i class="fas fa-plus"></i> Crear Nueva Receta
-                </button>
-                    
-                <section id="listado-recetas" class="mb-5">
-                    <h2>Recetas por Producto</h2>
+            <section id="listado-recetas" class="mb-5">
+                <h2>Recetas por Producto</h2>
 
-                    @forelse($recetas as $receta)
-                        <div class="card shadow-sm mb-3">
-                            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                                <h5>
-                                    <i class="fas fa-utensils"></i> Receta para Producto: 
-                                    <strong>{{ $receta['nombreProducto'] }}</strong> (ID: {{ $receta['idProducto'] }})
-                                </h5>
-                                <div>
-                                    {{-- Botón VER DETALLE (te lleva a show.blade.php) --}}
-                                    <a href="{{ route('recetas.show', $receta['idProducto']) }}" 
-                                       class="btn btn-sm btn-info me-2">
-                                        <i class="fas fa-eye"></i> Ver Detalles
-                                    </a>
-                                    
-                                    {{-- Botón ELIMINAR --}}
-                                    <form method="POST"
-                                        action="{{ route('recetas.destroy', $receta['idProducto']) }}"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('ADVERTENCIA: ¿Eliminar la receta del Producto ID {{ $receta['idProducto'] }}?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Ingredientes (Detalles):</strong></p>
-                                <ul class="list-group list-group-flush">
-                                    @foreach($receta['detalles'] as $detalle)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                                            <span>
-                                                **{{ number_format($detalle['cantidadRequerida'], 3) }}** (Unidad ID: {{ $detalle['idUnidad'] }}) de Ingrediente ID: {{ $detalle['idIngrediente'] }}
-                                            </span>
-                                            <small class="text-muted">ID Receta Detalle: {{ $detalle['idReceta'] }}</small>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                @forelse($recetas as $receta)
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                            <h5>
+                                <i class="fas fa-utensils"></i> Receta para Producto: 
+                                <strong>{{ $receta['nombreProducto'] }}</strong> (ID: {{ $receta['idProducto'] }})
+                            </h5>
+                            <div>
+                                {{-- Botón VER DETALLE --}}
+                                <a href="{{ route('recetas.show', $receta['idProducto']) }}" 
+                                   class="btn btn-sm btn-info me-2">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                
+                                {{-- Botón ELIMINAR --}}
+                                <form method="POST"
+                                    action="{{ route('recetas.destroy', $receta['idProducto']) }}"
+                                    class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('ADVERTENCIA: ¿Eliminar la receta del Producto ID {{ $receta['idProducto'] }}?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
-                    @empty
-                        <div class="alert alert-warning">No hay recetas registradas.</div>
-                    @endforelse
-                </section>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Ingredientes (Detalles):</strong></p>
+                            <ul class="list-group list-group-flush">
+                                @foreach($receta['detalles'] as $detalle)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                                        <span>
+                                            {{ number_format($detalle['cantidadRequerida'], 3) }} (Unidad ID: {{ $detalle['idUnidad'] }}) de Ingrediente ID: {{ $detalle['idIngrediente'] }}
+                                        </span>
+                                        <small class="text-muted">ID Receta Detalle: {{ $detalle['idReceta'] }}</small>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @empty
+                    <div class="alert alert-warning">No hay recetas registradas.</div>
+                @endforelse
+            </section>
 
-                {{-- MODAL CREAR RECETA --}}
-                <div class="modal fade" id="crearModal" tabindex="-1">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content p-4">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Crear Nueva Receta</h5>
-                                <button class="btn-close" data-bs-dismiss="modal"></button>
+            {{-- MODAL CREAR RECETA --}}
+            <div class="modal fade" id="crearModal" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content p-4">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Crear Nueva Receta</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <form method="POST" action="{{ route('recetas.store') }}" class="row g-3 p-3">
+                            @csrf
+
+                            <h3>Producto y Detalles</h3>
+                            <div class="col-12 mb-3">
+                                <label for="idProducto" class="form-label">ID Producto Terminado (Único)</label>
+                                <input type="number" id="idProducto" name="idProducto" class="form-control" required value="{{ old('idProducto') }}">
+                                @error('idProducto')<div class="text-danger">{{ $message }}</div>@enderror
+                            </div>
+                            
+                            <hr>
+                            
+                            <h4>Ingredientes Requeridos</h4>
+                            <p class="text-muted">Defina la lista completa de ingredientes para esta receta.</p>
+                            
+                            <div id="detalles-container">
+                                {{-- El script JS llenará esto o se llenará si hay errores de validación --}}
+                            </div>
+                            
+                            <div class="col-12 text-end">
+                                <button type="button" id="add-detail-btn" class="btn btn-sm btn-success">
+                                    <i class="fas fa-plus"></i> Agregar Ingrediente a Receta
+                                </button>
                             </div>
 
-                            <form method="POST" action="{{ route('recetas.store') }}" class="row g-3 p-3">
-                                @csrf
-
-                                <h3>Producto y Detalles</h3>
-                                <div class="col-12 mb-3">
-                                    <label for="idProducto" class="form-label">ID Producto Terminado (Único)</label>
-                                    <input type="number" id="idProducto" name="idProducto" class="form-control" required value="{{ old('idProducto') }}">
-                                    @error('idProducto')<div class="text-danger">{{ $message }}</div>@enderror
-                                </div>
-                                
-                                <hr>
-                                
-                                <h4>Ingredientes Requeridos</h4>
-                                <p class="text-muted">Defina la lista completa de ingredientes para esta receta.</p>
-                                
-                                <div id="detalles-container">
-                                    {{-- El script JS llenará esto o se llenará si hay errores de validación --}}
-                                </div>
-                                
-                                <div class="col-12 text-end">
-                                    <button type="button" id="add-detail-btn" class="btn btn-sm btn-success">
-                                        <i class="fas fa-plus"></i> Agregar Ingrediente a Receta
-                                    </button>
-                                </div>
-
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        Guardar Receta
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Guardar Receta
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+@endsection
+
+@push('scripts')
     {{-- SCRIPT PARA MANEJAR CAMPOS DINÁMICOS DE RECETA --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -139,10 +144,10 @@
             
             // Lógica para manejar índices y datos persistentes en caso de error
             let detailIndex = 0;
-            const oldDetalles = @json(old('ingredientes', []));
             
+            const oldDetalles = {!! htmlspecialchars_decode(json_encode(old('ingredientes') ?: [])) !!};            
             if (oldDetalles.length > 0) {
-                // Si hay datos viejos, cargarlos
+                // Si hay datos viejos (por error de validación), cargarlos
                 oldDetalles.forEach((detalle, index) => {
                     addDetailRow(index, detalle);
                 });
@@ -178,7 +183,7 @@
                         <input type="number" name="ingredientes[${currentIndex}][idUnidad]" class="form-control" required value="${idUnidadVal}">
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger w-100 remove-detail-btn" ${container.children.length === 0 ? 'disabled' : ''}>
+                        <button type="button" class="btn btn-danger w-100 remove-detail-btn">
                             <i class="fas fa-minus"></i>
                         </button>
                     </div>
@@ -211,10 +216,12 @@
             
             // Si hay errores de validación, el modal se debe mostrar
             @if($errors->any())
-                const modal = new bootstrap.Modal(document.getElementById('crearModal'));
-                modal.show();
+                // Usamos un pequeño timeout para asegurar que Bootstrap ha inicializado
+                setTimeout(() => {
+                    const modal = new bootstrap.Modal(document.getElementById('crearModal'));
+                    modal.show();
+                }, 100);
             @endif
         });
     </script>
-</body>
-</html>
+@endpush

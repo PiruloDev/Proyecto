@@ -33,7 +33,6 @@ class IngredientesController extends Controller
         
         $ingredientes = $response['data'] ?? [];
         
-        // La vista utiliza la variable $ingredientes para el bucle @forelse
         return view('inventarioviews.ingredientes.index', compact('ingredientes'));
     }
 
@@ -42,7 +41,6 @@ class IngredientesController extends Controller
      */
     public function create()
     {
-        // Pasar listas de Proveedores y Categorías si son necesarias para select boxes
         return view('inventarioviews.ingredientes.create');
     }
     
@@ -76,10 +74,7 @@ class IngredientesController extends Controller
         return Redirect::back()->withInput()->with('error', $response['error']);
     }
 
-    /**
-     * Muestra un ingrediente específico (Opcional, se puede hacer con la misma lista si solo se usa el DTO).
-     * Si el backend tiene un endpoint GET /ingrediente/{id}, se implementaría aquí.
-     */
+
     // public function show(int $id) {}
 
     /**
@@ -96,7 +91,6 @@ class IngredientesController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        // 🎯 VALIDACIÓN: Solo validamos los 4 campos del DTO
         $request->validate([
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
@@ -104,7 +98,6 @@ class IngredientesController extends Controller
             'referenciaIngrediente' => 'required|string|max:50',
         ]);
         
-        // Obtenemos solo los datos validados que necesita el service
         $data = $request->only([
             'idProveedor',
             'idCategoria',
