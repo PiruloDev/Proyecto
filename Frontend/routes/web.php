@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventario\ProduccionController;
 use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\Pedidos\PedidosController;
+use App\Http\Controllers\Pedidos\EstadoPedidoController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -302,6 +303,20 @@ Route::prefix('pedidos')->group(function () {
     Route::put('/{id}', [PedidosController::class, 'update'])->name('pedidos.update');
 
     Route::delete('/{id}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
+});
+
+// ============================================
+// ESTADO PEDIDO - CRUD COMPLETO
+// ============================================
+
+Route::prefix('estados')->group(function () {
+    Route::get('/', [EstadoPedidoController::class, 'index'])->name('estados.index');
+    Route::get('/create', [EstadoPedidoController::class, 'create'])->name('estados.create');
+    Route::post('/', [EstadoPedidoController::class, 'store'])->name('estados.store');
+
+    Route::get('/edit/{id}', [EstadoPedidoController::class, 'edit'])->name('estados.edit');
+    Route::put('/{id}', [EstadoPedidoController::class, 'update'])->name('estados.update');
+    Route::delete('/{id}', [EstadoPedidoController::class, 'destroy'])->name('estados.destroy');
 });
 
 require __DIR__.'/settings.php';
