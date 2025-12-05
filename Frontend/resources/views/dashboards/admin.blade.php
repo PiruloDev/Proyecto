@@ -18,7 +18,7 @@
                     <img src="{{ asset('images/logoprincipal.jpg') }}" alt="Logo Panadería" class="sidebar-logo">
                     <h5>Portal Administrador</h5>
                 </div>
-                
+
                 <div class="sidebar-divider"></div>
 
                 <ul class="nav flex-column">
