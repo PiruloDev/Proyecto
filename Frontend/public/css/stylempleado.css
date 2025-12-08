@@ -1,0 +1,84 @@
+/* ============================================
+   Gestión de Empleados - El Castillo del Pan
+   Estilos específicos para la vista de empleados
+   ============================================ */
+
+/* Contenedor de tabla con efecto glassmorphism */
+.table-responsive {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: var(--panaderia-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+/* ============================================
+   Botones de Acción
+   ============================================ */
+
+/* Asegurar visibilidad de botones pequeños */
+.btn-sm {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10 !important;
+    display: inline-block !important;
+}
+
+/* Contenedor de acciones */
+.btn-actions {
+    display: inline-flex !important;
+    gap: 0.5rem !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+}
+
+/* Asegurar que la columna de acciones sea visible */
+.table td:last-child,
+.table th:last-child {
+    min-width: 150px !important;
+    white-space: nowrap !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ============================================
+   Estilos de Botones Específicos
+   ============================================ */
+
+/* Botón de advertencia (Editar) */
+.btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+}
+
+/* Botón de peligro (Eliminar) */
+.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+.btn-danger:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* ============================================
+   Formularios Inline
+   ============================================ */
+
+/* Asegurar que los formularios inline no oculten botones */
+form.d-inline {
+    display: inline-block !important;
+    margin: 0 !important;
+}

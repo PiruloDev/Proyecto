@@ -11,6 +11,9 @@ use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\Pedidos\PedidosController;
 use App\Http\Controllers\Pedidos\EstadoPedidoController;
+use App\Http\Controllers\Usuarios\EmpleadoController;
+use App\Http\Controllers\Usuarios\ClienteController;
+use App\Http\Controllers\Auth\RegisterController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -41,15 +44,8 @@ Route::post('/login', function () {
 })->name('login.submit');
 
 // Registro
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
-
-Route::post('/register', function () {
-        // TODO: Implementar lógica de registro
-
-    return back()->with('success', 'Funcionalidad en desarrollo');
-})->name('register.submit');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 // Logout
 Route::post('/logout', function () {
@@ -298,10 +294,8 @@ Route::prefix('pedidos')->group(function () {
     Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
     Route::get('/create', [PedidosController::class, 'create'])->name('pedidos.create');
     Route::post('/', [PedidosController::class, 'store'])->name('pedidos.store');
-
     Route::get('/edit/{id}', [PedidosController::class, 'edit'])->name('pedidos.edit');
     Route::put('/{id}', [PedidosController::class, 'update'])->name('pedidos.update');
-
     Route::delete('/{id}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
 });
 
@@ -313,10 +307,27 @@ Route::prefix('estados')->group(function () {
     Route::get('/', [EstadoPedidoController::class, 'index'])->name('estados.index');
     Route::get('/create', [EstadoPedidoController::class, 'create'])->name('estados.create');
     Route::post('/', [EstadoPedidoController::class, 'store'])->name('estados.store');
-
     Route::get('/edit/{id}', [EstadoPedidoController::class, 'edit'])->name('estados.edit');
     Route::put('/{id}', [EstadoPedidoController::class, 'update'])->name('estados.update');
     Route::delete('/{id}', [EstadoPedidoController::class, 'destroy'])->name('estados.destroy');
 });
+
+// ============================================
+// EMPLEADOS - CRUD COMPLETO
+// ============================================
+Route::prefix('empleados')->name('empleados.')->group(function () {
+    Route::get('/', [EmpleadoController::class, 'index'])->name('index');
+    Route::get('/create', [EmpleadoController::class, 'create'])->name('create');
+    Route::post('/', [EmpleadoController::class, 'store'])->name('store');
+    Route::get('/{id}', [EmpleadoController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [EmpleadoController::class, 'edit'])->name('edit');
+    Route::patch('/{id}', [EmpleadoController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EmpleadoController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================
+// CLIENTES - SOLO LECTURA
+// ============================================
+Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
 
 require __DIR__.'/settings.php';

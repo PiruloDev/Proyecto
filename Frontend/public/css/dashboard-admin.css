@@ -158,6 +158,34 @@ html {
    ============================================ */
 .main-content {
     padding: 2rem;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Contenedor con scroll para el contenido */
+.content-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Personalizar scrollbar */
+.content-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+    background: rgba(187, 148, 103, 0.1);
+    border-radius: 10px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+    background: var(--panaderia-marron-principal);
+    border-radius: 10px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--panaderia-marron-hover);
 }
 
 .settings-btn {

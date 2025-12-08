@@ -131,7 +131,7 @@
                 <!-- Quick Actions -->
                 <div class="orders-section">
                     <div class="section-header mb-3">
-                        <h4><i class="bi bi-lightning"></i> Acciones Rápidas</h4>
+                        <h4> Acciones Rápidas</h4>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
