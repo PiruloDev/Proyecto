@@ -11,6 +11,7 @@ use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
 use App\Http\Controllers\Pedidos\PedidosController;
 use App\Http\Controllers\Pedidos\EstadoPedidoController;
+use App\Http\Controllers\Productos\ProductoController;
 
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
@@ -24,7 +25,13 @@ use App\Http\Controllers\Pedidos\EstadoPedidoController;
 Route::get('/', [Categoriaproductos::class, 'index'])->name('home');
 // Menú de productos
 Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
-
+// Ruta para la vista de productos (CRUD completo)
+Route::prefix('productos')->group(function() {
+    Route::get('/', [ProductoController::class, 'index'])->name('productos.index');
+    Route::post('/store', [ProductoController::class, 'store'])->name('productos.store');
+    Route::put('/update/{id}', [ProductoController::class, 'update'])->name('productos.update');
+    Route::delete('/delete/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+});
 // ============================================
 // AUTENTICACIÓN
 // ============================================
