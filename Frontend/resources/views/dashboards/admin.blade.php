@@ -11,65 +11,12 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-            <div class="sidebar-content position-relative" style="min-height: 100vh;">
-                <div class="sidebar-brand mb-4 text-center">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="width: 80px; height: 80px; object-fit: contain;" onerror="this.style.display='none'">
-                    <h5 class="mt-2">Portal Administrador</h5>
-                </div>
-
-                <div class="sidebar-divider"></div>
-
-                <ul class="nav flex-column mb-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('dashboard.admin') }}">
-                            <i class="bi bi-house-door"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard.inventario') }}">
-                            <i class="bi bi-boxes"></i>
-                            Producción
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pedidos.index') }}">
-                            <i class="bi bi-cart-check"></i>
-                            Pedidos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('productos.index') }}">
-                            <i class="bi bi-box-seam"></i>
-                            Productos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-people"></i>
-                            Empleados
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-graph-up"></i>
-                            Estadísticas
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <!-- Sidebar Component -->
+        @include('components.admin-sidebar')
         
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
-            <!-- Mobile menu button -->
-            <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
-                <i class="bi bi-list"></i> Menú
-            </button>
-
-            <div class="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Gestión de Panadería</h1>
             </div>
             
@@ -127,11 +74,29 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card glass-card border-0 rounded-4 shadow-sm h-100">
                         <div class="card-body text-center d-flex flex-column">
-                            <i class="bi bi-people" style="font-size: 3.5rem; color: #6c757d;"></i>
+                            <i class="bi bi-people" style="font-size: 3.5rem; color: var(--panaderia-marron-principal);"></i>
                             <h5 class="mt-3">Empleados</h5>
                             <p class="text-muted flex-grow-1">Gestión y administración de personal</p>
-                            <div class="mt-auto">
-                                <span class="badge bg-secondary">Próximamente</span>
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href="{{ route('empleados.index') }}" class="btn" style="background: var(--panaderia-marron-principal); color: white; border-radius: var(--panaderia-radius-md);">
+                                    Gestionar Empleados <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Clientes -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="bi bi-person-badge" style="font-size: 3.5rem; color: var(--panaderia-marron-principal);"></i>
+                            <h5 class="mt-3">Clientes</h5>
+                            <p class="text-muted flex-grow-1">Base de datos de clientes</p>
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href="{{ route('clientes.index') }}" class="btn" style="background: var(--panaderia-marron-principal); color: white; border-radius: var(--panaderia-radius-md);">
+                                    Ver Clientes <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -144,20 +109,6 @@
                             <i class="bi bi-graph-up" style="font-size: 3.5rem; color: #6c757d;"></i>
                             <h5 class="mt-3">Estadísticas</h5>
                             <p class="text-muted flex-grow-1">Reportes y análisis de ventas</p>
-                            <div class="mt-auto">
-                                <span class="badge bg-secondary">Próximamente</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card: Configuración -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100">
-                        <div class="card-body text-center d-flex flex-column">
-                            <i class="bi bi-gear" style="font-size: 3.5rem; color: #6c757d;"></i>
-                            <h5 class="mt-3">Configuración</h5>
-                            <p class="text-muted flex-grow-1">Ajustes y preferencias del sistema</p>
                             <div class="mt-auto">
                                 <span class="badge bg-secondary">Próximamente</span>
                             </div>
@@ -220,18 +171,7 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Marcar el enlace activo del sidebar
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav-link');
-        
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-            }
-        });
-
-        // Toggle sidebar en móvil
+        // Toggle sidebar en móvil si tienes botón
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
         
