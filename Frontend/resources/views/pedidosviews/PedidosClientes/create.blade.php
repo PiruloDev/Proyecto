@@ -7,7 +7,7 @@
 
     <h1 class="mb-4">Crear Nuevo Pedido</h1>
 
-    {{-- CORRECCIÓN: Cambiar 'pedidos_clientes.store' a 'pedidos.store' --}}
+    
     <form action="{{ route('pedidos.store') }}" method="POST">
         @csrf
 

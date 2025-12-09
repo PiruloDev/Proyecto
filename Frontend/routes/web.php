@@ -15,6 +15,11 @@ use App\Http\Controllers\Productos\ProductoController;
 use App\Http\Controllers\Usuarios\EmpleadoController;
 use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\Pedidos\CarritoController;
+
+>>>>>>> Stashed changes
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
@@ -58,16 +63,6 @@ Route::post('/logout', function () {
         // Auth::logout();
     return redirect()->route('home');
 })->name('logout');
-
-// ============================================
-// CARRITO
-// ============================================
-
-Route::get('/cart', function () {
-    $cartItems = [];
-    $subtotal = 0;
-    return view('cart', compact('cartItems', 'subtotal'));
-})->name('cart');
 
 // ============================================
 // DASHBOARDS (sin autenticación por ahora)
@@ -336,4 +331,22 @@ Route::prefix('empleados')->name('empleados.')->group(function () {
 // ============================================
 Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
 
+// =================================================================
+// CARRITO DE COMPRAS
+// =================================================================
+Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
+
+// API DEL CARRITO
+Route::prefix('/api/carrito')->group(function () {
+
+    Route::get('/', [CarritoController::class, 'obtenerCarrito'])->name('api.carrito.get');
+    
+    Route::post('/agregar/{id}', [CarritoController::class, 'agregar'])->name('api.carrito.agregar');
+    
+    Route::patch('/actualizar', [CarritoController::class, 'actualizar'])->name('api.carrito.actualizar');
+    
+    Route::delete('/remover/{id}', [CarritoController::class, 'remover'])->name('api.carrito.remover');
+    
+    Route::post('/checkout', [CarritoController::class, 'checkout'])->name('api.carrito.checkout');
+});
 require __DIR__.'/settings.php';

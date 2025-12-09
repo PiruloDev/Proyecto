@@ -24,22 +24,12 @@ class EstadoPedidoService
     public function actualizarEstado($id, array $data)
     {
         $estado = EstadoPedido::find($id);
-
-        if (!$estado) {
-            return false;
-        }
-
         return $estado->update($data);
     }
 
     public function eliminarEstado($id)
     {
         $estado = EstadoPedido::find($id);
-
-        if (!$estado) {
-            return false;
-        }
-
         return $estado->delete();
     }
 }

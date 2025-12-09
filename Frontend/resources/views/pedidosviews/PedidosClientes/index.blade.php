@@ -32,32 +32,31 @@
         <tbody>
             @foreach($pedidos as $pedido)
                 <tr>
-                    {{-- ID del pedido --}}
                     <td>{{ $pedido->ID_PEDIDO }}</td>
 
-                    {{-- Nombre del Cliente --}}
+                    
                     <td>{{ $pedido->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</td>
 
-                    {{-- Empleado --}}
+                    
                     <td>{{ $pedido->ID_EMPLEADO }}</td>
 
-                    {{-- Estado --}}
+                    
                     <td>{{ $pedido->estado->NOMBRE_ESTADO ?? 'Sin estado' }}</td>
 
-                    {{-- Total --}}
+                    
                     <td>{{ $pedido->TOTAL_PRODUCTO }}</td>
 
-                    {{-- Fechas --}}
+                    
                     <td>{{ $pedido->FECHA_INGRESO }}</td>
                     <td>{{ $pedido->FECHA_ENTREGA }}</td>
 
                     <td>
-                        {{-- Botón Editar --}}
+                        
                         <a href="{{ route('pedidos.edit', $pedido->ID_PEDIDO) }}" class="btn btn-warning btn-sm">
                             Editar
                         </a>
 
-                        {{-- Botón Eliminar --}}
+                        
                         <form action="{{ route('pedidos.destroy', $pedido->ID_PEDIDO) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')

@@ -7,15 +7,13 @@
 
     <h1 class="mb-4">Editar Pedido</h1>
 
-    {{-- CORRECCIÓN 1: Cambiar ruta a 'pedidos.update' --}}
-    {{-- CORRECCIÓN 2: Cambiar parámetro a $pedido['ID_PEDIDO'] --}}
     <form action="{{ route('pedidos.update', $pedido['ID_PEDIDO']) }}" method="POST">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
             <label>ID Cliente</label>
-            {{-- Usamos las claves de la base de datos en mayúsculas --}}
+            
             <input type="number" class="form-control" name="ID_CLIENTE" value="{{ $pedido['ID_CLIENTE'] }}" required>
         </div>
 
