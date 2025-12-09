@@ -269,20 +269,81 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+/* Estilo simple para manejar la ocultación en la búsqueda */
+.product-card-item.hidden {
+    display: none;
+}
+</style>
 <script>
+    // Función centralizada para manejar la adición al carrito
+    async function agregarProductoAlCarrito(idProducto, nombreProducto) {
+        try {
+            // 1. Iniciar la llamada API para agregar a la sesión de Laravel
+            const response = await fetch(`/api/carrito/agregar/${idProducto}`, {
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // 2. Intentar parsear la respuesta JSON (puede fallar si hay errores de red o servidor)
+            const data = await response.json();
+
+            if (data.success) {
+                // Éxito: Muestra una notificación rápida (Toast)
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Producto Agregado!',
+                    text: `${nombreProducto} ha sido añadido al carrito. Redirigiendo...`,
+                    toast: true,
+                    position: 'top-end', 
+                    showConfirmButton: false,
+                    timer: 1500, 
+                    timerProgressBar: true,
+                });
+                
+                // 3. Redirección CORREGIDA: Apunta a la vista del carrito (ruta index del CarritoController)
+                setTimeout(() => {
+                    // CAMBIAR 'nombre-ruta-del-carrito' por la ruta real que apunta a CarritoController@index
+                    window.location.href = "{{ route('carrito.index') }}"; 
+                }, 1500); 
+
+            } else {
+                // Manejo de errores de la API (ej: producto no encontrado, error de conexión al backend de Java, etc.)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al agregar',
+                    text: data.message || 'Ocurrió un error desconocido al agregar el producto.',
+                    confirmButtonColor: '#bb9467',
+                });
+            }
+        } catch (error) {
+            // Error de red
+            console.error('Error de red al agregar producto:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Conexión',
+                text: 'No se pudo contactar con el servidor. Verifica tu backend y conexión.',
+                confirmButtonColor: '#bb9467',
+            });
+        }
+    }
+
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Lógica de búsqueda (sin cambios)
         const searchInput = document.getElementById('productSearchInput');
         const productContainer = document.getElementById('product-container');
         const productCards = productContainer.getElementsByClassName('product-card-item');
 
-        // Funcionalidad de búsqueda
         searchInput.addEventListener('keyup', function() {
             const searchTerm = searchInput.value.toLowerCase().trim();
-
             for (let i = 0; i < productCards.length; i++) {
                 const card = productCards[i];
                 const productName = card.dataset.nombre;
-
                 if (productName.includes(searchTerm)) {
                     card.classList.remove('hidden');
                 } else {
@@ -291,39 +352,15 @@
             }
         });
 
-        // Funcionalidad para agregar productos al carrito
+        // Event listener para el botón "Agregar pedido" (sin cambios, llama a la función corregida)
         const addToCartButtons = document.querySelectorAll('.btn-agregar-pedido');
         addToCartButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const productId = this.dataset.productoId;
                 const productName = this.dataset.productoNombre;
-                const productPrice = this.dataset.productoPrecio;
                 
-                @guest
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Inicia sesión',
-                        text: 'Debes iniciar sesión para agregar productos al carrito',
-                        confirmButtonColor: '#bb9467',
-                        confirmButtonText: 'Ir a login'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "{{ route('login') }}";
-                        }
-                    });
-                    return;
-                @endguest
-                
-                // Aquí iría la lógica para agregar al carrito con fetch/axios
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Agregado!',
-                    text: `${productName} ha sido agregado a tu carrito`,
-                    confirmButtonColor: '#bb9467',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ver carrito',
-                    cancelButtonText: 'Continuar comprando'
-                });
+                // Llama a la función que ahora agrega y redirige al carrito
+                agregarProductoAlCarrito(productId, productName);
             });
         });
     });
