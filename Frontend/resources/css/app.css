@@ -141,10 +141,6 @@
         @apply bg-background text-foreground;
     }
 }
-
-/* ============================================
-   Paleta de Colores Global - El Castillo del Pan
-   ============================================ */
 :root {
     /* Colores principales de la marca */
     --panaderia-marron-principal: #8b6f47;

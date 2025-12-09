@@ -23,7 +23,9 @@
 /* Clases de borde */
 .border-marron { border-color: var(--color-marron) !important; }
 
-/* Estilos generales */
+/* ============================================
+   Estilos generales
+   ============================================ */
 body {
   font-family: 'Quicksand', sans-serif;
   background-color: #bb9467 !important;
@@ -31,7 +33,103 @@ body {
   overflow-x: hidden;
 }
 
-/* Navbar personalizada */
+.card {
+    background-color: white !important;
+    border: 1px solid #e0e0e0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.product-card {
+    background-color: white !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ============================================
+   Sección de Categorías
+   ============================================ */
+.categories-section {
+    background: linear-gradient(135deg, #f5ede4 0%, #ffffff 100%);
+    padding: 4rem 0;
+    margin: 3rem 0;
+}
+
+.category-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(139, 111, 71, 0.2);
+    border-color: #bb9467;
+}
+
+.category-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #bb9467 0%, #8b6f47 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon-wrapper {
+    transform: rotate(360deg);
+}
+
+.category-icon-wrapper i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.category-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #8b6f47;
+    margin-bottom: 0.5rem;
+}
+
+.category-count {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #8b6f47;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #bb9467, transparent);
+}
+
+/* ============================================
+   Navbar personalizada
+   ============================================ */
 .navbar {
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
@@ -514,15 +612,15 @@ header {
   .hero-section {
     padding: 60px 0;
   }
-  
+
   .display-4 {
     font-size: 2.5rem;
   }
-  
+
   .product-image {
     height: 200px;
   }
-  
+
   .card-hover:hover {
     transform: none;
   }
@@ -532,11 +630,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -544,11 +642,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }
@@ -750,36 +848,36 @@ header {
   .carousel-fixed-img {
     height: 250px;
   }
-  
+
   .card-img-custom {
     height: 200px;
   }
-  
+
   .carousel-control-prev,
   .carousel-control-next {
     width: 40px;
     height: 40px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   /* Dropdown responsivo */
   .dropdown-toggle {
     font-size: 0.9rem;
     padding: 6px 10px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-item {
     padding: 8px 12px;
   }
@@ -789,11 +887,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -801,11 +899,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }
@@ -1007,36 +1105,36 @@ header {
   .carousel-fixed-img {
     height: 250px;
   }
-  
+
   .card-img-custom {
     height: 200px;
   }
-  
+
   .carousel-control-prev,
   .carousel-control-next {
     width: 40px;
     height: 40px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   /* Dropdown responsivo */
   .dropdown-toggle {
     font-size: 0.9rem;
     padding: 6px 10px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-item {
     padding: 8px 12px;
   }
@@ -1046,11 +1144,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -1058,11 +1156,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }
@@ -1264,36 +1362,36 @@ header {
   .carousel-fixed-img {
     height: 250px;
   }
-  
+
   .card-img-custom {
     height: 200px;
   }
-  
+
   .carousel-control-prev,
   .carousel-control-next {
     width: 40px;
     height: 40px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   /* Dropdown responsivo */
   .dropdown-toggle {
     font-size: 0.9rem;
     padding: 6px 10px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-item {
     padding: 8px 12px;
   }
@@ -1303,11 +1401,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -1315,11 +1413,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }
@@ -1521,36 +1619,36 @@ header {
   .carousel-fixed-img {
     height: 250px;
   }
-  
+
   .card-img-custom {
     height: 200px;
   }
-  
+
   .carousel-control-prev,
   .carousel-control-next {
     width: 40px;
     height: 40px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   /* Dropdown responsivo */
   .dropdown-toggle {
     font-size: 0.9rem;
     padding: 6px 10px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-item {
     padding: 8px 12px;
   }
@@ -1560,11 +1658,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -1572,11 +1670,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }
@@ -1778,36 +1876,36 @@ header {
   .carousel-fixed-img {
     height: 250px;
   }
-  
+
   .card-img-custom {
     height: 200px;
   }
-  
+
   .carousel-control-prev,
   .carousel-control-next {
     width: 40px;
     height: 40px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   h2::after {
     width: 60px;
   }
-  
+
   /* Dropdown responsivo */
   .dropdown-toggle {
     font-size: 0.9rem;
     padding: 6px 10px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-item {
     padding: 8px 12px;
   }
@@ -1817,11 +1915,11 @@ header {
   .carousel-fixed-img {
     height: 200px;
   }
-  
+
   .card-img-custom {
     height: 180px;
   }
-  
+
   .carousel-caption {
     padding: 8px 15px;
     bottom: 10px;
@@ -1829,11 +1927,11 @@ header {
     right: 10px;
     max-width: 300px;
   }
-  
+
   .carousel-caption h5 {
     font-size: 1rem;
   }
-  
+
   .carousel-caption p {
     font-size: 0.8rem;
   }

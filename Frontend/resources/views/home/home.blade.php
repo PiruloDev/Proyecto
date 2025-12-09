@@ -4,101 +4,6 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/stylehomepage.css') }}">
-<style>
-    body {
-        background-color: #bb9467 !important;
-    }
-    .card {
-        background-color: white !important;
-        border: 1px solid #e0e0e0 !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    .product-card {
-        background-color: white !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-
-    /* Estilos para la sección de categorías */
-    .categories-section {
-        background: linear-gradient(135deg, #f5ede4 0%, #ffffff 100%);
-        padding: 4rem 0;
-        margin: 3rem 0;
-    }
-
-    .category-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        height: 100%;
-        cursor: pointer;
-        text-decoration: none;
-        display: block;
-    }
-
-    .category-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 30px rgba(139, 111, 71, 0.2);
-        border-color: #bb9467;
-    }
-
-    .category-icon-wrapper {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #bb9467 0%, #8b6f47 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .category-card:hover .category-icon-wrapper {
-        transform: rotate(360deg);
-    }
-
-    .category-icon-wrapper i {
-        font-size: 2.5rem;
-        color: white;
-    }
-
-    .category-name {
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: #8b6f47;
-        margin-bottom: 0.5rem;
-    }
-
-    .category-count {
-        color: #999;
-        font-size: 0.9rem;
-    }
-
-    .section-title {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #8b6f47;
-        margin-bottom: 1rem;
-        position: relative;
-        display: inline-block;
-    }
-
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #bb9467, transparent);
-    }
-</style>
 @endpush
 
 @section('content')
@@ -241,7 +146,7 @@
                                 </div>
                                 <h3 class="category-name">{{ $categoria->NOMBRE_CATEGORIAPRODUCTO }}</h3>
                                 <p class="category-count">
-                                    {{ $categoria->productosActivos->count() }} 
+                                    {{ $categoria->productosActivos->count() }}
                                     {{ $categoria->productosActivos->count() == 1 ? 'producto' : 'productos' }}
                                 </p>
                             </a>
@@ -267,7 +172,7 @@
     <section class="container my-5">
         <h2 class="text-center text-gris-oscuro mb-4 animate__animated animate__fadeInUp">Nuestros Productos Destacados</h2>
         <p class="text-center text-cafe-oscuro mb-5 animate__animated animate__fadeInUp animate__delay-1s">Una selección de nuestras delicias más populares.</p>
-        
+
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <!-- Card 1 -->
             <div class="col animate__animated animate__fadeInUp animate__delay-1s">
@@ -374,7 +279,6 @@
                     <a href="#" class="btn btn-primary btn-rounded mt-3">Conoce más</a>
                 </div>
                 <div class="col-md-6 animate__animated animate__fadeInRight">
-                    <img src="{{ asset('images/Local.png') }}" class="img-fluid rounded-3 shadow" alt="Nuestra panadería">
                 </div>
             </div>
         </div>
@@ -391,7 +295,7 @@
                     El Castillo del Pan
                 </h5>
                 <p class="text-light">
-                    Panadería artesanal con más de 10 años de experiencia, 
+                    Panadería artesanal con más de 10 años de experiencia,
                     ofreciendo productos frescos y de la más alta calidad.
                 </p>
             </div>
@@ -461,7 +365,7 @@
             keyboard: true,
             pause: 'hover'
         });
-        
+
         // Pause carousel on card hover
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
@@ -472,7 +376,7 @@
                 carousel.cycle();
             });
         });
-        
+
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {

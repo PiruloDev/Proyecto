@@ -7,7 +7,6 @@
 <div class="container">
     <h1 class="mb-4">Listado de Pedidos</h1>
 
-    {{-- Enlace 'Crear Pedido' usa la ruta corregida 'pedidos.create' --}}
     <a href="{{ route('pedidos.create') }}" class="btn btn-primary mb-3">
         Crear Pedido
     </a>
@@ -33,26 +32,33 @@
         <tbody>
             @foreach($pedidos as $pedido)
                 <tr>
-                    {{-- 1. Mostrar ID: Usamos la clave primaria correcta ID_PEDIDO --}}
-                    {{-- Nota: Usaremos $pedido['ID_PEDIDO'] asumiendo que el resultado es un array --}}
-                    <td>{{ $pedido['ID_PEDIDO'] }}</td> 
-                    
-                    {{-- Usar mayúsculas o minúsculas depende de cómo devuelve los datos tu consulta/Modelo --}}
-                    <td>{{ $pedido['ID_CLIENTE'] }}</td> 
-                    <td>{{ $pedido['ID_EMPLEADO'] }}</td> 
-                    <td>{{ $pedido['ID_ESTADO_PEDIDO'] }}</td> 
-                    <td>{{ $pedido['TOTAL_PRODUCTO'] }}</td> 
-                    <td>{{ $pedido['FECHA_INGRESO'] }}</td> 
-                    <td>{{ $pedido['FECHA_ENTREGA'] }}</td>
+                    {{-- ID del pedido --}}
+                    <td>{{ $pedido->ID_PEDIDO }}</td>
+
+                    {{-- Nombre del Cliente --}}
+                    <td>{{ $pedido->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</td>
+
+                    {{-- Empleado --}}
+                    <td>{{ $pedido->ID_EMPLEADO }}</td>
+
+                    {{-- Estado --}}
+                    <td>{{ $pedido->estado->NOMBRE_ESTADO ?? 'Sin estado' }}</td>
+
+                    {{-- Total --}}
+                    <td>{{ $pedido->TOTAL_PRODUCTO }}</td>
+
+                    {{-- Fechas --}}
+                    <td>{{ $pedido->FECHA_INGRESO }}</td>
+                    <td>{{ $pedido->FECHA_ENTREGA }}</td>
 
                     <td>
-                        {{-- 2. CORRECCIÓN EDICIÓN: Usamos $pedido['ID_PEDIDO'] para el parámetro de ruta --}}
-                        <a href="{{ route('pedidos.edit', $pedido['ID_PEDIDO']) }}" class="btn btn-warning btn-sm">
+                        {{-- Botón Editar --}}
+                        <a href="{{ route('pedidos.edit', $pedido->ID_PEDIDO) }}" class="btn btn-warning btn-sm">
                             Editar
                         </a>
 
-                        {{-- 3. CORRECCIÓN ELIMINAR: Usamos $pedido['ID_PEDIDO'] para el parámetro de ruta --}}
-                        <form action="{{ route('pedidos.destroy', $pedido['ID_PEDIDO']) }}" method="POST" class="d-inline">
+                        {{-- Botón Eliminar --}}
+                        <form action="{{ route('pedidos.destroy', $pedido->ID_PEDIDO) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm">Eliminar</button>

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Pedidos;
 
 use Illuminate\Http\Request;
-use App\Services\Pedidos\PedidosService; // <--- ¡CORRECTO! Apunta al nuevo namespace
+use App\Services\Pedidos\PedidosService;
+use App\Models\EstadoPedido;
 
-class PedidosController  
+class PedidosController
 {
     protected $service;
 
@@ -14,23 +15,26 @@ class PedidosController
         $this->service = $service;
     }
 
+   
     public function index()
     {
-        $pedidos = $this->service->obtenerPedidos();
+       
+        $pedidos = $this->service->obtenerPedidosConEstadoYCliente();
 
-        
-        return view('pedidosviews.PedidosClientes.index', compact('pedidos')); 
+        return view('pedidosviews.PedidosClientes.index', compact('pedidos'));
     }
 
+    
     public function create()
     {
-        
-        return view('pedidosviews.PedidosClientes.create'); 
+        $estados = EstadoPedido::all();
+
+        return view('pedidosviews.PedidosClientes.create', compact('estados'));
     }
 
+    
     public function store(Request $request)
     {
-        
         $data = $request->validate([
             'ID_CLIENTE' => 'required|integer',
             'ID_EMPLEADO' => 'required|integer',
@@ -38,28 +42,31 @@ class PedidosController
             'TOTAL_PRODUCTO' => 'required|numeric',
         ]);
 
-        
         $data['FECHA_INGRESO'] = now();
 
         $this->service->agregarPedido($data);
 
         return redirect()->route('pedidos.index')
-                            ->with('success', 'Pedido creado correctamente');
+            ->with('success', 'Pedido creado correctamente');
     }
 
+   
     public function edit($id)
     {
         $pedido = $this->service->obtenerPedidoPorId($id);
+        $estados = EstadoPedido::all();
 
-        return view('pedidosviews.PedidosClientes.edit', compact('pedido'));
+        return view('pedidosviews.PedidosClientes.edit', compact('pedido', 'estados'));
     }
 
+    
     public function update(Request $request, $id)
     {
         $pedido_original = $this->service->obtenerPedidoPorId($id);
 
         if (!$pedido_original) {
-            return redirect()->back()->with('error', 'Pedido no encontrado');
+            return redirect()->back()
+                ->with('error', 'Pedido no encontrado');
         }
 
         $data = $request->validate([
@@ -75,14 +82,15 @@ class PedidosController
         $this->service->actualizarPedido($id, $data);
 
         return redirect()->route('pedidos.index')
-                            ->with('success', 'Pedido con ID ' . $id . ' actualizado correctamente');
+            ->with('success', "Pedido con ID $id actualizado correctamente");
     }
 
+   
     public function destroy($id)
     {
         $this->service->eliminarPedido($id);
 
         return redirect()->route('pedidos.index')
-                          ->with('success', 'Pedido eliminado');
+            ->with('success', 'Pedido eliminado');
     }
 }

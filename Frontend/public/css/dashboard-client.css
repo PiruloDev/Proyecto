@@ -1,0 +1,425 @@
+/* ============================================
+   Dashboard Cliente - El Castillo del Pan
+   Usa variables CSS globales de variables.css
+   ============================================ */
+
+body {
+    background: linear-gradient(135deg, var(--panaderia-beige-claro) 0%, var(--panaderia-blanco-calido) 100%);
+    min-height: 100vh;
+    font-family: var(--panaderia-font-primary);
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+.container-fluid {
+    overflow-x: hidden;
+}
+
+/* ============================================
+   Glassmorphism Effect
+   ============================================ */
+.glass-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    box-shadow: var(--panaderia-shadow-md);
+    transition: all var(--panaderia-transition-normal);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+/* ============================================
+   Sidebar Sticky (Sin scroll interno)
+   ============================================ */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: var(--panaderia-marron-principal);
+    color: white;
+    padding: 1.5rem 0;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-brand {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.sidebar-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 3px solid var(--panaderia-cafe-claro);
+    object-fit: cover;
+}
+
+.sidebar-brand h5 {
+    color: var(--panaderia-cafe-claro);
+    font-weight: 700;
+    margin-bottom: 0;
+    font-family: var(--panaderia-font-primary);
+}
+
+.btn-explore {
+    background: var(--panaderia-cafe-claro);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: var(--panaderia-radius-md);
+    font-weight: 600;
+    transition: all var(--panaderia-transition-normal);
+    font-family: var(--panaderia-font-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-explore:hover {
+    background: var(--panaderia-marron-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--panaderia-shadow-md);
+    color: white;
+}
+
+.sidebar-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--panaderia-radius-sm);
+    margin: 0.25rem 0.5rem;
+    transition: all var(--panaderia-transition-normal);
+    display: flex;
+    align-items: center;
+    font-family: var(--panaderia-font-primary);
+}
+
+.nav-link:hover {
+    background: var(--panaderia-marron-hover);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: var(--panaderia-shadow-sm);
+}
+
+.nav-link.active {
+    background: var(--panaderia-cafe-claro);
+    color: white;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Sidebar user section */
+.sidebar-user {
+    margin-top: auto;
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    color: white;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.user-info i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.logout-btn,
+.change-pass-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--panaderia-radius-sm);
+    color: white;
+    width: 100%;
+    transition: all var(--panaderia-transition-normal);
+    font-family: var(--panaderia-font-primary);
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+}
+
+.logout-btn:hover,
+.change-pass-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+.main-content {
+    padding: 2rem;
+}
+
+.welcome-section {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--panaderia-marron-principal), var(--panaderia-cafe-claro));
+    color: white;
+    border-radius: var(--panaderia-radius-xl);
+    margin-bottom: 2rem;
+    box-shadow: var(--panaderia-shadow-lg);
+}
+
+.welcome-section h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.welcome-section p {
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+/* ============================================
+   Stats Grid
+   ============================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    border-radius: var(--panaderia-radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--panaderia-transition-normal);
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--panaderia-marron-principal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--panaderia-marron-principal);
+    font-family: var(--panaderia-font-primary);
+}
+
+.stat-label {
+    color: var(--panaderia-gris-texto);
+    font-size: 0.9rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+/* ============================================
+   Quick Actions
+   ============================================ */
+.quick-actions {
+    margin-bottom: 2rem;
+}
+
+.quick-actions h3 {
+    color: var(--panaderia-gris-oscuro);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.action-card {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    border-radius: var(--panaderia-radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all var(--panaderia-transition-normal);
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+.action-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: var(--panaderia-shadow-xl);
+}
+
+.action-card i {
+    font-size: 2.5rem;
+    color: var(--panaderia-marron-principal);
+    margin-bottom: 1rem;
+}
+
+.action-card h5 {
+    font-weight: 700;
+    color: var(--panaderia-gris-oscuro);
+    margin-bottom: 1rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.action-card p {
+    color: var(--panaderia-gris-texto);
+    margin-bottom: 1.5rem;
+}
+
+.btn-action {
+    background: var(--panaderia-marron-principal);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--panaderia-radius-md);
+    font-weight: 600;
+    transition: all var(--panaderia-transition-normal);
+    font-family: var(--panaderia-font-primary);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-action:hover {
+    background: var(--panaderia-marron-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--panaderia-shadow-md);
+    color: white;
+}
+
+/* ============================================
+   Recent Orders
+   ============================================ */
+.recent-orders {
+    background: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(187, 148, 103, 0.18);
+    border-radius: var(--panaderia-radius-lg);
+    padding: 2rem;
+    box-shadow: var(--panaderia-shadow-md);
+}
+
+.recent-orders h3 {
+    color: var(--panaderia-gris-oscuro);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-family: var(--panaderia-font-primary);
+}
+
+.order-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(187, 148, 103, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-info h6 {
+    color: var(--panaderia-gris-oscuro);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.order-info small {
+    color: var(--panaderia-gris-texto);
+}
+
+.order-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--panaderia-radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: rgba(255, 152, 0, 0.2);
+    color: var(--panaderia-warning);
+}
+
+.status-completed {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--panaderia-success);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        transition: left var(--panaderia-transition-normal);
+        z-index: 1000;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .stats-grid,
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}

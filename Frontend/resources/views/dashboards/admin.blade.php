@@ -11,12 +11,8 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-2 d-md-block sidebar">
-            <div class="sidebar-content position-relative" style="min-height: 100vh;">
-                <div class="sidebar-brand mb-4">
-                    <h5>Bienvenido Administrador</h5>
-                </div>
+        <!-- Sidebar Component -->
+        @include('components.admin-sidebar')
 
                 <div class="sidebar-divider"></div>
 
@@ -62,7 +58,12 @@
         </nav>
         
         <!-- Main Content -->
-        <main class="col-md-10 ms-sm-auto px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+            <!-- Mobile menu button -->
+            <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
+                <i class="bi bi-list"></i> Menú
+            </button>
+
             <div class="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Gestión de Panadería</h1>
             </div>

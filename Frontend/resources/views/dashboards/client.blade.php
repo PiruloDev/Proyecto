@@ -3,7 +3,8 @@
 @section('title', 'Dashboard Cliente - Panadería')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/styleclienteds.css') }}">
+<link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+<link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
 @endpush
 
 @section('body-class', '')

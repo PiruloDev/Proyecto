@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pedidos extends Model
 {
-    protected $table = 'pedidos'; 
+    protected $table = 'pedidos';
 
     protected $primaryKey = 'ID_PEDIDO';
-
-    public $timestamps = false; 
+    
+    public $timestamps = false;
 
     protected $fillable = [
         'ID_CLIENTE',
@@ -26,4 +26,14 @@ class Pedidos extends Model
         'FECHA_ENTREGA' => 'datetime',
         'TOTAL_PRODUCTO' => 'decimal:2',
     ];
+
+    public function estado()
+    {
+        return $this->belongsTo(EstadoPedido::class, 'ID_ESTADO_PEDIDO', 'ID_ESTADO_PEDIDO');
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Clientes::class, 'ID_CLIENTE', 'ID_CLIENTE');
+    }
 }
