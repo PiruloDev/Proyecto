@@ -1,45 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\Productos;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Productos\ProductosAdmin;  
+use App\Services\ProductoS\ProductoService;
 use Illuminate\Http\Request;
 
 class ProductoController extends Controller
 {
+    protected $service;
+
+    public function __construct(ProductoService $productoService)
+    {
+        $this->service = $productoService;
+    }
+
     public function index()
     {
-        $productos = ProductosAdmin::all()->toArray(); 
+        $productos = $this->service->obtenerTodos();
         return view('productos.index', compact('productos'));
     }
 
     public function store(Request $request)
     {
-        $producto = ProductosAdmin::create([
-            'nombre' => $request->nombre,
-            'categoria' => $request->categoria,
-            'descripcion' => $request->descripcion,
-            'precio' => $request->precio,
-            'stock' => $request->stock,
-            'estado' => $request->estado,
-            'imagen' => $request->imagen
-        ]);
-
-        return response()->json(['success' => true, 'producto' => $producto]);
+        $this->service->crear($request->all());
+        return back()->with('success', 'Producto creado correctamente');
     }
 
     public function update(Request $request, $id)
     {
-        $producto = ProductosAdmin::findOrFail($id);
-        $producto->update($request->all());
-
-        return response()->json(['success' => true, 'producto' => $producto]);
+        $this->service->actualizar($id, $request->all());
+        return back()->with('success', 'Producto actualizado correctamente');
     }
 
     public function destroy($id)
     {
-        ProductosAdmin::destroy($id);
-        return response()->json(['success' => true]);
+        $this->service->eliminar($id);
+        return back()->with('success', 'Producto eliminado');
     }
 }
