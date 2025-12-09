@@ -15,11 +15,7 @@ use App\Http\Controllers\Productos\ProductoController;
 use App\Http\Controllers\Usuarios\EmpleadoController;
 use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
-<<<<<<< Updated upstream
-=======
 use App\Http\Controllers\Pedidos\CarritoController;
-
->>>>>>> Stashed changes
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================

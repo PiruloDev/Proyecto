@@ -11,8 +11,13 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Component -->
-        @include('components.admin-sidebar')
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="sidebar-content position-relative" style="min-height: 100vh;">
+                <div class="sidebar-brand mb-4 text-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="width: 80px; height: 80px; object-fit: contain;" onerror="this.style.display='none'">
+                    <h5 class="mt-2">Portal Administrador</h5>
+                </div>
 
                 <div class="sidebar-divider"></div>
 
@@ -58,7 +63,7 @@
         </nav>
         
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
             <!-- Mobile menu button -->
             <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
                 <i class="bi bi-list"></i> Menú
@@ -225,6 +230,16 @@
                 link.classList.add('active');
             }
         });
+
+        // Toggle sidebar en móvil
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+        }
     });
 </script>
 @endpush
