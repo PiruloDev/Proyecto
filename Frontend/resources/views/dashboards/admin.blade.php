@@ -106,16 +106,18 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card glass-card border-0 rounded-4 shadow-sm h-100">
                         <div class="card-body text-center d-flex flex-column">
-                            <i class="bi bi-graph-up" style="font-size: 3.5rem; color: #6c757d;"></i>
+                            <i class="bi bi-person-badge" style="font-size: 3.5rem; color: var(--panaderia-marron-principal);"></i>
                             <h5 class="mt-3">Estadísticas</h5>
                             <p class="text-muted flex-grow-1">Reportes y análisis de ventas</p>
-                            <div class="mt-auto">
-                                <span class="badge bg-secondary">Próximamente</span>
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href="{{ route('ordenes.salida.index') }}" class="btn" style="background: var(--panaderia-marron-principal); color: white; border-radius: var(--panaderia-radius-md);">
+                                    Gestionar estadísticas <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
 
             <!-- Resumen General -->
             <div class="row g-4 mb-4">
