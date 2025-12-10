@@ -1,65 +1,166 @@
+{{-- resources/views/dashboard/inventario.blade.php (Versión Compacta) --}}
+
 @extends('layouts.app') 
-{{-- ⬆️ Asume un layout maestro en resources/views/layouts/app.blade.php --}}
 
-@section('title', 'Menú Principal - Inventario')
+@section('title', 'Dashboard - Módulo Inventario y Producción')
 
-{{-- Usamos el @push para añadir estilos que solo necesita esta página --}}
 @push('styles')
-    {{-- La URL del CSS debe apuntar a la carpeta public/css/ --}}
-    <link rel="stylesheet" href="{{ asset('css/stylemoduloinv.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+<link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    /* Estilo específico para las tarjetas de acceso rápido compactas */
+    .compact-module-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        min-height: 180px; /* Altura mínima para mantener uniformidad */
+    }
+    .compact-module-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+    .compact-module-card .card-icon {
+        font-size: 2.5rem; /* Icono más pequeño */
+    }
+    .compact-module-card h5 {
+        font-size: 1rem; /* Título un poco más pequeño */
+    }
+    .compact-module-card p {
+        font-size: 0.75rem; /* Descripción pequeña */
+    }
+</style>
 @endpush
 
 @section('content')
-
 <div class="container-fluid">
-    <div class="row g-0">
+    <div class="row">
         
-        @include('partials.sidebar-inventario')
-
-        <div class="col-md-9 col-lg-10 main-content">
+        {{-- Side Bar: Usa el componente que has definido --}}
+        @include('components.admin-sidebar') 
+        
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
             
-            {{-- Top Navbar (basado en menu.php) --}}
-            <nav class="navbar navbar-expand-lg top-navbar">
-                <div class="container-fluid">
-                    <a class="navbar-brand d-md-none" href="{{ route('dashboard.inventario') }}">Menú</a>
-                    
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    
-                    <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-                        <div class="navbar-nav">
-                            <div class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="me-2 text-dark d-none d-sm-inline">Administrador</span>
-                                    <div class="profile-icon-wrapper">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    {{-- Reemplazar # con la ruta de logout de Laravel --}}
-                                    <li><a class="dropdown-item" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
-                                </ul>
+            {{-- Título de la Sección --}}
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                <h1 class="h2"> Módulo de Inventario</h1>
+            </div>
+
+            
+            {{-- ======================================================= --}}
+            {{-- SECCIÓN: ACCESOS RÁPIDOS (Ahora 4 Cards por fila) --}}
+            {{-- ======================================================= --}}
+            <h3 class="mb-3 mt-4 text-primary">Accesos Directos</h3>
+            
+            {{-- FILA 1: Inventario y Catálogos --}}
+            <div class="row g-4 mb-4">
+                
+                {{-- Card 1: Inventario de Ingredientes --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('ingredientes.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="fas fa-boxes-stacked card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Inventario</h5>
+                                <p class="text-muted flex-grow-1 small">Stock de Ingredientes.</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Ver Stock</span>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
-            </nav>
 
-            {{-- Sección de Bienvenida (basado en menu.php) --}}
-            <div class="welcome-section">
-                <h1>Bienvenido al Panel de Control</h1>
-                <p class="lead" style="color: var(--text-light);">Usa el menú lateral para navegar entre los módulos de gestión.</p>
+                {{-- Card 2: Categorías de Ingredientes --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('categorias-ingredientes.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="bi bi-tag card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Clasificación</h5>
+                                <p class="text-muted flex-grow-1 small">Organización de Ingredientes.</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Gestionar</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                {{-- Card 3: Recetario --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('recetas.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="fas fa-book-open card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Recetario</h5>
+                                <p class="text-muted flex-grow-1 small">Definición de productos (BOM).</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Gestionar</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Card 4: Producción --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('produccion.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="fas fa-cookie-cutter card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Fabricación</h5>
+                                <p class="text-muted flex-grow-1 small">Órdenes de Producción.</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Ver Órdenes</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
             
-        </div>
+            {{-- FILA 2: Compras --}}
+            <div class="row g-4 mb-5">
+                
+                {{-- Card 5: Proveedores --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('proveedores.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="fas fa-truck-moving card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Proveedores</h5>
+                                <p class="text-muted flex-grow-1 small">Directorio de Compras.</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Ver Listado</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                {{-- Card 6: Pedidos a Proveedores --}}
+                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
+                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                        <a href="{{ route('pedidoproveedores.index') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center d-flex flex-column p-3">
+                                <i class="fas fa-receipt card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                <h5 class="mt-2">Pedidos de Compra</h5>
+                                <p class="text-muted flex-grow-1 small">Seguimiento de Órdenes.</p>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark">Ver Órdenes</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+            
+            {{-- Aquí puedes agregar otros gráficos o widgets más grandes --}}
+
+        </main>
     </div>
 </div>
 
 @endsection
-
-@push('scripts')
-    {{-- Si tienes scripts que solo se cargan en el menú, irían aquí --}}
-@endpush
