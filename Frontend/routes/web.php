@@ -9,7 +9,6 @@ use App\Http\Controllers\Inventario\RecetasController;
 use App\Http\Controllers\Inventario\ProduccionController;
 use App\Http\Controllers\Productos\Categoriaproductos;
 use App\Http\Controllers\Productos\Menuproductos;
-<<<<<<< HEAD
 use App\Http\Controllers\Pedidos\PedidosController;
 use App\Http\Controllers\Pedidos\EstadoPedidoController;
 use App\Http\Controllers\Productos\ProductoController;
@@ -18,12 +17,6 @@ use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pedidos\CarritoController;
 use App\Http\Controllers\Reportes\OrdenSalidaController;
-=======
-use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\PedidosController;
-use App\Http\Controllers\OrdenSalidaController;
-
->>>>>>> b12d9d4 (Guardando cambios locales)
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================

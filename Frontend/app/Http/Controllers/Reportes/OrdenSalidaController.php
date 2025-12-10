@@ -1,204 +1,101 @@
 <?php
+
 namespace App\Http\Controllers\Reportes;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Reportes\ReportesVentas;
 use App\Http\Controllers\Controller;
-use App\Services\OrdenSalidaService;
 
-class OrdenSalidaController extends Controller {
-    private $ordenSalidaService;
-
-    public function __construct() {
-        $this->OrdenSalidaService = new OrdenSalidaService();
+class OrdenSalidaController extends Controller
+{
+    public function index()
+    {
+        $ventas = ReportesVentas::all();
+        return view('reportes.index', compact('ventas'));
     }
 
-    /**
-     * Mostrar listado de ventas
-     */
-    public function index(Request $request) {
-        $mensaje = "";
+    public function create()
+    {
+        return view('reportes.create');
+    }
 
-        if ($request->has('eliminar')) {
-            $id = intval($request->get('eliminar'));
-            $resultado = $this->ordenSalidaService->eliminarVenta($id);
+    public function edit($id)
+    {
+        $venta = ReportesVentas::find($id);
 
-            if (!empty($resultado['success'])) {
-                $mensaje = "<p style='color:green;'>Venta eliminada correctamente.</p>";
-            } else {
-                $error = $resultado['error'] ?? 'Error desconocido';
-                $mensaje = "<p style='color:red;'>Error al eliminar venta: " . htmlspecialchars($error) . "</p>";
-            }
+        if (!$venta) {
+            return abort(404, 'Orden no encontrada');
         }
 
-        // Obtener lista de ventas
-        $ventas = $this->ordenSalidaService->obtenerVentas();
-
-        return view('reportes.ventas.index', compact('ventas', 'mensaje'));
+        return view('reportes.edit', compact('venta'));
     }
 
-    /**
-     * Crear una nueva venta
-     */
-    public function store(Request $request) {
-        $idCliente = intval($request->input('idCliente', 0));
-        $idPedido = intval($request->input('idPedido', 0));
-        $fecha = trim($request->input('fecha', ''));
-        $hora = trim($request->input('hora', ''));
-        $totalFactura = floatval($request->input('totalFactura', 0));
-
-        $fechaFacturacion = ($fecha && $hora) ? $fecha . "T" . $hora : null;
-
-        if ($idCliente && $idPedido && $fechaFacturacion && $totalFactura > 0) {
-            $resultado = $this->ordenSalidaService->agregarVenta([
-                "idCliente" => $idCliente,
-                "idPedido" => $idPedido,
-                "fechaFacturacion" => $fechaFacturacion,
-                "totalFactura" => $totalFactura
-            ]);
-
-            if (!empty($resultado['success'])) {
-                return redirect()->route('ventas.index')
-                    ->with('success', 'Venta agregada correctamente.');
-            } else {
-                return redirect()->back()
-                    ->with('error', 'Error al agregar venta: ' . ($resultado['error'] ?? 'Error desconocido'))
-                    ->withInput();
-            }
-        } else {
-            return redirect()->back()
-                ->with('error', 'Todos los campos son obligatorios para registrar la venta.')
-                ->withInput();
-        }
-    }
-
-    /**
-     * Actualizar una venta existente
-     */
-    public function update(Request $request, $id) {
-        $idCliente = intval($request->input('idCliente', 0));
-        $idPedido = intval($request->input('idPedido', 0));
-        $fecha = trim($request->input('fecha', ''));
-        $hora = trim($request->input('hora', ''));
-        $totalFactura = floatval($request->input('totalFactura', 0));
-
-        $fechaFacturacion = ($fecha && $hora) ? $fecha . "T" . $hora : null;
-
-        $resultado = $this->ordenSalidaService->actualizarVenta($id, [
-            "idCliente" => $idCliente,
-            "idPedido" => $idPedido,
-            "fechaFacturacion" => $fechaFacturacion,
-            "totalFactura" => $totalFactura
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ID_CLIENTE' => 'required|integer',
+            'ID_PEDIDO' => 'required|integer',
+            'FECHA_FACTURACION' => 'required|date',
+            'TOTAL_FACTURA' => 'required|numeric',
         ]);
 
-        if (!empty($resultado['success'])) {
-            return redirect()->route('ventas.index')
-                ->with('success', 'Venta actualizada correctamente.');
-        } else {
-            return redirect()->back()
-                ->with('error', 'Error al actualizar venta: ' . ($resultado['error'] ?? 'Error desconocido'))
-                ->withInput();
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
+
+        ReportesVentas::create([
+            'ID_CLIENTE' => $request->ID_CLIENTE,
+            'ID_PEDIDO' => $request->ID_PEDIDO,
+            'FECHA_FACTURACION' => $request->FECHA_FACTURACION,
+            'TOTAL_FACTURA' => $request->TOTAL_FACTURA,
+        ]);
+
+        return redirect()->route('ordenes.salida.index')
+            ->with('success', 'Orden creada correctamente.');
     }
 
-    /**
-     * Eliminar una venta
-     */
-    public function destroy($id) {
-        $resultado = $this->ordenSalidaService->eliminarVenta($id);
-
-        if (!empty($resultado['success'])) {
-            return redirect()->route('ventas.index')
-                ->with('success', 'Venta eliminada correctamente.');
-        } else {
-            return redirect()->back()
-                ->with('error', 'Error al eliminar venta: ' . ($resultado['error'] ?? 'Error desconocido'));
+    public function update(Request $request, $id)
+    {
+        $venta = ReportesVentas::find($id);
+        if (!$venta) {
+            return redirect()->route('ordenes.salida.index')->with('error', 'Orden no encontrada.');
         }
+
+        $validator = Validator::make($request->all(), [
+            'ID_CLIENTE' => 'required|integer',
+            'ID_PEDIDO' => 'required|integer',
+            'FECHA_FACTURACION' => 'required|date',
+            'TOTAL_FACTURA' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $venta->update([
+            'ID_CLIENTE' => $request->ID_CLIENTE,
+            'ID_PEDIDO' => $request->ID_PEDIDO,
+            'FECHA_FACTURACION' => $request->FECHA_FACTURACION,
+            'TOTAL_FACTURA' => $request->TOTAL_FACTURA,
+        ]);
+
+        return redirect()->route('ordenes.salida.index')
+            ->with('success', 'Orden actualizada correctamente.');
     }
 
+    public function destroy($id)
+    {
+        $venta = ReportesVentas::find($id);
 
-    public function manejarPeticion() {
-        $mensaje = "";
-
-        // ----- ELIMINAR POR GET -----
-        if (isset($_GET['eliminar'])) {
-            $id = intval($_GET['eliminar']);
-            $resultado = $this->ordenSalidaService->eliminarVenta($id);
-
-            if (!empty($resultado['success'])) {
-                $mensaje = "<p style='color:green;'>Venta eliminada correctamente.</p>";
-            } else {
-                $error = $resultado['error'] ?? 'Error desconocido';
-                $mensaje = "<p style='color:red;'>Error al eliminar venta: " . htmlspecialchars($error) . "</p>";
-            }
+        if (!$venta) {
+            return redirect()->route('ordenes.salida.index')
+                ->with('error', 'Orden no encontrada.');
         }
 
-        // ----- POST, PATCH, DELETE -----
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $accion = $_POST['accion'] ?? 'agregar';
-            $id = isset($_POST['id']) ? intval($_POST['id']) : null;
-            $idCliente = intval($_POST['idCliente'] ?? 0);
-            $idPedido = intval($_POST['idPedido'] ?? 0);
-            $fecha = trim($_POST['fecha'] ?? '');
-            $hora = trim($_POST['hora'] ?? '');
-            $totalFactura = floatval($_POST['totalFactura'] ?? 0);
+        $venta->delete();
 
-            $fechaFacturacion = $fecha && $hora ? $fecha . "T" . $hora : null;
-
-            if ($accion === 'agregar') {
-                if ($idCliente && $idPedido && $fechaFacturacion && $totalFactura > 0) {
-                    $resultado = $this->ordenSalidaService->agregarVenta([
-                        "idCliente" => $idCliente,
-                        "idPedido" => $idPedido,
-                        "fechaFacturacion" => $fechaFacturacion,
-                        "totalFactura" => $totalFactura
-                    ]);
-                    if (!empty($resultado['success'])) {
-                        $mensaje = "<p style='color:green;'>Venta agregada correctamente.</p>";
-                    } else {
-                        $mensaje = "<p style='color:red;'>Error al agregar venta: " . htmlspecialchars($resultado['error'] ?? 'Error desconocido') . "</p>";
-                    }
-                } else {
-                    $mensaje = "<p style='color:red;'>Todos los campos son obligatorios para registrar la venta.</p>";
-                }
-
-            } elseif ($accion === 'actualizar') {
-                if ($id) {
-                    $resultado = $this->ordenSalidaService->actualizarVenta($id, [
-                        "idCliente" => $idCliente,
-                        "idPedido" => $idPedido,
-                        "fechaFacturacion" => $fechaFacturacion,
-                        "totalFactura" => $totalFactura
-                    ]);
-                    if (!empty($resultado['success'])) {
-                        $mensaje = "<p style='color:green;'>Venta actualizada correctamente.</p>";
-                    } else {
-                        $mensaje = "<p style='color:red;'>Error al actualizar venta: " . htmlspecialchars($resultado['error'] ?? 'Error desconocido') . "</p>";
-                    }
-                } else {
-                    $mensaje = "<p style='color:red;'>ID requerido para actualizar.</p>";
-                }
-
-            } elseif ($accion === 'eliminar') {
-                if ($id) {
-                    $resultado = $this->ordenSalidaService->eliminarVenta($id);
-                    if (!empty($resultado['success'])) {
-                        $mensaje = "<p style='color:green;'>Venta eliminada correctamente.</p>";
-                    } else {
-                        $mensaje = "<p style='color:red;'>Error al eliminar venta: " . htmlspecialchars($resultado['error'] ?? 'Error desconocido') . "</p>";
-                    }
-                } else {
-                    $mensaje = "<p style='color:red;'>ID requerido para eliminar.</p>";
-                }
-
-            } else {
-                $mensaje = "<p style='color:red;'>Acción no reconocida.</p>";
-            }
-        }
-
-        // ----- OBTENER LISTA DE VENTAS -----
-        $ventas = $this->ordenSalidaService->obtenerVentas();
-
-        // ----- CARGAR VISTA -----
-        require __DIR__ . '/../Vista/ReportesVentasIndex.php';
+        return redirect()->route('ordenes.salida.index')
+            ->with('success', 'Orden eliminada correctamente.');
     }
 }

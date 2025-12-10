@@ -1,14 +1,16 @@
 <?php
-namespace App\Services;
+namespace App\Services\Reportes;
 
-use App\Models\OrdenSalida;
+use App\Models\Reportes\ReportesVentas;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrdenSalidaService {
 
-    
+    /**
+     * Obtener todas las ventas/órdenes de salida
+     */
     public function obtenerVentas() {
         try {
             return ReportesVentas::with(['cliente', 'pedido'])
