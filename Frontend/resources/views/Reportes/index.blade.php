@@ -481,7 +481,7 @@ function editarModal(id, cliente, pedido, fecha, total) {
     
     document.getElementById('modal-titulo').textContent = 'Editar Orden #' + id;
     document.getElementById('formulario-modal').action = '/reportes/ordenes-salida/' + id;
-    document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+    document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PATCH">';
     
     document.getElementById('ID_CLIENTE').value = cliente;
     document.getElementById('ID_PEDIDO').value = pedido;
