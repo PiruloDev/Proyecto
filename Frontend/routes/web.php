@@ -16,6 +16,7 @@ use App\Http\Controllers\Usuarios\EmpleadoController;
 use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pedidos\CarritoController;
+use App\Http\Controllers\Reportes\OrdenSalidaController;
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
@@ -331,6 +332,31 @@ Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.ind
 // CARRITO DE COMPRAS
 // =================================================================
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
+
+// =================================================================
+// REPORTES
+// =================================================================
+
+Route::prefix('reportes/ordenes-salida')->group(function() {
+
+    Route::get('/', [OrdenSalidaController::class, 'index'])
+        ->name('ordenes.salida.index');
+
+    Route::get('/crear', [OrdenSalidaController::class, 'create'])
+        ->name('ordenes.salida.create');
+
+    Route::post('/', [OrdenSalidaController::class, 'store'])
+        ->name('ordenes.salida.store');
+
+    Route::get('/editar/{id}', [OrdenSalidaController::class, 'edit'])
+        ->name('ordenes.salida.edit');
+
+    Route::patch('/{id}', [OrdenSalidaController::class, 'update'])
+        ->name('ordenes.salida.update');
+
+    Route::delete('/{id}', [OrdenSalidaController::class, 'destroy'])
+        ->name('ordenes.salida.destroy');
+});
 
 // API DEL CARRITO
 Route::prefix('/api/carrito')->group(function () {
