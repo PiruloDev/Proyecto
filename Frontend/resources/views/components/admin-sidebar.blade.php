@@ -45,7 +45,8 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ request()->routeIs('reportes.*') || request()->routeIs('estadisticas.*') ? 'active' : '' }}"
+                   href="{{ route('ordenes.salida.index') }}">
                     <i class="bi bi-graph-up"></i>
                     Estadísticas
                 </a>
