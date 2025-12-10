@@ -14,14 +14,17 @@
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Cliente</th>
-                <th>Empleado</th>
-                <th>Estado</th>
+                <th>Cliente ID</th>
+                <th>Empleado ID</th>
+                <th>Estado ID</th>
                 <th>Total</th>
                 <th>Ingreso</th>
                 <th>Entrega</th>
@@ -32,32 +35,21 @@
         <tbody>
             @foreach($pedidos as $pedido)
                 <tr>
-                    <td>{{ $pedido->ID_PEDIDO }}</td>
-
-                    
-                    <td>{{ $pedido->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</td>
-
-                    
-                    <td>{{ $pedido->ID_EMPLEADO }}</td>
-
-                    
-                    <td>{{ $pedido->estado->NOMBRE_ESTADO ?? 'Sin estado' }}</td>
-
-                    
-                    <td>{{ $pedido->TOTAL_PRODUCTO }}</td>
-
-                    
-                    <td>{{ $pedido->FECHA_INGRESO }}</td>
-                    <td>{{ $pedido->FECHA_ENTREGA }}</td>
+                    {{-- 🛑 CORRECCIÓN: Usar las claves EXACTAS del JSON --}}
+                    <td>{{ $pedido['id_PEDIDO'] }}</td> 
+                    <td>{{ $pedido['id_CLIENTE'] }}</td>
+                    <td>{{ $pedido['id_EMPLEADO'] }}</td>
+                    <td>{{ $pedido['id_ESTADO_PEDIDO'] }}</td>
+                    <td>{{ $pedido['total_PRODUCTO'] }}</td>
+                    <td>{{ $pedido['fecha_INGRESO'] }}</td>
+                    <td>{{ $pedido['fecha_ENTREGA'] }}</td>
 
                     <td>
-                        
-                        <a href="{{ route('pedidos.edit', $pedido->ID_PEDIDO) }}" class="btn btn-warning btn-sm">
+                        <a href="{{ route('pedidos.edit', $pedido['id_PEDIDO']) }}" class="btn btn-warning btn-sm">
                             Editar
                         </a>
 
-                        
-                        <form action="{{ route('pedidos.destroy', $pedido->ID_PEDIDO) }}" method="POST" class="d-inline">
+                        <form action="{{ route('pedidos.destroy', $pedido['id_PEDIDO']) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm">Eliminar</button>
@@ -66,7 +58,6 @@
                 </tr>
             @endforeach
         </tbody>
-
     </table>
 </div>
 
