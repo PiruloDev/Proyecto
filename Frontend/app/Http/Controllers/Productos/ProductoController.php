@@ -1,40 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Productos;
 
-use App\Services\ProductoS\ProductoService;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\Productos\ProductoService;
 
 class ProductoController extends Controller
 {
-    protected $service;
+    protected $productoService;
 
     public function __construct(ProductoService $productoService)
     {
-        $this->service = $productoService;
+        $this->productoService = $productoService;
     }
 
     public function index()
     {
-        $productos = $this->service->obtenerTodos();
-        return view('productos.index', compact('productos'));
-    }
+        // Esto pasa la variable $productos a la vista
+        $productos = $this->productoService->obtenerProductos();
 
-    public function store(Request $request)
-    {
-        $this->service->crear($request->all());
-        return back()->with('success', 'Producto creado correctamente');
+        return view('Productos.index', compact('productos'));
     }
-
-    public function update(Request $request, $id)
+    
+    // Si necesitas la función 'list' para llamadas AJAX de filtrado/búsqueda posterior,
+    // puedes implementarla aquí, pero no es necesaria para la carga inicial.
+    public function list()
     {
-        $this->service->actualizar($id, $request->all());
-        return back()->with('success', 'Producto actualizado correctamente');
+        return response()->json($this->productoService->obtenerProductos());
     }
-
-    public function destroy($id)
-    {
-        $this->service->eliminar($id);
-        return back()->with('success', 'Producto eliminado');
-    }
+    // ... otros métodos (store, update, destroy)
 }

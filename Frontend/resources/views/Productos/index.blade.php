@@ -4,7 +4,8 @@
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-<link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+{{-- Reemplaza con tu ruta correcta si es necesario --}}
+{{-- <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> --}}
 <style>
     .glass-card {
         background: rgba(255, 255, 255, 0.95);
@@ -34,12 +35,20 @@
         border-radius: 15px;
         margin-bottom: 2rem;
     }
+    
+    /* Animación simple para el spinner */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .spin-animation {
+        animation: spin 1s linear infinite;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Header -->
     <div class="search-section">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
@@ -54,7 +63,6 @@
         </div>
     </div>
 
-    <!-- Filtros y búsqueda -->
     <div class="card glass-card border-0 shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3">
@@ -67,11 +75,12 @@
                 <div class="col-md-3">
                     <select class="form-select" id="filtroCategoria">
                         <option value="">📦 Todas las categorías</option>
-                        <option value="panes">🍞 Panes</option>
-                        <option value="pasteles">🎂 Pasteles</option>
-                        <option value="galletas">🍪 Galletas</option>
-                        <option value="bebidas">☕ Bebidas</option>
-                        <option value="postres">🍰 Postres</option>
+                        {{-- NOTA: Estos son valores fijos. Para un sistema real, deberían cargarse desde la API --}}
+                        <option value="Panes">🍞 Panes</option>
+                        <option value="Pasteles">🎂 Pasteles</option>
+                        <option value="Galletas">🍪 Galletas</option>
+                        <option value="Bebidas">☕ Bebidas</option>
+                        <option value="Postres">🍰 Postres</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -90,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Estadísticas rápidas -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card glass-card border-0 shadow-sm">
@@ -130,7 +138,6 @@
         </div>
     </div>
 
-    <!-- Tabla de productos -->
     <div class="card glass-card border-0 shadow-sm">
         <div class="card-header bg-white border-0">
             <h5 class="mb-0"><i class="bi bi-list-ul"></i> Listado de Productos</h5>
@@ -152,14 +159,18 @@
                         </tr>
                     </thead>
                     <tbody id="tablaProductos">
-                        <!-- Los productos se cargarán aquí dinámicamente -->
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-primary">
+                                <i class="bi bi-arrow-repeat fs-3 spin-animation"></i>
+                                <p class="mt-2">Cargando productos...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Botón volver -->
     <div class="mt-4">
         <a href="{{ route('dashboard.admin') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Volver al Dashboard
@@ -167,7 +178,6 @@
     </div>
 </div>
 
-<!-- Modal para Crear/Editar Producto -->
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-labelledby="modalProductoLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -204,11 +214,12 @@
                             </label>
                             <select class="form-select" id="categoriaProducto" required>
                                 <option value="">Seleccione una categoría</option>
-                                <option value="panes">🍞 Panes</option>
-                                <option value="pasteles">🎂 Pasteles</option>
-                                <option value="galletas">🍪 Galletas</option>
-                                <option value="bebidas">☕ Bebidas</option>
-                                <option value="postres">🍰 Postres</option>
+                                {{-- Usar los mismos valores que en el filtro --}}
+                                <option value="Panes">🍞 Panes</option>
+                                <option value="Pasteles">🎂 Pasteles</option>
+                                <option value="Galletas">🍪 Galletas</option>
+                                <option value="Bebidas">☕ Bebidas</option>
+                                <option value="Postres">🍰 Postres</option>
                             </select>
                         </div>
 
@@ -262,7 +273,6 @@
     </div>
 </div>
 
-<!-- Modal de Detalles del Producto -->
 <div class="modal fade" id="modalDetalleProducto" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -271,8 +281,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="detalleProductoContenido">
-                <!-- Se llenará dinámicamente -->
-            </div>
+                </div>
         </div>
     </div>
 </div>
@@ -281,19 +290,16 @@
 
 @push('scripts')
 <script>
-    // Datos de ejemplo (en producción vendrían del backend)
-    let productos = @json($productos ?? []);
+    let productos = []; 
+    const API_URL = 'http://localhost:8080/productos'; 
 
     document.addEventListener('DOMContentLoaded', function() {
-        cargarProductos();
-        actualizarEstadisticas();
+        fetchAndRenderProductos();
 
-        // Event listeners para filtros
         document.getElementById('buscarProducto').addEventListener('input', filtrarProductos);
         document.getElementById('filtroCategoria').addEventListener('change', filtrarProductos);
         document.getElementById('filtroEstado').addEventListener('change', filtrarProductos);
 
-        // Vista previa de imagen
         document.getElementById('imagenProducto').addEventListener('input', function() {
             const url = this.value;
             const preview = document.getElementById('vistaPrevia');
@@ -307,64 +313,116 @@
             }
         });
     });
+    
+    // =========================================================
+    // 1. CARGA ASÍNCRONA DE DATOS DESDE LA API (CORRECCIÓN DE URL Y CLAVES)
+    // =========================================================
+    async function fetchAndRenderProductos() {
+        try {
+            const response = await fetch(API_URL); 
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}. URL: ${API_URL}`);
+            }
 
-    function cargarProductos() {
+            productos = await response.json(); 
+            
+            console.log("Productos cargados desde Spring Boot:", productos);
+            
+            renderTablaProductos(productos);
+            actualizarEstadisticas();
+
+        } catch (error) {
+            console.error("Error al cargar los productos desde la API:", error);
+            const tbody = document.getElementById('tablaProductos');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-5 text-danger">
+                        <i class="bi bi-x-octagon fs-1"></i>
+                        <p class="mt-2">Error al conectar con la API de productos.</p>
+                        <p>Asegúrese de que el backend esté corriendo en 8080 y, si el error es 'Failed to fetch', active la extensión CORS o configure el proxy.</p>
+                        <p>Detalle: ${error.message}</p>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('totalProductos').textContent = 0;
+            document.getElementById('productosActivos').textContent = 0;
+            document.getElementById('stockBajo').textContent = 0;
+            document.getElementById('valorInventario').textContent = '$0';
+        }
+    }
+
+    // =========================================================
+    // 2. FUNCIONES PRINCIPALES
+    // =========================================================
+
+    function renderTablaProductos(listaProductos) {
         const tbody = document.getElementById('tablaProductos');
         tbody.innerHTML = '';
         
-        if (productos.length === 0) {
+        if (!listaProductos || listaProductos.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="9" class="text-center py-5">
                         <i class="bi bi-inbox fs-1 text-muted"></i>
-                        <p class="text-muted mt-2">No hay productos registrados</p>
+                        <p class="text-muted mt-2">No hay productos registrados o la búsqueda no arrojó resultados.</p>
                     </td>
                 </tr>
             `;
             return;
         }
 
-        productos.forEach(producto => {
+        listaProductos.forEach(producto => {
+            const id = producto['Id Producto'];
+            const nombre = producto['Nombre Producto'] || 'N/A';
+            const descripcionCorta = (producto['Descripcion Producto'] || '').length > 50 
+                ? (producto['Descripcion Producto'] || '').substring(0, 50) + '...' 
+                : (producto['Descripcion Producto'] || '');
+            
+            const categoria = producto['Marca Producto'] || 'Sin marca'; 
+            
+            const estado = producto.activo ? 'activo' : 'inactivo';
+            const precio = parseFloat(producto['Precio']) || 0;
+            const stock = parseInt(producto['Stock Minimo']) || 0; 
+            const imagen = producto['Imagen Url'] || 'https://via.placeholder.com/60';
+            
             const tr = document.createElement('tr');
-            const descripcionCorta = producto.descripcion.length > 50 
-                ? producto.descripcion.substring(0, 50) + '...' 
-                : producto.descripcion;
             
             tr.innerHTML = `
-                <td class="ps-4"><strong>#${producto.id}</strong></td>
+                <td class="ps-4"><strong>#${id}</strong></td>
                 <td>
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="producto-img" 
-                         onerror="this.src='https://via.placeholder.com/60'">
+                    <img src="${imagen}" alt="${nombre}" class="producto-img" 
+                        onerror="this.src='https://via.placeholder.com/60'">
                 </td>
-                <td><strong>${producto.nombre}</strong></td>
+                <td><strong>${nombre}</strong></td>
                 <td>
                     <span class="badge bg-info text-dark">
-                        ${getCategoriaEmoji(producto.categoria)} ${capitalizar(producto.categoria)}
+                        ${categoria}
                     </span>
                 </td>
                 <td><small>${descripcionCorta}</small></td>
-                <td><strong>$${formatearPrecio(producto.precio)}</strong></td>
+                <td><strong>$${formatearPrecio(precio)}</strong></td>
                 <td>
-                    ${producto.stock <= 10 && producto.stock > 0 
-                        ? `<span class="badge bg-warning text-dark">${producto.stock}</span>` 
-                        : producto.stock === 0 
-                        ? `<span class="badge bg-danger">${producto.stock}</span>`
-                        : `<span class="badge bg-success">${producto.stock}</span>`
+                    ${stock <= 10 && stock > 0 
+                        ? `<span class="badge bg-warning text-dark">${stock}</span>` 
+                        : stock === 0 
+                        ? `<span class="badge bg-danger">${stock}</span>`
+                        : `<span class="badge bg-success">${stock}</span>`
                     }
                 </td>
                 <td>
-                    <span class="badge ${producto.estado === 'activo' ? 'bg-success' : 'bg-danger'}">
-                        ${producto.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                    <span class="badge ${estado === 'activo' ? 'bg-success' : 'bg-danger'}">
+                        ${estado === 'activo' ? 'Activo' : 'Inactivo'}
                     </span>
                 </td>
                 <td class="text-center table-actions pe-4">
-                    <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles(${producto.id})" title="Ver detalles">
+                    <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles(${id})" title="Ver detalles">
                         <i class="bi bi-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-warning btn-action me-1" onclick="editarProducto(${producto.id})" title="Editar">
+                    <button class="btn btn-sm btn-warning btn-action me-1" onclick="editarProducto(${id})" title="Editar">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger btn-action" onclick="eliminarProducto(${producto.id})" title="Eliminar">
+                    <button class="btn btn-sm btn-danger btn-action" onclick="eliminarProducto(${id})" title="Eliminar">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -379,63 +437,69 @@
         const estado = document.getElementById('filtroEstado').value;
         
         const productosFiltrados = productos.filter(producto => {
-            const cumpleBusqueda = producto.nombre.toLowerCase().includes(busqueda) || 
-                                   producto.descripcion.toLowerCase().includes(busqueda);
-            const cumpleCategoria = !categoria || producto.categoria === categoria;
-            const cumpleEstado = !estado || producto.estado === estado;
+            const nombre = (producto['Nombre Producto'] || '').toLowerCase();
+            const descripcion = (producto['Descripcion Producto'] || '').toLowerCase();
+            const productoCategoria = (producto['Marca Producto'] || '').toLowerCase();
+            const productoEstado = producto.activo ? 'activo' : 'inactivo';
+            
+            const cumpleBusqueda = (nombre.includes(busqueda) || descripcion.includes(busqueda));
+            
+            const cumpleCategoria = !categoria || productoCategoria.includes(categoria.toLowerCase());
+            const cumpleEstado = !estado || productoEstado === estado;
+            
             return cumpleBusqueda && cumpleCategoria && cumpleEstado;
         });
         
-        const tbody = document.getElementById('tablaProductos');
-        tbody.innerHTML = '';
+        renderTablaProductos(productosFiltrados); 
+    }
+
+    function actualizarEstadisticas() {
+        const total = productos.length;
+        const activos = productos.filter(p => p.activo).length;
         
-        productosFiltrados.forEach(producto => {
-            const tr = document.createElement('tr');
-            const descripcionCorta = producto.descripcion.length > 50 
-                ? producto.descripcion.substring(0, 50) + '...' 
-                : producto.descripcion;
-            
-            tr.innerHTML = `
-                <td class="ps-4"><strong>#${producto.id}</strong></td>
-                <td>
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="producto-img"
-                         onerror="this.src='https://via.placeholder.com/60'">
-                </td>
-                <td><strong>${producto.nombre}</strong></td>
-                <td>
-                    <span class="badge bg-info text-dark">
-                        ${getCategoriaEmoji(producto.categoria)} ${capitalizar(producto.categoria)}
-                    </span>
-                </td>
-                <td><small>${descripcionCorta}</small></td>
-                <td><strong>$${formatearPrecio(producto.precio)}</strong></td>
-                <td>
-                    ${producto.stock <= 10 && producto.stock > 0 
-                        ? `<span class="badge bg-warning text-dark">${producto.stock}</span>` 
-                        : producto.stock === 0 
-                        ? `<span class="badge bg-danger">${producto.stock}</span>`
-                        : `<span class="badge bg-success">${producto.stock}</span>`
-                    }
-                </td>
-                <td>
-                    <span class="badge ${producto.estado === 'activo' ? 'bg-success' : 'bg-danger'}">
-                        ${producto.estado === 'activo' ? 'Activo' : 'Inactivo'}
-                    </span>
-                </td>
-                <td class="text-center table-actions pe-4">
-                    <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles(${producto.id})" title="Ver detalles">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-warning btn-action me-1" onclick="editarProducto(${producto.id})" title="Editar">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger btn-action" onclick="eliminarProducto(${producto.id})" title="Eliminar">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        const stockBajo = productos.filter(p => {
+            const stock = parseInt(p['Stock Minimo']) || 0; 
+            return stock <= 10 && stock > 0;
+        }).length;
+        
+        const valorTotal = productos.reduce((sum, p) => {
+            const precio = parseFloat(p['Precio']) || 0;
+            const stock = parseInt(p['Stock Minimo']) || 0;
+            return sum + (precio * stock);
+        }, 0);
+        
+        document.getElementById('totalProductos').textContent = total;
+        document.getElementById('productosActivos').textContent = activos;
+        document.getElementById('stockBajo').textContent = stockBajo;
+        
+        document.getElementById('valorInventario').textContent = '$' + formatearPrecio(Math.round(valorTotal));
+    }
+    
+    // =========================================================
+    // 3. FUNCIONES DE MANTENIMIENTO (CRUD JS en frontend - SIMULADAS)
+    // =========================================================
+
+    function guardarProducto() {
+        alert("Función 'guardarProducto' no implementada. Necesita hacer un FETCH a la API.");
+    }
+    
+    function editarProducto(id) {
+        alert(`Función 'editarProducto' para ID ${id} no implementada.`);
+    }
+
+    function eliminarProducto(id) {
+        alert(`Función 'eliminarProducto' para ID ${id} no implementada.`);
+    }
+
+    function verDetalles(id) {
+        alert(`Función 'verDetalles' para ID ${id} no implementada.`);
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('buscarProducto').value = '';
+        document.getElementById('filtroCategoria').value = '';
+        document.getElementById('filtroEstado').value = '';
+        renderTablaProductos(productos); 
     }
 
     function limpiarFormulario() {
@@ -445,130 +509,14 @@
         document.getElementById('vistaPrevia').style.display = 'none';
     }
 
-    function guardarProducto() {
-        const id = document.getElementById('productoId').value;
-        const producto = {
-            id: id ? parseInt(id) : Math.max(...productos.map(p => p.id)) + 1,
-            nombre: document.getElementById('nombreProducto').value,
-            categoria: document.getElementById('categoriaProducto').value,
-            descripcion: document.getElementById('descripcionProducto').value || 'Sin descripción',
-            precio: parseFloat(document.getElementById('precioProducto').value),
-            stock: parseInt(document.getElementById('stockProducto').value),
-            estado: document.getElementById('estadoProducto').value,
-            imagen: document.getElementById('imagenProducto').value || 'https://via.placeholder.com/60'
-        };
-        
-        if (id) {
-            const index = productos.findIndex(p => p.id === parseInt(id));
-            productos[index] = producto;
-            mostrarAlerta('Producto actualizado correctamente', 'success');
-        } else {
-            productos.push(producto);
-            mostrarAlerta('Producto creado correctamente', 'success');
-        }
-        
-        cargarProductos();
-        actualizarEstadisticas();
-        bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
-    }
-
-    function editarProducto(id) {
-        const producto = productos.find(p => p.id === id);
-        if (producto) {
-            document.getElementById('productoId').value = producto.id;
-            document.getElementById('nombreProducto').value = producto.nombre;
-            document.getElementById('categoriaProducto').value = producto.categoria;
-            document.getElementById('descripcionProducto').value = producto.descripcion;
-            document.getElementById('precioProducto').value = producto.precio;
-            document.getElementById('stockProducto').value = producto.stock;
-            document.getElementById('estadoProducto').value = producto.estado;
-            document.getElementById('imagenProducto').value = producto.imagen;
-            document.getElementById('modalProductoLabel').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
-            
-            if (producto.imagen) {
-                document.getElementById('imagenPreview').src = producto.imagen;
-                document.getElementById('vistaPrevia').style.display = 'block';
-            }
-            
-            const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-            modal.show();
-        }
-    }
-
-    function eliminarProducto(id) {
-        const producto = productos.find(p => p.id === id);
-        if (confirm(`¿Está seguro de eliminar el producto "${producto.nombre}"?`)) {
-            productos = productos.filter(p => p.id !== id);
-            cargarProductos();
-            actualizarEstadisticas();
-            mostrarAlerta('Producto eliminado correctamente', 'danger');
-        }
-    }
-
-    function verDetalles(id) {
-        const producto = productos.find(p => p.id === id);
-        if (producto) {
-            const contenido = document.getElementById('detalleProductoContenido');
-            contenido.innerHTML = `
-                <div class="text-center mb-3">
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid rounded" style="max-height: 250px;">
-                </div>
-                <h4>${producto.nombre}</h4>
-                <hr>
-                <p><strong>ID:</strong> #${producto.id}</p>
-                <p><strong>Categoría:</strong> <span class="badge bg-info">${getCategoriaEmoji(producto.categoria)} ${capitalizar(producto.categoria)}</span></p>
-                <p><strong>Precio:</strong> $${formatearPrecio(producto.precio)} COP</p>
-                <p><strong>Stock:</strong> ${producto.stock} unidades</p>
-                <p><strong>Estado:</strong> <span class="badge ${producto.estado === 'activo' ? 'bg-success' : 'bg-danger'}">${producto.estado === 'activo' ? '✅ Activo' : '❌ Inactivo'}</span></p>
-                <p><strong>Descripción:</strong><br>${producto.descripcion}</p>
-            `;
-            
-            const modal = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
-            modal.show();
-        }
-    }
-
-    function actualizarEstadisticas() {
-        const total = productos.length;
-        const activos = productos.filter(p => p.estado === 'activo').length;
-        const stockBajo = productos.filter(p => p.stock <= 10 && p.stock > 0).length;
-        const valorTotal = productos.reduce((sum, p) => sum + (p.precio * p.stock), 0);
-        
-        document.getElementById('totalProductos').textContent = total;
-        document.getElementById('productosActivos').textContent = activos;
-        document.getElementById('stockBajo').textContent = stockBajo;
-        document.getElementById('valorInventario').textContent = '$' + formatearPrecio(valorTotal);
-    }
-
-    function limpiarFiltros() {
-        document.getElementById('buscarProducto').value = '';
-        document.getElementById('filtroCategoria').value = '';
-        document.getElementById('filtroEstado').value = '';
-        cargarProductos();
-    }
+    // =========================================================
+    // 4. FUNCIONES DE UTILIDAD
+    // =========================================================
 
     function formatearPrecio(precio) {
-        return new Intl.NumberFormat('es-CO').format(precio);
+        if (typeof precio !== 'number') return '0';
+        return new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(precio);
     }
-
-    function capitalizar(texto) {
-        return texto.charAt(0).toUpperCase() + texto.slice(1);
-    }
-
-    function getCategoriaEmoji(categoria) {
-        const emojis = {
-            'panes': '🍞',
-            'pasteles': '🎂',
-            'galletas': '🍪',
-            'bebidas': '☕',
-            'postres': '🍰'
-        };
-        return emojis[categoria] || '📦';
-    }
-
-    function mostrarAlerta(mensaje, tipo) {
-        // Puedes implementar tu sistema de notificaciones aquí
-        alert(mensaje);
-    }
+    
 </script>
 @endpush

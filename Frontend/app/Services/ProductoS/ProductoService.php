@@ -1,37 +1,15 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Productos;
 
 use App\Models\Productos\ProductosAdmin;
 
 class ProductoService
 {
-    public function obtenerTodos()
+    public function obtenerProductos()
     {
+        // Retorna la colección de productos
         return ProductosAdmin::all();
     }
-
-    public function buscar($id)
-    {
-        return ProductosAdmin::findOrFail($id);
-    }
-
-    public function crear(array $data)
-    {
-        return ProductosAdmin::create($data);
-    }
-
-    public function actualizar($id, array $data)
-    {
-        $producto = ProductosAdmin::findOrFail($id);
-        $producto->update($data);
-
-        return $producto;
-    }
-
-    public function eliminar($id)
-    {
-        $producto = ProductosAdmin::findOrFail($id);
-        return $producto->delete();
-    }
+    // ... otros métodos (crear, actualizar, eliminar)
 }

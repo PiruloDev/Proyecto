@@ -30,12 +30,12 @@ Route::get('/', [Categoriaproductos::class, 'index'])->name('home');
 // Menú de productos
 Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
 // Ruta para la vista de productos (CRUD completo)
-Route::prefix('productos')->group(function() {
-    Route::get('/', [ProductoController::class, 'index'])->name('productos.index');
-    Route::post('/store', [ProductoController::class, 'store'])->name('productos.store');
-    Route::put('/update/{id}', [ProductoController::class, 'update'])->name('productos.update');
-    Route::delete('/delete/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
-});
+Route::get('/productos', [ProductoController::class, 'index']) ->name('productos.index');
+Route::get('/productos/list', [ProductoController::class, 'list']);
+Route::post('/productos', [ProductoController::class, 'store']);
+Route::put('/productos/{id}', [ProductoController::class, 'update']);
+Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+
 // ============================================
 // AUTENTICACIÓN
 // ============================================

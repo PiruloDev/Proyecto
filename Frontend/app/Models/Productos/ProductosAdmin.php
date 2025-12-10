@@ -6,16 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductosAdmin extends Model
 {
-    protected $table = 'productos'; 
+    protected $table = 'productos';
 
     protected $fillable = [
         'nombre',
-        'categoria', 
         'descripcion',
         'precio',
         'stock',
-        'estado',
-        'imagen'
+        'categoria_id',
+        'estado'
     ];
-     public $timestamps = true;
 }
