@@ -12,7 +12,6 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar">
             <div class="sidebar-content">
                 <div class="sidebar-brand">
@@ -23,25 +22,27 @@
 
                 <ul class="nav flex-column">
                     <div class="nav-item">
+                        {{-- Enlace a Dashboard --}}
                         <a class="nav-link active" href="#dashboard" data-section="dashboard">
                             <i class="bi bi-house"></i>
                             Dashboard
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link" href="#pedidos">
+                        {{-- ENLACE CORREGIDO: Usará la ruta 'pedidos.index' --}}
+                        <a class="nav-link" href="{{ route('pedidos.index') }}" data-section="pedidos-index">
                             <i class="bi bi-cart-check"></i>
                             Gestionar Pedidos
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link" href="#productos">
+                        <a class="nav-link" href="#productos" data-section="productos">
                             <i class="bi bi-box-seam"></i>
                             Ver Productos
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link" href="#perfil">
+                        <a class="nav-link" href="#perfil" data-section="perfil">
                             <i class="bi bi-person-circle"></i>
                             Mi Perfil
                         </a>
@@ -66,21 +67,17 @@
             </div>
         </nav>
 
-        <!-- Main content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-            <!-- Mobile menu button -->
             <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
                 <i class="bi bi-list"></i> Menú
             </button>
 
-            <!-- Dashboard Section -->
             <div class="section-content" id="dashboard-section">
                 <div class="welcome-section mb-4">
                     <h2>Bienvenido, Empleado!</h2>
                     <p>Panel de control del empleado</p>
                 </div>
 
-                <!-- Stats Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-6 col-lg-3">
                         <div class="stat-card">
@@ -128,7 +125,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
                 <div class="orders-section">
                     <div class="section-header mb-3">
                         <h4> Acciones Rápidas</h4>
@@ -139,7 +135,8 @@
                                 <i class="bi bi-plus-circle fs-1 text-primary mb-3"></i>
                                 <h5>Crear Pedido</h5>
                                 <p class="text-muted">Registrar un nuevo pedido</p>
-                                <button class="btn btn-primary w-100">Crear</button>
+                                {{-- ENLACE CORREGIDO: a la vista de creación --}}
+                                <a href="{{ route('pedidos.create') }}" class="btn btn-primary w-100">Crear</a>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -147,11 +144,30 @@
                                 <i class="bi bi-list-check fs-1 text-success mb-3"></i>
                                 <h5>Ver Pedidos</h5>
                                 <p class="text-muted">Revisar pedidos pendientes</p>
-                                <button class="btn btn-success w-100">Ver</button>
+                                {{-- ENLACE CORREGIDO: a la vista de índice/listado --}}
+                                <a href="{{ route('pedidos.index') }}" class="btn btn-success w-100">Ver</a>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                {{-- Aquí irían otras secciones del dashboard (pedidos, productos, perfil) --}}
+
+                <div class="section-content" id="pedidos-section" style="display: none;">
+                    <h3>Gestión de Pedidos</h3>
+                    <p>Contenido para gestionar pedidos. Incluiría la tabla de pedidos pendientes, etc.</p>
+                </div>
+                
+                <div class="section-content" id="productos-section" style="display: none;">
+                    <h3>Productos</h3>
+                    <p>Contenido para visualizar productos disponibles.</p>
+                </div>
+                
+                <div class="section-content" id="perfil-section" style="display: none;">
+                    <h3>Mi Perfil</h3>
+                    <p>Contenido de la información del empleado.</p>
+                </div>
+                
             </div>
         </main>
     </div>
@@ -173,10 +189,12 @@
             });
         }
 
-        // Navegación entre secciones
+        // Navegación entre secciones (Lógica para pestañas dentro del dashboard)
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
+                
+                // Solo si es un enlace interno del dashboard (#...)
                 if (href && href.startsWith('#')) {
                     e.preventDefault();
 
@@ -191,8 +209,15 @@
                         targetSection.style.display = 'block';
                     }
                 }
+                // Si NO empieza con '#' (es decir, usa route() como "Gestionar Pedidos"), navega normalmente.
             });
         });
+        
+        // Mostrar la sección del dashboard por defecto al cargar
+        const dashboardSection = document.getElementById('dashboard-section');
+        if (dashboardSection) {
+            dashboardSection.style.display = 'block';
+        }
     });
 </script>
 @endpush
