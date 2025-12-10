@@ -16,57 +16,84 @@ class PedidosController extends Controller
         $this->apiService = $apiService;
     }
 
+    
     public function index()
     {
         try {
             $pedidos = $this->apiService->obtenerPedidos();
-            // La vista 'index' ya fue corregida para usar claves como 'id_PEDIDO'
             return view('pedidosviews.PedidosClientes.index', compact('pedidos'));
             
         } catch (Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar los pedidos: ' . $e->getMessage());
         }
     }
 
+    
     public function create()
     {
-         // NOTA: Si EstadosPedidos no está migrado, este array es temporal
          $estados = []; 
          return view('pedidosviews.PedidosClientes.create', compact('estados'));
     }
 
+    
     public function store(Request $request)
     {
-        // 1. Validación (Usamos los nombres que vienen del formulario/input)
+    
         $request->validate([
             'ID_CLIENTE' => 'required|integer',
             'ID_EMPLEADO' => 'required|integer',
             'ID_ESTADO_PEDIDO' => 'required|integer',
             'TOTAL_PRODUCTO' => 'required|numeric',
+            'FECHA_ENTREGA' => 'nullable|date', 
         ]);
         
-        // 2. Mapeo: Convertimos las claves del formulario (MAYÚSCULAS)
-        //    al formato exacto que la API de Java necesita (id_CLIENTE, total_PRODUCTO)
+        
         $dataApi = [
-            'id_CLIENTE' => $request->input('ID_CLIENTE'),
+            'id_CLIENTE' => $request->input('ID_CLIENTE'), 
             'id_EMPLEADO' => $request->input('ID_EMPLEADO'),
             'id_ESTADO_PEDIDO' => $request->input('ID_ESTADO_PEDIDO'),
             'total_PRODUCTO' => $request->input('TOTAL_PRODUCTO'),
-            // NOTA: fecha_INGRESO y fecha_ENTREGA generalmente se manejan en Java (servidor)
-            // Si Java requiere fecha_INGRESO, debes añadirla aquí: 'fecha_INGRESO' => now()->format('Y-m-d')
+            'fecha_ENTREGA' => $request->input('FECHA_ENTREGA'), 
         ];
         
         try {
-            $this->apiService->crearPedido($dataApi); // Enviamos los datos mapeados
+            $this->apiService->crearPedido($dataApi); 
 
             return redirect()->route('pedidos.index')
                  ->with('success', 'Pedido creado correctamente.');
         } catch (Exception $e) {
-            // Se mostrará el error devuelto por la API de Java
+            
             return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
         }
     }
 
+    
+    public function dashboardEmpleado()
+    {
+        $pedidos = [];
+        $pedidosHoy = 0;
+        $pedidosPendientes = 0;
+        $productosDisponibles = 0;
+        $totalPedidos = 0;
+        
+        try {
+            $pedidos = $this->apiService->obtenerPedidos();
+            $totalPedidos = count($pedidos); 
+        } catch (Exception $e) {
+             
+        }
+
+        return view('dashboards.employee', compact(
+            'pedidos', 
+            'pedidosHoy', 
+            'pedidosPendientes', 
+            'productosDisponibles', 
+            'totalPedidos' 
+        ));
+    }
+
+
+    
     public function edit($id)
     {
         try {
@@ -75,43 +102,42 @@ class PedidosController extends Controller
                 return redirect()->back()->with('error', 'Pedido no encontrado.');
             }
             
-            // NOTA: Si EstadosPedidos no está migrado, este array es temporal
             $estados = []; 
 
-            // La vista 'edit' ya fue corregida para usar claves como 'id_PEDIDO'
             return view('pedidosviews.PedidosClientes.edit', compact('pedido', 'estados'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Error al cargar pedido: ' . $e->getMessage());
         }
     }
 
+   
     public function update(Request $request, $id)
     {
-        // 1. Validación
+    
         $request->validate([
             'ID_CLIENTE' => 'required|integer',
             'ID_EMPLEADO' => 'required|integer',
             'ID_ESTADO_PEDIDO' => 'required|integer',
             'TOTAL_PRODUCTO' => 'required|numeric',
+            'FECHA_ENTREGA' => 'nullable|date', 
         ]);
 
-        // 2. Mapeo: Convertimos las claves del formulario (MAYÚSCULAS)
-        //    al formato exacto que la API de Java necesita (id_CLIENTE, total_PRODUCTO)
+        
         $dataApi = [
             'id_CLIENTE' => $request->input('ID_CLIENTE'),
             'id_EMPLEADO' => $request->input('ID_EMPLEADO'),
             'id_ESTADO_PEDIDO' => $request->input('ID_ESTADO_PEDIDO'),
             'total_PRODUCTO' => $request->input('TOTAL_PRODUCTO'),
-            // NOTA: Para PUT/UPDATE, no necesitas enviar ID_PEDIDO, ya que va en la URL.
+            'fecha_ENTREGA' => $request->input('FECHA_ENTREGA'), 
         ];
 
         try {
-            $this->apiService->actualizarPedido($id, $dataApi); // Enviamos los datos mapeados
+            $this->apiService->actualizarPedido($id, $dataApi); 
 
             return redirect()->route('pedidos.index')
                  ->with('success', "Pedido con ID $id actualizado correctamente.");
         } catch (Exception $e) {
-            // Se mostrará el error devuelto por la API de Java
+            
             return redirect()->back()->withInput()->with('error', 'Error al actualizar pedido: ' . $e->getMessage());
         }
     }
