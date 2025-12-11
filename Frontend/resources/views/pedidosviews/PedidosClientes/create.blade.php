@@ -2,74 +2,117 @@
 
 @section('title', 'Crear Pedido')
 
+@push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> 
+    <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+@endpush
+
 @section('content')
-<div class="container">
-
-    <h1 class="mb-4">Crear Nuevo Pedido</h1>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <form action="{{ route('pedidos.store') }}" method="POST">
-        @csrf
-
-        <div class="mb-3">
-            <label for="ID_CLIENTE" class="form-label">ID Cliente</label>
-            <input type="number" class="form-control" id="ID_CLIENTE" name="ID_CLIENTE" value="{{ old('ID_CLIENTE') }}" required> 
-            @error('ID_CLIENTE')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label for="ID_EMPLEADO" class="form-label">ID Empleado</label>
-            <input type="number" class="form-control" id="ID_EMPLEADO" name="ID_EMPLEADO" value="{{ old('ID_EMPLEADO') }}" required>
-            @error('ID_EMPLEADO')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label for="ID_ESTADO_PEDIDO" class="form-label">ID Estado Pedido</label>
-            <input type="number" class="form-control" id="ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" value="{{ old('ID_ESTADO_PEDIDO') }}" required>
-            @error('ID_ESTADO_PEDIDO')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+<div class="container-fluid">
+    <div class="row">
         
-        <div class="mb-3">
-            <label for="FECHA_ENTREGA" class="form-label">Fecha de Entrega (Opcional)</label>
-            <input type="date" class="form-control" id="FECHA_ENTREGA" name="FECHA_ENTREGA" value="{{ old('FECHA_ENTREGA') }}">
-            @error('FECHA_ENTREGA')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+        {{-- ================================================= --}}
+        {{-- ✅ LÓGICA CONDICIONAL DEL SIDEBAR --}}
+        {{-- ================================================= --}}
+        @php
+            $esAdmin = Auth::check() && Auth::user()->rol === 'admin'; 
+        @endphp
 
-        <div class="mb-3">
-            <label for="TOTAL_PRODUCTO" class="form-label">Total Producto</label>
-            <input type="number" step="0.01" class="form-control" id="TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" value="{{ old('TOTAL_PRODUCTO') }}" required>
-            @error('TOTAL_PRODUCTO')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+        @if ($esAdmin)
+            @include('components.admin-sidebar') 
+        @else
+            @include('components.employee-sidebar') 
+        @endif
+        
+        {{-- CONTENIDO PRINCIPAL --}}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+            
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                <h1 class="h2">Crear Nuevo Pedido</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ route('pedidos.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> Ver Listado
+                    </a>
+                </div>
+            </div>
 
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{{ route('pedidos.index') }}" class="btn btn-secondary">Cancelar</a>
+            {{-- MENSAJES DE VALIDACIÓN Y ERROR --}}
+            @if ($errors->any())
+                <div class="alert alert-danger my-3">
+                    <p>Por favor, corrige los siguientes errores:</p>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-    </form>
+            @if (session('error'))
+                <div class="alert alert-danger my-3">
+                    {{ session('error') }}
+                </div>
+            @endif
 
+            <section class="p-4 bg-white shadow-sm rounded-3">
+                <form action="{{ route('pedidos.store') }}" method="POST" class="row g-3">
+                    @csrf
+
+                    <div class="col-md-6">
+                        <label for="ID_CLIENTE" class="form-label">ID Cliente</label>
+                        <input type="number" class="form-control" id="ID_CLIENTE" name="ID_CLIENTE" value="{{ old('ID_CLIENTE') }}" required> 
+                        @error('ID_CLIENTE')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ID_EMPLEADO" class="form-label">ID Empleado</label>
+                        <input type="number" class="form-control" id="ID_EMPLEADO" name="ID_EMPLEADO" value="{{ old('ID_EMPLEADO') }}" required>
+                        @error('ID_EMPLEADO')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ID_ESTADO_PEDIDO" class="form-label">ID Estado Pedido</label>
+                        <input type="number" class="form-control" id="ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" value="{{ old('ID_ESTADO_PEDIDO') }}" required>
+                        @error('ID_ESTADO_PEDIDO')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="FECHA_ENTREGA" class="form-label">Fecha de Entrega (Opcional)</label>
+                        <input type="date" class="form-control" id="FECHA_ENTREGA" name="FECHA_ENTREGA" value="{{ old('FECHA_ENTREGA') }}">
+                        @error('FECHA_ENTREGA')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="TOTAL_PRODUCTO" class="form-label">Total Producto</label>
+                        <input type="number" step="0.01" class="form-control" id="TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" value="{{ old('TOTAL_PRODUCTO') }}" required>
+                        @error('TOTAL_PRODUCTO')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12 mt-4 d-flex justify-content-start">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                        <a href="{{ route('pedidos.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </section>
+
+        </main>
+
+    </div>
 </div>
 @endsection

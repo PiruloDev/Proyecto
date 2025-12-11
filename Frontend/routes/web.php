@@ -73,6 +73,9 @@ Route::get('/dashboardcliente', function () {
     return view('dashboards.client', compact('totalPedidos', 'pedidosPendientes', 'pedidosRecientes'));
 })->name('dashboard.client');
 
+Route::get('/dashboard/cliente', [PedidosController::class, 'dashboardCliente'])
+    ->name('dashboard.cliente');
+
 // Dashboard Empleado
 Route::get('/dashboardempleado', function () {
     $pedidosHoy = 0;
