@@ -29,12 +29,17 @@ use App\Http\Controllers\Reportes\OrdenSalidaController;
 Route::get('/', [Categoriaproductos::class, 'index'])->name('home');
 // Menú de productos
 Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
-// Ruta para la vista de productos (CRUD completo)
-Route::get('/productos', [ProductoController::class, 'index']) ->name('productos.index');
-Route::get('/productos/list', [ProductoController::class, 'list']);
-Route::post('/productos', [ProductoController::class, 'store']);
-Route::put('/productos/{id}', [ProductoController::class, 'update']);
-Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+// ============================================
+// PRODUCTOS - CRUD COMPLETO
+// ============================================
+Route::prefix('productos')->group(function () {
+    Route::get('/', [ProductoController::class, 'index'])->name('productos.index');
+    Route::post('/', [ProductoController::class, 'store'])->name('productos.store');
+    Route::put('/{id}', [ProductoController::class, 'update'])->name('productos.update');
+    Route::delete('/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+});
+
+
 
 // ============================================
 // AUTENTICACIÓN
