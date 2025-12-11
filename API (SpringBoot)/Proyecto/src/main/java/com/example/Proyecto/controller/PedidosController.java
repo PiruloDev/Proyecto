@@ -16,14 +16,12 @@ public class PedidosController {
     @Autowired
     private pedidosService pedidosService;
 
-    // Endpoint para obtener todos los pedidos (GET)
     @GetMapping
     public ResponseEntity<List<Pedidos>> obtenerTodosLosPedidos() {
         List<Pedidos> pedidos = pedidosService.obtenerPedidos();
         return new ResponseEntity<>(pedidos, HttpStatus.OK);
     }
 
-    // Endpoint para obtener un pedido por su ID (GET)
     @GetMapping("/{id}")
     public ResponseEntity<Pedidos> obtenerPedidoPorId(@PathVariable("id") Long id) {
         Pedidos pedido = pedidosService.obtenerPedidoPorId(id);
@@ -34,24 +32,30 @@ public class PedidosController {
         }
     }
 
-    // Endpoint para crear un nuevo pedido (POST)
     @PostMapping
     public ResponseEntity<String> crearPedido(@RequestBody Pedidos pedido) {
         pedidosService.crearPedido(pedido);
         return new ResponseEntity<>("Pedido creado con éxito.", HttpStatus.CREATED);
     }
 
-    // Endpoint para actualizar un pedido (PUT)
+
     @PutMapping("/{id}")
     public ResponseEntity<String> actualizarPedido(@PathVariable("id") Long id, @RequestBody Pedidos pedido) {
         pedidosService.actualizarPedido(id, pedido);
         return new ResponseEntity<>("Pedido con ID " + id + " actualizado con éxito.", HttpStatus.OK);
     }
 
-    // Endpoint para eliminar un pedido (DELETE)
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarPedido(@PathVariable("id") Long id) {
         pedidosService.eliminarPedido(id);
         return new ResponseEntity<>("Pedido con ID " + id + " eliminado con éxito.", HttpStatus.OK);
+    }
+
+    @GetMapping("/pedidos/cliente/{id_cliente}")
+    public List<Pedidos> obtenerPedidosPorCliente(@PathVariable long id_cliente) {
+        // Implementa la lógica en tu PedidosService para hacer la consulta SQL:
+        // SELECT * FROM Pedidos WHERE ID_CLIENTE = ?
+        return pedidosService.obtenerPedidosPorCliente(id_cliente);
     }
 }

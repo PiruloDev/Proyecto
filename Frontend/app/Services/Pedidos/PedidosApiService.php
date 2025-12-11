@@ -110,4 +110,29 @@ class PedidosApiService
             throw new Exception($message);
         }
     }
+
+    // ----------------------------------------------------------------------
+    // ✅ MÉTODO CLAVE PARA EL DASHBOARD DEL CLIENTE (NUEVO)
+    // ----------------------------------------------------------------------
+    
+    /**
+     * Obtiene todos los pedidos asociados a un ID de cliente específico
+     * llamando al endpoint filtrado del backend.
+     * * @param int $clienteId El ID del cliente actual.
+     * @return array La lista de pedidos del cliente.
+     */
+    public function obtenerPedidosPorCliente($clienteId)
+    {
+        // Llama al endpoint de Spring Boot que implementaste: http://localhost:8080/pedidos/cliente/{id}
+        $url = "{$this->baseUrl}/cliente/{$clienteId}"; 
+        
+        try {
+            $response = Http::get($url);
+            $response->throw(); 
+            return $response->json();
+        } catch (Exception $e) {
+            // Este error será capturado por el PedidosController y mostrado al cliente.
+            throw new Exception("Error al obtener los pedidos del cliente {$clienteId} de la API.");
+        }
+    }
 }
