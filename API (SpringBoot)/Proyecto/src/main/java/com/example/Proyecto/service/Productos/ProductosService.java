@@ -159,23 +159,52 @@ public class ProductosService {
     }
 
     public boolean actualizarProducto(PojoProductos pojoProductos) {
-        String sql = "UPDATE Productos SET NOMBRE_PRODUCTO = ?, PRODUCTO_STOCK_MIN = ?, PRECIO_PRODUCTO = ?, FECHA_VENCIMIENTO_PRODUCTO = ?, TIPO_PRODUCTO_MARCA = ? WHERE ID_PRODUCTO = ?";
+        String sql = "UPDATE Productos SET " +
+                "NOMBRE_PRODUCTO = ?, " +
+                "ID_CATEGORIA_PRODUCTO = ?, " +
+                "DESCRIPCION_PRODUCTO = ?, " +
+                "PRODUCTO_STOCK_MIN = ?, " +
+                "PRECIO_PRODUCTO = ?, " +
+                "FECHA_VENCIMIENTO_PRODUCTO = ?, " +
+                "TIPO_PRODUCTO_MARCA = ?, " +
+                "ACTIVO = ?, " +
+                "IMAGEN_URL_PRODUCTO = ? " +
+                "WHERE ID_PRODUCTO = ?";
         try {
+            System.out.println("=== ACTUALIZANDO PRODUCTO ===");
+            System.out.println("ID: " + pojoProductos.getId());
+            System.out.println("Nombre: " + pojoProductos.getNombreProducto());
+            System.out.println("Categoría: " + pojoProductos.getIdCategoriaProducto());
+            System.out.println("Descripción: " + pojoProductos.getDescripcionProducto());
+            System.out.println("Stock: " + pojoProductos.getStockMinimo());
+            System.out.println("Precio: " + pojoProductos.getPrecio());
+            System.out.println("Marca: " + pojoProductos.getMarcaProducto());
+            System.out.println("Activo: " + pojoProductos.isActivo());
+            System.out.println("Imagen: " + pojoProductos.getImagenUrl());
+
             java.sql.Date fechaVencimiento = null;
             if (pojoProductos.getFechaVencimiento() != null) {
                 fechaVencimiento = java.sql.Date.valueOf(pojoProductos.getFechaVencimiento());
             }
-            
+
             int result = jdbcTemplate.update(sql,
                     pojoProductos.getNombreProducto(),
+                    pojoProductos.getIdCategoriaProducto(),
+                    pojoProductos.getDescripcionProducto(),
                     pojoProductos.getStockMinimo(),
                     pojoProductos.getPrecio(),
                     fechaVencimiento,
                     pojoProductos.getMarcaProducto(),
+                    pojoProductos.isActivo(),
+                    pojoProductos.getImagenUrl(),
                     pojoProductos.getId()
             );
+
+            System.out.println("Filas actualizadas: " + result);
             return result > 0;
+
         } catch (DataAccessException e) {
+            System.out.println("ERROR SQL: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

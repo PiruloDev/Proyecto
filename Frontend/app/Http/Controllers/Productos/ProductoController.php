@@ -13,96 +13,167 @@ class ProductoController extends Controller
 
     public function index()
     {
-        $response = Http::get($this->apiUrl);
-        $productos = $response->successful() ? $response->json() : [];
+        try {
+            $response = Http::get($this->apiUrl);
+            $productos = $response->json();
+            
+            if ($response->failed() || !is_array($productos)) {
+                $productos = []; 
+                Log::error('Error al cargar productos desde la API', ['status' => $response->status()]);
+            }
 
-        return view('productos.index', compact('productos'));
+            $categorias = [
+                1 => 'Tortas Tres Leches',
+                2 => 'Tortas Milyway',
+                3 => 'Tortas por Encargo',
+                4 => 'Pan Grande',
+                5 => 'Pan Pequeño',
+                6 => 'Postres',
+                7 => 'Galletas',
+                8 => 'Tamales',
+                9 => 'Yogures',
+                10 => 'Pasteles Pollo',
+            ];
+
+            return view('productos.index', compact('productos', 'categorias'));
+        
+        } catch (\Exception $e) {
+            Log::error('Excepción en ProductoController@index: ' . $e->getMessage());
+            $productos = [];
+            $categorias = [];
+            return view('productos.index', compact('productos', 'categorias'))
+                ->withErrors('No se pudo conectar con el servicio de productos.');
+        }
     }
 
     public function store(Request $request)
     {
         try {
-            Log::info('Creando producto', $request->all());
-            
-            $response = Http::timeout(10)->post($this->apiUrl, [
-                'nombreProducto' => $request->nombre,
-                'idCategoriaProducto' => (int)$request->categoria,
-                'descripcionProducto' => $request->descripcion ?? '',
-                'precio' => (float)$request->precio,
-                'stockMinimo' => (int)$request->stock,
-                'marcaProducto' => $request->marca ?? 'Propio',
-                'activo' => $request->estado === 'activo',
-                'imagenProducto' => $request->imagen ?? 'https://via.placeholder.com/60',
-                'fechaVencimiento' => now()->addYear()->format('Y-m-d'),
-                'fechaIngreso' => now()->format('Y-m-d'),
-                'idAdmin' => 1
+            $validated = $request->validate([
+                'nombre' => 'required|string|max:255',
+                'categoria' => 'required|integer|min:1|max:10',
+                'descripcion' => 'nullable|string',
+                'precio' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'estado' => 'required|in:activo,inactivo',
+                'imagen' => 'nullable|url',
+                'marca' => 'nullable|string'
             ]);
 
-            Log::info('Respuesta API CREATE', [
-                'status' => $response->status(),
-                'body' => $response->json()
-            ]);
+            $data = [
+                'NOMBRE_PRODUCTO' => $validated['nombre'],
+                'ID_CATEGORIA_PRODUCTO' => (int)$validated['categoria'],
+                'DESCRIPCION_PRODUCTO' => $validated['descripcion'] ?? '',
+                'PRECIO_PRODUCTO' => (float)$validated['precio'],
+                'PRODUCTO_STOCK_MIN' => (int)$validated['stock'],
+                'TIPO_PRODUCTO_MARCA' => $validated['marca'] ?? 'Propio',
+                'ACTIVO' => $validated['estado'] === 'activo',
+                'IMAGEN_URL_PRODUCTO' => $validated['imagen'] ?? 'https://via.placeholder.com/60',
+                'ID_ADMIN' => 1,
+                'FECHA_VENCIMIENTO_PRODUCTO' => now()->addYear()->format('Y-m-d'),
+                'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
+            ];
+
+            Log::info('CREAR PRODUCTO - Datos a enviar:', $data);
+
+            $response = Http::timeout(10)
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post($this->apiUrl, $data);
 
             if ($response->successful()) {
                 return redirect()->route('productos.index')
-                    ->with('success', 'Producto creado correctamente');
+                    ->with('success', 'Producto creado correctamente.');
+            } else {
+                Log::error('Error API al crear producto', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                return back()->with('error', 'Error al crear el producto. Código: ' . $response->status())
+                    ->withInput();
             }
 
-            return redirect()->back()
-                ->with('error', 'Error al crear: ' . json_encode($response->json()))
-                ->withInput();
-                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            Log::error('Error crear producto: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Error de conexión: ' . $e->getMessage())
+            Log::error('Excepción al crear producto: ' . $e->getMessage());
+            return back()->with('error', 'Error inesperado: ' . $e->getMessage())
                 ->withInput();
         }
     }
 
     public function update(Request $request, $id)
-    {
-        try {
-            Log::info('Actualizando producto ID: ' . $id, $request->all());
-            
-            $data = [
-                'id' => (int)$id,
-                'nombreProducto' => $request->nombre,
-                'idCategoriaProducto' => (int)$request->categoria,
-                'descripcionProducto' => $request->descripcion ?? '',
-                'precio' => (float)$request->precio,
-                'stockMinimo' => (int)$request->stock,
-                'marcaProducto' => $request->marca ?? 'Propio',
-                'activo' => $request->estado === 'activo',
-                'imagenProducto' => $request->imagen ?? 'https://via.placeholder.com/60'
-            ];
-            
-            Log::info('Datos enviados a API', $data);
-            
-            $response = Http::timeout(10)->put($this->apiUrl . '/' . $id, $data);
+{
+    try {
+        \Log::info('=== UPDATE REQUEST ===', [
+            'id' => $id,
+            'all_data' => $request->all(),
+        ]);
 
-            Log::info('Respuesta API UPDATE', [
-                'status' => $response->status(),
-                'body' => $response->json()
-            ]);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'categoria' => 'required|integer|min:1|max:10',
+            'descripcion' => 'nullable|string',
+            'precio' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'estado' => 'required|in:activo,inactivo',
+            'imagen' => 'nullable|string', 
+            'marca' => 'nullable|string'
+        ]);
 
-            if ($response->successful()) {
-                return redirect()->route('productos.index')
-                    ->with('success', 'Producto actualizado correctamente');
-            }
+        $imagenDefault = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="rgba(0,0,0,0.5)" font-family="sans-serif" font-size="14" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo imagen%3C/text%3E%3C/svg%3E';
 
-            $errorBody = $response->json();
-            return redirect()->back()
-                ->with('error', 'Error al actualizar: ' . ($errorBody['error'] ?? $response->body()))
-                ->withInput();
-                
-        } catch (\Exception $e) {
-            Log::error('Error actualizar producto: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Error de conexión: ' . $e->getMessage())
-                ->withInput();
+        $data = [
+            'ID_PRODUCTO' => (int)$id,
+            'NOMBRE_PRODUCTO' => $validated['nombre'],
+            'ID_CATEGORIA_PRODUCTO' => (int)$validated['categoria'],
+            'DESCRIPCION_PRODUCTO' => $validated['descripcion'] ?? '',
+            'PRECIO_PRODUCTO' => (float)$validated['precio'],
+            'PRODUCTO_STOCK_MIN' => (int)$validated['stock'],
+            'TIPO_PRODUCTO_MARCA' => $validated['marca'] ?? 'Propio',
+            'ACTIVO' => $validated['estado'] === 'activo',
+            'IMAGEN_URL_PRODUCTO' => !empty($validated['imagen']) ? $validated['imagen'] : $imagenDefault,
+            'ID_ADMIN' => 1,
+            'FECHA_VENCIMIENTO_PRODUCTO' => now()->addYear()->format('Y-m-d'),
+            'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
+        ];
+
+        \Log::info('Datos a enviar a API:', $data);
+
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ])
+            ->patch($this->apiUrl . '/' . $id, $data);
+
+        \Log::info('Respuesta de API:', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->route('productos.index')
+                ->with('success', 'Producto actualizado correctamente.');
         }
+
+        return back()
+            ->with('error', 'Error ' . $response->status() . ': ' . $response->body())
+            ->withInput();
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        \Log::error('Errores de validación:', $e->errors());
+        return back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        \Log::error('Excepción en update:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return back()
+            ->with('error', 'Error: ' . $e->getMessage())
+            ->withInput();
     }
+}
 
     public function destroy($id)
     {
@@ -113,7 +184,7 @@ class ProductoController extends Controller
 
             Log::info('Respuesta API DELETE', [
                 'status' => $response->status(),
-                'body' => $response->json()
+                'body' => $response->body()
             ]);
 
             if ($response->successful()) {

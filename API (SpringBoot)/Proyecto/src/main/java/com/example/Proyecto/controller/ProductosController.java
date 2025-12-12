@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RequestMapping("/productos")
 @RestController
-@CrossOrigin(origins = {"http://localhost:8000", "http://127.0.0.1:8000"}) 
 public class ProductosController {
 
     @Autowired
@@ -66,9 +65,29 @@ public class ProductosController {
 
         try {
             System.out.println("=== DEBUG POST PRODUCTOS ===");
+            System.out.println("Datos recibidos:");
             System.out.println("Nombre: " + pojoProductos.getNombreProducto());
             System.out.println("Stock Mínimo: " + pojoProductos.getStockMinimo());
             System.out.println("Precio: " + pojoProductos.getPrecio());
+            System.out.println("Fecha Vencimiento RAW: " + pojoProductos.getFechaVencimiento());
+            System.out.println("Fecha Ingreso RAW: " + pojoProductos.getFechaIngreso());
+            System.out.println("Marca: " + pojoProductos.getMarcaProducto());
+            System.out.println("ID Admin: " + pojoProductos.getIdAdmin());
+            System.out.println("ID Categoria: " + pojoProductos.getIdCategoriaProducto());
+
+            if (pojoProductos.getFechaVencimiento() != null) {
+                System.out.println("Tipo de fecha vencimiento: " + pojoProductos.getFechaVencimiento().getClass().getSimpleName());
+                System.out.println("Fecha vencimiento toString: " + pojoProductos.getFechaVencimiento().toString());
+            } else {
+                System.out.println("ALERTA: fechaVencimiento es NULL");
+            }
+
+            if (pojoProductos.getFechaIngreso() != null) {
+                System.out.println("Tipo de fecha ingreso: " + pojoProductos.getFechaIngreso().getClass().getSimpleName());
+                System.out.println("Fecha ingreso toString: " + pojoProductos.getFechaIngreso().toString());
+            } else {
+                System.out.println("ALERTA: fechaIngreso es NULL");
+            }
 
             if (pojoProductos.getNombreProducto() == null || pojoProductos.getNombreProducto().trim().isEmpty()) {
                 response.put("error", "El nombre del producto es obligatorio");
@@ -77,6 +96,7 @@ public class ProductosController {
             }
 
             boolean creado = productosService.crearProducto(pojoProductos);
+            System.out.println("Resultado del servicio: " + creado);
 
             if (creado) {
                 response.put("mensaje", "Nuevo Producto creado e ingresado exitosamente");
@@ -90,72 +110,81 @@ public class ProductosController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Excepción en crearProducto: " + e.getMessage());
             response.put("error", "Excepción al crear producto: " + e.getMessage());
             response.put("status", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> actualizarProducto(
-            @PathVariable("id") Long id,
-            @RequestBody PojoProductos pojoProductos) {
-
-        Map<String, Object> response = new HashMap<>();
-
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> actualizarProducto(@PathVariable("id") Long id, @RequestBody PojoProductos pojoProductos) {
         try {
-            System.out.println("=== DEBUG PUT PRODUCTOS ===");
-            System.out.println("ID a actualizar: " + id);
+            // ← LOGS DE DEBUG
+            System.out.println("=== DATOS RECIBIDOS EN PATCH ===");
+            System.out.println("ID: " + id);
             System.out.println("Nombre: " + pojoProductos.getNombreProducto());
             System.out.println("Precio: " + pojoProductos.getPrecio());
             System.out.println("Stock: " + pojoProductos.getStockMinimo());
+            System.out.println("Categoría: " + pojoProductos.getIdCategoriaProducto());
+            System.out.println("Marca: " + pojoProductos.getMarcaProducto());
+            System.out.println("Activo: " + pojoProductos.isActivo());
+            System.out.println("Objeto completo: " + pojoProductos.toString());
 
             pojoProductos.setId(id.intValue());
             boolean actualizado = productosService.actualizarProducto(pojoProductos);
 
             if (actualizado) {
-                response.put("mensaje", "Producto actualizado correctamente");
-                response.put("status", 200);
-                response.put("producto", pojoProductos.getNombreProducto());
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok("El producto " + pojoProductos.getNombreProducto() + " ha sido actualizado correctamente");
             } else {
-                response.put("error", "No se pudo actualizar el producto");
-                response.put("status", 400);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Error al actualizar el producto");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.put("error", "Excepción al actualizar: " + e.getMessage());
-            response.put("status", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            System.out.println("ERROR EN PATCH: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Excepción: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> eliminarProducto(@PathVariable("id") int id) {
-        Map<String, Object> response = new HashMap<>();
-
+    public ResponseEntity<String> eliminarProducto(@PathVariable("id") int id) {
         try {
-            System.out.println("=== DEBUG DELETE PRODUCTOS ===");
-            System.out.println("ID a eliminar: " + id);
-
             boolean eliminado = productosService.eliminarProducto(id);
-
             if (eliminado) {
-                response.put("mensaje", "Producto eliminado correctamente");
-                response.put("status", 200);
-                response.put("id", id);
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok("Producto con ID " + id + " eliminado correctamente");
             } else {
-                response.put("error", "No se encontró producto con ID " + id);
-                response.put("status", 404);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontro producto con ID " + id);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.put("error", "Error al eliminar: " + e.getMessage());
-            response.put("status", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el producto: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/test-fechas")
+    public ResponseEntity<Map<String, Object>> testFechas(@RequestBody PojoProductos pojoProductos) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            System.out.println("=== TEST FECHAS ===");
+            System.out.println("Fecha Vencimiento recibida: " + pojoProductos.getFechaVencimiento());
+            System.out.println("Fecha Ingreso recibida: " + pojoProductos.getFechaIngreso());
+
+            response.put("mensaje", "Test de fechas ejecutado");
+            response.put("fechaVencimiento", pojoProductos.getFechaVencimiento());
+            response.put("fechaIngreso", pojoProductos.getFechaIngreso());
+            response.put("fechaVencimientoEsNull", pojoProductos.getFechaVencimiento() == null);
+            response.put("fechaIngresoEsNull", pojoProductos.getFechaIngreso() == null);
+            response.put("nombreProducto", pojoProductos.getNombreProducto());
+            response.put("precio", pojoProductos.getPrecio());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("error", "Error en test de fechas: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
 }

@@ -35,11 +35,11 @@ Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
 Route::prefix('productos')->group(function () {
     Route::get('/', [ProductoController::class, 'index'])->name('productos.index');
     Route::post('/', [ProductoController::class, 'store'])->name('productos.store');
-    Route::put('/{id}', [ProductoController::class, 'update'])->name('productos.update');
+    Route::patch('/{id}', [ProductoController::class, 'update'])->name('productos.update'); 
     Route::delete('/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+    Route::resource('productos', ProductoController::class)->except(['show', 'create', 'edit']);
+
 });
-
-
 
 // ============================================
 // AUTENTICACIÓN

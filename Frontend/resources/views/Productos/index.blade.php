@@ -51,6 +51,18 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i>
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- HEADER -->
     <div class="search-section d-flex justify-content-between align-items-center flex-wrap">
         <div>
@@ -76,11 +88,9 @@
                 <div class="col-md-3">
                     <select id="filtroCategoria" class="form-select">
                         <option value="">📦 Todas las categorías</option>
-                        <option value="panes">🍞 Panes</option>
-                        <option value="pasteles">🎂 Pasteles</option>
-                        <option value="galletas">🍪 Galletas</option>
-                        <option value="bebidas">☕ Bebidas</option>
-                        <option value="postres">🍰 Postres</option>
+                        @foreach ($categorias as $id => $nombre)
+                            <option value="{{ $id }}">{{ $nombre }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -117,7 +127,6 @@
             <div class="card glass-card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <i class="bi bi-check-circle fs-2 text-success"></i>
-                    {{-- No tienes campo ACTIVO en el JSON: asumimos activo por defecto --}}
                     <h3 class="mt-2 mb-0" id="productosActivos">{{ isset($productos) ? count($productos) : 0 }}</h3>
                     <small class="text-muted">Productos Activos</small>
                 </div>
@@ -162,7 +171,7 @@
                             <th class="ps-4">ID</th>
                             <th>Imagen</th>
                             <th>Nombre</th>
-                            <th>Categoría (ID)</th>
+                            <th>Categoría</th>
                             <th>Descripción</th>
                             <th>Precio</th>
                             <th>Stock</th>
@@ -182,15 +191,18 @@
                                     <td class="ps-4"><strong>#{{ $producto['Id Producto:'] ?? '' }}</strong></td>
 
                                     <td>
-                                        {{-- No hay campo imagen en tu JSON: mostramos placeholder --}}
                                         <img src="https://via.placeholder.com/60" alt="{{ $producto['Nombre Producto:'] ?? '' }}" class="producto-img">
                                     </td>
 
                                     <td><strong>{{ $producto['Nombre Producto:'] ?? '-' }}</strong></td>
 
-                                    <td>
+                                    <td class="align-middle">
                                         <span class="badge bg-info text-dark">
-                                            {{ $producto['Id Categoria Producto:'] ?? '-' }}
+                                            @php
+                                                $categoriaId = $producto['Id Categoria Producto:'] ?? null;
+                                                $categoriaNombre = $categorias[$categoriaId] ?? 'N/A';
+                                            @endphp
+                                            {{ $categoriaNombre }}
                                         </span>
                                     </td>
 
@@ -257,7 +269,7 @@
                 <input type="hidden" name="_method" id="methodField" value="POST">
 
                 <div class="modal-header" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color:white;">
-                    <h5 class="modal-title"><i class="bi bi-box-seam"></i> Producto</h5>
+                    <h5 class="modal-title" id="modalTitulo"><i class="bi bi-box-seam"></i> Nuevo Producto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -277,14 +289,14 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="categoriaProducto" class="form-label"><i class="bi bi-grid"></i> Categoría *</label>
+                            <label for="categoriaProducto" class="form-label">
+                                <i class="bi bi-grid"></i> Categoría *
+                            </label>
                             <select id="categoriaProducto" name="categoria" class="form-select" required>
                                 <option value="">Seleccione una categoría</option>
-                                <option value="panes">🍞 Panes</option>
-                                <option value="pasteles">🎂 Pasteles</option>
-                                <option value="galletas">🍪 Galletas</option>
-                                <option value="bebidas">☕ Bebidas</option>
-                                <option value="postres">🍰 Postres</option>
+                                @foreach ($categorias as $id => $nombre)
+                                    <option value="{{ $id }}">{{ $nombre }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -298,15 +310,20 @@
                             <input type="number" class="form-control" id="stockProducto" name="stock" min="0" required>
                         </div>
 
-                        <div class="col-md-12">
-                            <label for="descripcionProducto" class="form-label"><i class="bi bi-file-text"></i> Descripción</label>
-                            <textarea class="form-control" id="descripcionProducto" name="descripcion" rows="3"></textarea>
+                        <!-- ← ASEGÚRATE DE TENER ESTE CAMPO -->
+                        <div class="col-md-6">
+                            <label for="marcaProducto" class="form-label"><i class="bi bi-tag-fill"></i> Marca</label>
+                            <input type="text" class="form-control" id="marcaProducto" name="marca" value="Propio">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="imagenProducto" class="form-label"><i class="bi bi-image"></i> URL de Imagen</label>
+                            <input type="url" class="form-control" id="imagenProducto" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
                         </div>
 
                         <div class="col-md-12">
-                            <label for="imagenProducto" class="form-label"><i class="bi bi-image"></i> URL de Imagen</label>
-                            <input type="url" class="form-control" id="imagenProducto" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
-                            <small class="text-muted">Ingresa la URL de una imagen del producto (opcional)</small>
+                            <label for="descripcionProducto" class="form-label"><i class="bi bi-file-text"></i> Descripción</label>
+                            <textarea class="form-control" id="descripcionProducto" name="descripcion" rows="3"></textarea>
                         </div>
 
                         <div class="col-md-12" id="vistaPrevia" style="display:none;">
@@ -315,15 +332,31 @@
                                 <img id="imagenPreview" src="" alt="Vista previa" class="img-fluid rounded" style="max-height:200px;">
                             </div>
                         </div>
-
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" style="background:#8B4513; border: none;">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="background:#8B4513; border: none;">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL DETALLES --}}
+<div class="modal fade" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color:white;">
+                <h5 class="modal-title"><i class="bi bi-info-circle"></i> Detalles del Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalleProductoContenido">
+                <!-- Contenido dinámico -->
+            </div>
         </div>
     </div>
 </div>
@@ -333,6 +366,7 @@
 @push('scripts')
 <script>
     const productosData = @json($productos ?? []);
+    const categoriaNames = @json($categorias ?? []);
 
     document.addEventListener('DOMContentLoaded', function() {
         const buscarInput = document.getElementById('buscarProducto');
@@ -362,17 +396,17 @@
 
     function filtrarProductos() {
         const busqueda = (document.getElementById('buscarProducto').value || '').toLowerCase();
-        const categoria = document.getElementById('filtroCategoria').value;
+        const categoriaFiltro = document.getElementById('filtroCategoria').value; 
         const estado = document.getElementById('filtroEstado').value;
 
         const filas = document.querySelectorAll('#tablaProductos tr[data-id]');
         filas.forEach(fila => {
             const nombre = (fila.getAttribute('data-nombre') || '').toLowerCase();
-            const categoriaProducto = fila.getAttribute('data-categoria') || '';
+            const categoriaIdProducto = fila.getAttribute('data-categoria') || ''; 
             const estadoProducto = fila.getAttribute('data-estado') || '';
 
             const cumpleBusqueda = nombre.includes(busqueda);
-            const cumpleCategoria = !categoria || categoriaProducto === categoria;
+            const cumpleCategoria = !categoriaFiltro || String(categoriaIdProducto) === categoriaFiltro;
             const cumpleEstado = !estado || estadoProducto === estado;
 
             fila.style.display = (cumpleBusqueda && cumpleCategoria && cumpleEstado) ? '' : 'none';
@@ -382,54 +416,88 @@
     function limpiarFormulario() {
         const form = document.getElementById('formProducto');
         if (form) form.reset();
+        
         document.getElementById('methodField').value = 'POST';
-        document.getElementById('productoId').value = '';
+        document.getElementById('formProducto').action = '/productos';
+        document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-box-seam"></i> Nuevo Producto';
+        document.getElementById('marcaProducto').value = 'Propio';
+        
         const vista = document.getElementById('vistaPrevia');
         if (vista) vista.style.display = 'none';
-        document.getElementById('modalProductoLabel').innerHTML = '<i class="bi bi-box-seam"></i> Nuevo Producto';
     }
 
-   function editarProducto(p) {
-    document.querySelector("#modalProducto .modal-title").innerHTML = "Editar Producto";
+    function editarProducto(p) {
+    console.log("=== EDITANDO PRODUCTO ===", p);
+    
+    document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
+    document.getElementById('methodField').value = 'PATCH';
+    document.getElementById('formProducto').action = '/productos/' + (p['Id Producto:'] ?? '');
 
-    document.getElementById("methodField").value = "PUT"; 
+    document.getElementById('nombreProducto').value = p['Nombre Producto:'] ?? '';
+    document.getElementById('precioProducto').value = p['Precio:'] ?? 0;
+    document.getElementById('stockProducto').value = p['Stock Minímo:'] ?? 0;
+    
+    const descripcionField = document.getElementById('descripcionProducto');
+    if (descripcionField) {
+        descripcionField.value = p['Descripcion Producto:'] ?? '';
+    }
+    
+    const marcaField = document.getElementById('marcaProducto');
+    if (marcaField) {
+        marcaField.value = p['Marca Producto:'] ?? 'Propio';
+    }
+    
+    const isActive = p['ACTIVO'] == 1 || p['ACTIVO'] === true;
+    const estadoField = document.getElementById('estadoProducto');
+    if (estadoField) {
+        estadoField.value = isActive ? 'activo' : 'inactivo';
+    }
+    
+    const categoriaId = p['Id Categoria Producto:'] ?? '';
+    const categoriaField = document.getElementById('categoriaProducto');
+    if (categoriaField) {
+        categoriaField.value = categoriaId;
+    }
+    console.log(`Categoría seleccionada: ID=${categoriaId}, Nombre=${categoriaNames[categoriaId]}`);
 
-    document.getElementById("formProducto").action = "/productos/" + p["Id Producto:"];
-
-    document.getElementById("nombreProducto").value = p["Nombre Producto:"] ?? '';
-    document.getElementById("estadoProducto").value = (p["ACTIVO"] ?? true) ? "activo" : "inactivo";
-    document.getElementById("categoriaProducto").value = p["Id Categoria Producto:"] ?? '';
-    document.getElementById("precioProducto").value = p["Precio:"] ?? 0;
-    document.getElementById("stockProducto").value = p["Stock Minímo:"] ?? 0;
-    document.getElementById("descripcionProducto").value = p["Descripcion Producto:"] ?? '';
-
-    if (p["Imagen Producto:"]) {
-        document.getElementById("imagenProducto").value = p["Imagen Producto:"];
-        document.getElementById("imagenPreview").src = p["Imagen Producto:"];
-        document.getElementById("vistaPrevia").style.display = "block";
-    } else {
-        document.getElementById("vistaPrevia").style.display = "none";
+    const imgUrl = p['Imagen Producto:'] ?? '';
+    const imagenField = document.getElementById('imagenProducto');
+    if (imagenField) {
+        imagenField.value = imgUrl;
+    }
+    
+    const vista = document.getElementById('vistaPrevia');
+    const preview = document.getElementById('imagenPreview');
+    if (imgUrl && imgUrl.trim() !== '' && vista && preview) {
+        preview.src = imgUrl;
+        vista.style.display = 'block';
+    } else if (vista) {
+        vista.style.display = 'none';
     }
 
     var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
     modal.show();
 }
 
-
-
     function eliminarProducto(id, nombre) {
-        if (!confirm(`¿Está seguro de eliminar el producto "${nombre}"?`)) return;
+        if (!confirm(`¿Está seguro de eliminar el producto "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+            return;
+        }
+
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `/productos/${id}`;
+        
         const token = document.createElement('input');
         token.type = 'hidden';
         token.name = '_token';
         token.value = '{{ csrf_token() }}';
+        
         const method = document.createElement('input');
         method.type = 'hidden';
         method.name = '_method';
         method.value = 'DELETE';
+        
         form.appendChild(token);
         form.appendChild(method);
         document.body.appendChild(form);
@@ -438,26 +506,75 @@
 
     function verDetalles(id) {
         const producto = productosData.find(p => String(p['Id Producto:']) === String(id));
-        if (!producto) return alert('Producto no encontrado');
-        const cont = document.getElementById('detalleProductoContenido');
-        if (!cont) {
-            // si no hay modal de detalles, mostramos un alert simple
-            alert(`${producto['Nombre Producto:']}\nPrecio: ${producto['Precio:']}\nStock: ${producto['Stock Minímo:']}`);
+        if (!producto) {
+            alert('Producto no encontrado');
             return;
         }
+
+        const categoriaId = producto['Id Categoria Producto:'] ?? '';
+        const categoriaNombre = categoriaNames[categoriaId] ?? 'Sin categoría';
+
+        const cont = document.getElementById('detalleProductoContenido');
         cont.innerHTML = `
             <div class="text-center mb-3">
-                <img src="https://via.placeholder.com/250" alt="${producto['Nombre Producto:']}" class="img-fluid rounded" style="max-height:250px;">
+                <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}" 
+                     alt="${producto['Nombre Producto:']}" 
+                     class="img-fluid rounded" 
+                     style="max-height:250px;"
+                     onerror="this.src='https://via.placeholder.com/250'">
             </div>
-            <h4>${producto['Nombre Producto:']}</h4>
+            <h4 class="text-center mb-3">${producto['Nombre Producto:'] ?? 'Sin nombre'}</h4>
             <hr>
-            <p><strong>ID:</strong> #${producto['Id Producto:']}</p>
-            <p><strong>Categoría (ID):</strong> ${producto['Id Categoria Producto:'] ?? '-'}</p>
-            <p><strong>Precio:</strong> $${new Intl.NumberFormat('es-CO').format(parseFloat(producto['Precio:'] || 0))} COP</p>
-            <p><strong>Stock:</strong> ${producto['Stock Minímo:'] ?? '0'} unidades</p>
-            <p><strong>Marca:</strong> ${producto['Marca Producto:'] ?? '-'}</p>
-            <p><strong>Fecha Vencimiento:</strong> ${producto['Fecha Vencimiento:'] ?? '-'}</p>
+            <div class="row">
+                <div class="col-6">
+                    <p><strong><i class="bi bi-hash"></i> ID:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p>#${producto['Id Producto:'] ?? '-'}</p>
+                </div>
+                
+                <div class="col-6">
+                    <p><strong><i class="bi bi-grid"></i> Categoría:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p><span class="badge bg-info text-dark">${categoriaNombre}</span></p>
+                </div>
+                
+                <div class="col-6">
+                    <p><strong><i class="bi bi-currency-dollar"></i> Precio:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p class="text-success fw-bold">$${new Intl.NumberFormat('es-CO').format(parseFloat(producto['Precio:'] || 0))} COP</p>
+                </div>
+                
+                <div class="col-6">
+                    <p><strong><i class="bi bi-box"></i> Stock:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p>${producto['Stock Minímo:'] ?? '0'} unidades</p>
+                </div>
+                
+                <div class="col-6">
+                    <p><strong><i class="bi bi-tag"></i> Marca:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p>${producto['Marca Producto:'] ?? 'Sin marca'}</p>
+                </div>
+                
+                <div class="col-6">
+                    <p><strong><i class="bi bi-calendar"></i> Vencimiento:</strong></p>
+                </div>
+                <div class="col-6">
+                    <p>${producto['Fecha Vencimiento:'] ?? 'N/A'}</p>
+                </div>
+                
+                <div class="col-12">
+                    <p><strong><i class="bi bi-file-text"></i> Descripción:</strong></p>
+                    <p class="text-muted">${producto['Descripcion Producto:'] ?? 'Sin descripción'}</p>
+                </div>
+            </div>
         `;
+        
         var modal = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
         modal.show();
     }
@@ -468,20 +585,5 @@
         document.getElementById('filtroEstado').value = '';
         filtrarProductos();
     }
-
-    function limpiarFormulario() {
-
-    document.getElementById("formProducto").reset();
-
-    // Método vuelve a POST
-    document.getElementById("methodField").value = "POST";
-
-    // Action vuelve a productos.store
-    document.getElementById("formProducto").action = "/productos";
-
-    // Ocultar vista previa
-    document.getElementById("vistaPrevia").style.display = "none";
-}
-
 </script>
 @endpush

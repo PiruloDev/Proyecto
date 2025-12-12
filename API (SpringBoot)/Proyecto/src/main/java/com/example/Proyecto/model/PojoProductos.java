@@ -1,27 +1,49 @@
 package com.example.Proyecto.model;
+
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PojoProductos {
+
+    @JsonProperty("ID_PRODUCTO")
     private int id;
+
+    @JsonProperty("ID_ADMIN")
     private int idAdmin;
+
+    @JsonProperty("ID_CATEGORIA_PRODUCTO")
     private int idCategoriaProducto;
+
+    @JsonProperty("NOMBRE_PRODUCTO")
     private String nombreProducto;
+
+    @JsonProperty("DESCRIPCION_PRODUCTO")
     private String descripcionProducto;
+
+    @JsonProperty("PRODUCTO_STOCK_MIN")
     private int stockMinimo;
+
+    @JsonProperty("PRECIO_PRODUCTO")
     private BigDecimal precio;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonProperty("fechaVencimiento")
+    @JsonProperty("FECHA_VENCIMIENTO_PRODUCTO")
     private LocalDate fechaVencimiento;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonProperty("fechaIngreso")
+    @JsonProperty("FECHA_INGRESO_PRODUCTO")
     private LocalDate fechaIngreso;
+
+    @JsonProperty("TIPO_PRODUCTO_MARCA")
     private String marcaProducto;
+
+    @JsonProperty("ACTIVO")
     private boolean activo = true;
+
+    @JsonProperty("IMAGEN_URL_PRODUCTO")
+    private String imagenUrl;
 
     public PojoProductos() {}
 
@@ -98,7 +120,7 @@ public class PojoProductos {
         this.fechaIngreso = fechaIngreso;
     }
 
-    public String getMarcaProducto(){
+    public String getMarcaProducto() {
         return marcaProducto;
     }
 
@@ -112,5 +134,25 @@ public class PojoProductos {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "PojoProductos{" +
+                "id=" + id +
+                ", nombreProducto='" + nombreProducto + '\'' +
+                ", idCategoriaProducto=" + idCategoriaProducto +
+                ", precio=" + precio +
+                ", stockMinimo=" + stockMinimo +
+                ", activo=" + activo +
+                '}';
     }
 }
