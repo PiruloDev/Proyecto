@@ -82,12 +82,10 @@ class InventarioController extends Controller
         'cantidadIngrediente' => 'required|integer|min:0',
     ]);
     
-    // CORRECCIÓN: Aseguramos que el valor se envía como un INT explícito
     $data = [
         'cantidadIngrediente' => (int) $request->input('cantidadIngrediente')
     ];
     
-    // Llamada al método del servicio
     $resultado = $this->inventarioService->actualizarCantidadIngrediente($request->input('id'), $data);
     
     if ($resultado["success"]) {

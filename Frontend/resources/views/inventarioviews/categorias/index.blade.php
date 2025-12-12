@@ -5,13 +5,11 @@
 @section('title', 'Gestión de Categorías de Ingredientes - El Castillo del Pan')
 
 @push('styles')
-    {{-- Estilos necesarios para la integración con el layout de dashboard --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> 
     <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    {{-- Manteniendo el enlace a tu CSS específico si fuese necesario --}}
     {{-- <link rel="stylesheet" href="/pre-produccion/PHP Modulos/css/stylemoduloinv.css"> --}}
 @endpush
 
@@ -19,7 +17,6 @@
 <div class="container-fluid">
     <div class="row">
         
-        {{-- Side Bar: Incluye el sidebar del nuevo layout --}}
         @include('components.admin-sidebar') 
         
         {{-- CONTENIDO PRINCIPAL --}}
@@ -92,7 +89,7 @@
                                     </td>
                                 </tr>
 
-                                {{-- ================== MODAL EDITAR (Mantenido y Estilizado) ================== --}}
+                                {{-- ================== MODAL EDITAR ================== --}}
                                 <div class="modal fade" id="editModal-{{ $cat['idCategoriaIngrediente'] }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -137,7 +134,7 @@
                 </div>
             </section>
 
-            {{-- MODAL CREAR CATEGORÍA (Mantenido y Estilizado) --}}
+            {{-- MODAL CREAR CATEGORÍA --}}
             <section class="mb-5">
                 <div class="modal fade" id="crearModal" tabindex="-1">
                     <div class="modal-dialog">

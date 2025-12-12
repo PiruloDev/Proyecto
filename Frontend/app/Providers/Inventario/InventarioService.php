@@ -12,7 +12,6 @@ class InventarioService
     {
         // Obtiene la URL base de tu microservicio desde el archivo .env de Laravel
         $this->baseUrl = env('API_SPRING_URL');
-        // Ejemplo: $this->baseUrl podría ser http://localhost:8080
     }
 
     // ===========================================

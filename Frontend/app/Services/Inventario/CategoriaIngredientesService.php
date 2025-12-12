@@ -67,7 +67,6 @@ class CategoriaIngredientesService
     public function crearCategoriaIngrediente(array $data): array
     {
         try {
-            // Solo enviamos el campo nombreCategoria
             $payload = [
                 'nombreCategoria' => $data['nombreCategoria']
             ];

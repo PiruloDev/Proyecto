@@ -36,6 +36,22 @@ class IngredientesController extends Controller
         return view('inventarioviews.ingredientes.index', compact('ingredientes'));
     }
 
+    public function inventario()
+{
+    $response = $this->ingredientesService->obtenerIngredientesSimple();
+
+    if (!$response['success']) {
+        // Manejo de error específico para la vista de stock
+        return view('inventarioviews.ingredientes.inventario', ['ingredientes' => []])
+                   ->with('error', 'Error al cargar el stock: ' . $response['error']);
+    }
+    
+    $ingredientes = $response['data'] ?? [];
+    
+    // El nombre de la vista es la que se usó en la solicitud anterior.
+    return view('inventarioviews.ingredientes.inventario', compact('ingredientes')); 
+}
+
     /**
      * Muestra el formulario para crear un nuevo ingrediente.
      */
@@ -56,7 +72,6 @@ class IngredientesController extends Controller
             'referenciaIngrediente' => 'required|string|max:50',
         ]);
 
-        // Obtenemos solo los datos validados que necesita el service
         $data = $request->only([
             'idProveedor',
             'idCategoria',
@@ -75,16 +90,6 @@ class IngredientesController extends Controller
     }
 
 
-    // public function show(int $id) {}
-
-    /**
-     * Muestra el formulario para editar un ingrediente. (READ ONE for EDIT)
-     */
-    // public function edit(int $id) 
-    // { 
-        // Si el backend tiene un endpoint GET /ingrediente/{id}, se llama aquí 
-        // y se pasa el ingrediente a la vista de edición.
-    // }
 
     /**
      * Actualiza un ingrediente existente. (UPDATE)

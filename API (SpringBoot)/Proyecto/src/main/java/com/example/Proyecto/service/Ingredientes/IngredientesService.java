@@ -1,6 +1,7 @@
 package com.example.Proyecto.service.Ingredientes;
 
 import com.example.Proyecto.model.Ingredientes;
+import com.example.Proyecto.dto.IngredientesCantidad;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,14 @@ public class IngredientesService {
 
             return ingrediente;
         }
+    };
+    //Row Mapper para cantidad de ingredientes
+    private RowMapper<IngredientesCantidad> ingredientesCantidadRowMapper = (rs, rowNum) -> {
+        IngredientesCantidad dto = new IngredientesCantidad();
+        dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+        dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+        dto.setCantidadIngrediente(rs.getBigDecimal("CANTIDAD_INGREDIENTE"));
+        return dto;
     };
 
 
@@ -112,6 +121,14 @@ public class IngredientesService {
     public int eliminarIngrediente(Long id) {
         String sql = "DELETE FROM Ingredientes WHERE ID_INGREDIENTE = ?";
         return jdbcTemplate.update(sql, id);
+    }
+
+    public List<IngredientesCantidad> obtenerIngredientesCantidad() {
+        String sql = "SELECT ID_INGREDIENTE, NOMBRE_INGREDIENTE, CANTIDAD_INGREDIENTE " +
+                "FROM Ingredientes " +
+                "ORDER BY NOMBRE_INGREDIENTE";
+
+        return jdbcTemplate.query(sql, ingredientesCantidadRowMapper);
     }
 
 

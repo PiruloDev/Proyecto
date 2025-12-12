@@ -3,6 +3,7 @@ package com.example.Proyecto.controller;
 import com.example.Proyecto.model.Ingredientes;
 import com.example.Proyecto.dto.IngresoStockRequest;
 import com.example.Proyecto.dto.IngredienteListadoDTO;
+import com.example.Proyecto.dto.IngredientesCantidad;
 import com.example.Proyecto.service.Ingredientes.IngredientesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,17 @@ public class Ingredientescontroller {
     @GetMapping("/ingredientes")
     public List<String> obtenerIngredientes() {
         return ingredientesService.obtenerIngredientes();
+    }
+
+    @GetMapping("/ingredientes/cantidad")
+    public ResponseEntity<List<IngredientesCantidad>> obtenerIngredientesCantidad() {
+        try {
+            List<IngredientesCantidad> ingredientes = ingredientesService.obtenerIngredientesCantidad();
+            return ResponseEntity.ok(ingredientes);
+        } catch (Exception e) {
+            System.err.println("Error al obtener ingredientes simples: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("ingredientes/lista")

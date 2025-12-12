@@ -47,9 +47,6 @@
             </div>
 
             
-            {{-- ======================================================= --}}
-            {{-- SECCIÓN: ACCESOS RÁPIDOS (Ahora 4 Cards por fila) --}}
-            {{-- ======================================================= --}}
             <h3 class="mb-3 mt-4 text-primary">Accesos Directos</h3>
             
             {{-- FILA 1: Inventario y Catálogos --}}
@@ -157,6 +154,23 @@
                 
             </div>
             
+            {{-- Card 1: Inventario de Ingredientes --}}
+<div class="col-6 col-lg-3">
+    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+        {{-- Cambiar esta línea: --}}
+        <a href="{{ route('ingredientes.inventario') }}" class="text-decoration-none text-dark h-100">
+            <div class="card-body text-center d-flex flex-column p-3">
+                <i class="fas fa-boxes-stacked card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                <h5 class="mt-2">Inventario</h5>
+                <p class="text-muted flex-grow-1 small">Stock de Ingredientes.</p>
+                <div class="d-flex justify-content-center mt-auto">
+                    <span class="btn btn-sm btn-outline-dark">Ver Stock</span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
             {{-- Aquí puedes agregar otros gráficos o widgets más grandes --}}
 
         </main>

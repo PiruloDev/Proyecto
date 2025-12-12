@@ -20,7 +20,7 @@ class IngredientesService
      */
     protected function getApiClient()
     {
-        // Se elimina la lógica del token JWT.
+        // Se eliminó la lógica del token JWT.
         // Crea un cliente HTTP con la configuración base.
         return Http::baseUrl($this->baseUrl);
     }
@@ -40,6 +40,36 @@ class IngredientesService
         // Retorna un array que solo contiene las claves especificadas
         return array_intersect_key($data, array_flip($allowedKeys));
     }
+
+    // =========================================================================
+    // GET: OBTENER Los ingredientes con su cantidad (GET /ingredientes/cantidad)
+    // =========================================================================
+    
+
+    public function obtenerIngredientesSimple(): array
+{
+    try {
+        $response = $this->getApiClient()->get('/ingredientes/cantidad');
+
+        if ($response->successful()) {
+            return [
+                'success' => true,
+                'data' => $response->json()
+            ];
+        }
+
+        return [
+            'success' => false,
+            'error' => $response->json()['error'] ?? 'Error al obtener inventario simple (' . $response->status() . ')'
+        ];
+
+    } catch (\Exception $e) {
+        return [
+            'success' => false,
+            'error' => 'No se pudo conectar con el servidor: ' . $e->getMessage()
+        ];
+    }
+}
 
 
     // =========================================================================
@@ -80,14 +110,10 @@ class IngredientesService
     // CRUD: CREAR (POST /crearingrediente)
     // =========================================================================
 
-    /**
-     * Agrega un nuevo ingrediente, enviando solo los 4 campos básicos.
-     * @param array $data Array con idProveedor, idCategoria, nombreIngrediente, referenciaIngrediente.
-     */
+
     public function agregarIngredientes(array $data): array
     {
         try {
-            // 🎯 Usa el helper para asegurar que solo se envían los 4 campos al backend
             $payload = $this->filterIngredienteData($data); 
 
             $response = $this->getApiClient()->post('/crearingrediente', $payload);
@@ -116,13 +142,9 @@ class IngredientesService
     // CRUD: ACTUALIZAR (PUT /ingrediente/{id})
     // =========================================================================
 
-    /**
-     * Actualiza un ingrediente existente por ID con solo los 4 campos básicos.
-     */
     public function actualizarIngrediente(int $id, array $data): array
     {
         try {
-            // 🎯 Usa el helper para asegurar que solo se envían los 4 campos al backend
             $payload = $this->filterIngredienteData($data); 
 
             $response = $this->getApiClient()->put("/ingrediente/{$id}", $payload);
@@ -151,9 +173,6 @@ class IngredientesService
     // CRUD: ELIMINAR (DELETE /ingrediente/{id})
     // =========================================================================
 
-    /**
-     * Elimina un ingrediente por ID.
-     */
     public function eliminarIngrediente(int $id): array
     {
         try {
@@ -183,13 +202,9 @@ class IngredientesService
     // ACTUALIZACIÓN PARCIAL DE CANTIDAD (PATCH /{id}/cantidad) - Se mantiene para stock
     // =========================================================================
 
-    /**
-     * Actualiza solo la cantidad de un ingrediente.
-     */
     public function actualizarCantidadIngrediente(int $id, array $data): array
     {
         try {
-            // Nos aseguramos de enviar solo la clave 'cantidadIngrediente'
             $payload = array_intersect_key($data, array_flip(['cantidadIngrediente']));
 
             $response = $this->getApiClient()->patch("/{$id}/cantidad", $payload);
