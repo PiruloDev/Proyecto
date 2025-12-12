@@ -276,11 +276,13 @@ Route::prefix('/dashboard/inventario/produccion')->group(function () {
     Route::delete('/delete/{id}', [ProduccionController::class, 'destroy'])
          ->name('produccion.destroy');
 });
+
 // ============================================
-// PEDIDOS CLIENTES - CRUD COMPLETO
+// PEDIDOS CLIENTES - CRUD COMPLETO (RUTA EMPLEADO)
 // ============================================
+// **RESTABLECIDA COMO RUTA DEL EMPLEADO**
 Route::prefix('pedidos')->group(function () {
-    Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
+    Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index'); 
     Route::get('/create', [PedidosController::class, 'create'])->name('pedidos.create');
     Route::post('/', [PedidosController::class, 'store'])->name('pedidos.store');
     Route::get('/edit/{id}', [PedidosController::class, 'edit'])->name('pedidos.edit');
@@ -362,4 +364,18 @@ Route::prefix('/api/carrito')->group(function () {
     
     Route::post('/checkout', [CarritoController::class, 'checkout'])->name('api.carrito.checkout');
 });
+
+// ADMINISTRADOR SECCION PEDIDOS
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Pedidos de Clientes - Ruta: admin.pedidos.index | URL: /admin/pedidos
+    Route::get('/pedidos', [PedidosController::class, 'indexAdmin'])->name('pedidos.index'); 
+    Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');
+    Route::put('/pedidos/{id_PEDIDO}', [PedidosController::class, 'update'])->name('pedidos.update');
+    Route::delete('/pedidos/{id_PEDIDO}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
+    
+    // (OPCIONAL) Si quieres que 'estados' y 'proveedores' también estén bajo '/admin/'
+    // Route::get('/estados', [EstadoPedidoController::class, 'index'])->name('estados.index');
+    // Route::get('/pedidos-proveedores', [PedidosProveedoresController::class, 'index'])->name('pedidoproveedores.index');
+});
+
 require __DIR__.'/settings.php';

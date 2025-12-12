@@ -45,11 +45,13 @@
                             <i class="bi bi-cart-check" style="font-size: 3.5rem; color: var(--panaderia-marron-principal);"></i>
                             <h5 class="mt-3">Pedidos</h5>
                             <p class="text-muted flex-grow-1">Administra y gestiona pedidos de clientes</p>
-                            <div class="d-flex justify-content-center mt-auto">
-                                <a href="{{ route('pedidos.index') }}" class="btn" style="background: var(--panaderia-marron-principal); color: white; border-radius: var(--panaderia-radius-md);">
-                                    Ver Pedidos <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
+                            <div class="nav-item">
+    <a class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}"
+       href="{{ route('admin.pedidos.index') }}">
+        <i class="bi bi-cart-check"></i>
+        Pedidos
+    </a>
+</div>
                         </div>
                     </div>
                 </div>
