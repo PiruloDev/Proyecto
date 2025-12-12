@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Carrito de Compras')
+
 @section('content')
 <div class="container mt-4">
 
@@ -19,7 +21,7 @@
             </thead>
             <tbody id="tbodyCarrito">
                 <tr>
-                    <td colspan="6" class="text-center">Cargando...</td>
+                    <td colspan="6" class="text-center">Cargando...</td> 
                 </tr>
             </tbody>
         </table>
@@ -38,29 +40,34 @@
 </div>
 @endsection
 
-@section('scripts')
+{{-- CORRECTO: Usar @push('scripts') --}}
+@push('scripts') 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Obtener el token CSRF de la meta etiqueta para usarlo en las peticiones
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+    console.log('--- 1. Script Carrito Iniciado ---');
 
+    const CSRF_TOKEN = '{{ csrf_token() }}';
+    
 // ==========================
 // CARGAR CARRITO (GET)
 // ==========================
 async function cargarCarrito() {
     try {
-        // GET /api/carrito no necesita token CSRF si no estás modificando la sesión, pero es buena práctica de flujo.
         const res = await fetch("/api/carrito");
         
         if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Error del servidor al cargar:', errorText);
             throw new Error(`Error en la carga: ${res.status}`);
         }
 
         const data = await res.json();
-        const tbody = document.getElementById("tbodyCarrito");
-        tbody.innerHTML = ""; // Limpiar tabla
+        const items = data.items;
 
-        if (data.carrito.length === 0) {
+        const tbody = document.getElementById("tbodyCarrito");
+        tbody.innerHTML = ""; 
+
+        if (items.length === 0) { 
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center">¡El carrito está vacío!</td>
@@ -70,24 +77,22 @@ async function cargarCarrito() {
         }
 
         // --- Rellenar Tabla ---
-        data.carrito.forEach(item => {
-            // Aseguramos el formateo de números
-            const precioFormatted = new Intl.NumberFormat('es-CO').format(item.precio);
-            const subtotal = (item.precio * item.cantidad);
-            const subtotalFormatted = new Intl.NumberFormat('es-CO').format(subtotal.toFixed(2));
-            
+        items.forEach(item => { 
             tbody.innerHTML += `
                 <tr id="fila-${item.id}">
                     <td>${item.id}</td>
-                    <td>${item.nombre}</td>
-                    <td>$${precioFormatted}</td>
+                    <td>${item.producto}</td>
+                    <td>$${item.precio}</td> 
                     <td>
-                        <button class="btn btn-sm btn-secondary" onclick="actualizarCantidad(${item.id}, ${item.cantidad - 1})">-</button>
-                        <span class="mx-2">${item.cantidad}</span>
-                        <button class="btn btn-sm btn-primary" onclick="actualizarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
+                        <div class="input-group input-group-sm">
+                            <button class="btn btn-sm btn-secondary" onclick="actualizarCantidad(${item.id}, ${item.cantidad - 1})">-</button>
+                            <span class="form-control text-center mx-1">${item.cantidad}</span>
+                            <button class="btn btn-sm btn-primary" onclick="actualizarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
+                        </div>
                     </td>
-                    <td>$${subtotalFormatted}</td>
+                    <td>$${item.subtotal}</td> 
                     <td>
+                        {{-- 🔥 LLAMADA CORREGIDA: Ahora llama a la función JS remover() --}}
                         <button class="btn btn-sm btn-danger" onclick="remover(${item.id})">
                             Eliminar
                         </button>
@@ -96,15 +101,13 @@ async function cargarCarrito() {
             `;
         });
 
-        // Actualizar Total General
-        const totalFormatted = new Intl.NumberFormat('es-CO').format(parseFloat(data.total));
-        document.getElementById("totalGeneral").innerText = totalFormatted;
+        document.getElementById("totalGeneral").innerText = data.total;
 
     } catch (error) {
-        console.error('Error al cargar el carrito:', error);
+        console.error('Error al cargar el carrito (Catch):', error);
         document.getElementById("tbodyCarrito").innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-danger">Error al cargar el carrito.</td>
+                <td colspan="6" class="text-center text-danger">Error al cargar el carrito. Revisa la Consola (F12).</td>
             </tr>`;
     }
 }
@@ -113,61 +116,62 @@ async function cargarCarrito() {
 // ACTUALIZAR CANTIDAD (PATCH)
 // ==========================
 async function actualizarCantidad(id, cantidad) {
-    if (cantidad < 0) return; // Previene cantidades negativas
+    if (cantidad < 0) {
+        // Esto previene que se envíe cantidad negativa si el controlador no lo valida.
+        return; 
+    }
 
     try {
         const res = await fetch("/api/carrito/actualizar", {
-            method: "PATCH",
+            method: "POST", 
             headers: { 
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": CSRF_TOKEN // AÑADIDO: Token CSRF para peticiones que modifican datos
+                "Content-Type": "application/json", 
+                "X-CSRF-TOKEN": CSRF_TOKEN 
             },
-            // CORREGIDO: Aseguramos el envío del objeto JSON
-            body: JSON.stringify({ id: id, cantidad: cantidad })
+            body: JSON.stringify({ 
+                id: id, 
+                cantidad: cantidad, 
+                _method: 'PATCH' 
+            }) 
         });
 
         const data = await res.json();
-
+        
+        // Si el controlador nos devuelve éxito, recargamos la tabla
         if (data.success) {
-            // Recargar el carrito para actualizar la tabla y el total
-            cargarCarrito();
-            if (data.removed) {
-                 Swal.fire('Eliminado', 'Producto removido por alcanzar cantidad 0.', 'warning');
+            // El controlador ya maneja la eliminación si cantidad es 0.
+            if (cantidad === 0) {
+                Swal.fire('Eliminado', data.message, 'success');
             }
+            cargarCarrito();
         } else {
-             Swal.fire('Error', data.message || 'Error al actualizar la cantidad.', 'error');
+            Swal.fire('Error', data.message || 'Error al actualizar la cantidad.', 'error');
         }
     } catch (error) {
         console.error('Error de red al actualizar:', error);
-         Swal.fire('Error de Conexión', 'No se pudo contactar con el servidor.', 'error');
+        Swal.fire('Error de Conexión', 'No se pudo contactar con el servidor.', 'error');
     }
 }
 
 // ==========================
-// REMOVER PRODUCTO (DELETE)
+// REMOVER PRODUCTO (Llama a actualizarCantidad(id, 0))
 // ==========================
 async function remover(id) {
     try {
-        if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
-
-        const res = await fetch(`/api/carrito/remover/${id}`, {
-            method: "DELETE",
-            headers: {
-                 "X-CSRF-TOKEN": CSRF_TOKEN // AÑADIDO: Token CSRF para DELETE
-            }
+        const confirmResult = await Swal.fire({
+            title: '¿Estás seguro?', text: "El producto se eliminará del carrito.", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
         });
 
-        const data = await res.json();
+        if (!confirmResult.isConfirmed) return;
 
-        if (data.success) {
-            Swal.fire('Eliminado', data.message, 'success');
-            cargarCarrito();
-        } else {
-             Swal.fire('Error', data.message || 'Error al remover el producto.', 'error');
-        }
+        // 🔥 CORRECCIÓN: Usamos el endpoint PATCH con cantidad 0, que ya funciona
+        actualizarCantidad(id, 0); 
+
     } catch (error) {
-        console.error('Error de red al remover:', error);
-        Swal.fire('Error de Conexión', 'No se pudo contactar con el servidor.', 'error');
+        console.error('Error al solicitar la eliminación:', error);
+        Swal.fire('Error', 'No se pudo iniciar el proceso de eliminación.', 'error');
     }
 }
 
@@ -175,19 +179,25 @@ async function remover(id) {
 // CHECKOUT (POST)
 // ==========================
 async function checkout() {
+    Swal.fire({
+        title: 'Procesando Pedido',
+        text: 'Por favor, espere mientras finalizamos su orden...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
     try {
         const res = await fetch("/api/carrito/checkout", { 
             method: "POST",
-            headers: {
-                 "X-CSRF-TOKEN": CSRF_TOKEN // AÑADIDO: Token CSRF para POST
-            }
+            headers: { "X-CSRF-TOKEN": CSRF_TOKEN }
         });
         
         const data = await res.json();
-
         if (data.success) {
             Swal.fire('¡Pedido Exitoso!', data.message, 'success');
-            cargarCarrito(); // Vuelve a cargar el carrito (debería quedar vacío)
+            cargarCarrito(); 
         } else {
             Swal.fire('Error al Finalizar', data.message, 'error');
         }
@@ -197,7 +207,7 @@ async function checkout() {
     }
 }
 
-// Cargar carrito al iniciar
+// Cargar carrito al iniciar la página
 document.addEventListener("DOMContentLoaded", cargarCarrito);
 </script>
-@endsection
+@endpush

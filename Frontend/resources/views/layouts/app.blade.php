@@ -7,6 +7,9 @@
     <title>@yield('title', 'El Castillo del Pan')</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logoprincipal.jpg') }}">
 
+    {{-- 🔥 CORRECCIÓN CLAVE: AGREGAR TOKEN CSRF 🔥 --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

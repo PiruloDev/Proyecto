@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Pedidos;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Pedidos\PedidosApiService; // Importamos el servicio para comunicarnos con la API de Java
+use App\Services\Pedidos\PedidosApiService; 
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class CarritoController extends Controller
@@ -13,7 +14,6 @@ class CarritoController extends Controller
 
     /**
      * Inyección de dependencias.
-     * El controlador usará el servicio para todas las interacciones con la API.
      */
     public function __construct(PedidosApiService $pedidosApiService)
     {
@@ -36,15 +36,31 @@ class CarritoController extends Controller
     {
         $carrito = session()->get('carrito', []);
         
+        Log::info('Carrito leído en obtenerCarrito:', ['contenido_leido' => $carrito]); 
+
         // Calcula el total general
         $totalGeneral = array_reduce($carrito, function ($sum, $item) {
             return $sum + ((float)$item['precio'] * $item['cantidad']);
         }, 0);
+        
+        // Mapeo para que el JSON sea fácil de consumir por el JS
+        $itemsFormateados = array_map(function ($item) {
+            $precio = (float) $item['precio'];
+            $cantidad = (int) $item['cantidad'];
+            $subtotal = $precio * $cantidad;
+            return [
+                'id' => $item['id'],
+                'producto' => $item['nombre'],
+                'precio' => number_format($precio, 0, ',', '.'), 
+                'cantidad' => $cantidad,
+                'subtotal' => number_format($subtotal, 0, ',', '.'), 
+            ];
+        }, $carrito);
+
 
         return response()->json([
-            // array_values() es importante para convertir el array asociativo en un array indexado para JSON
-            'carrito' => array_values($carrito), 
-            'total' => number_format($totalGeneral, 2, '.', ''), 
+            'items' => array_values($itemsFormateados), 
+            'total' => number_format($totalGeneral, 0, ',', '.'), 
             'count' => count($carrito),
             'success' => true
         ]);
@@ -52,16 +68,17 @@ class CarritoController extends Controller
 
     /**
      * Agrega un producto al carrito o incrementa su cantidad.
-     * Llama a la API de Java para obtener los datos del producto (precio, nombre).
-     * Método: POST /api/carrito/agregar/{id}
+     * (Método 'agregar' omitido por brevedad, no necesita cambios)
      */
     public function agregar(Request $request, $id)
     {
+        // ... (Tu código existente del método agregar) ...
         try {
             // 1. Obtener la lista completa de productos desde la API de Java
             $productos = $this->pedidosApiService->obtenerProductos();
 
         } catch (Exception $e) {
+            Log::error('Error de conexión con API de Productos:', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error de conexión con el servicio de Productos.'
@@ -71,9 +88,8 @@ class CarritoController extends Controller
         // 2. Buscar el producto por ID dentro del array devuelto por la API.
         $productoData = null;
         
-        // La búsqueda debe ser flexible (==) si los IDs vienen como strings o enteros
         foreach ($productos as $producto) {
-            // Usamos las claves de la respuesta JSON de la API: 'Id Producto:' y 'Precio:'
+            // Usamos la clave de Java 'Id Producto:'
             if (isset($producto['Id Producto:']) && $producto['Id Producto:'] == $id) {
                 $productoData = $producto;
                 break;
@@ -87,13 +103,17 @@ class CarritoController extends Controller
             ], 404);
         }
 
-        // 3. Mapear los campos
+        // 3. Mapear los campos y limpiar el formato de precio
         $productoId = $productoData['Id Producto:'];
         $nombreProducto = $productoData['Nombre Producto:'];
-        $precioProducto = (float)$productoData['Precio:']; 
+        
+        $precioString = $productoData['Precio:'];
+        $precioProducto = (float) str_replace(',', '.', preg_replace('/[^0-9,.]/', '', $precioString));
 
         // 4. Gestionar el carrito en la sesión de Laravel
         $carrito = session()->get('carrito', []);
+
+        Log::info('Carrito ANTES de agregar (ID: ' . $productoId . '):', ['carrito' => $carrito]); 
 
         if (isset($carrito[$productoId])) {
             $carrito[$productoId]['cantidad']++;
@@ -101,12 +121,14 @@ class CarritoController extends Controller
             $carrito[$productoId] = [
                 'id' => $productoId,
                 'nombre' => $nombreProducto,
-                'precio' => $precioProducto,
+                'precio' => $precioProducto, // Precio guardado como float/numeric limpio
                 'cantidad' => 1,
             ];
         }
 
         session()->put('carrito', $carrito);
+
+        Log::info('Carrito DESPUÉS de agregar (ID: ' . $productoId . '):', ['carrito_actual' => session()->get('carrito')]);
 
         return response()->json([
             'success' => true,
@@ -116,36 +138,47 @@ class CarritoController extends Controller
         ]);
     }
 
+
     /**
-     * Actualiza la cantidad de un producto en el carrito.
-     * Método: POST /api/carrito/actualizar
+     * Actualiza la cantidad de un producto en el carrito o lo remueve si cantidad es 0.
+     * Método: PATCH /api/carrito/actualizar
      */
     public function actualizar(Request $request)
     {
         $request->validate([
             'id' => 'required|integer',
-            'cantidad' => 'required|integer|min:1',
+            // 🔥 CAMBIO: Permitimos 0 para la eliminación 🔥
+            'cantidad' => 'required|integer|min:0', 
         ]);
 
         $id = $request->id;
         $cantidad = $request->cantidad;
         $carrito = session()->get('carrito', []);
 
-        if (isset($carrito[$id])) {
-            $carrito[$id]['cantidad'] = $cantidad;
-            session()->put('carrito', $carrito);
-            return response()->json(['success' => true, 'message' => 'Cantidad actualizada.']);
+        if (!isset($carrito[$id])) {
+            return response()->json(['success' => false, 'message' => 'Producto no encontrado en el carrito.'], 404);
         }
 
-        return response()->json(['success' => false, 'message' => 'Producto no encontrado en el carrito.'], 404);
+        // 🔥 NUEVA LÓGICA: Si la cantidad es 0, eliminamos el producto. 🔥
+        if ($cantidad === 0) { 
+            unset($carrito[$id]);
+            session()->put('carrito', $carrito);
+            return response()->json(['success' => true, 'message' => 'Producto eliminado del carrito.']);
+        }
+        
+        // Lógica de actualización normal (cantidad > 0)
+        $carrito[$id]['cantidad'] = $cantidad;
+        session()->put('carrito', $carrito);
+        return response()->json(['success' => true, 'message' => 'Cantidad actualizada.']);
     }
 
     /**
-     * Remueve un producto del carrito.
-     * Método: DELETE /api/carrito/remover/{id}
+     * Remueve un producto del carrito. (Este método ya no se usa, pero se mantiene para la ruta DELETE)
      */
     public function remover($id)
     {
+        // Se recomienda llamar a la función actualizar(id, 0) para consolidar la lógica.
+        // Pero si se usa la ruta DELETE, este código es correcto:
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$id])) {
@@ -159,11 +192,11 @@ class CarritoController extends Controller
 
     /**
      * Proceso de checkout (FINALIZAR PEDIDO).
-     * Llama al endpoint POST /pedidos de la API de Java para crear el pedido.
-     * Método: POST /api/carrito/checkout
+     * (Método 'checkout' omitido por brevedad, no necesita cambios)
      */
     public function checkout()
     {
+        // ... (Tu código existente del método checkout) ...
         $carrito = session()->get('carrito', []);
 
         if (empty($carrito)) {
@@ -173,8 +206,8 @@ class CarritoController extends Controller
         try {
             // 1. Preparamos el payload que espera el PedidoRequest en Java
             $payload = [
-                'cliente_id' => auth()->id() ?? 1, // Usar el ID del cliente logeado (o 1 por defecto si no hay auth)
-                'items' => array_values($carrito), // Convertir el carrito en un array indexado de items
+                'cliente_id' => auth()->id() ?? 1,
+                'items' => array_values($carrito),
             ];
 
             // 2. LLAMADA A LA API DE JAVA A TRAVÉS DEL SERVICIO
@@ -186,11 +219,10 @@ class CarritoController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $response['message'] ?? '¡Pedido realizado con éxito!',
-                'id' => $response['id'] ?? null // ID del pedido creado en la API
+                'id' => $response['id'] ?? null
             ], 200);
 
         } catch (Exception $e) {
-            // Capturamos cualquier error lanzado por el servicio (ej. error 500, stock insuficiente)
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()

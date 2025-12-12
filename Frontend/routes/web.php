@@ -373,9 +373,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/pedidos/{id_PEDIDO}', [PedidosController::class, 'update'])->name('pedidos.update');
     Route::delete('/pedidos/{id_PEDIDO}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
     
-    // (OPCIONAL) Si quieres que 'estados' y 'proveedores' también estén bajo '/admin/'
-    // Route::get('/estados', [EstadoPedidoController::class, 'index'])->name('estados.index');
-    // Route::get('/pedidos-proveedores', [PedidosProveedoresController::class, 'index'])->name('pedidoproveedores.index');
+   
 });
 
 require __DIR__.'/settings.php';
