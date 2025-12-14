@@ -169,13 +169,13 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="ps-4">ID</th>
-                            <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Categoría</th>
                             <th>Descripción</th>
                             <th>Precio</th>
                             <th>Stock</th>
                             <th>Marca</th>
+                            <th>Estado</th>
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -190,10 +190,6 @@
                                 >
                                     <td class="ps-4"><strong>#{{ $producto['Id Producto:'] ?? '' }}</strong></td>
 
-                                    <td>
-                                        <img src="https://via.placeholder.com/60" alt="{{ $producto['Nombre Producto:'] ?? '' }}" class="producto-img">
-                                    </td>
-
                                     <td><strong>{{ $producto['Nombre Producto:'] ?? '-' }}</strong></td>
 
                                     <td class="align-middle">
@@ -206,7 +202,7 @@
                                         </span>
                                     </td>
 
-                                    <td><small>{{ Str::limit($producto['Descripcion Producto:'] ?? ($producto['Descripcion'] ?? ''), 50) }}</small></td>
+                                    <td><small>{{ Str::limit($producto['Descripcion Producto:'] ?? '', 50) }}</small></td>
 
                                     <td><strong>${{ number_format((float)($producto['Precio:'] ?? 0), 0, ',', '.') }}</strong></td>
 
@@ -222,6 +218,14 @@
                                     </td>
 
                                     <td>{{ $producto['Marca Producto:'] ?? '-' }}</td>
+
+                                    <td>
+                                        @if(isset($producto['ACTIVO']) && $producto['ACTIVO'])
+                                            <span class="badge bg-success">Activo</span>
+                                        @else
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                        @endif
+                                    </td>
 
                                     <td class="text-center table-actions pe-4">
                                         <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles('{{ $producto['Id Producto:'] ?? '' }}')" title="Ver detalles">
@@ -264,8 +268,10 @@
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <form id="formProducto" method="POST">
+            {{-- ✅ CAMBIADO: action inicial apunta a productos.store --}}
+            <form id="formProducto" method="POST" action="{{ route('productos.store') }}">
                 @csrf
+                {{-- ✅ CAMBIADO: _method oculto con valor POST por defecto --}}
                 <input type="hidden" name="_method" id="methodField" value="POST">
 
                 <div class="modal-header" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color:white;">
@@ -310,27 +316,14 @@
                             <input type="number" class="form-control" id="stockProducto" name="stock" min="0" required>
                         </div>
 
-                        <!-- ← ASEGÚRATE DE TENER ESTE CAMPO -->
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label for="marcaProducto" class="form-label"><i class="bi bi-tag-fill"></i> Marca</label>
                             <input type="text" class="form-control" id="marcaProducto" name="marca" value="Propio">
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="imagenProducto" class="form-label"><i class="bi bi-image"></i> URL de Imagen</label>
-                            <input type="url" class="form-control" id="imagenProducto" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
-                        </div>
-
                         <div class="col-md-12">
                             <label for="descripcionProducto" class="form-label"><i class="bi bi-file-text"></i> Descripción</label>
-                            <textarea class="form-control" id="descripcionProducto" name="descripcion" rows="3"></textarea>
-                        </div>
-
-                        <div class="col-md-12" id="vistaPrevia" style="display:none;">
-                            <label class="form-label">Vista Previa:</label>
-                            <div class="text-center">
-                                <img id="imagenPreview" src="" alt="Vista previa" class="img-fluid rounded" style="max-height:200px;">
-                            </div>
+                            <textarea class="form-control" id="descripcionProducto" name="descripcion" rows="3" placeholder="Describe el producto..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -377,21 +370,6 @@
 
         const filtroEstado = document.getElementById('filtroEstado');
         if (filtroEstado) filtroEstado.addEventListener('change', filtrarProductos);
-
-        const imagenInput = document.getElementById('imagenProducto');
-        if (imagenInput) {
-            imagenInput.addEventListener('input', function() {
-                const url = this.value;
-                const preview = document.getElementById('imagenPreview');
-                const cont = document.getElementById('vistaPrevia');
-                if (url && url.trim() !== '') {
-                    preview.src = url;
-                    cont.style.display = 'block';
-                } else {
-                    cont.style.display = 'none';
-                }
-            });
-        }
     });
 
     function filtrarProductos() {
@@ -417,67 +395,62 @@
         const form = document.getElementById('formProducto');
         if (form) form.reset();
         
+        // Restaura el action y method a POST
         document.getElementById('methodField').value = 'POST';
-        document.getElementById('formProducto').action = '/productos';
+        document.getElementById('formProducto').action = '{{ route("productos.store") }}';
         document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-box-seam"></i> Nuevo Producto';
         document.getElementById('marcaProducto').value = 'Propio';
+        document.getElementById('estadoProducto').value = 'activo';
+    }
+
+    function editarProducto(producto) {
+        console.log('=== EDITANDO PRODUCTO ===');
+        console.log('Producto recibido:', producto);
         
-        const vista = document.getElementById('vistaPrevia');
-        if (vista) vista.style.display = 'none';
-    }
+        // Extraer datos del producto (funciona con ambos formatos)
+        const id = producto['Id Producto:'] ?? producto.ID_PRODUCTO ?? '';
+        const nombre = producto['Nombre Producto:'] ?? producto.NOMBRE_PRODUCTO ?? '';
+        const precio = producto['Precio:'] ?? producto.PRECIO_PRODUCTO ?? 0;
+        const stock = producto['Stock Minímo:'] ?? producto.PRODUCTO_STOCK_MIN ?? 0;
+        const descripcion = producto['Descripcion Producto:'] ?? producto.DESCRIPCION_PRODUCTO ?? '';
+        const marca = producto['Marca Producto:'] ?? producto.TIPO_PRODUCTO_MARCA ?? 'Propio';
+        const categoria = producto['Id Categoria Producto:'] ?? producto.ID_CATEGORIA_PRODUCTO ?? '';
+        
+        // ⚠️ IMPORTANTE: Determinar el estado correctamente
+        let activo = false;
+        if (producto.ACTIVO !== undefined) {
+            activo = producto.ACTIVO === true || producto.ACTIVO === 1 || producto.ACTIVO === '1';
+        } else if (producto['ACTIVO'] !== undefined) {
+            activo = producto['ACTIVO'] === true || producto['ACTIVO'] === 1 || producto['ACTIVO'] === '1';
+        }
+        
+        console.log('Datos extraídos:', {
+            id, nombre, precio, stock, descripcion, marca, activo, categoria
+        });
+        console.log('Estado determinado:', activo ? 'activo' : 'inactivo');
+        
+        // Cambiar título y método
+        document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
+        document.getElementById('methodField').value = 'PATCH';
+        document.getElementById('formProducto').action = '/productos/' + id;
 
-    function editarProducto(p) {
-    console.log("=== EDITANDO PRODUCTO ===", p);
-    
-    document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
-    document.getElementById('methodField').value = 'PATCH';
-    document.getElementById('formProducto').action = '/productos/' + (p['Id Producto:'] ?? '');
+        // Llenar los campos del formulario
+        document.getElementById('nombreProducto').value = nombre;
+        document.getElementById('precioProducto').value = precio;
+        document.getElementById('stockProducto').value = stock;
+        document.getElementById('descripcionProducto').value = descripcion || '';
+        document.getElementById('marcaProducto').value = marca || 'Propio';
+        document.getElementById('categoriaProducto').value = categoria;
+        
+        // ⚠️ IMPORTANTE: Establecer el estado correctamente
+        const estadoSelect = document.getElementById('estadoProducto');
+        estadoSelect.value = activo ? 'activo' : 'inactivo';
+        
+        console.log('Estado SELECT después de asignar:', estadoSelect.value);
 
-    document.getElementById('nombreProducto').value = p['Nombre Producto:'] ?? '';
-    document.getElementById('precioProducto').value = p['Precio:'] ?? 0;
-    document.getElementById('stockProducto').value = p['Stock Minímo:'] ?? 0;
-    
-    const descripcionField = document.getElementById('descripcionProducto');
-    if (descripcionField) {
-        descripcionField.value = p['Descripcion Producto:'] ?? '';
+        // Mostrar el modal
+        new bootstrap.Modal(document.getElementById('modalProducto')).show();
     }
-    
-    const marcaField = document.getElementById('marcaProducto');
-    if (marcaField) {
-        marcaField.value = p['Marca Producto:'] ?? 'Propio';
-    }
-    
-    const isActive = p['ACTIVO'] == 1 || p['ACTIVO'] === true;
-    const estadoField = document.getElementById('estadoProducto');
-    if (estadoField) {
-        estadoField.value = isActive ? 'activo' : 'inactivo';
-    }
-    
-    const categoriaId = p['Id Categoria Producto:'] ?? '';
-    const categoriaField = document.getElementById('categoriaProducto');
-    if (categoriaField) {
-        categoriaField.value = categoriaId;
-    }
-    console.log(`Categoría seleccionada: ID=${categoriaId}, Nombre=${categoriaNames[categoriaId]}`);
-
-    const imgUrl = p['Imagen Producto:'] ?? '';
-    const imagenField = document.getElementById('imagenProducto');
-    if (imagenField) {
-        imagenField.value = imgUrl;
-    }
-    
-    const vista = document.getElementById('vistaPrevia');
-    const preview = document.getElementById('imagenPreview');
-    if (imgUrl && imgUrl.trim() !== '' && vista && preview) {
-        preview.src = imgUrl;
-        vista.style.display = 'block';
-    } else if (vista) {
-        vista.style.display = 'none';
-    }
-
-    var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-    modal.show();
-}
 
     function eliminarProducto(id, nombre) {
         if (!confirm(`¿Está seguro de eliminar el producto "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
@@ -518,7 +491,7 @@
         cont.innerHTML = `
             <div class="text-center mb-3">
                 <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}" 
-                     alt="${producto['Nombre Producto:']}" 
+                     alt="${producto['Nombre Producto:'] ?? ''}" 
                      class="img-fluid rounded" 
                      style="max-height:250px;"
                      onerror="this.src='https://via.placeholder.com/250'">

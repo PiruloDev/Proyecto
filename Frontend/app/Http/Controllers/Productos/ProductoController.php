@@ -56,7 +56,6 @@ class ProductoController extends Controller
                 'precio' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
                 'estado' => 'required|in:activo,inactivo',
-                'imagen' => 'nullable|url',
                 'marca' => 'nullable|string'
             ]);
 
@@ -68,7 +67,6 @@ class ProductoController extends Controller
                 'PRODUCTO_STOCK_MIN' => (int)$validated['stock'],
                 'TIPO_PRODUCTO_MARCA' => $validated['marca'] ?? 'Propio',
                 'ACTIVO' => $validated['estado'] === 'activo',
-                'IMAGEN_URL_PRODUCTO' => $validated['imagen'] ?? 'https://via.placeholder.com/60',
                 'ID_ADMIN' => 1,
                 'FECHA_VENCIMIENTO_PRODUCTO' => now()->addYear()->format('Y-m-d'),
                 'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
@@ -102,78 +100,76 @@ class ProductoController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    try {
-        \Log::info('=== UPDATE REQUEST ===', [
-            'id' => $id,
-            'all_data' => $request->all(),
-        ]);
+    {
+        try {
+            Log::info('=== UPDATE REQUEST ===', [
+                'id' => $id,
+                'all_data' => $request->all(),
+            ]);
 
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'categoria' => 'required|integer|min:1|max:10',
-            'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'estado' => 'required|in:activo,inactivo',
-            'imagen' => 'nullable|string', 
-            'marca' => 'nullable|string'
-        ]);
+            $validated = $request->validate([
+                'nombre' => 'required|string|max:255',
+                'categoria' => 'required|integer|min:1|max:10',
+                'descripcion' => 'nullable|string',
+                'precio' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'estado' => 'required|in:activo,inactivo',
+                'marca' => 'nullable|string'
+            ]);
 
-        $imagenDefault = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="rgba(0,0,0,0.5)" font-family="sans-serif" font-size="14" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo imagen%3C/text%3E%3C/svg%3E';
+            Log::info('=== DATOS VALIDADOS ===', $validated);
 
-        $data = [
-            'ID_PRODUCTO' => (int)$id,
-            'NOMBRE_PRODUCTO' => $validated['nombre'],
-            'ID_CATEGORIA_PRODUCTO' => (int)$validated['categoria'],
-            'DESCRIPCION_PRODUCTO' => $validated['descripcion'] ?? '',
-            'PRECIO_PRODUCTO' => (float)$validated['precio'],
-            'PRODUCTO_STOCK_MIN' => (int)$validated['stock'],
-            'TIPO_PRODUCTO_MARCA' => $validated['marca'] ?? 'Propio',
-            'ACTIVO' => $validated['estado'] === 'activo',
-            'IMAGEN_URL_PRODUCTO' => !empty($validated['imagen']) ? $validated['imagen'] : $imagenDefault,
-            'ID_ADMIN' => 1,
-            'FECHA_VENCIMIENTO_PRODUCTO' => now()->addYear()->format('Y-m-d'),
-            'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
-        ];
+            $data = [
+                'ID_PRODUCTO' => (int)$id,
+                'NOMBRE_PRODUCTO' => $validated['nombre'],
+                'ID_CATEGORIA_PRODUCTO' => (int)$validated['categoria'],
+                'DESCRIPCION_PRODUCTO' => $validated['descripcion'] ?? '',
+                'PRECIO_PRODUCTO' => (float)$validated['precio'],
+                'PRODUCTO_STOCK_MIN' => (int)$validated['stock'],
+                'TIPO_PRODUCTO_MARCA' => $validated['marca'] ?? 'Propio',
+                'ACTIVO' => $validated['estado'] === 'activo',
+                'ID_ADMIN' => 1,
+                'FECHA_VENCIMIENTO_PRODUCTO' => now()->addYear()->format('Y-m-d'),
+                'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
+            ];
 
-        \Log::info('Datos a enviar a API:', $data);
+            Log::info('=== DATOS A ENVIAR A API ===', $data);
 
-        $response = Http::timeout(10)
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ])
-            ->patch($this->apiUrl . '/' . $id, $data);
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ])
+                ->patch($this->apiUrl . '/' . $id, $data);
 
-        \Log::info('Respuesta de API:', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
+            Log::info('=== RESPUESTA DE API ===', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
 
-        if ($response->successful()) {
-            return redirect()->route('productos.index')
-                ->with('success', 'Producto actualizado correctamente.');
+            if ($response->successful()) {
+                return redirect()->route('productos.index')
+                    ->with('success', 'Producto actualizado correctamente.');
+            }
+
+            return back()
+                ->with('error', 'Error ' . $response->status() . ': ' . $response->body())
+                ->withInput();
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Errores de validación:', $e->errors());
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('Excepción en update:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()
+                ->with('error', 'Error: ' . $e->getMessage())
+                ->withInput();
         }
-
-        return back()
-            ->with('error', 'Error ' . $response->status() . ': ' . $response->body())
-            ->withInput();
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        \Log::error('Errores de validación:', $e->errors());
-        return back()->withErrors($e->errors())->withInput();
-    } catch (\Exception $e) {
-        \Log::error('Excepción en update:', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        
-        return back()
-            ->with('error', 'Error: ' . $e->getMessage())
-            ->withInput();
     }
-}
 
     public function destroy($id)
     {
