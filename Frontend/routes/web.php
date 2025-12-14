@@ -105,7 +105,7 @@ Route::get('/dashboardadmin', function () {
 // ============================================
 
 // Vista principal (Dashboard del Módulo)
-Route::get('/dashboard/inventario', function () {
+Route::get('/inventario', function () {
     return view('inventarioviews.indexinventario');
 })->name('dashboard.inventario');
 
@@ -113,7 +113,7 @@ Route::get('/dashboard/inventario', function () {
 // --------------------------------------------
 // CATEGORÍAS - CRUD COMPLETO
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/categorias-ingredientes')->group(function () {
+Route::prefix('/inventario/categorias-ingredientes')->group(function () {
     // 1. Listar/Index
     Route::get('/', [CategoriaIngredientesController::class, 'index'])
          ->name('categorias-ingredientes.index');
@@ -143,7 +143,7 @@ Route::prefix('/dashboard/inventario/categorias-ingredientes')->group(function (
 // --------------------------------------------
 // PROVEEDORES - CRUD COMPLETO
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/proveedores')->group(function() {
+Route::prefix('/inventario/proveedores')->group(function() {
     // 1. Listar/Index
     Route::get('/', [ProveedoresController::class, 'index'])
          ->name('proveedores.index');
@@ -173,7 +173,7 @@ Route::prefix('/dashboard/inventario/proveedores')->group(function() {
 // --------------------------------------------
 // PEDIDOS A PROVEEDORES - CRUD COMPLETO
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/pedidos-proveedores')->group(function () {
+Route::prefix('/inventario/pedidos-proveedores')->group(function () {
     // 1. Listar/Index
     Route::get('/', [PedidosProveedoresController::class, 'index'])
          ->name('pedidoproveedores.index');
@@ -199,7 +199,7 @@ Route::prefix('/dashboard/inventario/pedidos-proveedores')->group(function () {
 // --------------------------------------------
 // INGREDIENTES - CRUD COMPLETO
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
+Route::prefix('/inventario/ingredientes')->group(function () {
     // 1. Listar/Index (Vista completa de gestión)
     Route::get('/', [IngredientesController::class, 'index'])
          ->name('ingredientes.index');
@@ -237,7 +237,7 @@ Route::prefix('/dashboard/inventario/ingredientes')->group(function () {
 // --------------------------------------------
 // RECETAS - CRUD
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/recetas')->group(function () {
+Route::prefix('/inventario/recetas')->group(function () {
     // 1. Listar todas las recetas (RecetasController.java: obtenerTodasLasRecetas)
     Route::get('/', [RecetasController::class, 'index'])
          ->name('recetas.index');
@@ -263,7 +263,7 @@ Route::prefix('/dashboard/inventario/recetas')->group(function () {
 // --------------------------------------------
 // PRODUCCIÓN - CRUD
 // --------------------------------------------
-Route::prefix('/dashboard/inventario/produccion')->group(function () {
+Route::prefix('/inventario/produccion')->group(function () {
     // 1. Listar Historial (Index)
     Route::get('/', [ProduccionController::class, 'index'])
          ->name('produccion.index');
