@@ -57,7 +57,6 @@ public class AuthController {
                 response.put("mensaje", "Login exitoso");
                 return ResponseEntity.ok(response);
             }
-            
             // Usuario cliente hardcodeado para pruebas
             if ("cliente".equals(usuario.getUsername()) && "123456".equals(usuario.getPassword())) {
                 Map<String, Object> clienteInfo = new HashMap<>();
@@ -73,7 +72,6 @@ public class AuthController {
                 response.put("mensaje", "Login exitoso");
                 return ResponseEntity.ok(response);
             }
-            
             // Autenticación real con base de datos
             Map<String, Object> usuarioAutenticado = authService.autenticarUsuario(usuario.getUsername(), usuario.getPassword());
             if (usuarioAutenticado != null) {

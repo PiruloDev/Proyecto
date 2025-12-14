@@ -10,10 +10,8 @@
 }
 
 body {
-    background-image: url(../files/img/pan-rtzqhi1ok4k1bxlo.jpg);
-    background-repeat: no-repeat;                 
-    background-size: cover;                                
-    height: 100vh;                                     
+    background: url(../images/bg.jpg) no-repeat center center / cover;
+    height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
@@ -348,7 +346,7 @@ body {
         max-width: 90%;
         gap: 20px;
     }
-    
+
     .registro-left {
         border-right: none;
         border-bottom: 3px solid #8C5A37;
@@ -356,26 +354,26 @@ body {
         padding-bottom: 20px;
         min-height: auto;
     }
-    
+
     .registro-right {
         padding-left: 0;
         padding-top: 20px;
     }
-    
+
     .titulo-registro {
         font-size: 2rem;
     }
-    
+
     .logo-img-registro {
         margin-top: 50px !important;
         width: 100px;
         height: 100px;
     }
-    
+
     .form-group-registro {
         margin-bottom: 18px;
     }
-    
+
     .user-type-info-registro {
         padding: 12px;
     }

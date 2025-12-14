@@ -79,24 +79,6 @@
         </div>
     </nav>
 </header>
-
-<!-- Sección Hero del Menú -->
-<section class="hero-section text-center py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h1 class="display-4 fw-bold text-cafe-crema mb-4 fade-in">
-                    ¿Estás Listo para Disfrutar de tú antojo?
-                </h1>
-                <img src="{{ asset('images/Pan1.jpg') }}" class="img-fluid" alt="Imagen representativa de un pan">
-                <p class="lead text-gris-oscuro mb-5 fade-in">
-                    Descubre nuestros deliciosos productos artesanales, elaborados con los mejores ingredientes y mucho amor
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Sección de Productos por Categorías -->
 <section class="py-5">
     <div class="container">
@@ -104,11 +86,11 @@
         <div class="row mb-5 justify-content-center">
             <div class="col-lg-8">
                 <div class="search-container text-center">
-                    <h3 class="text-marron fw-bold mb-4">
-                        <i class="fas fa-search me-2"></i>Busca tu Producto Favorito
+                    <h3 class="text-white fw-bold mb-4">
+                        <i class="fas fa-search me-2"></i>Tengo ganas de...
                     </h3>
                     <div class="input-group input-group-lg shadow-sm">
-                        <input type="text" id="productSearchInput" class="form-control" placeholder="Ej: Torta de chocolate, Pan francés, Brownie...">
+                        <input type="text" id="productSearchInput" class="form-control" placeholder="Buscar productos..." aria-label="Buscar productos">
                         <span class="input-group-text bg-marron text-white"><i class="fas fa-search"></i></span>
                     </div>
                 </div>
@@ -118,16 +100,42 @@
         <!-- Contenedor de Productos -->
 <div class="row" id="product-container">
     @forelse($productos ?? [] as $producto)
-        <div class="col-lg-4 col-md-6 mb-4 product-card-item" 
+        <div class="col-lg-4 col-md-6 mb-4 product-card-item"
              data-nombre="{{ strtolower($producto->NOMBRE_PRODUCTO) }}">
 
             <div class="product-card card h-100 shadow-sm border-0 card-hover">
                 <div class="card-img-container position-relative">
+                    @php
+                        // Intentar obtener la imagen del producto de varias formas
+                        $imagenProducto = null;
 
-                    <img src="{{ asset('images/' . $producto->imagen) }}" 
-                         class="card-img-top product-image" 
+                        // Prioridad 1: Campo 'imagen' o 'IMAGEN' del producto
+                        if (isset($producto->imagen) && !empty($producto->imagen)) {
+                            $imagenProducto = $producto->imagen;
+                        } elseif (isset($producto->IMAGEN) && !empty($producto->IMAGEN)) {
+                            $imagenProducto = $producto->IMAGEN;
+                        }
+                        // Prioridad 2: Campo 'IMAGEN_PRODUCTO' o 'imagen_producto'
+                        elseif (isset($producto->IMAGEN_PRODUCTO) && !empty($producto->IMAGEN_PRODUCTO)) {
+                            $imagenProducto = $producto->IMAGEN_PRODUCTO;
+                        } elseif (isset($producto->imagen_producto) && !empty($producto->imagen_producto)) {
+                            $imagenProducto = $producto->imagen_producto;
+                        }
+                        // Prioridad 3: Usar imagen por defecto basada en categoría o nombre
+                        else {
+                            $imagenProducto = 'jugo.jpg'; // Imagen por defecto
+                        }
+
+                        // Construir la ruta completa de la imagen
+                        $rutaImagen = asset('images/' . $imagenProducto);
+                        $imagenDefault = asset('images/jugo.jpg');
+                    @endphp
+
+                    <img src="{{ $rutaImagen }}"
+                         class="card-img-top product-image"
                          alt="{{ $producto->NOMBRE_PRODUCTO }}"
-                         onerror="this.onerror=null;this.src='{{ asset('images/pan-rtzqhi1ok4k1bxlo.jpg') }}';">
+                         onerror="this.onerror=null;this.src='{{ $imagenDefault }}';"
+                         loading="lazy">
 
                     <div class="price-badge">
                         ${{ number_format($producto->PRECIO_PRODUCTO, 0) }}
@@ -140,44 +148,59 @@
                     </h5>
 
                     <p class="card-text text-muted flex-grow-1">
-                        {{ $producto->DESCRIPCION_PRODUCTO ?? 'Producto fresco y delicioso' }}
+                        {{ $producto->DESCRIPCION_PRODUCTO ?? 'Producto fresco y delicioso de nuestra panadería artesanal' }}
                     </p>
 
                     <div class="product-info mb-3">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="availability-badge">
-                                <i class="fas fa-check-circle me-1"></i>Disponible
-                            </span>
-                            <small class="text-muted stock-info">
-                                Stock: {{ $producto->STOCK_ACTUAL }}
-                            </small>
+                            @if(isset($producto->STOCK_ACTUAL) && $producto->STOCK_ACTUAL > 0)
+                                <span class="availability-badge">
+                                    <i class="fas fa-check-circle me-1"></i>Disponible
+                                </span>
+                                <small class="text-muted stock-info">
+                                    Stock: {{ $producto->STOCK_ACTUAL }}
+                                </small>
+                            @else
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle me-1"></i>Sin stock
+                                </span>
+                                <small class="text-muted">No disponible</small>
+                            @endif
                         </div>
                     </div>
 
                     <div class="d-grid">
-                        <button class="btn btn-agregar-pedido"
-                                data-producto-id="{{ $producto->ID_PRODUCTO }}"
-                                data-producto-nombre="{{ $producto->NOMBRE_PRODUCTO }}"
-                                data-producto-precio="{{ $producto->PRECIO_PRODUCTO }}">
-
-                            <i class="fas fa-plus-circle me-2"></i>Agregar pedido
-                        </button>
+                        @if(isset($producto->STOCK_ACTUAL) && $producto->STOCK_ACTUAL > 0)
+                            <button class="btn btn-agregar-pedido"
+                                    data-producto-id="{{ $producto->ID_PRODUCTO }}"
+                                    data-producto-nombre="{{ $producto->NOMBRE_PRODUCTO }}"
+                                    data-producto-precio="{{ $producto->PRECIO_PRODUCTO }}">
+                                <i class="fas fa-plus-circle me-2"></i>Agregar pedido
+                            </button>
+                        @else
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-ban me-2"></i>No disponible
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     @empty
         <div class="col-12 text-center">
-            <div class="alert alert-info">
-                <h4 class="alert-heading">¡No hay productos!</h4>
-                <p>Actualmente no tenemos productos disponibles en el menú. Por favor, vuelve a intentarlo más tarde.</p>
+            <div class="alert alert-info shadow-sm">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <h4 class="alert-heading">¡No hay productos disponibles!</h4>
+                <p class="mb-0">Actualmente no tenemos productos en el menú. Por favor, vuelve a intentarlo más tarde.</p>
             </div>
         </div>
     @endforelse
 </div>
+    </div>
+</section>
 
 <!-- Sección de Llamada a la Acción -->
-<section class="py-5 bg-marron text-white">
+<section class="py-5 bg-success text-white text-center">
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
@@ -204,11 +227,10 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <h5 class="fw-bold mb-3">
-                    <i class="fas fa-bread-slice me-2 text-dorado"></i>
                     El Castillo del Pan
                 </h5>
                 <p class="text-light">
-                    Panadería artesanal con más de 10 años de experiencia, 
+                    Panadería artesanal con más de 10 años de experiencia,
                     ofreciendo productos frescos y de la más alta calidad.
                 </p>
             </div>
@@ -272,9 +294,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 /* Estilo simple para manejar la ocultación en la búsqueda */
-.product-card-item.hidden {
-    display: none;
-}
+.product-card-item.hidden {display: none;}
 </style>
 <script>
     // Función centralizada para manejar la adición al carrito
@@ -284,7 +304,7 @@
             const response = await fetch(`/api/carrito/agregar/${idProducto}`, {
                 method: "POST",
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Content-Type': 'application/json'
                 }
             });
@@ -299,17 +319,17 @@
                     title: '¡Producto Agregado!',
                     text: `${nombreProducto} ha sido añadido al carrito. Redirigiendo...`,
                     toast: true,
-                    position: 'top-end', 
+                    position: 'top-end',
                     showConfirmButton: false,
-                    timer: 1500, 
+                    timer: 1500,
                     timerProgressBar: true,
                 });
-                
+
                 // 3. Redirección CORREGIDA: Apunta a la vista del carrito (ruta index del CarritoController)
                 setTimeout(() => {
                     // CAMBIAR 'nombre-ruta-del-carrito' por la ruta real que apunta a CarritoController@index
-                    window.location.href = "{{ route('carrito.index') }}"; 
-                }, 1500); 
+                    window.location.href = "{{ route('carrito.index') }}";
+                }, 1500);
 
             } else {
                 // Manejo de errores de la API (ej: producto no encontrado, error de conexión al backend de Java, etc.)
@@ -358,7 +378,7 @@
             button.addEventListener('click', function() {
                 const productId = this.dataset.productoId;
                 const productName = this.dataset.productoNombre;
-                
+
                 // Llama a la función que ahora agrega y redirige al carrito
                 agregarProductoAlCarrito(productId, productName);
             });

@@ -1,19 +1,74 @@
+/* ============================================
+   ESTILOS ESPECÍFICOS PARA LA PÁGINA DE MENÚ
+   ============================================ */
 
 .product-card-item {
-    display: block; /* Asegura que la tarjeta sea visible por defecto */
+  display: block;
 }
+
 .product-card-item.hidden {
-    display: none; /* Oculta la tarjeta */
+  display: none;
 }
+
 .btn-agregar-pedido {
-    background-color: #E2725B; /* Tono terracota */
-    color: white;
-    border: none;
-    transition: background-color 0.3s, transform 0.2s;
-    font-weight: bold;
+  background-color: #E2725B;
+  color: white;
+  border: none;
+  transition: background-color 0.3s, transform 0.2s;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
 }
+
 .btn-agregar-pedido:hover {
-    background-color: #C66049; /* Tono terracota más oscuro */
-    color: white;
-    transform: translateY(-2px);
+  background-color: #C66049;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.price-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(139, 69, 19, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.availability-badge {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.stock-info {
+  font-size: 0.85rem;
+}
+
+.search-container {
+  margin-bottom: 2rem;
+}
+
+.search-container .input-group {
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-container .form-control {
+  border: none;
+  padding: 1rem 1.5rem;
+}
+
+.search-container .input-group-text {
+  border: none;
+  padding: 1rem 1.5rem;
+}
+
+.bg-marron .input-group-text {
+  background-color: var(--color-marron, #8b4513) !important;
 }

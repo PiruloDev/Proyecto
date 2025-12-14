@@ -9,10 +9,8 @@
 }
 
 body {
-    background-image: url(../files/img/pan-rtzqhi1ok4k1bxlo.jpg);
-    background-repeat: no-repeat;                 
-    background-size: cover;                                
-    height: 100vh;                                     
+    background: url(../images/bg.jpg) no-repeat center center / cover;
+    height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;

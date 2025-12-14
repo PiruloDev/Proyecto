@@ -76,25 +76,25 @@
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <a href="#" class="carousel-link">
-                        <img src="{{ asset('images/pangrande1.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Panes grandes">
+                        <img src="{{ asset('images/cupcake.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Panes grandes">
                         <div class="carousel-caption d-none d-md-block">
-                            <h5 class="fw-bold">Panes Artesanales</h5>
-                            <p>Elaborados con masa madre tradicional</p>
+                            <h5 class="fw-bold">Postres que deleitan</h5>
+                            <p>Date el gusto que tanto quieres</p>
                         </div>
                     </a>
                 </div>
                 <div class="carousel-item">
                     <a href="#" class="carousel-link">
-                        <img src="{{ asset('images/torta1.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Postres">
+                        <img src="{{ asset('images/pan.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Postres">
                         <div class="carousel-caption d-none d-md-block">
-                            <h5 class="fw-bold">Dulces Tentaciones</h5>
-                            <p>Postres únicos para cada ocasión</p>
+                            <h5 class="fw-bold">La mejor masa de Pan</h5>
+                            <p>Pan fresco todo el día, todos los días</p>
                         </div>
                     </a>
                 </div>
                 <div class="carousel-item">
                     <a href="#" class="carousel-link">
-                        <img src="{{ asset('images/torta2.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Torta">
+                        <img src="{{ asset('images/pastel.jpg') }}" class="d-block w-100 carousel-fixed-img" alt="Torta">
                         <div class="carousel-caption d-none d-md-block">
                             <h5 class="fw-bold">Tortas a tu Gusto</h5>
                             <p>Personalizadas para tus momentos especiales</p>
@@ -113,61 +113,6 @@
         </div>
     </section>
 
-    <!-- ========== NUEVA SECCIÓN: CATEGORÍAS ========== -->
-    <section class="categories-section">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Explora Nuestras Categorías</h2>
-                <p class="text-muted mt-3">Descubre la variedad de productos que tenemos para ti</p>
-            </div>
-
-            <div class="row g-4">
-                @php
-                    $iconos = [
-                        'fas fa-birthday-cake',
-                        'fas fa-bread-slice',
-                        'fas fa-cookie-bite',
-                        'fas fa-ice-cream',
-                        'fas fa-pizza-slice',
-                        'fas fa-cheese',
-                        'fas fa-candy-cane',
-                        'fas fa-mug-hot',
-                        'fas fa-drumstick-bite',
-                        'fas fa-hamburger'
-                    ];
-                @endphp
-
-                @if(isset($categorias) && $categorias->count() > 0)
-                    @foreach($categorias as $index => $categoria)
-                        <div class="col-lg-3 col-md-4 col-sm-6 animate__animated animate__fadeInUp" style="animation-delay: {{ $index * 0.1 }}s">
-                            <a href="{{ route('menu') }}#categoria-{{ $categoria->ID_CATEGORIA_PRODUCTO }}" class="category-card">
-                                <div class="category-icon-wrapper">
-                                    <i class="{{ $iconos[$index % count($iconos)] }}"></i>
-                                </div>
-                                <h3 class="category-name">{{ $categoria->NOMBRE_CATEGORIAPRODUCTO }}</h3>
-                                <p class="category-count">
-                                    {{ $categoria->productosActivos->count() }}
-                                    {{ $categoria->productosActivos->count() == 1 ? 'producto' : 'productos' }}
-                                </p>
-                            </a>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12 text-center">
-                        <p class="text-muted">Cargando categorías...</p>
-                    </div>
-                @endif
-            </div>
-
-            <div class="text-center mt-5">
-                <a href="{{ route('menu') }}" class="btn btn-primary btn-rounded btn-lg">
-                    <i class="fas fa-shopping-basket me-2"></i>Ver Todo el Menú
-                </a>
-            </div>
-        </div>
-    </section>
-    <!-- ========== FIN SECCIÓN CATEGORÍAS ========== -->
-
     <!-- Products Section -->
     <section class="container my-5">
         <h2 class="text-center text-gris-oscuro mb-4 animate__animated animate__fadeInUp">Nuestros Productos Destacados</h2>
@@ -175,115 +120,155 @@
 
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <!-- Card 1 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/brazoreina1.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Brazo de Reina">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Brazo de Reina</h5>
                         <p class="card-text text-gris-oscuro">Bizcochuelo suave relleno de arequipe artesanal, un clásico irresistible.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Brazo de Reina</h5>
-                        <p>¡Especialidad de la casa! Preparado con ingredientes premium y amor artesanal.</p>
-                    </div>
                 </div>
             </div>
 
             <!-- Card 2 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/hojaldre1.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Hojaldres">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Hojaldres</h5>
                         <p class="card-text text-gris-oscuro">Capas crujientes de masa fina con rellenos selectos y dorados perfectos.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Hojaldres</h5>
-                        <p>Masa hojaldrada artesanal con rellenos que cambian según la temporada.</p>
-                    </div>
                 </div>
             </div>
 
             <!-- Card 3 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-3s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/pangrande1.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Panes grandes">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Panes Grandes</h5>
                         <p class="card-text text-gris-oscuro">Pan artesanal con corteza dorada y miga suave, ideal para compartir.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Panes Grandes</h5>
-                        <p>Horneados diariamente con masa madre tradicional e ingredientes naturales.</p>
-                    </div>
                 </div>
             </div>
 
             <!-- Card 4 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-4s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/brownie1.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Brownies">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Brownies</h5>
                         <p class="card-text text-gris-oscuro">Esponjosos con rellenos de Chocolate.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Brownies</h5>
-                        <p>Nuestra obra magna de años de tradición en cada bocado.</p>
-                    </div>
                 </div>
             </div>
 
             <!-- Card 5 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-5s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/croissants.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Croissants">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Croissants</h5>
                         <p class="card-text text-gris-oscuro">Hojaldre francés auténtico, mantequillosos y perfectamente dorados.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Croissants</h5>
-                        <p>Técnica francesa tradicional con ingredientes locales de primera calidad.</p>
-                    </div>
                 </div>
             </div>
 
             <!-- Card 6 -->
-            <div class="col animate__animated animate__fadeInUp animate__delay-6s">
+            <div>
                 <div class="card h-100 rounded-3 shadow-sm">
                     <img src="{{ asset('images/muffins1.jpg') }}" class="card-img-top rounded-top-3 card-img-custom" alt="Muffins">
                     <div class="card-body">
                         <h5 class="card-title text-marron fw-bold">Muffins</h5>
                         <p class="card-text text-gris-oscuro">Esponjosos y llenos de sabor, perfectos para acompañar tu café.</p>
                     </div>
-                    <div class="card-overlay">
-                        <h5>Muffins</h5>
-                        <p>Variedad de sabores que cambian semanalmente para sorprenderte.</p>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="bg-crema py-5 my-5">
+<section class="about-section bg-white py-5 my-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 animate__animated animate__fadeInLeft">
-                    <h1 class="text-gris-oscuro mb-4">Un poco sobre nosotros...</h1>
+                    <h1 class="text-gris-oscuro mb-4 font-weight-bold">La mejor calidad directo a tu casa</h1>
                     <p class="text-gris-oscuro lead">
-                        Somos una Panadería Artesanal con más de 10 años de experiencia, ubicada en <strong>Bogotá</strong> en el sector de Bosa el Recreo. Desde 2015, El Castillo del Pan ha sido el corazón de la panadería artesanal en nuestra comunidad.
-                        Nos caracterizamos por ofrecer productos frescos y de alta calidad, elaborados con recetas tradicionales.
+                        En El Castillo del Pan, la calidad es nuestro compromiso diario. Seleccionamos los mejores ingredientes y aplicamos técnicas artesanales tradicionales. Cada producto lleva el sello de la excelencia, llevando el auténtico sabor de la panadería artesanal directamente a tu mesa, sin intermediarios.
                     </p>
-                    <a href="#" class="btn btn-primary btn-rounded mt-3">Conoce más</a>
                 </div>
-                <div class="col-md-6 animate__animated animate__fadeInRight">
+                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center">
+                    <img src="{{ asset('images/panadero.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 325px;">
                 </div>
             </div>
         </div>
     </section>
-</main>
+
+<section class="about-section bg-crema py-5 my-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 animate__animated animate__fadeInLeft d-flex justify-content-center">
+                    <img src="{{ asset('images/preparacion.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 350px;">
+                </div>
+                <div class="col-md-6 animate__animated animate__fadeInRight">
+                    <h1 class="text-gris-oscuro mb-4">Nuestros productos son 100% frescos</h1>
+                    <p class="text-gris-oscuro lead">
+                    La frescura es nuestra promesa. Cada mañana horneamos antes del amanecer para ofrecerte pan recién hecho. Sin conservantes ni aditivos artificiales, solo ingredientes de calidad y proceso artesanal que garantizan sabor, textura y aroma natural desde el horno hasta tus manos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="about-section bg-white py-5 my-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 animate__animated animate__fadeInLeft">
+                    <h1 class="text-gris-oscuro mb-4 font-weight-bold">Frescura que se siente en tu paladar</h1>
+                    <p class="text-gris-oscuro lead">
+                        La diferencia se nota al primer bocado. Corteza crujiente, miga esponjosa, aroma irresistible: eso es frescura real. Elaboramos cada producto el mismo día para que disfrutes texturas y sabores auténticos. Más que comer pan, vives una experiencia que despierta recuerdos y crea momentos especiales.
+                    </p>
+                </div>
+                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center">
+                    <img src="{{ asset('images/productoab.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 325px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Mobile Card Compacta -->
+    <section class="container my-4">
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="flex-grow-1">
+                        <h5 class="text-gris-oscuro mb-2 fw-bold">
+                            <i class="fas fa-mobile-alt text-marron me-2"></i>
+                            ¡Descarga nuestra App Móvil!
+                        </h5>
+                        <p class="text-gris-oscuro mb-2 small">
+                            Haz pedidos, consulta el menú y promociones desde tu celular.
+                        </p>
+                        <a class="btn btn-link text-marron p-0 text-decoration-none small" data-bs-toggle="collapse" href="#appDetails" role="button" aria-expanded="false" aria-controls="appDetails">
+                            <i class="fas fa-chevron-down me-1"></i> Ver más información
+                        </a>
+                    </div>
+                    <button class="btn btn-marron btn-sm ms-3 text-white">
+                        <i class="fas fa-download me-1"></i> Descargar
+                    </button>
+                </div>
+                <div class="collapse mt-3" id="appDetails">
+                    <div class="text-center mb-3">
+                        <img src="{{ asset('images/appmobile.jpg') }}" alt="App Móvil" class="img-fluid rounded-3 shadow-sm" style="max-width: 200px;">
+                    </div>
+                    <p class="text-gris-oscuro mb-0 small text-center">
+                        Por esta razón es que hemos creado una Aplicación Móvil para nuestros clientes, desde el confort de sus celulares podrán hacer sus pedidos, ver nuestro menú, promociones y mucho más. ¡Descarga nuestra app y mantente conectado con El Castillo del Pan!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+        </div>
+    </section>
+
 
 <!-- Footer -->
 <footer class="py-5 bg-gris-oscuro text-white">
@@ -291,7 +276,6 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <h5 class="fw-bold mb-3">
-                    <i class="fas fa-bread-slice me-2 text-dorado"></i>
                     El Castillo del Pan
                 </h5>
                 <p class="text-light">
@@ -306,15 +290,6 @@
                     <li><a href="{{ route('menu') }}" class="text-light text-decoration-none">Menú</a></li>
                     <li><a href="#" class="text-light text-decoration-none">Pedidos</a></li>
                     <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 mb-4">
-                <h6 class="fw-bold mb-3">Productos</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-light text-decoration-none">Panes</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Pasteles</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Galletas</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Especiales</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 mb-4">

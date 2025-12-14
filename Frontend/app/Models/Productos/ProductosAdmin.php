@@ -18,7 +18,11 @@ class ProductosAdmin extends Model
         'DESCRIPCION_PRODUCTO',
         'PRECIO_PRODUCTO',
         'PRODUCTO_STOCK_MIN',
-        'ACTIVO'
+        'ACTIVO',
+        'IMAGEN',
+        'imagen',
+        'IMAGEN_PRODUCTO',
+        'imagen_producto'
     ];
 
     protected $casts = [
