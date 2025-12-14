@@ -25,7 +25,7 @@
             </div>
             <div class="nav-item">
                 <a class="nav-link {{ request()->routeIs('pedidos.*') ? 'active' : '' }}"
-                   href="{{ route('pedidos.index') }}">
+                    href="{{ route('admin.pedidos.index') }}">
                     <i class="bi bi-cart-check"></i>
                     Pedidos
                 </a>

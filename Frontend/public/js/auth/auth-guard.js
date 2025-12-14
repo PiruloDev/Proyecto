@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const isLoginPage = window.location.pathname === '/login';
-    const isRegisterPage = window.location.pathname === '/register';
-    const isPublicPage = window.location.pathname === '/' ||
-                         window.location.pathname === '/menu' ||
-                         window.location.pathname.startsWith('/productos');
+const isRegisterPage = window.location.pathname === '/register';
+const isAuthRequiredPage = window.location.pathname === '/acceso-requerido'; // <--- NUEVA LÍNEA
+const isPublicPage = window.location.pathname === '/' ||
+                         window.location.pathname === '/menu' ||
+                         window.location.pathname.startsWith('/productos') ||
+                         isAuthRequiredPage;
 
     if (!isLoginPage && !isRegisterPage && !isPublicPage) {
         if (!AuthManager.isAuthenticated()) {

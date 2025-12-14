@@ -372,8 +372,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');
     Route::put('/pedidos/{id_PEDIDO}', [PedidosController::class, 'update'])->name('pedidos.update');
     Route::delete('/pedidos/{id_PEDIDO}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
-
-
 });
+
+Route::get('/acceso-requerido', function () {
+    return view('auth.auth_required'); // Asegúrate que el path de la vista sea correcto
+})->name('auth.required');
 
 require __DIR__.'/settings.php';

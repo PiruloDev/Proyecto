@@ -29,8 +29,8 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-marron fw-semibold" href="#">Pedidos</a>
-                    </li>
+    <a class="nav-link text-marron fw-semibold" href="{{ route('auth.required') }}">Pedidos</a>
+</li>
                     <li class="nav-item">
                         <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
                     </li>
