@@ -38,6 +38,10 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Auth Manager -->
+    <script src="{{ asset('js/auth/auth-manager.js') }}"></script>
+    <script src="{{ asset('js/auth/auth-guard.js') }}"></script>
+
     <!-- Scripts personalizados -->
     @stack('scripts')
 

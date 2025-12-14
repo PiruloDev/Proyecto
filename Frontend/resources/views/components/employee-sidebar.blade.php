@@ -43,7 +43,7 @@
                 <i class="bi bi-person-circle"></i>
                 <span>Empleado</span>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" class="logout-form">
                 @csrf
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>

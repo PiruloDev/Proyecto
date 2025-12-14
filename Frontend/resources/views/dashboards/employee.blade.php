@@ -56,7 +56,7 @@
                         <i class="bi bi-person-circle"></i>
                         <span>Empleado</span>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">
                             <i class="bi bi-box-arrow-right"></i>
@@ -150,24 +150,24 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Aquí irían otras secciones del dashboard (pedidos, productos, perfil) --}}
 
                 <div class="section-content" id="pedidos-section" style="display: none;">
                     <h3>Gestión de Pedidos</h3>
                     <p>Contenido para gestionar pedidos. Incluiría la tabla de pedidos pendientes, etc.</p>
                 </div>
-                
+
                 <div class="section-content" id="productos-section" style="display: none;">
                     <h3>Productos</h3>
                     <p>Contenido para visualizar productos disponibles.</p>
                 </div>
-                
+
                 <div class="section-content" id="perfil-section" style="display: none;">
                     <h3>Mi Perfil</h3>
                     <p>Contenido de la información del empleado.</p>
                 </div>
-                
+
             </div>
         </main>
     </div>
@@ -177,24 +177,38 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        if (!AuthManager.isAuthenticated()) {
+            AuthManager.redirectToLogin();
+            return;
+        }
+
+        const userData = AuthManager.getUserData();
+        const userRole = AuthManager.getRole();
+
+        if (userRole !== 'EMPLEADO') {
+            console.warn('Usuario no autorizado para dashboard empleado');
+            const correctDashboard = AuthManager.getDashboardRoute(userRole);
+            window.location.href = correctDashboard;
+            return;
+        }
+
+        console.log('Dashboard Empleado - Usuario autenticado:', userData);
+
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
 
-        // Toggle sidebar en móvil
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('show');
             });
         }
 
-        // Navegación entre secciones (Lógica para pestañas dentro del dashboard)
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
-                
-                // Solo si es un enlace interno del dashboard (#...)
+
                 if (href && href.startsWith('#')) {
                     e.preventDefault();
 
@@ -209,11 +223,9 @@
                         targetSection.style.display = 'block';
                     }
                 }
-                // Si NO empieza con '#' (es decir, usa route() como "Gestionar Pedidos"), navega normalmente.
             });
         });
-        
-        // Mostrar la sección del dashboard por defecto al cargar
+
         const dashboardSection = document.getElementById('dashboard-section');
         if (dashboardSection) {
             dashboardSection.style.display = 'block';

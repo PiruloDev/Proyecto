@@ -13,13 +13,13 @@
     <div class="row">
         <!-- Sidebar Component -->
         @include('components.admin-sidebar')
-        
+
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Gestión de Panadería</h1>
             </div>
-            
+
             <!-- Dashboard Cards Grid -->
             <div class="row g-4 mb-4">
                 <!-- Card: Producción -->
@@ -175,10 +175,26 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Toggle sidebar en móvil si tienes botón
+        if (!AuthManager.isAuthenticated()) {
+            AuthManager.redirectToLogin();
+            return;
+        }
+
+        const userData = AuthManager.getUserData();
+        const userRole = AuthManager.getRole();
+
+        if (userRole !== 'ADMIN' && userRole !== 'ADMINISTRADOR') {
+            console.warn('Usuario no autorizado para dashboard admin');
+            const correctDashboard = AuthManager.getDashboardRoute(userRole);
+            window.location.href = correctDashboard;
+            return;
+        }
+
+        console.log('Dashboard Admin - Usuario autenticado:', userData);
+
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
-        
+
         if (sidebarToggle && sidebar) {
             sidebarToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('show');

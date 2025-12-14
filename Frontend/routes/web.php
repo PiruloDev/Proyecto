@@ -35,7 +35,7 @@ Route::get('/menu', [Menuproductos::class, 'index'])->name('menu');
 Route::prefix('productos')->group(function () {
     Route::get('/', [ProductoController::class, 'index'])->name('productos.index');
     Route::post('/', [ProductoController::class, 'store'])->name('productos.store');
-    Route::patch('/{id}', [ProductoController::class, 'update'])->name('productos.update'); 
+    Route::patch('/{id}', [ProductoController::class, 'update'])->name('productos.update');
     Route::delete('/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
     Route::resource('productos', ProductoController::class)->except(['show', 'create', 'edit']);
 
@@ -45,24 +45,24 @@ Route::prefix('productos')->group(function () {
 // AUTENTICACIÓN
 // ============================================
 
-// Login
+// Vistas de autenticación
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::post('/login', function () {
-        // TODO: Implementar lógica de autenticación
-
-    return back()->with('error', 'Funcionalidad en desarrollo');
-})->name('login.submit');
-
-// Registro
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
+
+// API de autenticación
+Route::prefix('api/auth')->group(function () {
+    Route::post('/login', [App\Http\Controllers\Auth\AuthController::class, 'login']);
+    Route::post('/registro/cliente', [App\Http\Controllers\Auth\AuthController::class, 'registrarCliente']);
+    Route::post('/registro/empleado', [App\Http\Controllers\Auth\AuthController::class, 'registrarEmpleado']);
+    Route::post('/registro/admin', [App\Http\Controllers\Auth\AuthController::class, 'registrarAdmin']);
+    Route::post('/validar', [App\Http\Controllers\Auth\AuthController::class, 'validarToken']);
+});
 
 // Logout
 Route::post('/logout', function () {
-        // Auth::logout();
     return redirect()->route('home');
 })->name('logout');
 
@@ -282,7 +282,7 @@ Route::prefix('/dashboard/inventario/produccion')->group(function () {
 // ============================================
 // **RESTABLECIDA COMO RUTA DEL EMPLEADO**
 Route::prefix('pedidos')->group(function () {
-    Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index'); 
+    Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
     Route::get('/create', [PedidosController::class, 'create'])->name('pedidos.create');
     Route::post('/', [PedidosController::class, 'store'])->name('pedidos.store');
     Route::get('/edit/{id}', [PedidosController::class, 'edit'])->name('pedidos.edit');
@@ -355,25 +355,25 @@ Route::prefix('reportes/ordenes-salida')->group(function() {
 Route::prefix('/api/carrito')->group(function () {
 
     Route::get('/', [CarritoController::class, 'obtenerCarrito'])->name('api.carrito.get');
-    
+
     Route::post('/agregar/{id}', [CarritoController::class, 'agregar'])->name('api.carrito.agregar');
-    
+
     Route::patch('/actualizar', [CarritoController::class, 'actualizar'])->name('api.carrito.actualizar');
-    
+
     Route::delete('/remover/{id}', [CarritoController::class, 'remover'])->name('api.carrito.remover');
-    
+
     Route::post('/checkout', [CarritoController::class, 'checkout'])->name('api.carrito.checkout');
 });
 
 // ADMINISTRADOR SECCION PEDIDOS
 Route::prefix('admin')->name('admin.')->group(function () {
     // Pedidos de Clientes - Ruta: admin.pedidos.index | URL: /admin/pedidos
-    Route::get('/pedidos', [PedidosController::class, 'indexAdmin'])->name('pedidos.index'); 
+    Route::get('/pedidos', [PedidosController::class, 'indexAdmin'])->name('pedidos.index');
     Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');
     Route::put('/pedidos/{id_PEDIDO}', [PedidosController::class, 'update'])->name('pedidos.update');
     Route::delete('/pedidos/{id_PEDIDO}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
-    
-   
+
+
 });
 
 require __DIR__.'/settings.php';
