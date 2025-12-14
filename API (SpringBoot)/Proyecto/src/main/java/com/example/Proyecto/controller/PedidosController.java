@@ -34,8 +34,20 @@ public class PedidosController {
 
     @PostMapping
     public ResponseEntity<String> crearPedido(@RequestBody Pedidos pedido) {
-        pedidosService.crearPedido(pedido);
-        return new ResponseEntity<>("Pedido creado con éxito.", HttpStatus.CREATED);
+
+        System.out.println("CLIENTE = " + pedido.getID_CLIENTE());
+        System.out.println("EMPLEADO = " + pedido.getID_EMPLEADO());
+        System.out.println("TOTAL = " + pedido.getTOTAL_PRODUCTO());
+        try {
+            pedidosService.crearPedido(pedido);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Pedido creado con éxito.");
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
     }
 
 
@@ -52,10 +64,8 @@ public class PedidosController {
         return new ResponseEntity<>("Pedido con ID " + id + " eliminado con éxito.", HttpStatus.OK);
     }
 
-    @GetMapping("/pedidos/cliente/{id_cliente}")
+    @GetMapping("/cliente/{id_cliente}")
     public List<Pedidos> obtenerPedidosPorCliente(@PathVariable long id_cliente) {
-        // Implementa la lógica en tu PedidosService para hacer la consulta SQL:
-        // SELECT * FROM Pedidos WHERE ID_CLIENTE = ?
         return pedidosService.obtenerPedidosPorCliente(id_cliente);
     }
 }

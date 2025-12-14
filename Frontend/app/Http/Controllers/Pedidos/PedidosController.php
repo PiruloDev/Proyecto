@@ -17,9 +17,6 @@ class PedidosController extends Controller
         $this->apiService = $apiService;
     }
 
-    // ----------------------------------------------------
-    //  MÉTODOS DE ADMINISTRACIÓN/EMPLEADO (RUTAS BASE: /pedidos)
-    // ----------------------------------------------------
     
     public function index()
     {
@@ -159,16 +156,14 @@ class PedidosController extends Controller
         }
     }
     
-    // ----------------------------------------------------
-    // MÉTODO PARA EL DASHBOARD DEL CLIENTE (se mantiene)
-    // ----------------------------------------------------
-    
     public function dashboardCliente()
     {
     
-        $clienteId = 1; 
+        $clienteId = Auth::id();
         
         $pedidos = [];
+
+        dd($clienteId);
         
         try {
             $pedidos = $this->apiService->obtenerPedidosPorCliente($clienteId);
@@ -180,10 +175,6 @@ class PedidosController extends Controller
         return view('dashboards.client', compact('pedidos'));
     }
     
-    // ----------------------------------------------------
-    // MÉTODOS DE DASHBOARD DE EMPLEADO (se mantiene)
-    // ----------------------------------------------------
-
     public function dashboardEmpleado()
     {
         $pedidos = [];

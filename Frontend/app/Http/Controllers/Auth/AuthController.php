@@ -36,19 +36,29 @@ class AuthController extends Controller
             Log::info('Usuario data: ' . json_encode($result['usuario']));
         }
 
-        if ($result['success']) {
-            $response = [
-                'success' => true,
-                'token' => $result['token'],
-                'usuario' => $result['usuario'],
-                'mensaje' => $result['mensaje']
-            ];
+      if ($result['success']) {
+    $response = [
+        'success' => true,
+        'token' => $result['token'],
+        'usuario' => $result['usuario'],
+        'mensaje' => $result['mensaje']
+    ];
 
-            Log::info('=== RESPUESTA ENVIADA AL FRONTEND ===');
-            Log::info(json_encode($response));
+    Log::info('=== RESPUESTA ENVIADA AL FRONTEND ===');
+    Log::info(json_encode($response));
 
-            return response()->json($response);
-        }
+    // 🔥 GUARDAR EN SESIÓN (CORREGIDO)
+    session([
+        'usuario' => $result['usuario'],
+        'token' => $result['token'],
+    ]);
+
+    Log::info('Usuario guardado en sesión', [
+        'usuario' => session('usuario')
+    ]);
+
+    return response()->json($response);
+}
 
         return response()->json([
             'success' => false,

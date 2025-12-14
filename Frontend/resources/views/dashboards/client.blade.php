@@ -19,24 +19,23 @@
     $totalPedidos = count($pedidos);
     $pedidosPendientes = 0;
 
-    // Suponiendo que ID_ESTADO_PEDIDO = 1 es "Pendiente" (ajusta según tu base de datos)
+    // Suponiendo que id_ESTADO_PEDIDO = 1 es "Pendiente"
     foreach ($pedidos as $pedido) {
-        if (($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 1) {
+        if (($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) {
             $pedidosPendientes++;
         }
     }
 
-    // Tomamos los 5 pedidos más recientes para la sección "Recientes"
-    // Los pedidos de la API de Spring Boot deberían venir ordenados por FECHA_INGRESO descendente
+    // Tomamos los 5 pedidos más recientes
     $pedidosRecientes = array_slice($pedidos, 0, 5);
 
-    // Función auxiliar para formatear la fecha (el objeto de la API es una cadena)
+    // Función auxiliar para formatear la fecha
     function formatApiDate($dateString) {
         if (empty($dateString)) return 'N/A';
         try {
             return date('d/m/Y H:i', strtotime($dateString));
         } catch (\Exception $e) {
-            return $dateString; // Devuelve la cadena si falla el formato
+            return $dateString;
         }
     }
 @endphp
@@ -50,7 +49,6 @@
                     <h5>Portal Cliente</h5>
                 </div>
                 <div class="px-3 mb-3">
-                    {{-- Asume que 'menu' es la ruta para la tienda --}}
                     <a href="{{ route('menu') }}" class="btn btn-explore w-100">
                         <i class="bi bi-compass"></i>
                         Explorar Productos
@@ -65,7 +63,6 @@
                             Dashboard
                         </a>
                     </div>
-                    {{-- Enlace a la sección "Mis Pedidos" --}}
                     <div class="nav-item">
                         <a class="nav-link" href="#pedidos" data-section="pedidos">
                             <i class="bi bi-cart-check"></i>
@@ -85,7 +82,6 @@
                 <div class="sidebar-user">
                     <div class="user-info">
                         <i class="bi bi-person-circle"></i>
-                        {{-- Muestra el nombre del usuario autenticado si es posible --}}
                         <span>{{ Auth::user()->name ?? 'Cliente' }}</span>
                     </div>
                     <a href="#" class="logout-btn mb-2 change-pass-btn">
@@ -108,7 +104,6 @@
                 <i class="bi bi-list"></i> Menú
             </button>
 
-            {{-- Mensajes de error globales --}}
             @if(session('error'))
                 <div class="alert alert-danger" role="alert">
                     {{ session('error') }}
@@ -155,21 +150,17 @@
                         @foreach($pedidosRecientes as $pedido)
                         <div class="order-item">
                             <div class="order-info">
-                                <h6>Pedido #{{ $pedido['ID_PEDIDO'] ?? 'N/A' }}</h6>
-                                {{-- ⚠️ NOTA: El nombre del empleado y estado se obtienen de la base de datos de Spring Boot,
-                                    si no vienen en el JSON devuelto, estos campos mostrarán un valor por defecto.
-                                    Aquí solo usamos los datos que vienen en la API. --}}
-                                <p class="mb-1">Fecha Ingreso: {{ formatApiDate($pedido['FECHA_INGRESO'] ?? null) }}</p>
-                                <p class="mb-0">Total: ${{ number_format($pedido['TOTAL_PRODUCTO'] ?? 0, 2) }}</p>
+                                <h6>Pedido #{{ $pedido['id_PEDIDO'] ?? 'N/A' }}</h6>
+                                <p class="mb-1">Fecha Ingreso: {{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</p>
+                                <p class="mb-0">Total: ${{ number_format($pedido['total_PRODUCTO'] ?? 0, 2) }}</p>
                             </div>
                             <div class="order-status
-                                @if(($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 1) status-pendiente
-                                @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 3) status-entregado
+                                @if(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) status-pendiente
+                                @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 3) status-entregado
                                 @else status-otro
                                 @endif
                                 ">
-                                {{-- Aquí deberías mapear ID_ESTADO_PEDIDO a un nombre (Ej: 1 -> Pendiente) --}}
-                                Estado: {{ $pedido['ID_ESTADO_PEDIDO'] ?? 'N/A' }}
+                                Estado: {{ $pedido['id_ESTADO_PEDIDO'] ?? 'N/A' }}
                             </div>
                         </div>
                         @endforeach
@@ -206,22 +197,21 @@
                         <tbody>
                             @foreach ($pedidos as $pedido)
                                 <tr>
-                                    <td>#{{ $pedido['ID_PEDIDO'] ?? 'N/A' }}</td>
-                                    <td>{{ formatApiDate($pedido['FECHA_INGRESO'] ?? null) }}</td>
-                                    <td>${{ number_format($pedido['TOTAL_PRODUCTO'] ?? 0, 2) }}</td>
-                                    {{-- Aquí se muestra el ID del estado. Idealmente se mapea el nombre. --}}
+                                    <td>#{{ $pedido['id_PEDIDO'] ?? 'N/A' }}</td>
+                                    <td>{{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</td>
+                                    <td>${{ number_format($pedido['total_PRODUCTO'] ?? 0, 2) }}</td>
                                     <td>
                                         <span class="badge
-                                            @if(($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 1) bg-warning text-dark
-                                            @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 2) bg-info
-                                            @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? 0) === 3) bg-success
+                                            @if(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) bg-warning text-dark
+                                            @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 2) bg-info
+                                            @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 3) bg-success
                                             @else bg-secondary
                                             @endif
                                         ">
-                                            {{ $pedido['ID_ESTADO_PEDIDO'] ?? 'N/A' }}
+                                            {{ $pedido['id_ESTADO_PEDIDO'] ?? 'N/A' }}
                                         </span>
                                     </td>
-                                    <td>{{ formatApiDate($pedido['FECHA_ENTREGA'] ?? null) }}</td>
+                                    <td>{{ formatApiDate($pedido['fecha_ENTREGA'] ?? null) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

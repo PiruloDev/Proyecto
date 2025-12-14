@@ -11,7 +11,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -20,42 +19,54 @@ public class pedidosService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<Pedidos> obtenerPedidosPorCliente(Long clienteId) {
-        // La consulta SQL selecciona todos los pedidos donde el ID_CLIENTE coincida
-        String sql = "SELECT * FROM Pedidos WHERE ID_CLIENTE = ?";
-
-        try {
-            return jdbcTemplate.query(sql, new Object[]{clienteId}, pedidoRowMapper);
-        } catch (DataAccessException e) {
-            System.err.println("Error al obtener pedidos para el cliente " + clienteId + ": " + e.getMessage());
-            return List.of(); // Devuelve una lista vacía en caso de error o si no hay pedidos.
-        }
+    /* =====================================================
+       VALIDAR EXISTENCIA DEL CLIENTE (NUEVO - OBLIGATORIO)
+       ===================================================== */
+    private boolean clienteExiste(long idCliente) {
+        String sql = "SELECT COUNT(*) FROM clientes WHERE ID_CLIENTE = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, idCliente);
+        return count != null && count > 0;
     }
-    private final RowMapper<Pedidos> pedidoRowMapper = new RowMapper<Pedidos>() {
-        @Override
-        public Pedidos mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Pedidos pedido = new Pedidos();
-            pedido.setID_PEDIDO(rs.getInt("ID_PEDIDO"));
-            pedido.setID_CLIENTE(rs.getLong("ID_CLIENTE"));
-            pedido.setID_EMPLEADO(rs.getLong("ID_EMPLEADO"));
-            pedido.setID_ESTADO_PEDIDO(rs.getLong("ID_ESTADO_PEDIDO"));
 
-            Timestamp tsIngreso = rs.getTimestamp("FECHA_INGRESO");
-            pedido.setFECHA_INGRESO(tsIngreso != null ? new java.util.Date(tsIngreso.getTime()) : null);
+    /* =========================
+       ROW MAPPER
+       ========================= */
+    private final RowMapper<Pedidos> pedidoRowMapper = (rs, rowNum) -> {
+        Pedidos pedido = new Pedidos();
+        pedido.setID_PEDIDO(rs.getInt("ID_PEDIDO"));
+        pedido.setID_CLIENTE(rs.getLong("ID_CLIENTE"));
+        pedido.setID_EMPLEADO(rs.getLong("ID_EMPLEADO"));
+        pedido.setID_ESTADO_PEDIDO(rs.getLong("ID_ESTADO_PEDIDO"));
 
-            Timestamp tsEntrega = rs.getTimestamp("FECHA_ENTREGA");
-            pedido.setFECHA_ENTREGA(tsEntrega != null ? new java.util.Date(tsEntrega.getTime()) : null);
+        Timestamp tsIngreso = rs.getTimestamp("FECHA_INGRESO");
+        pedido.setFECHA_INGRESO(tsIngreso != null ? new java.util.Date(tsIngreso.getTime()) : null);
 
-            pedido.setTOTAL_PRODUCTO(rs.getBigDecimal("TOTAL_PRODUCTO"));
-            return pedido;
-        }
+        Timestamp tsEntrega = rs.getTimestamp("FECHA_ENTREGA");
+        pedido.setFECHA_ENTREGA(tsEntrega != null ? new java.util.Date(tsEntrega.getTime()) : null);
+
+        pedido.setTOTAL_PRODUCTO(rs.getBigDecimal("TOTAL_PRODUCTO"));
+        return pedido;
     };
+
+    /* =========================
+       CONSULTAS
+       ========================= */
 
     public List<Pedidos> obtenerPedidos() {
         String sql = "SELECT * FROM Pedidos";
         return jdbcTemplate.query(sql, pedidoRowMapper);
     }
 
+    public List<Pedidos> obtenerPedidosPorCliente(Long clienteId) {
+        String sql = "SELECT * FROM Pedidos WHERE ID_CLIENTE = ?";
+
+        try {
+            return jdbcTemplate.query(sql, new Object[]{clienteId}, pedidoRowMapper);
+        } catch (DataAccessException e) {
+            System.err.println("Error al obtener pedidos para el cliente " + clienteId + ": " + e.getMessage());
+            return List.of();
+        }
+    }
 
     public Pedidos obtenerPedidoPorId(Long id) {
         String sql = "SELECT * FROM Pedidos WHERE ID_PEDIDO = ?";
@@ -66,11 +77,21 @@ public class pedidosService {
         }
     }
 
+    /* =========================
+       CREAR PEDIDO (CORREGIDO)
+       ========================= */
     public int crearPedido(Pedidos pedido) {
 
-        String sql = "INSERT INTO Pedidos (ID_CLIENTE, ID_EMPLEADO, ID_ESTADO_PEDIDO, FECHA_INGRESO, FECHA_ENTREGA, TOTAL_PRODUCTO) VALUES (?, ?, ?, ?, ?, ?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        // 🔥 VALIDACIÓN CLAVE
+        if (!clienteExiste(pedido.getID_CLIENTE())) {
+            throw new RuntimeException("El cliente con ID " + pedido.getID_CLIENTE() + " no existe");
+        }
 
+        String sql = "INSERT INTO Pedidos " +
+                "(ID_CLIENTE, ID_EMPLEADO, ID_ESTADO_PEDIDO, FECHA_INGRESO, FECHA_ENTREGA, TOTAL_PRODUCTO) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         Timestamp fechaIngresoActual = new Timestamp(System.currentTimeMillis());
 
         jdbcTemplate.update(connection -> {
@@ -89,9 +110,13 @@ public class pedidosService {
             ps.setBigDecimal(6, pedido.getTOTAL_PRODUCTO());
             return ps;
         }, keyHolder);
+
         return keyHolder.getKey().intValue();
     }
 
+    /* =========================
+       ACTUALIZAR PEDIDO
+       ========================= */
     public void actualizarPedido(Long id, Pedidos nuevosDatos) {
 
         Pedidos pedidoExistente = obtenerPedidoPorId(id);
@@ -100,16 +125,16 @@ public class pedidosService {
             throw new RuntimeException("Pedido con ID " + id + " no encontrado para actualizar.");
         }
 
-
         Timestamp fechaIngresoAUsar = new Timestamp(pedidoExistente.getFECHA_INGRESO().getTime());
 
-        // La FECHA_ENTREGA se actualiza solo si el nuevo objeto tiene un valor.
         Timestamp fechaEntregaAUsar = nuevosDatos.getFECHA_ENTREGA() != null
                 ? new Timestamp(nuevosDatos.getFECHA_ENTREGA().getTime())
-                : (pedidoExistente.getFECHA_ENTREGA() != null ? new Timestamp(pedidoExistente.getFECHA_ENTREGA().getTime()) : null);
+                : (pedidoExistente.getFECHA_ENTREGA() != null
+                ? new Timestamp(pedidoExistente.getFECHA_ENTREGA().getTime())
+                : null);
 
-        String sql = "UPDATE Pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, FECHA_INGRESO = ?, FECHA_ENTREGA = ?, TOTAL_PRODUCTO = ? WHERE ID_PEDIDO = ?";
-
+        String sql = "UPDATE Pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, " +
+                "FECHA_INGRESO = ?, FECHA_ENTREGA = ?, TOTAL_PRODUCTO = ? WHERE ID_PEDIDO = ?";
 
         Object[] params = {
                 nuevosDatos.getID_CLIENTE(),
@@ -134,7 +159,9 @@ public class pedidosService {
         jdbcTemplate.update(sql, params, types);
     }
 
-    // Método para eliminar un pedido (DELETE)
+    /* =========================
+       ELIMINAR PEDIDO
+       ========================= */
     public void eliminarPedido(Long id) {
         String sql = "DELETE FROM Pedidos WHERE ID_PEDIDO = ?";
         jdbcTemplate.update(sql, id);

@@ -10,36 +10,38 @@ class PedidosApiService
     protected $baseUrl = 'http://localhost:8080/pedidos';
     protected $productosUrl = 'http://localhost:8080/productos';
 
-    // --- Métodos de Productos (Usados por CarritoController) ---
+    /* =========================
+       PRODUCTOS
+       ========================= */
 
     public function obtenerProductos()
     {
         try {
             $response = Http::get($this->productosUrl);
-            $response->throw(); 
+            $response->throw();
+
             $productosResponse = $response->json();
-            
-            // Devuelve el array de productos (maneja estructuras de respuesta de Spring)
+
             if (isset($productosResponse['content']) && is_array($productosResponse['content'])) {
                 return $productosResponse['content'];
             }
+
             return $productosResponse;
-            
+
         } catch (Exception $e) {
             throw new Exception("Error al obtener productos de la API.");
         }
     }
 
-    // --- Métodos de Pedidos CRUD (Usados por PedidosController) ---
+    /* =========================
+       PEDIDOS CRUD
+       ========================= */
 
     public function obtenerPedidos()
     {
         try {
-            $response = Http::get($this->baseUrl);
-            $response->throw(); 
-            return $response->json();
+            return Http::get($this->baseUrl)->throw()->json();
         } catch (Exception $e) {
-            // Este mensaje se mostrará en el Listado de Pedidos
             throw new Exception("Error al obtener el listado de pedidos de la API.");
         }
     }
@@ -47,26 +49,21 @@ class PedidosApiService
     public function obtenerPedidoPorId($id)
     {
         try {
-            $response = Http::get("{$this->baseUrl}/{$id}");
-            $response->throw();
-            return $response->json();
+            return Http::get("{$this->baseUrl}/{$id}")->throw()->json();
         } catch (\Illuminate\Http\Client\RequestException $e) {
-            if ($e->response->status() === 404) {
+            if ($e->response && $e->response->status() === 404) {
                 return null;
             }
             throw new Exception("Error al obtener pedido ID {$id} de la API.");
         }
     }
-    
+
     public function crearPedido($data)
     {
         try {
-            // Llama a POST /pedidos (para el CRUD manual)
-            $response = Http::post($this->baseUrl, $data);
-            $response->throw();
-            return $response->json();
-        } catch (Exception $e) {
-            $message = $response->json('message') ?? 'Error al crear pedido en la API.';
+            return Http::post($this->baseUrl, $data)->throw()->json();
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            $message = $e->response?->json('message') ?? 'Error al crear pedido en la API.';
             throw new Exception($message);
         }
     }
@@ -74,9 +71,7 @@ class PedidosApiService
     public function actualizarPedido($id, $data)
     {
         try {
-            $response = Http::put("{$this->baseUrl}/{$id}", $data);
-            $response->throw();
-            return $response->json();
+            return Http::put("{$this->baseUrl}/{$id}", $data)->throw()->json();
         } catch (Exception $e) {
             throw new Exception("Error al actualizar pedido ID {$id} en la API.");
         }
@@ -85,53 +80,54 @@ class PedidosApiService
     public function eliminarPedido($id)
     {
         try {
-            $response = Http::delete("{$this->baseUrl}/{$id}");
-            $response->throw();
-            return $response->json();
+            return Http::delete("{$this->baseUrl}/{$id}")->throw()->json();
         } catch (Exception $e) {
             throw new Exception("Error al eliminar pedido ID {$id} en la API.");
         }
     }
-    
-    // --- Método de Checkout (Usado por CarritoController) ---
 
-    /**
-     * Procesa el carrito de compras a través del endpoint de la API de Java.
-     * @param array $payload Debe contener 'cliente_id' y 'items'.
-     */
+    /* =========================
+       CHECKOUT (CLAVE)
+       ========================= */
+
     public function crearPedidoCheckout(array $payload)
     {
+        /**
+         * Java espera un objeto Pedidos:
+         * ID_CLIENTE
+         * ID_EMPLEADO
+         * ID_ESTADO_PEDIDO
+         * TOTAL_PRODUCTO
+         */
+
+        $pedido = [
+            'ID_CLIENTE'        => $payload['cliente_id'],
+            'ID_EMPLEADO'       => 1, // fijo o el que manejes
+            'ID_ESTADO_PEDIDO'  => 1, // estado inicial
+            'TOTAL_PRODUCTO'    => collect($payload['items'])->sum(function ($item) {
+                return $item['precio'] * $item['cantidad'];
+            })
+        ];
+
         try {
-            $response = Http::post($this->baseUrl, $payload);
-            $response->throw(); 
-            return $response->json();
-        } catch (Exception $e) {
-            $message = $response->json('message') ?? 'Error desconocido en la API al finalizar el pedido.';
+            return Http::post($this->baseUrl, $pedido)->throw()->json();
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            $message = $e->response?->json('message') ?? 'Error al finalizar el pedido en la API.';
             throw new Exception($message);
         }
     }
 
-    // ----------------------------------------------------------------------
-    // ✅ MÉTODO CLAVE PARA EL DASHBOARD DEL CLIENTE (NUEVO)
-    // ----------------------------------------------------------------------
-    
-    /**
-     * Obtiene todos los pedidos asociados a un ID de cliente específico
-     * llamando al endpoint filtrado del backend.
-     * * @param int $clienteId El ID del cliente actual.
-     * @return array La lista de pedidos del cliente.
-     */
+    /* =========================
+       DASHBOARD CLIENTE
+       ========================= */
+
     public function obtenerPedidosPorCliente($clienteId)
     {
-        // Llama al endpoint de Spring Boot que implementaste: http://localhost:8080/pedidos/cliente/{id}
-        $url = "{$this->baseUrl}/cliente/{$clienteId}"; 
-        
         try {
-            $response = Http::get($url);
-            $response->throw(); 
-            return $response->json();
+            return Http::get("{$this->baseUrl}/cliente/{$clienteId}")
+                ->throw()
+                ->json();
         } catch (Exception $e) {
-            // Este error será capturado por el PedidosController y mostrado al cliente.
             throw new Exception("Error al obtener los pedidos del cliente {$clienteId} de la API.");
         }
     }

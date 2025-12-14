@@ -194,39 +194,53 @@ class CarritoController extends Controller
      * Proceso de checkout (FINALIZAR PEDIDO).
      * (Método 'checkout' omitido por brevedad, no necesita cambios)
      */
-    public function checkout()
-    {
-        // ... (Tu código existente del método checkout) ...
-        $carrito = session()->get('carrito', []);
+   public function checkout()
+{
+    $carrito = session()->get('carrito', []);
 
-        if (empty($carrito)) {
-            return response()->json(['success' => false, 'message' => 'El carrito está vacío.'], 400);
-        }
-
-        try {
-            // 1. Preparamos el payload que espera el PedidoRequest en Java
-            $payload = [
-                'cliente_id' => auth()->id() ?? 1,
-                'items' => array_values($carrito),
-            ];
-
-            // 2. LLAMADA A LA API DE JAVA A TRAVÉS DEL SERVICIO
-            $response = $this->pedidosApiService->crearPedidoCheckout($payload);
-
-            // 3. Limpiar el carrito solo si el pedido fue exitoso
-            session()->forget('carrito');
-
-            return response()->json([
-                'success' => true,
-                'message' => $response['message'] ?? '¡Pedido realizado con éxito!',
-                'id' => $response['id'] ?? null
-            ], 200);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+    if (empty($carrito)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'El carrito está vacío.'
+        ], 400);
     }
+
+    try {
+        // Calcula el total general (basado en productos en el carrito)
+        $totalGeneral = array_reduce($carrito, function ($sum, $item) {
+            return $sum + ($item['precio'] * $item['cantidad']);
+        }, 0);
+
+        // Ahora sí, arma el payload correctamente
+        $payload = [
+            'cliente_id' => session('usuario.id'),
+            'empleado_id' => 1,
+            'estado_pedido_id' => 1,
+            'fecha_entrega' => null,
+            'total_producto' => $totalGeneral // Aquí ya está correctamente calculado
+        ];
+
+        Log::info('Payload enviado a Java:', $payload);
+
+        // Llamada a la API de Java para crear el pedido
+        $response = $this->pedidosApiService->crearPedido($payload);
+
+        // Vaciar carrito solo si el pedido fue exitoso
+        session()->forget('carrito');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pedido realizado con éxito',
+            'pedido' => $response
+        ]);
+
+    } catch (Exception $e) {
+        Log::error('Error al finalizar pedido:', ['error' => $e->getMessage()]);
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }
