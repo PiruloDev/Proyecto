@@ -41,7 +41,10 @@
         <div class="sidebar-user">
             <div class="user-info">
                 <i class="bi bi-person-circle"></i>
-                <span>Empleado</span>
+                <div class="d-flex flex-column">
+                    <span id="employee-name" class="fw-bold">Empleado</span>
+                    <small id="employee-role" class="text-muted">Empleado</small>
+                </div>
             </div>
             <form method="POST" action="{{ route('logout') }}" class="logout-form">
                 @csrf
@@ -53,3 +56,34 @@
         </div>
     </div>
 </nav>
+
+<script>
+    (function() {
+        function updateEmployeeSidebar() {
+            if (typeof AuthManager === 'undefined') {
+                console.warn('AuthManager no está disponible');
+                return;
+            }
+
+            const userData = AuthManager.getUserData();
+            const userRole = AuthManager.getRole();
+
+            const employeeNameElement = document.getElementById('employee-name');
+            const employeeRoleElement = document.getElementById('employee-role');
+
+            if (employeeNameElement && userData && userData.nombre) {
+                employeeNameElement.textContent = userData.nombre;
+            }
+
+            if (employeeRoleElement && userRole) {
+                employeeRoleElement.textContent = userRole === 'EMPLEADO' ? 'Empleado' : userRole;
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateEmployeeSidebar);
+        } else {
+            updateEmployeeSidebar();
+        }
+    })();
+</script>

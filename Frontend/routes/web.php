@@ -362,6 +362,8 @@ Route::prefix('/api/carrito')->group(function () {
 
     Route::delete('/remover/{id}', [CarritoController::class, 'remover'])->name('api.carrito.remover');
 
+    Route::delete('/vaciar', [CarritoController::class, 'vaciar'])->name('api.carrito.vaciar');
+
     Route::post('/checkout', [CarritoController::class, 'checkout'])->name('api.carrito.checkout');
 });
 

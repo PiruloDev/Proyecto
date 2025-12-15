@@ -24,61 +24,8 @@
 @endpush
 
 @section('content')
-<!-- Header -->
-<header>
-    <nav class="navbar navbar-expand-md navbar-light bg-crema shadow-sm animate__animated animate__fadeInDown">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center logo" href="{{ url('/') }}">
-                <img src="{{ asset('images/logoprincipal.jpg') }}" width="50" alt="Logo El Castillo del Pan" class="me-2 rounded-circle border border-3 border-marron p-1 bg-white">
-                <span class="fw-bold text-marron fs-4">El Castillo del Pan</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-marron fw-semibold" href="{{ route('menu') }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            ¡Explorar!
-                        </a>
-                        <ul class="dropdown-menu bg-crema shadow rounded-3 border-0 mt-2" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item text-marron fw-semibold py-2" href="{{ route('menu') }}">Ver Menú</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-            <a class="nav-link text-marron fw-semibold" href="{{ route('pedidos.index') }}">Pedidos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
-                    </li>
-                </ul>
-                @auth
-                    <div class="dropdown">
-                        <a class="btn btn-user-glass dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user me-2"></i>{{ Auth::user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-glass">
-                            <li><a class="dropdown-item" href="{{ route('dashboard.client') }}">
-                                <i class="fas fa-user-circle me-2"></i>Mi Perfil
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-rounded fw-bold ms-3">Acceder</a>
-                @endauth
-            </div>
-        </div>
-    </nav>
-</header>
+@include('partials.navbar')
+
 <!-- Sección de Productos por Categorías -->
 <section class="py-5">
     <div class="container">
@@ -221,76 +168,11 @@
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="py-5 bg-gris-oscuro text-white">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <h5 class="fw-bold mb-3">
-                    El Castillo del Pan
-                </h5>
-                <p class="text-light">
-                    Panadería artesanal con más de 10 años de experiencia,
-                    ofreciendo productos frescos y de la más alta calidad.
-                </p>
-            </div>
-            <div class="col-lg-2 mb-4">
-                <h6 class="fw-bold mb-3">Enlaces</h6>
-                <ul class="list-unstyled">
-                    <li><a href="{{ url('/') }}" class="text-light text-decoration-none">Inicio</a></li>
-                    <li><a href="{{ route('menu') }}" class="text-light text-decoration-none">Menú</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Pedidos</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 mb-4">
-                <h6 class="fw-bold mb-3">Productos</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-light text-decoration-none">Panes</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Pasteles</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Galletas</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Especiales</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 mb-4">
-                <h6 class="fw-bold mb-3">Contacto</h6>
-                <p class="text-light mb-2">
-                    <i class="fas fa-map-marker-alt me-2"></i>
-                    123 Calle Principal, Ciudad
-                </p>
-                <p class="text-light mb-2">
-                    <i class="fas fa-phone me-2"></i>
-                    (555) 123-4567
-                </p>
-                <p class="text-light mb-2">
-                    <i class="fas fa-envelope me-2"></i>
-                    info@elcastillodelpan.com
-                </p>
-                <div class="mt-3">
-                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-        </div>
-        <hr class="my-4 border-secondary">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <p class="text-light mb-0">
-                    &copy; 2024 El Castillo del Pan. Todos los derechos reservados.
-                </p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <small class="text-light">
-                    Hecho con <i class="fas fa-heart text-danger"></i> para nuestros clientes
-                </small>
-            </div>
-        </div>
-    </div>
-</footer>
+@include('partials.footer')
 @endsection
 
 @push('scripts')
+@include('partials.auth-scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 /* Estilo simple para manejar la ocultación en la búsqueda */

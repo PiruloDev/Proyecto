@@ -17,25 +17,6 @@ html {
 .container-fluid {
     overflow-x: hidden;
 }
-
-/* ============================================
-   Glassmorphism Effect
-   ============================================ */
-.glass-card {
-    background: rgba(255, 255, 255, 0.25);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(187, 148, 103, 0.18);
-    box-shadow: var(--panaderia-shadow-md);
-    transition: all var(--panaderia-transition-normal);
-}
-
-.glass-card:hover {
-    background: rgba(255, 255, 255, 0.35);
-    transform: translateY(-5px);
-    box-shadow: var(--panaderia-shadow-xl);
-}
-
 /* ============================================
    Sidebar Sticky (Sin scroll interno)
    ============================================ */
@@ -78,11 +59,14 @@ html {
     font-family: var(--panaderia-font-primary);
 }
 
+/* ============================================
+   BOTÓN EXPLORAR CON HOVER E IMAGEN
+   ============================================ */
 .btn-explore {
     background: var(--panaderia-cafe-claro);
-    color: white;
+    color: rgb(255, 255, 255);
     border: none;
-    padding: 0.75rem;
+    padding: 1.5rem;
     border-radius: var(--panaderia-radius-md);
     font-weight: 600;
     transition: all var(--panaderia-transition-normal);
@@ -91,15 +75,43 @@ html {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Imagen de fondo que aparece en hover */
+.btn-explore::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/hov.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity var(--panaderia-transition-normal);
+    z-index: 0;
+}
+/* Efectos en hover */
+.btn-explore:hover::before {
+    opacity: 1;
+}
+
+.btn-explore:hover::after {
+    opacity: 1;
 }
 
 .btn-explore:hover {
-    background: var(--panaderia-marron-hover);
     transform: translateY(-2px);
     box-shadow: var(--panaderia-shadow-md);
     color: white;
 }
-
+/* ============================================
+   Sidebar Elements
+   ============================================ */
 .sidebar-divider {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     margin: 1rem 0;

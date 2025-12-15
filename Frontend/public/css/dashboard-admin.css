@@ -121,6 +121,7 @@ html {
 .user-info {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     color: white;
     padding: 0.5rem;
     margin-bottom: 0.5rem;
@@ -129,7 +130,23 @@ html {
 
 .user-info i {
     font-size: 1.5rem;
-    margin-right: 0.5rem;
+    margin-right: 0;
+}
+
+.user-info .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.user-info #admin-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.user-info #admin-role {
+    font-size: 0.75rem;
+    opacity: 0.8;
 }
 
 .logout-btn {

@@ -82,7 +82,10 @@
                 <div class="sidebar-user">
                     <div class="user-info">
                         <i class="bi bi-person-circle"></i>
-                        <span>{{ Auth::user()->name ?? 'Cliente' }}</span>
+                        <div class="d-flex flex-column">
+                            <span id="client-name" class="fw-bold">Cliente</span>
+                            <small id="client-role" class="text-muted">Cliente</small>
+                        </div>
                     </div>
                     <a href="#" class="logout-btn mb-2 change-pass-btn">
                         <i class="bi bi-key"></i>
@@ -275,6 +278,18 @@
         }
 
         console.log('Dashboard Cliente - Usuario autenticado:', userData);
+
+        // Actualizar nombre y rol en sidebar
+        const clientNameElement = document.getElementById('client-name');
+        const clientRoleElement = document.getElementById('client-role');
+
+        if (clientNameElement && userData && userData.nombre) {
+            clientNameElement.textContent = userData.nombre;
+        }
+
+        if (clientRoleElement && userRole) {
+            clientRoleElement.textContent = userRole === 'CLIENTE' || userRole === 'CLIENT' ? 'Cliente' : userRole;
+        }
 
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');

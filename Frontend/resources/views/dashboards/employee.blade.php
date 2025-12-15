@@ -54,7 +54,10 @@
                 <div class="sidebar-user">
                     <div class="user-info">
                         <i class="bi bi-person-circle"></i>
-                        <span>Empleado</span>
+                        <div class="d-flex flex-column">
+                            <span id="employee-name" class="fw-bold">Empleado</span>
+                            <small id="employee-role" class="text-muted">Empleado</small>
+                        </div>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
@@ -193,6 +196,18 @@
         }
 
         console.log('Dashboard Empleado - Usuario autenticado:', userData);
+
+        // Actualizar nombre y rol en sidebar
+        const employeeNameElement = document.getElementById('employee-name');
+        const employeeRoleElement = document.getElementById('employee-role');
+
+        if (employeeNameElement && userData && userData.nombre) {
+            employeeNameElement.textContent = userData.nombre;
+        }
+
+        if (employeeRoleElement && userRole) {
+            employeeRoleElement.textContent = userRole === 'EMPLEADO' ? 'Empleado' : userRole;
+        }
 
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');

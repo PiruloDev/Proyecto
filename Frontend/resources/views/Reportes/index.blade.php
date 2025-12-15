@@ -1,146 +1,98 @@
 @extends('layouts.app')
 
-@section('content')
+@section('title', 'Estadísticas - Panadería')
+
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+<link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet">
 <style>
-    .ordenes-container {
+    body {
         background: linear-gradient(135deg, #FFF8E7 0%, #FFE9D0 100%);
-        min-height: 100vh;
-        padding: 2rem;
     }
-    
-    .page-header {
-        background: #F5E6D3;
-        border-radius: 15px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(139, 90, 43, 0.1);
-    }
-    
-    .page-title {
-        color: #8B5A2B;
-        font-size: 2rem;
-        font-weight: 600;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
+
     .btn-nuevo {
-        background: linear-gradient(135deg, #D4A574 0%, #B8935F 100%);
+        background: #a67c52;
         color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
         text-decoration: none;
         font-weight: 500;
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
-        box-shadow: 0 4px 6px rgba(139, 90, 43, 0.2);
     }
-    
+
     .btn-nuevo:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(139, 90, 43, 0.3);
+        background: #8b6745;
         color: white;
     }
-    
-    .btn-atras {
-        background: linear-gradient(135deg, #D4A574 0%, #B8935F 100%);
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(139, 90, 43, 0.2);
-    }
-    
-    .btn-atras:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(139, 90, 43, 0.3);
-        color: white;
-    }
-    
+
     .cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1.5rem;
     }
-    
+
     .orden-card {
         background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 8px rgba(139, 90, 43, 0.15);
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 4px rgba(139, 90, 43, 0.1);
         transition: all 0.3s ease;
-        border: 2px solid #F5E6D3;
-        position: relative;
-        overflow: hidden;
+        border: 1px solid #F5E6D3;
     }
-    
-    .orden-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #D4A574 0%, #B8935F 100%);
-    }
-    
+
     .orden-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(139, 90, 43, 0.25);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(139, 90, 43, 0.2);
     }
-    
+
     .card-header-custom {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #FFF8E7;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #F5E6D3;
     }
-    
+
     .orden-id {
-        background: linear-gradient(135deg, #D4A574 0%, #B8935F 100%);
+        background: #a67c52;
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
-    
+
     .card-body-custom {
         margin: 1rem 0;
     }
-    
+
     .info-row {
         display: flex;
         justify-content: space-between;
         padding: 0.75rem 0;
         border-bottom: 1px solid #FFF8E7;
     }
-    
+
     .info-row:last-child {
         border-bottom: none;
     }
-    
+
     .info-label {
         color: #8B5A2B;
         font-weight: 600;
         font-size: 0.9rem;
     }
-    
+
     .info-value {
         color: #5C4033;
         font-size: 0.9rem;
     }
-    
+
     .total-factura {
         background: #FFF8E7;
         padding: 1rem;
@@ -148,26 +100,26 @@
         margin: 1rem 0;
         text-align: center;
     }
-    
+
     .total-label {
         color: #8B5A2B;
         font-size: 0.85rem;
         font-weight: 500;
         margin-bottom: 0.25rem;
     }
-    
+
     .total-amount {
         color: #5C4033;
         font-size: 1.5rem;
         font-weight: 700;
     }
-    
+
     .card-actions {
         display: flex;
         gap: 0.75rem;
         margin-top: 1rem;
     }
-    
+
     .btn-action {
         flex: 1;
         padding: 0.75rem;
@@ -182,46 +134,46 @@
         justify-content: center;
         gap: 0.5rem;
     }
-    
+
     .btn-editar {
-        background: linear-gradient(135deg, #46a169ff 0%, #6BB88A 100%);
+        background: #46a169;
         color: white;
     }
-    
+
     .btn-editar:hover {
-        background: linear-gradient(135deg, #46a169ff 0%, #6BB88A 100%);
-        transform: scale(1.05);
-    }
-    
-    .btn-eliminar {
-        background: linear-gradient(135deg, #fc7272ff 0%, #f85252ff 100%);
+        background: #3d8f5a;
         color: white;
     }
-    
-    .btn-eliminar:hover {
-        background: linear-gradient(135deg, #fc7272ff 0%, #f85252ff 100%);
-        transform: scale(1.05);
+
+    .btn-eliminar {
+        background: #fc7272;
+        color: white;
     }
-    
+
+    .btn-eliminar:hover {
+        background: #f85252;
+        color: white;
+    }
+
     .alert {
         padding: 1rem 1.5rem;
         border-radius: 10px;
         margin-bottom: 1.5rem;
         font-weight: 500;
     }
-    
+
     .alert-success {
         background: #D4EDDA;
         color: #155724;
         border: 2px solid #C3E6CB;
     }
-    
+
     .alert-error {
         background: #F8D7DA;
         color: #721C24;
         border: 2px solid #F5C6CB;
     }
-    
+
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
@@ -229,19 +181,19 @@
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(139, 90, 43, 0.15);
     }
-    
+
     .empty-icon {
         font-size: 4rem;
         color: #D4A574;
         margin-bottom: 1rem;
     }
-    
+
     .empty-text {
         color: #8B5A2B;
         font-size: 1.2rem;
         font-weight: 500;
     }
-    
+
     .fecha-badge {
         background: #FFF8E7;
         padding: 0.25rem 0.75rem;
@@ -353,44 +305,45 @@
     }
 
     .btn-submit {
-        background: linear-gradient(135deg, #D4A574 0%, #B8935F 100%);
+        background: #a67c52;
         color: white;
-        padding: 1rem 2rem;
-        border-radius: 25px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
         border: none;
         cursor: pointer;
         font-weight: 600;
         width: 100%;
         transition: all 0.3s ease;
-        font-size: 1.1rem;
-        margin-top: 0.5rem;
+        font-size: 1rem;
     }
 
     .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(139, 90, 43, 0.4);
+        background: #8b6745;
     }
 </style>
+@endpush
 
-<div class="ordenes-container">
-    <div class="page-header">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap: 1rem;">
-                <a href="{{ route('dashboard.admin') }}" class="btn-atras">
-                    ← Volver
-                </a>
-                <h1 class="page-title">Órdenes de Salida</h1>
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Component -->
+        @include('components.admin-sidebar')
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                <h1 class="h2"><i class="bi bi-graph-up me-2"></i>Estadísticas y Reportes</h1>
+                <button onclick="abrirModal()" class="btn-nuevo">
+                    <i class="bi bi-plus-circle me-1"></i> Nueva Orden
+                </button>
             </div>
-            <button class="btn-nuevo" onclick="abrirModal()">+ Nueva Orden</button>
-        </div>
-    </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
 
-    @if($ventas && count($ventas) > 0)
-        <div class="cards-grid">
+            @if($ventas && count($ventas) > 0)
+                <div class="cards-grid">
             @foreach($ventas as $venta)
                 <div class="orden-card">
                     <div class="card-header-custom">
@@ -415,13 +368,14 @@
                     </div>
                 </div>
             @endforeach
-        </div>
-    @else
-        <div class="empty-state">
-            <div class="empty-icon">📦</div>
-            <p class="empty-text">No hay órdenes de salida</p>
-        </div>
-    @endif
+            @else
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <p class="empty-text">No hay órdenes de salida</p>
+                </div>
+            @endif
+        </main>
+    </div>
 </div>
 
 {{-- MODAL OVERLAY --}}
@@ -433,31 +387,31 @@
         <h2 id="modal-titulo">Nueva Orden</h2>
         <button class="btn-close-modal" onclick="cerrarModal()" type="button">&times;</button>
     </div>
-    
+
     <form id="formulario-modal" method="POST" action="{{ route('ordenes.salida.store') }}">
         @csrf
         <div id="method-field"></div>
-        
+
         <div class="form-group">
             <label for="ID_CLIENTE">ID Cliente</label>
             <input type="number" name="ID_CLIENTE" id="ID_CLIENTE" required>
         </div>
-        
+
         <div class="form-group">
             <label for="ID_PEDIDO">ID Pedido</label>
             <input type="number" name="ID_PEDIDO" id="ID_PEDIDO" required>
         </div>
-        
+
         <div class="form-group">
             <label for="FECHA_FACTURACION">Fecha Facturación</label>
             <input type="datetime-local" name="FECHA_FACTURACION" id="FECHA_FACTURACION" required>
         </div>
-        
+
         <div class="form-group">
             <label for="TOTAL_FACTURA">Total Factura</label>
             <input type="number" step="0.01" name="TOTAL_FACTURA" id="TOTAL_FACTURA" required>
         </div>
-        
+
         <button type="submit" class="btn-submit">Guardar Orden</button>
     </form>
 </div>
@@ -466,28 +420,28 @@
 function abrirModal() {
     document.getElementById('modal-overlay').classList.add('show');
     document.getElementById('modal-box').classList.add('show');
-    
+
     document.getElementById('modal-titulo').textContent = 'Nueva Orden';
     document.getElementById('formulario-modal').action = '{{ route("ordenes.salida.store") }}';
     document.getElementById('method-field').innerHTML = '';
     document.getElementById('formulario-modal').reset();
-    
+
     document.body.style.overflow = 'hidden';
 }
 
 function editarModal(id, cliente, pedido, fecha, total) {
     document.getElementById('modal-overlay').classList.add('show');
     document.getElementById('modal-box').classList.add('show');
-    
+
     document.getElementById('modal-titulo').textContent = 'Editar Orden #' + id;
     document.getElementById('formulario-modal').action = '/reportes/ordenes-salida/' + id;
     document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PATCH">';
-    
+
     document.getElementById('ID_CLIENTE').value = cliente;
     document.getElementById('ID_PEDIDO').value = pedido;
     document.getElementById('FECHA_FACTURACION').value = fecha;
     document.getElementById('TOTAL_FACTURA').value = total;
-    
+
     document.body.style.overflow = 'hidden';
 }
 
@@ -502,6 +456,24 @@ document.addEventListener('keydown', function(e) {
         cerrarModal();
     }
 });
-</script>
 
+// Actualizar nombre y rol del administrador en sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
+        const userData = AuthManager.getUserData();
+        const userRole = AuthManager.getRole();
+
+        const adminNameElement = document.getElementById('admin-name');
+        const adminRoleElement = document.getElementById('admin-role');
+
+        if (adminNameElement && userData && userData.nombre) {
+            adminNameElement.textContent = userData.nombre;
+        }
+
+        if (adminRoleElement && userRole) {
+            adminRoleElement.textContent = userRole.charAt(0) + userRole.slice(1).toLowerCase();
+        }
+    }
+});
+</script>
 @endsection

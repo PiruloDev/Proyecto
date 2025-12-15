@@ -71,7 +71,10 @@
         <div class="sidebar-user">
             <div class="user-info">
                 <i class="bi bi-person-circle"></i>
-                <span>Administrador</span>
+                <div class="d-flex flex-column">
+                    <span id="admin-name" class="fw-bold">Administrador</span>
+                    <small id="admin-role" class="text-muted">Administrador</small>
+                </div>
             </div>
             <form method="POST" action="{{ route('logout') }}" class="logout-form">
                 @csrf
@@ -83,3 +86,32 @@
         </div>
     </div>
 </nav>
+<script>
+// Script para actualizar el nombre del administrador en la sidebar
+(function() {
+    function updateAdminSidebar() {
+        if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
+            const userData = AuthManager.getUserData();
+            const userRole = AuthManager.getRole();
+
+            const adminNameElement = document.getElementById('admin-name');
+            const adminRoleElement = document.getElementById('admin-role');
+
+            if (adminNameElement && userData && userData.nombre) {
+                adminNameElement.textContent = userData.nombre;
+            }
+
+            if (adminRoleElement && userRole) {
+                adminRoleElement.textContent = userRole.charAt(0) + userRole.slice(1).toLowerCase();
+            }
+        }
+    }
+
+    // Ejecutar inmediatamente si el DOM ya está cargado
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateAdminSidebar);
+    } else {
+        updateAdminSidebar();
+    }
+})();
+</script>
