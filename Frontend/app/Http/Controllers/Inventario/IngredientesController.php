@@ -132,4 +132,35 @@ class IngredientesController extends Controller
         
         return Redirect::back()->with('error', $response['error']);
     }
+
+    public function ingresarStock(Request $request, int $id)
+{
+    // 1. Validación de los datos
+    $request->validate([
+        // Se espera un número con al menos dos decimales (0.01)
+        'cantidadIngresada' => 'required|numeric|min:0.01',
+    ], [
+        'cantidadIngresada.required' => 'La cantidad a ingresar es obligatoria.',
+        'cantidadIngresada.numeric' => 'La cantidad debe ser un número válido.',
+        'cantidadIngresada.min' => 'La cantidad debe ser positiva.'
+    ]);
+
+    $data = $request->only('cantidadIngresada');
+    
+    // 2. Llamada al servicio que interactúa con Spring Boot
+    $response = $this->ingredientesService->ingresarStock($id, $data);
+
+    if ($response['success']) {
+        // Respuesta JSON de éxito para la petición AJAX
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock actualizado con éxito. El inventario se está recargando...'
+        ]);
+    }
+
+    return response()->json([
+        'success' => false,
+        'error' => $response['error']
+    ], 500); // Retorna un código 500 para manejar el error en JavaScript
+}
 }

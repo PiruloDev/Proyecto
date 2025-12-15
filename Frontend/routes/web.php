@@ -260,6 +260,9 @@ Route::prefix('/inventario/recetas')->group(function () {
 });
 
 
+Route::post('/ingredientes/{id}/ingresar-stock', 
+[IngredientesController::class, 'ingresarStock'])->name('ingredientes.ingresarStock');
+
 // --------------------------------------------
 // PRODUCCIÓN - CRUD
 // --------------------------------------------

@@ -182,11 +182,20 @@
                                     <p class="text-muted small mb-3">ID: {{ $ingrediente['idIngrediente'] }}</p>
                                     
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">Unidades disponibles</small>
-                                        <a href="{{ route('ingredientes.index') }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </div>
+                                <small class="text-muted">Unidades disponibles</small>
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-success btn-ingreso-stock" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#ingresoStockModal"
+                                            data-id="{{ $ingrediente['idIngrediente'] }}" 
+                                            data-name="{{ $ingrediente['nombreIngrediente'] }}">
+                                        <i class="fas fa-truck-ramp-box me-1"></i> Reponer
+                                    </button>
+                                    <a href="{{ route('ingredientes.index') }}" class="btn btn-sm btn-outline-primary ms-1">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
                                 </div>
                             </div>
                         </div>
@@ -197,6 +206,43 @@
         </main>
     </div>
 </div>
+
+<div class="modal fade" id="ingresoStockModal" tabindex="-1" aria-labelledby="ingresoStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="ingresoStockModalLabel">
+                    <i class="fas fa-truck-ramp-box me-2"></i> Reponer Stock
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formIngresoStock">
+                <div class="modal-body">
+                    <input type="hidden" name="ingrediente_id" id="ingredienteId">
+                    <p class="text-muted mb-4">Ingresando stock para: 
+                        <strong id="ingredienteNombreModal"></strong>
+                    </p>
+
+                    <div class="mb-3">
+                        <label for="cantidadIngresada" class="form-label">Cantidad a Ingresar</label>
+                        <input type="number" step="0.01" min="0.01" class="form-control form-control-lg" id="cantidadIngresada" name="cantidadIngresada" required placeholder="Ej: 15.5">
+                        <div class="invalid-feedback" id="cantidadIngresadaFeedback">
+                            Ingrese una cantidad positiva.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnGuardarStock">
+                        <i class="fas fa-save me-1"></i> Registrar Ingreso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 @push('scripts')
 <script>
@@ -238,6 +284,127 @@
             }
         });
     }
+
+    const ingresoStockModal = document.getElementById('ingresoStockModal');
+    const formIngresoStock = document.getElementById('formIngresoStock');
+    const ingredienteIdInput = document.getElementById('ingredienteId');
+    const ingredienteNombreModal = document.getElementById('ingredienteNombreModal');
+    const cantidadIngresadaInput = document.getElementById('cantidadIngresada');
+    const cantidadIngresadaFeedback = document.getElementById('cantidadIngresadaFeedback');
+    const btnGuardarStock = document.getElementById('btnGuardarStock');
+
+    // 1. Lógica para cargar datos al abrir el modal
+    ingresoStockModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Botón que disparó el modal
+        
+        // Extraer info de los data-attributes
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        
+        // Insertar datos en el modal
+        ingredienteIdInput.value = id;
+        ingredienteNombreModal.textContent = name;
+        
+        // Limpiar el estado de validación previo
+        cantidadIngresadaInput.value = '';
+        cantidadIngresadaInput.classList.remove('is-invalid');
+        btnGuardarStock.disabled = false;
+        btnGuardarStock.innerHTML = '<i class="fas fa-save me-1"></i> Registrar Ingreso';
+    });
+
+    // 2. Lógica para manejar el envío del formulario (AJAX)
+    formIngresoStock.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const id = ingredienteIdInput.value;
+        const cantidad = cantidadIngresadaInput.value;
+        const url = `{{ url('/ingredientes') }}/${id}/ingresar-stock`;
+        
+        // Validación básica en JS (previene envío con campo vacío o negativo)
+        if (cantidad === '' || parseFloat(cantidad) <= 0) {
+            cantidadIngresadaInput.classList.add('is-invalid');
+            cantidadIngresadaFeedback.textContent = 'La cantidad debe ser un número positivo (ej: 1.5).';
+            return;
+        } else {
+            cantidadIngresadaInput.classList.remove('is-invalid');
+        }
+
+        // Deshabilitar botón y mostrar carga
+        btnGuardarStock.disabled = true;
+        btnGuardarStock.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Procesando...';
+
+        
+        // Petición AJAX (Fetch API)
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Importante: Token de seguridad CSRF de Laravel
+                'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+            },
+            body: JSON.stringify({
+                cantidadIngresada: cantidad
+            })
+        })
+        .then(response => {
+            // Manejar la respuesta HTTP (incluyendo 500 del controlador)
+            if (!response.ok) {
+                // Si hay error, intentar leer el JSON del controlador
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Error desconocido en el servidor.');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Éxito: Redirigir o recargar para ver la nueva cantidad de stock
+            const successMessage = data.message || 'Stock actualizado correctamente.';
+            
+            // Recargamos la página con el mensaje de éxito en la URL para que se muestre arriba
+            window.location.href = `{{ url()->current() }}?success=${encodeURIComponent(successMessage)}`;
+            
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Revertir el estado del botón
+            btnGuardarStock.disabled = false;
+            btnGuardarStock.innerHTML = '<i class="fas fa-save me-1"></i> Registrar Ingreso';
+            
+            let errorMessage = error.message || 'Error de conexión desconocido.';
+            
+            // Mostrar error en el formulario (y quitar el spinner si lo hay)
+            cantidadIngresadaInput.classList.add('is-invalid');
+            cantidadIngresadaFeedback.textContent = errorMessage;
+        });
+    });
+
+    // 3. Lógica para manejar el mensaje de éxito/error después de la redirección
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const successMessage = urlParams.get('success');
+
+        if (successMessage) {
+            // 1. Eliminar el parámetro 'success' de la URL para limpieza
+            window.history.replaceState(null, '', window.location.pathname);
+            
+            // 2. Agregar alerta de éxito al inicio del contenido principal
+            const alertHtml = `
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>${decodeURIComponent(successMessage)}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            // Aseguramos que el mensaje se añada en la sección de alertas, asumiendo que está dentro del main content
+            const mainContent = document.querySelector('.container-fluid');
+            if(mainContent) {
+                mainContent.querySelector('.row').insertAdjacentHTML('afterbegin', alertHtml);
+            }
+        }
+    });
+
+
+
 </script>
 @endpush
 

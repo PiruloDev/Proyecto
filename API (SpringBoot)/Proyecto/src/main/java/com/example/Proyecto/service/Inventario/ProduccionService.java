@@ -4,7 +4,7 @@ import com.example.Proyecto.dto.ProduccionRequest;
 import com.example.Proyecto.model.Produccion;
 import com.example.Proyecto.model.RecetaProducto;
 import com.example.Proyecto.service.Ingredientes.IngredientesService;
-import com.example.Proyecto.service.Productos.ProductosService; // <--- INYECCIÓN CLAVE
+import com.example.Proyecto.service.Productos.ProductosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,7 +12,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
@@ -110,14 +109,11 @@ public class ProduccionService {
 
         // 3a. Reponer ingredientes
         for (RecetaProducto detalle : receta) {
-            // Cantidad total a reponer = Cantidad_Requerida_por_Receta * Cantidad_Producida
             BigDecimal reposicionTotal = detalle.getCantidadRequerida().multiply(cantidadProducida);
 
-            // Llamada al servicio de ingredientes (usa cantidad positiva para reponer)
             ingredientesService.actualizarStock(detalle.getIdIngrediente(), reposicionTotal);
         }
 
-        // 3b. Disminuir stock del producto terminado
         productosService.actualizarStockProducto(idProducto, cantidadProducida.negate());
 
         // 4. Eliminar el registro de producción
@@ -131,7 +127,6 @@ public class ProduccionService {
 
     @Transactional
     public void actualizarParcial(Long idProduccion, Map<String, Object> updates) {
-        // Implementación simplificada (se asume que existe)
         StringBuilder sql = new StringBuilder("UPDATE produccion SET ");
         boolean first = true;
 

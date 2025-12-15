@@ -228,4 +228,44 @@ class IngredientesService
             ];
         }
     }
+
+    public function ingresarStock(int $id, array $data): array
+{
+    try {
+        // La API espera un objeto JSON como: {"cantidadIngresada": 10.5}
+        // Usamos array_intersect_key para asegurar que solo enviamos el campo necesario.
+        $payload = array_intersect_key($data, array_flip(['cantidadIngresada']));
+
+        // Realiza la petición POST al endpoint de Spring Boot
+        $response = $this->getApiClient()->post("/ingredientes/{$id}/ingreso", $payload);
+
+        if ($response->successful()) {
+            return [
+                'success' => true,
+                'response' => $response->body() // El backend retorna un String de éxito.
+            ];
+        }
+        
+        // Manejo de errores 4xx o 5xx del backend.
+        // El body puede ser un simple string de error o un JSON.
+        $errorMessage = $response->body() ?? 'Error desconocido al reponer stock (' . $response->status() . ')';
+
+        // Intenta obtener el mensaje de error del cuerpo JSON si está disponible
+        if ($response->json() && isset($response->json()['error'])) {
+            $errorMessage = $response->json()['error'];
+        }
+
+        return [
+            'success' => false,
+            'error' => $errorMessage
+        ];
+
+    } catch (\Exception $e) {
+        return [
+            'success' => false,
+            'error' => 'Fallo de conexión al intentar ingresar stock: ' . $e->getMessage()
+        ];
+    }
+}
+
 }
