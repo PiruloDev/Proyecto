@@ -39,8 +39,9 @@ public class ProductosService {
     }
 
     public List<Map<String, Object>> obtenerDetallesProducto() {
-        String sql = "SELECT ID_PRODUCTO, ID_CATEGORIA_PRODUCTO, NOMBRE_PRODUCTO, PRODUCTO_STOCK_MIN, " +
-                "PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, FECHA_ULTIMA_MODIFICACION " +
+        String sql = "SELECT ID_PRODUCTO, ID_CATEGORIA_PRODUCTO, NOMBRE_PRODUCTO, DESCRIPCION_PRODUCTO, " +
+                "PRODUCTO_STOCK_MIN, PRECIO_PRODUCTO, FECHA_VENCIMIENTO_PRODUCTO, TIPO_PRODUCTO_MARCA, " +
+                "ACTIVO, FECHA_ULTIMA_MODIFICACION " +
                 "FROM Productos";
 
         return jdbcTemplate.query(sql, new RowMapper<Map<String, Object>>() {
@@ -48,16 +49,19 @@ public class ProductosService {
             public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Map<String, Object> producto = new HashMap<>();
                 producto.put("Id Producto:", rs.getInt("ID_PRODUCTO"));
-                producto.put("Id Categoria Producto:", rs.getInt("ID_CATEGORIA_PRODUCTO")); // 👈 AÑADIDO
+                producto.put("Id Categoria Producto:", rs.getInt("ID_CATEGORIA_PRODUCTO"));
                 producto.put("Nombre Producto:", rs.getString("NOMBRE_PRODUCTO"));
-                producto.put("Stock Minímo:", rs.getString("PRODUCTO_STOCK_MIN"));
-                producto.put("Precio:", rs.getString("PRECIO_PRODUCTO"));
-                producto.put("Fecha Vencimiento:", rs.getString("FECHA_VENCIMIENTO_PRODUCTO"));
+                producto.put("Descripcion Producto:", rs.getString("DESCRIPCION_PRODUCTO")); // ← AGREGADO
+                producto.put("Stock Minímo:", rs.getInt("PRODUCTO_STOCK_MIN"));
+                producto.put("Precio:", rs.getBigDecimal("PRECIO_PRODUCTO"));
+                producto.put("Fecha Vencimiento:", rs.getDate("FECHA_VENCIMIENTO_PRODUCTO"));
                 producto.put("Marca Producto:", rs.getString("TIPO_PRODUCTO_MARCA"));
-                producto.put("Fecha Ultima Modificación:", rs.getString("FECHA_ULTIMA_MODIFICACION"));
+                producto.put("ACTIVO", rs.getBoolean("ACTIVO")); // ← AGREGADO
+                producto.put("Fecha Ultima Modificación:", rs.getTimestamp("FECHA_ULTIMA_MODIFICACION"));
                 return producto;
             }
         });
+
     }
 
     public Map<String, Object> obtenerProductoPorId(int id) {
@@ -78,6 +82,8 @@ public class ProductosService {
                     producto.put("Fecha Vencimiento:", rs.getString("FECHA_VENCIMIENTO_PRODUCTO"));
                     producto.put("Marca Producto:", rs.getString("TIPO_PRODUCTO_MARCA"));
                     producto.put("Fecha Ultima Modificación:", rs.getString("FECHA_ULTIMA_MODIFICACION"));
+                    producto.put("Descripcion Producto:", rs.getString("DESCRIPCION_PRODUCTO"));
+                    producto.put("ACTIVO", rs.getBoolean("ACTIVO"));
                     return producto;
                 }
             }, id);
