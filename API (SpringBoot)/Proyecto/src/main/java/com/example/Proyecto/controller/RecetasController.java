@@ -3,6 +3,11 @@ package com.example.Proyecto.controller;
 import com.example.Proyecto.dto.RecetaRequest;
 import com.example.Proyecto.model.RecetaProducto;
 import com.example.Proyecto.service.Inventario.RecetasService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,22 +16,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-//Fature
+
 @RestController
 @RequestMapping("/inventario/recetas")
+@Tag(name = "Recetas", description = "Gestión de recetas de productos")
 public class RecetasController {
 
     @Autowired
     private RecetasService recetasService;
 
+    @Operation(summary = "Obtener todas las recetas", description = "Retorna la lista completa de recetas de productos")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
     @GetMapping
     public ResponseEntity<List<RecetaProducto>> obtenerTodasLasRecetas() {
         List<RecetaProducto> todasLasRecetas = recetasService.obtenerTodasLasRecetas();
         return ResponseEntity.ok(todasLasRecetas);
     }
 
+    @Operation(summary = "Obtener receta por producto", description = "Retorna la receta de un producto específico")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Receta encontrada"),
+        @ApiResponse(responseCode = "404", description = "Receta no encontrada")
+    })
     @GetMapping("/producto/{idProducto}")
-    public ResponseEntity<List<RecetaProducto>> obtenerRecetaPorProducto(@PathVariable Long idProducto) {
+    public ResponseEntity<List<RecetaProducto>> obtenerRecetaPorProducto(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable Long idProducto) {
 
         List<RecetaProducto> receta = recetasService.obtenerRecetaPorIdProducto(idProducto);
 
@@ -38,8 +53,16 @@ public class RecetasController {
     }
 
 
+    @Operation(summary = "Crear receta", description = "Registra una nueva receta para un producto")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Receta creada exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno")
+    })
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crearReceta(@RequestBody RecetaRequest request) {
+    public ResponseEntity<Map<String, Object>> crearReceta(
+        @Parameter(description = "Datos de la receta", required = true)
+        @RequestBody RecetaRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
             recetasService.crearReceta(request);
@@ -54,8 +77,18 @@ public class RecetasController {
         }
     }
 
+    @Operation(summary = "Actualizar receta", description = "Actualiza una receta existente de un producto")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Receta actualizada"),
+        @ApiResponse(responseCode = "404", description = "Receta no encontrada"),
+        @ApiResponse(responseCode = "500", description = "Error interno")
+    })
     @PutMapping("/producto/{idProducto}")
-    public ResponseEntity<Map<String, Object>> actualizarReceta(@PathVariable Long idProducto, @RequestBody RecetaRequest request) {
+    public ResponseEntity<Map<String, Object>> actualizarReceta(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable Long idProducto, 
+        @Parameter(description = "Datos actualizados", required = true)
+        @RequestBody RecetaRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
             recetasService.actualizarReceta(idProducto, request);
@@ -70,8 +103,16 @@ public class RecetasController {
         }
     }
 
+    @Operation(summary = "Eliminar receta", description = "Elimina la receta de un producto")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Receta eliminada"),
+        @ApiResponse(responseCode = "404", description = "Receta no encontrada"),
+        @ApiResponse(responseCode = "500", description = "Error interno")
+    })
     @DeleteMapping("/{idProducto}")
-    public ResponseEntity<Map<String, Object>> eliminarReceta(@PathVariable Long idProducto) {
+    public ResponseEntity<Map<String, Object>> eliminarReceta(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable Long idProducto) {
         Map<String, Object> response = new HashMap<>();
         try {
             recetasService.eliminarReceta(idProducto);

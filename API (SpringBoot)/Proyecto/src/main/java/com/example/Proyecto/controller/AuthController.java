@@ -6,6 +6,13 @@ import com.example.Proyecto.model.PojoEmpleado;
 import com.example.Proyecto.model.PojoCliente;
 import com.example.Proyecto.security.JwtUtilidad;
 import com.example.Proyecto.service.Auth.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Autenticación", description = "Endpoints para autenticación y registro de usuarios (Admin, Empleados y Clientes)")
 public class AuthController {
 
     @Autowired
@@ -24,9 +32,10 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-        /**
-     * Endpoint de prueba para verificar que el controlador funciona
-     */
+        @Operation(summary = "Test del controlador", description = "Endpoint de prueba para verificar que el controlador de autenticación está funcionando correctamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Controlador funcionando correctamente")
+    })
     @GetMapping("/test")
     public ResponseEntity<Map<String, Object>> test() {
         Map<String, Object> response = new HashMap<>();
@@ -34,11 +43,16 @@ public class AuthController {
         response.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(response);
     }
-    /**
-     * Login universal para administradores, empleados y clientes
-     */
+    @Operation(summary = "Iniciar sesión", description = "Autentica a un usuario (administrador, empleado o cliente) y devuelve un token JWT")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login exitoso, devuelve token JWT y datos del usuario"),
+        @ApiResponse(responseCode = "401", description = "Credenciales inválidas"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Usuario usuario) {
+    public ResponseEntity<Map<String, Object>> login(
+        @Parameter(description = "Credenciales del usuario (username/email y password)", required = true)
+        @RequestBody Usuario usuario) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -94,11 +108,16 @@ public class AuthController {
         }
     }
 
-    /**
-     * Registro de administradores
-     */
+    @Operation(summary = "Registrar administrador", description = "Crea una nueva cuenta de administrador en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Administrador registrado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+        @ApiResponse(responseCode = "500", description = "Error al registrar administrador")
+    })
     @PostMapping("/registro/admin")
-    public ResponseEntity<Map<String, Object>> registrarAdmin(@RequestBody PojoAdmin admin) {
+    public ResponseEntity<Map<String, Object>> registrarAdmin(
+        @Parameter(description = "Datos del administrador a registrar", required = true)
+        @RequestBody PojoAdmin admin) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -119,11 +138,16 @@ public class AuthController {
         }
     }
 
-    /**
-     * Registro de empleados
-     */
+    @Operation(summary = "Registrar empleado", description = "Crea una nueva cuenta de empleado en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Empleado registrado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+        @ApiResponse(responseCode = "500", description = "Error al registrar empleado")
+    })
     @PostMapping("/registro/empleado")
-    public ResponseEntity<Map<String, Object>> registrarEmpleado(@RequestBody PojoEmpleado empleado) {
+    public ResponseEntity<Map<String, Object>> registrarEmpleado(
+        @Parameter(description = "Datos del empleado a registrar", required = true)
+        @RequestBody PojoEmpleado empleado) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -144,11 +168,16 @@ public class AuthController {
         }
     }
 
-    /**
-     * Registro de clientes
-     */
+    @Operation(summary = "Registrar cliente", description = "Crea una nueva cuenta de cliente en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Cliente registrado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+        @ApiResponse(responseCode = "500", description = "Error al registrar cliente")
+    })
     @PostMapping("/registro/cliente")
-    public ResponseEntity<Map<String, Object>> registrarCliente(@RequestBody PojoCliente cliente) {
+    public ResponseEntity<Map<String, Object>> registrarCliente(
+        @Parameter(description = "Datos del cliente a registrar", required = true)
+        @RequestBody PojoCliente cliente) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -169,11 +198,17 @@ public class AuthController {
         }
     }
 
-    /**
-     * Endpoint para validar un token
-     */
+    @Operation(summary = "Validar token JWT", description = "Verifica si un token JWT es válido y devuelve información del usuario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Token válido, devuelve información del usuario"),
+        @ApiResponse(responseCode = "400", description = "Token no proporcionado"),
+        @ApiResponse(responseCode = "401", description = "Token inválido o expirado"),
+        @ApiResponse(responseCode = "500", description = "Error al validar token")
+    })
     @PostMapping("/validar")
-    public ResponseEntity<Map<String, Object>> validarToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Map<String, Object>> validarToken(
+        @Parameter(description = "Header de autorización con formato: Bearer {token}", required = true)
+        @RequestHeader("Authorization") String authHeader) {
         Map<String, Object> response = new HashMap<>();
         
         try {

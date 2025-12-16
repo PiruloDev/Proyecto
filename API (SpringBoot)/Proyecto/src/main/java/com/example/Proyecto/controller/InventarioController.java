@@ -4,6 +4,11 @@ import com.example.Proyecto.dto.ProduccionRequest;
 import com.example.Proyecto.model.Produccion;
 import com.example.Proyecto.service.Inventario.ProduccionService;
 import com.example.Proyecto.service.Inventario.RecetasService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/inventario/produccion")
+@Tag(name = "Inventario - Producción", description = "Gestión de producción e inventario de productos")
 public class InventarioController {
 
     @Autowired
@@ -24,6 +30,11 @@ public class InventarioController {
     private ProduccionService produccionService;
 
 
+    @Operation(summary = "Obtener historial de producción", description = "Retorna el historial completo de producción")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Historial obtenido exitosamente"),
+        @ApiResponse(responseCode = "204", description = "No hay registros de producción")
+    })
     @GetMapping
     public ResponseEntity<List<Produccion>> obtenerTodoElHistorial() {
         List<Produccion> historial = produccionService.obtenerTodoElHistorial();
@@ -33,8 +44,16 @@ public class InventarioController {
         return ResponseEntity.status(HttpStatus.OK).body(historial);
     }
 
+    @Operation(summary = "Registrar producción", description = "Registra una nueva producción de productos y actualiza el inventario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Producción registrada exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos o error de inventario"),
+        @ApiResponse(responseCode = "500", description = "Error inesperado")
+    })
     @PostMapping
-    public ResponseEntity<Map<String, Object>> registrarProduccion(@RequestBody ProduccionRequest request) {
+    public ResponseEntity<Map<String, Object>> registrarProduccion(
+        @Parameter(description = "Datos de la producción", required = true)
+        @RequestBody ProduccionRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -69,8 +88,17 @@ public class InventarioController {
         }
     }
 
+    @Operation(summary = "Eliminar producción", description = "Elimina un registro de producción y revierte el inventario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Producción eliminada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Producción no encontrada"),
+        @ApiResponse(responseCode = "400", description = "Error al revertir inventario"),
+        @ApiResponse(responseCode = "500", description = "Error inesperado")
+    })
     @DeleteMapping("/{idProduccion}")
-    public ResponseEntity<Map<String, Object>> eliminarProduccion(@PathVariable Long idProduccion) {
+    public ResponseEntity<Map<String, Object>> eliminarProduccion(
+        @Parameter(description = "ID de la producción", required = true)
+        @PathVariable Long idProduccion) {
         try {
 
             produccionService.eliminarProduccion(idProduccion);

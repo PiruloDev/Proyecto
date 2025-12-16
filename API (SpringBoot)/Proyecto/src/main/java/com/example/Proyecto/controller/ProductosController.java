@@ -2,6 +2,11 @@ package com.example.Proyecto.controller;
 
 import com.example.Proyecto.model.PojoProductos;
 import com.example.Proyecto.service.Productos.ProductosService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +18,31 @@ import java.util.Map;
 
 @RequestMapping("/productos")
 @RestController
+@Tag(name = "Productos", description = "Gestión de productos de panadería")
 public class ProductosController {
 
     @Autowired
     private ProductosService productosService;
 
+    @Operation(summary = "Obtener todos los productos", description = "Retorna una lista con todos los productos y sus detalles")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de productos obtenida exitosamente")
+    })
     @GetMapping
     public List<Map<String, Object>> obtenerDetallesProductos() {
         return productosService.obtenerDetallesProducto();
     }
 
+    @Operation(summary = "Obtener productos por categoría", description = "Retorna todos los productos que pertenecen a una categoría específica")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Productos encontrados"),
+        @ApiResponse(responseCode = "404", description = "No se encontraron productos en esta categoría"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/categoria/{idCategoria}")
-    public ResponseEntity<List<Map<String, Object>>> obtenerProductosPorCategoria(@PathVariable int idCategoria) {
+    public ResponseEntity<List<Map<String, Object>>> obtenerProductosPorCategoria(
+        @Parameter(description = "ID de la categoría", required = true)
+        @PathVariable int idCategoria) {
         try {
             List<Map<String, Object>> productos = productosService.obtenerProductosPorCategoria(idCategoria);
             if (productos != null && !productos.isEmpty()) {
@@ -38,8 +56,16 @@ public class ProductosController {
         }
     }
 
+    @Operation(summary = "Obtener producto por ID", description = "Retorna los detalles de un producto específico")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto encontrado"),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> obtenerProductoPorId(@PathVariable int id) {
+    public ResponseEntity<Map<String, Object>> obtenerProductoPorId(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable int id) {
         try {
             Map<String, Object> producto = productosService.obtenerProductoPorId(id);
             if (producto != null && !producto.isEmpty()) {
@@ -59,8 +85,16 @@ public class ProductosController {
         }
     }
 
+    @Operation(summary = "Crear nuevo producto", description = "Registra un nuevo producto en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Producto creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error al crear el producto")
+    })
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crearProducto(@RequestBody PojoProductos pojoProductos) {
+    public ResponseEntity<Map<String, Object>> crearProducto(
+        @Parameter(description = "Datos del producto a crear", required = true)
+        @RequestBody PojoProductos pojoProductos) {
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -117,8 +151,18 @@ public class ProductosController {
         }
     }
 
+    @Operation(summary = "Actualizar producto", description = "Actualiza los datos de un producto existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Error al actualizar"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PatchMapping("/{id}")
-    public ResponseEntity<String> actualizarProducto(@PathVariable("id") Long id, @RequestBody PojoProductos pojoProductos) {
+    public ResponseEntity<String> actualizarProducto(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable("id") Long id, 
+        @Parameter(description = "Datos a actualizar", required = true)
+        @RequestBody PojoProductos pojoProductos) {
         try {
             // ← LOGS DE DEBUG
             System.out.println("=== DATOS RECIBIDOS EN PATCH ===");
@@ -148,8 +192,16 @@ public class ProductosController {
         }
     }
 
+    @Operation(summary = "Eliminar producto", description = "Elimina un producto del sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error al eliminar")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarProducto(@PathVariable("id") int id) {
+    public ResponseEntity<String> eliminarProducto(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable("id") int id) {
         try {
             boolean eliminado = productosService.eliminarProducto(id);
             if (eliminado) {

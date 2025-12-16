@@ -2,6 +2,11 @@ package com.example.Proyecto.controller;
 
 import com.example.Proyecto.model.PedidosProveedores;
 import com.example.Proyecto.service.PedidosProveedores.PedidosProveedoresService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,23 +15,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@Tag(name = "Pedidos Proveedores", description = "Gestión de pedidos a proveedores")
 public class PedidosProveedoresController {
 
     @Autowired
     private PedidosProveedoresService pedidosProveedoresService;
 
-    // GET - Obtener todos los pedidos de proveedores
+    @Operation(summary = "Obtener pedidos a proveedores", description = "Retorna todos los pedidos realizados a proveedores")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
     @GetMapping("/pedido/proveedores")
     public List<PedidosProveedores> obtenerTodosLosPedidosProveedores() {
         return pedidosProveedoresService.obtenerTodosLosPedidosProveedores();
     }
 
-    /**
-     * POST - Crea un pedido de proveedor completo (encabezado y detalles).
-     * Este método llama al servicio transaccional.
-     */
+    @Operation(summary = "Crear pedido a proveedor", description = "Crea un pedido completo con encabezado y detalles")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Pedido creado exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error al crear el pedido")
+    })
     @PostMapping("/pedido/proveedores")
-    public ResponseEntity<String> crearPedidoProveedor(@RequestBody PedidosProveedores pedido) {
+    public ResponseEntity<String> crearPedidoProveedor(
+        @Parameter(description = "Datos del pedido con detalles", required = true)
+        @RequestBody PedidosProveedores pedido) {
         try {
             // Llama al método transaccional que inserta el encabezado y los detalles
             int idPedidoProv = pedidosProveedoresService.crearPedidoProveedorCompleto(pedido);
@@ -43,9 +53,15 @@ public class PedidosProveedoresController {
         }
     }
 
-    // GET - Obtener un pedido con todos sus detalles por ID
+    @Operation(summary = "Obtener pedido con detalles", description = "Retorna un pedido específico con todos sus detalles")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pedido encontrado"),
+        @ApiResponse(responseCode = "404", description = "Pedido no encontrado")
+    })
     @GetMapping("/pedido/proveedores/{id}")
-    public ResponseEntity<PedidosProveedores> obtenerPedidoConDetalles(@PathVariable int id) {
+    public ResponseEntity<PedidosProveedores> obtenerPedidoConDetalles(
+        @Parameter(description = "ID del pedido", required = true)
+        @PathVariable int id) {
         PedidosProveedores pedido = pedidosProveedoresService.obtenerPedidoConDetalles(id);
         if (pedido != null) {
             return ResponseEntity.ok(pedido);
@@ -54,9 +70,17 @@ public class PedidosProveedoresController {
         }
     }
 
-    // PUT - Actualizar un pedido de proveedor existente
+    @Operation(summary = "Actualizar pedido a proveedor", description = "Actualiza los datos de un pedido existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pedido actualizado"),
+        @ApiResponse(responseCode = "404", description = "Pedido no encontrado")
+    })
     @PutMapping("/pedido/proveedores/{id}")
-    public ResponseEntity<String> editarPedidoProveedor(@PathVariable int id, @RequestBody PedidosProveedores pedido) {
+    public ResponseEntity<String> editarPedidoProveedor(
+        @Parameter(description = "ID del pedido", required = true)
+        @PathVariable int id, 
+        @Parameter(description = "Datos actualizados", required = true)
+        @RequestBody PedidosProveedores pedido) {
         pedido.setIdPedidoProv(id);
         int filas = pedidosProveedoresService.editarPedidoProveedor(pedido);
         if (filas > 0) {
@@ -66,9 +90,15 @@ public class PedidosProveedoresController {
         }
     }
 
-    // DELETE - Eliminar un pedido de proveedor por ID
+    @Operation(summary = "Eliminar pedido a proveedor", description = "Elimina un pedido a proveedor")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pedido eliminado"),
+        @ApiResponse(responseCode = "404", description = "Pedido no encontrado")
+    })
     @DeleteMapping("/pedido/proveedores/{id}")
-    public ResponseEntity<String> eliminarPedidoProveedor(@PathVariable int id) {
+    public ResponseEntity<String> eliminarPedidoProveedor(
+        @Parameter(description = "ID del pedido", required = true)
+        @PathVariable int id) {
         // En un escenario real, deberías manejar la eliminación de los detalles aquí o mediante CASCADE en la BD.
         int filas = pedidosProveedoresService.eliminarPedidoProveedor(id);
         if (filas > 0) {

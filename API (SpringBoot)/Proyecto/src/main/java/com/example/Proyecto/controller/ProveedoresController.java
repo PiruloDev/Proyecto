@@ -1,6 +1,11 @@
 package com.example.Proyecto.controller;
 import com.example.Proyecto.service.Proveedores.Proveedores;
 import com.example.Proyecto.service.Proveedores.ProveedoresService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,27 +13,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/proveedores")
+@Tag(name = "Proveedores", description = "Gestión de proveedores")
 public class ProveedoresController {
 
     @Autowired
     private ProveedoresService proveedoresService;
 
-    // GET - Obtener todos los proveedores
+    @Operation(summary = "Obtener todos los proveedores", description = "Retorna la lista completa de proveedores")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
     @GetMapping
     public List<Proveedores> obtenerTodosLosProveedores() {
         return proveedoresService.obtenerTodosLosProveedores();
     }
 
-    // POST - Crear un nuevo proveedor
+    @Operation(summary = "Crear proveedor", description = "Registra un nuevo proveedor")
+    @ApiResponse(responseCode = "200", description = "Proveedor creado exitosamente")
     @PostMapping
-    public ResponseEntity<String> crearProveedor(@RequestBody Proveedores proveedor) {
+    public ResponseEntity<String> crearProveedor(
+        @Parameter(description = "Datos del proveedor", required = true)
+        @RequestBody Proveedores proveedor) {
         proveedoresService.crearProveedor(proveedor);
         return ResponseEntity.ok("Proveedor " + proveedor.getNombreProv() + " creado con éxito.");
     }
 
-    // PUT - Actualizar un proveedor existente
+    @Operation(summary = "Actualizar proveedor", description = "Actualiza los datos de un proveedor existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Proveedor actualizado"),
+        @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<String> editarProveedor(@PathVariable int id, @RequestBody Proveedores proveedor) {
+    public ResponseEntity<String> editarProveedor(
+        @Parameter(description = "ID del proveedor", required = true)
+        @PathVariable int id, 
+        @Parameter(description = "Datos actualizados", required = true)
+        @RequestBody Proveedores proveedor) {
         proveedor.setIdProveedor(id);
         int filas = proveedoresService.editarProveedor(proveedor);
         if (filas > 0) {
@@ -38,9 +56,15 @@ public class ProveedoresController {
         }
     }
 
-    // DELETE - Eliminar un proveedor por ID
+    @Operation(summary = "Eliminar proveedor", description = "Elimina un proveedor del sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Proveedor eliminado"),
+        @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarProveedor(@PathVariable int id) {
+    public ResponseEntity<String> eliminarProveedor(
+        @Parameter(description = "ID del proveedor", required = true)
+        @PathVariable int id) {
         int filas = proveedoresService.eliminarProveedor(id);
         if (filas > 0) {
             return ResponseEntity.ok("Proveedor con ID " + id + " eliminado correctamente.");
