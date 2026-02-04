@@ -51,58 +51,59 @@
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped align-middle shadow-sm rounded-3">
                         <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente ID</th>
-                                <th>Empleado ID</th>
-                                <th>Estado ID</th>
-                                <th>Total</th>
-                                <th>Ingreso</th>
-                                <th>Entrega</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+    <tr>
+        <th>ID</th>
+        <th>Cliente</th>  {{-- Antes Cliente ID --}}
+        <th>Empleado</th> {{-- Antes Empleado ID --}}
+        <th>Estado</th>   {{-- Antes Estado ID --}}
+        <th>Total</th>
+        <th>Ingreso</th>
+        <th>Entrega</th>
+        <th>Acciones</th>
+    </tr>
+</thead>
 
                         <tbody>
-                            @forelse($pedidos as $pedido)
-                                <tr>
-                                    <td>{{ $pedido['id_PEDIDO'] }}</td>
-                                    <td>{{ $pedido['id_CLIENTE'] }}</td>
-                                    <td>{{ $pedido['id_EMPLEADO'] }}</td>
-                                    <td>{{ $pedido['id_ESTADO_PEDIDO'] }}</td>
-                                    <td>${{ number_format($pedido['total_PRODUCTO'] ?? 0, 2) }}</td>
-                                    <td>{{ $pedido['fecha_INGRESO'] ?? 'N/A' }}</td>
-                                    <td>{{ $pedido['fecha_ENTREGA'] ?? 'N/A' }}</td>
+    @forelse($pedidos as $pedido)
+        <tr>
+            <td>{{ $pedido['id_PEDIDO'] }}</td>
+            
+            {{-- Mostramos el nombre, si no existe, mostramos el ID --}}
+            <td>{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['cliente_id'] }}</td>
+            <td>{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['empleado_id'] }}</td>
+            <td>
+                <span class="badge bg-info text-dark">
+                    {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
+                </span>
+            </td>
 
-                                    <td class="text-nowrap">
-                                        {{-- Botón Editar - Abre el modal e inyecta datos --}}
-                                        <button type="button" 
-                                            class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#pedidoModal"
-                                            data-pedido="{{ json_encode($pedido) }}">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
+            <td>${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}</td>
+            <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
+            <td>{{ $pedido['fecha_entrega'] ?? 'N/A' }}</td>
 
-                                        {{-- Formulario Eliminar - USA RUTA DE ADMIN --}}
-                                        <form method="POST"
-                                            action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('¿Está seguro de eliminar este pedido?')">
-                                                <i class="fas fa-trash"></i> Eliminar
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">No hay pedidos registrados.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+            <td class="text-nowrap">
+                {{-- El botón de editar se mantiene igual porque el JSON completo ya va en data-pedido --}}
+                <button type="button" 
+                    class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#pedidoModal"
+                    data-pedido="{{ json_encode($pedido) }}">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+
+                <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar?')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    @empty
+        {{-- ... --}}
+    @endforelse
+</tbody>
                     </table>
                 </div>
             </section>
