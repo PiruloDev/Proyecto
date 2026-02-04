@@ -91,32 +91,20 @@ class PedidosApiService
        ========================= */
 
     public function crearPedidoCheckout(array $payload)
-    {
-        /**
-         * Java espera un objeto Pedidos:
-         * ID_CLIENTE
-         * ID_EMPLEADO
-         * ID_ESTADO_PEDIDO
-         * TOTAL_PRODUCTO
-         */
-
-        $pedido = [
-            'ID_CLIENTE'        => $payload['cliente_id'],
-            'ID_EMPLEADO'       => 1, // fijo o el que manejes
-            'ID_ESTADO_PEDIDO'  => 1, // estado inicial
-            'TOTAL_PRODUCTO'    => collect($payload['items'])->sum(function ($item) {
-                return $item['precio'] * $item['cantidad'];
-            })
-        ];
-
-        try {
-            return Http::post($this->baseUrl, $pedido)->throw()->json();
-        } catch (\Illuminate\Http\Client\RequestException $e) {
-            $message = $e->response?->json('message') ?? 'Error al finalizar el pedido en la API.';
-            throw new Exception($message);
-        }
+{
+    try {
+        return Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ])
+        ->asJson() 
+        ->post($this->baseUrl, $payload) // Enviamos el payload con cliente_id, etc.
+        ->throw()
+        ->json();
+    } catch (\Exception $e) {
+        throw new Exception("Error API: " . ($e->response?->body() ?? $e->getMessage()));
     }
-
+}
     /* =========================
        DASHBOARD CLIENTE
        ========================= */

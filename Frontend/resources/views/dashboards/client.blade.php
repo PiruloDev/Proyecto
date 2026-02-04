@@ -12,32 +12,33 @@
 @section('content')
 
 @php
-    // ----------------------------------------------------
-    //  LÓGICA DE CÁLCULO DE ESTADÍSTICAS (BLADE PHP)
-    // ----------------------------------------------------
-    $pedidos = $pedidos ?? []; // Asegura que $pedidos exista y sea un array
+    $pedidos = $pedidos ?? [];
     $totalPedidos = count($pedidos);
+    $pedidosInvertidos = array_reverse($pedidos);
     $pedidosPendientes = 0;
 
-    // Suponiendo que id_ESTADO_PEDIDO = 1 es "Pendiente"
     foreach ($pedidos as $pedido) {
-        if (($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) {
+        // Java usa ID_ESTADO_PEDIDO según tu log de éxito
+        $estadoId = $pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0;
+        if ((int)$estadoId === 1) {
             $pedidosPendientes++;
         }
     }
 
-    // Tomamos los 5 pedidos más recientes
-    $pedidosRecientes = array_slice($pedidos, 0, 5);
+   $pedidosRecientes = array_slice($pedidosInvertidos, 0, 5);
 
-    // Función auxiliar para formatear la fecha
+    if (!function_exists('formatApiDate')) {
     function formatApiDate($dateString) {
-        if (empty($dateString)) return 'N/A';
+        if (empty($dateString) || $dateString == 'N/A') return 'Pendiente';
+        
         try {
-            return date('d/m/Y H:i', strtotime($dateString));
+            // Carbon es la librería de fechas de Laravel, es mucho más potente
+            return \Carbon\Carbon::parse($dateString)->format('d/m/Y h:i A');
         } catch (\Exception $e) {
             return $dateString;
         }
     }
+}
 @endphp
 
 <div class="container-fluid">
@@ -140,46 +141,45 @@
                     </div>
                 </div>
 
-                <div class="orders-section">
-                    <div class="section-header">
-                        <h4><i class="bi bi-receipt"></i> Pedidos Recientes</h4>
-                        <a href="#" data-section="pedidos" class="btn btn-primary btn-sm nav-link-trigger">
-                            <i class="bi bi-list-ul"></i> Ver Todos
-                        </a>
-                    </div>
+              <div class="orders-section">
+    <div class="section-header mb-4">
+        <h4><i class="bi bi-receipt"></i> Pedidos Recientes</h4>
+        {{-- Botón eliminado para una vista más limpia --}}
+    </div>
 
-                    @if($totalPedidos > 0)
-                    <div class="orders-list">
-                        @foreach($pedidosRecientes as $pedido)
-                        <div class="order-item">
-                            <div class="order-info">
-                                <h6>Pedido #{{ $pedido['id_PEDIDO'] ?? 'N/A' }}</h6>
-                                <p class="mb-1">Fecha Ingreso: {{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</p>
-                                <p class="mb-0">Total: ${{ number_format($pedido['total_PRODUCTO'] ?? 0, 2) }}</p>
-                            </div>
-                            <div class="order-status
-                                @if(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) status-pendiente
-                                @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 3) status-entregado
-                                @else status-otro
-                                @endif
-                                ">
-                                Estado: {{ $pedido['id_ESTADO_PEDIDO'] ?? 'N/A' }}
-                            </div>
+    @if($totalPedidos > 0)
+        <div class="orders-list">
+            @foreach($pedidosRecientes as $pedido)
+                <div class="order-item shadow-sm mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="order-info">
+                            <h6 class="fw-bold">Pedido #{{ $pedido['ID_PEDIDO'] ?? $pedido['id_PEDIDO'] ?? 'N/A' }}</h6>
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-calendar3"></i> {{ formatApiDate($pedido['FECHA_INGRESO'] ?? $pedido['fecha_INGRESO'] ?? null) }}
+                            </p>
+                            <p class="fw-bold mb-0 text-primary">
+                                Total: ${{ number_format($pedido['TOTAL_PRODUCTO'] ?? $pedido['total_PRODUCTO'] ?? 0, 2) }}
+                            </p>
                         </div>
-                        @endforeach
+                        <div class="order-status-badge">
+                            <span class="badge rounded-pill 
+                                @if(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 1) bg-warning text-dark
+                                @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 3) bg-success
+                                @else bg-info @endif">
+                                Estado: {{ $pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 'Pendiente' }}
+                            </span>
+                        </div>
                     </div>
-                    @else
-                        <div class="no-orders">
-                            <div class="text-center py-4">
-                                <i class="bi bi-cart-x" style="font-size: 3rem; color: #dee2e6;"></i>
-                                <p class="text-muted">No tienes pedidos aún</p>
-                                <a href="{{ route('menu') }}" class="btn btn-primary">
-                                    <i class="bi bi-shop"></i> Explorar Productos
-                                </a>
-                            </div>
-                        </div>
-                    @endif
                 </div>
+            @endforeach
+        </div>
+    @else
+        {{-- Vista simplificada cuando no hay pedidos --}}
+        <div class="p-4 border rounded bg-light text-center">
+            <p class="text-muted mb-0">No se encontraron pedidos recientes en tu historial.</p>
+        </div>
+    @endif
+</div>
             </div>
 
             <div class="section-content" id="pedidos-section" style="display: none;">

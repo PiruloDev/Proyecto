@@ -33,7 +33,7 @@
                         <i class="fas fa-user me-2"></i><span id="user-name"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass">
-                        <li><a class="dropdown-item" href="{{ route('dashboard.client') }}">
+                        <li><a class="dropdown-item" href="{{ route('dashboard.cliente') }}">
                             <i class="fas fa-user-circle me-2"></i>Ver perfil
                         </a></li>
                         <li><hr class="dropdown-divider"></li>

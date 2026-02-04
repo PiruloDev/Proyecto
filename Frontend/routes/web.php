@@ -17,6 +17,7 @@ use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pedidos\CarritoController;
 use App\Http\Controllers\Reportes\OrdenSalidaController;
+use App\Http\Controllers\Pedidos\DashboardController;
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
@@ -382,5 +383,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/acceso-requerido', function () {
     return view('auth.auth_required'); // Asegúrate que el path de la vista sea correcto
 })->name('auth.required');
+
+// DASHBOARD CONTROLLER PEDIDOS CLIENTE
+Route::get('/dashboardcliente', [DashboardController::class, 'index'])->name('dashboard.cliente');
 
 require __DIR__.'/settings.php';

@@ -219,7 +219,7 @@ class CarritoController extends Controller
         ]);
     }
 
-   public function checkout()
+  public function checkout()
 {
     $carrito = session()->get('carrito', []);
 
@@ -230,37 +230,49 @@ class CarritoController extends Controller
         ], 400);
     }
 
+    // 1. VERIFICACIÓN CRÍTICA: ¿Hay un usuario logueado?
+    $clienteId = session('usuario.id'); 
+
+    if (!$clienteId) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Sesión no válida. Por favor, inicie sesión nuevamente para comprar.'
+        ], 401); // 401 es Unauthorized
+    }
+
     try {
-        // Calcula el total general (basado en productos en el carrito)
         $totalGeneral = array_reduce($carrito, function ($sum, $item) {
             return $sum + ($item['precio'] * $item['cantidad']);
         }, 0);
 
+        // 2. PAYLOAD: Aseguramos que las llaves coincidan con el Modelo de Java
         $payload = [
-            'cliente_id' => session('usuario.id'),
-            'empleado_id' => 1,
-            'estado_pedido_id' => 1,
-            'fecha_entrega' => null,
-            'total_producto' => $totalGeneral // Aquí ya está correctamente calculado
-        ];
+    'cliente_id'       => (int) $clienteId, 
+    'empleado_id'      => 1, 
+    'estado_pedido_id' => 1, 
+    'total_producto'   => (float) $totalGeneral 
+];
 
-        Log::info('Payload enviado a Java:', $payload);
+        Log::info('Enviando pedido a API Java:', $payload);
 
-        $response = $this->pedidosApiService->crearPedido($payload);
+        // 3. LLAMADA AL SERVICIO: Usamos el que acabas de arreglar
+        $response = $this->pedidosApiService->crearPedidoCheckout($payload);
+
+        // 4. LIMPIEZA: Solo si la API respondió bien
         session()->forget('carrito');
 
         return response()->json([
             'success' => true,
-            'message' => 'Pedido realizado con éxito',
-            'pedido' => $response
+            'message' => '¡Pedido realizado con éxito!',
+            'pedido'  => $response
         ]);
 
     } catch (Exception $e) {
-        Log::error('Error al finalizar pedido:', ['error' => $e->getMessage()]);
+        Log::error('Error en Checkout:', ['error' => $e->getMessage()]);
 
         return response()->json([
             'success' => false,
-            'message' => $e->getMessage()
+            'message' => 'Error al procesar el pedido: ' . $e->getMessage()
         ], 500);
     }
 }

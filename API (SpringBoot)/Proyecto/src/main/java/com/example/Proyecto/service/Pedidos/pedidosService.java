@@ -39,10 +39,10 @@ public class pedidosService {
         pedido.setID_ESTADO_PEDIDO(rs.getLong("ID_ESTADO_PEDIDO"));
 
         Timestamp tsIngreso = rs.getTimestamp("FECHA_INGRESO");
-        pedido.setFECHA_INGRESO(tsIngreso != null ? new java.util.Date(tsIngreso.getTime()) : null);
+        pedido.setFECHA_INGRESO(tsIngreso != null ? tsIngreso.toLocalDateTime() : null);
 
         Timestamp tsEntrega = rs.getTimestamp("FECHA_ENTREGA");
-        pedido.setFECHA_ENTREGA(tsEntrega != null ? new java.util.Date(tsEntrega.getTime()) : null);
+        pedido.setFECHA_ENTREGA(tsEntrega != null ? tsEntrega.toLocalDateTime() : null);
 
         pedido.setTOTAL_PRODUCTO(rs.getBigDecimal("TOTAL_PRODUCTO"));
         return pedido;
@@ -104,7 +104,7 @@ public class pedidosService {
             if (pedido.getFECHA_ENTREGA() == null) {
                 ps.setNull(5, Types.TIMESTAMP);
             } else {
-                ps.setTimestamp(5, new Timestamp(pedido.getFECHA_ENTREGA().getTime()));
+                ps.setTimestamp(5, java.sql.Timestamp.valueOf(pedido.getFECHA_ENTREGA()));
             }
 
             ps.setBigDecimal(6, pedido.getTOTAL_PRODUCTO());
@@ -125,12 +125,12 @@ public class pedidosService {
             throw new RuntimeException("Pedido con ID " + id + " no encontrado para actualizar.");
         }
 
-        Timestamp fechaIngresoAUsar = new Timestamp(pedidoExistente.getFECHA_INGRESO().getTime());
+        Timestamp fechaIngresoAUsar = Timestamp.valueOf(pedidoExistente.getFECHA_INGRESO());
 
         Timestamp fechaEntregaAUsar = nuevosDatos.getFECHA_ENTREGA() != null
-                ? new Timestamp(nuevosDatos.getFECHA_ENTREGA().getTime())
+                ? Timestamp.valueOf(nuevosDatos.getFECHA_ENTREGA())
                 : (pedidoExistente.getFECHA_ENTREGA() != null
-                ? new Timestamp(pedidoExistente.getFECHA_ENTREGA().getTime())
+                ? Timestamp.valueOf(pedidoExistente.getFECHA_ENTREGA())
                 : null);
 
         String sql = "UPDATE Pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, " +
