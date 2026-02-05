@@ -25,12 +25,11 @@
         }
     }
 
-   $pedidosRecientes = array_slice($pedidosInvertidos, 0, 5);
+    $pedidosRecientes = array_slice($pedidos, 0, 5);
 
-    if (!function_exists('formatApiDate')) {
     function formatApiDate($dateString) {
         if (empty($dateString) || $dateString == 'N/A') return 'Pendiente';
-        
+
         try {
             // Carbon es la librería de fechas de Laravel, es mucho más potente
             return \Carbon\Carbon::parse($dateString)->format('d/m/Y h:i A');
@@ -38,7 +37,6 @@
             return $dateString;
         }
     }
-}
 @endphp
 
 <div class="container-fluid">
@@ -88,10 +86,6 @@
                             <small id="client-role" class="text-muted">Cliente</small>
                         </div>
                     </div>
-                    <a href="#" class="logout-btn mb-2 change-pass-btn">
-                        <i class="bi bi-key"></i>
-                        Cambiar Contraseña
-                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">
@@ -162,7 +156,7 @@
                             </p>
                         </div>
                         <div class="order-status-badge">
-                            <span class="badge rounded-pill 
+                            <span class="badge rounded-pill
                                 @if(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 1) bg-warning text-dark
                                 @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 3) bg-success
                                 @else bg-info @endif">
@@ -224,7 +218,6 @@
                     <div class="alert alert-info">No tienes pedidos registrados.</div>
                 @endif
             </div>
-
             <div class="section-content" id="mi-cuenta-section" style="display: none;">
                 <h3>Mi Cuenta</h3>
                 <div class="action-cards">
@@ -233,18 +226,9 @@
                             <i class="bi bi-person-gear"></i>
                             <h5>Información Personal</h5>
                         </div>
-                        <div class="card-body">
-                            <a href="#" class="action-btn">
-                                <i class="bi bi-person-lines-fill"></i>
-                                Editar Perfil
-                            </a>
                             <a href="#" class="action-btn">
                                 <i class="bi bi-geo"></i>
                                 Mis Direcciones
-                            </a>
-                            <a href="#" class="action-btn">
-                                <i class="bi bi-key"></i>
-                                Cambiar Contraseña
                             </a>
                             <a href="#" class="action-btn">
                                 <i class="bi bi-gear"></i>

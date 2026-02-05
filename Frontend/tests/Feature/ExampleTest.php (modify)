@@ -1,0 +1,7 @@
+class ExampleTest extends \PHPUnit\Framework\TestCase
+{
+    public function testFeature()
+    {
+        $this->assertTrue(true);
+    }
+}

@@ -12,19 +12,16 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-marron fw-semibold" href="{{ route('menu') }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            ¡Explorar!
+                            Menú<i class="fas fa-bread-slice ms-1"></i>
                         </a>
                         <ul class="dropdown-menu bg-crema shadow rounded-3 border-0 mt-2" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item text-marron fw-semibold py-2" href="{{ route('menu') }}">Ver Menú</a></li>
+                            <li><a class="dropdown-item text-marron fw-semibold py-2" href="{{ route('menu') }}">Ver menú</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item ms-3">
                         <a class="nav-link text-marron fw-semibold" href="{{ route('carrito.index') }}">
-                            Carrito
+                            Carrito <i class="fas fa-shopping-cart ms-1"></i>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-marron fw-semibold" href="#">Contáctanos</a>
                     </li>
                 </ul>
                 <!-- Usuario Autenticado (mostrado con JS) -->
