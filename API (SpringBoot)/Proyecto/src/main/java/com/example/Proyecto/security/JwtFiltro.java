@@ -26,6 +26,18 @@ public class JwtFiltro extends OncePerRequestFilter {
                                     HttpServletResponse respuesta,
                                     FilterChain cadenaFiltro) throws ServletException, IOException {
 
+        String requestPath = solicitud.getRequestURI();
+
+        if (requestPath.equals("/auth/login") ||
+                requestPath.equals("/auth/test") ||
+                requestPath.startsWith("/auth/registro/") ||
+                requestPath.equals("/reset-pass") ||
+                requestPath.equals("/reset-pass/health") ||
+                requestPath.equals("/change-password")) {
+            cadenaFiltro.doFilter(solicitud, respuesta);
+            return;
+        }
+
         String authHeader = solicitud.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -45,18 +57,18 @@ public class JwtFiltro extends OncePerRequestFilter {
                 solicitud.setAttribute("rolUsuario", infoUsuario.get("rol"));
                 solicitud.setAttribute("userEmail", infoUsuario.get("email"));
                 solicitud.setAttribute("userId", infoUsuario.get("userId"));
-                
+
                 System.out.println("=== FILTRO JWT ===");
                 System.out.println("Usuario autenticado: " + infoUsuario.get("email"));
                 System.out.println("Tipo: " + infoUsuario.get("tipoUsuario"));
                 System.out.println("Rol: " + infoUsuario.get("rol"));
-                
+
             } catch (Exception e) {
                 String usuario = jwtUtilidad.obtenerUsuario(token);
                 solicitud.setAttribute("userEmail", usuario);
                 System.out.println("Usuario autenticado (simple): " + usuario);
             }
-            
+
         } else {
             respuesta.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             respuesta.getWriter().write("{\"error\": \"Token de autorización requerido\"}");

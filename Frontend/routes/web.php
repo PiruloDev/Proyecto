@@ -67,6 +67,11 @@ Route::post('/logout', function () {
     return redirect()->route('home');
 })->name('logout');
 
+// Reset Password
+Route::get('/recuperar-contrasena', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showRequestForm'])->name('reset-password');
+Route::post('/api/recuperar-contrasena/validate-email', [App\Http\Controllers\Auth\ResetPasswordController::class, 'validateEmail'])->name('reset-password.validate');
+Route::post('/api/recuperar-contrasena/update', [App\Http\Controllers\Auth\ResetPasswordController::class, 'updatePassword'])->name('reset-password.update');
+
 // ============================================
 // DASHBOARDS (sin autenticación por ahora)
 // ============================================
@@ -261,7 +266,7 @@ Route::prefix('/inventario/recetas')->group(function () {
 });
 
 
-Route::post('/ingredientes/{id}/ingresar-stock', 
+Route::post('/ingredientes/{id}/ingresar-stock',
 [IngredientesController::class, 'ingresarStock'])->name('ingredientes.ingresarStock');
 
 // --------------------------------------------
