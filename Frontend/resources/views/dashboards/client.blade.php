@@ -138,7 +138,6 @@
               <div class="orders-section">
     <div class="section-header mb-4">
         <h4><i class="bi bi-receipt"></i> Pedidos Recientes</h4>
-        {{-- Botón eliminado para una vista más limpia --}}
     </div>
 
     @if($totalPedidos > 0)
@@ -219,22 +218,17 @@
                 @endif
             </div>
             <div class="section-content" id="mi-cuenta-section" style="display: none;">
-                <h3>Mi Cuenta</h3>
-                <div class="action-cards">
-                    <div class="action-card">
-                        <div class="card-header">
-                            <i class="bi bi-person-gear"></i>
-                            <h5>Información Personal</h5>
-                        </div>
-                            <a href="#" class="action-btn">
-                                <i class="bi bi-geo"></i>
-                                Mis Direcciones
-                            </a>
-                            <a href="#" class="action-btn">
-                                <i class="bi bi-gear"></i>
-                                Configuración
-                            </a>
-                        </div>
+                <div class="account-box">
+                    <h3>Configuración</h3>
+                    <div class="profile-actions">
+                        <a class="action-btn">
+                            <i class="bi bi-phone"></i>
+                            Cambiar Teléfono
+                        </a>
+                        <a class="action-btn">
+                            <i class="bi bi-shield-lock"></i>
+                            Cambiar Contraseña
+                        </a>
                     </div>
                 </div>
             </div>
