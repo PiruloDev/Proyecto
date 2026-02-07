@@ -45,43 +45,44 @@ class PedidosController extends Controller
         return view('pedidosviews.PedidosClientes.create', compact('estados'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'ID_CLIENTE' => 'required|integer',
-            'ID_EMPLEADO' => 'required|integer',
-            'ID_ESTADO_PEDIDO' => 'required|integer',
-            'TOTAL_PRODUCTO' => 'required|numeric',
-            'FECHA_ENTREGA' => 'nullable|date', 
-        ]);
-        
-     
-        $dataApi = [
-            'id_CLIENTE' => $request->input('ID_CLIENTE'), 
-            'id_EMPLEADO' => $request->input('ID_EMPLEADO'),
-            'id_ESTADO_PEDIDO' => $request->input('ID_ESTADO_PEDIDO'),
-            'total_PRODUCTO' => $request->input('TOTAL_PRODUCTO'),
-            'fecha_ENTREGA' => $request->input('FECHA_ENTREGA'), 
-            
-        ];
-        
-        try {
-            $this->apiService->crearPedido($dataApi); 
+   public function store(Request $request)
+{
+    $request->validate([
+        'ID_CLIENTE' => 'required|integer',
+        'ID_EMPLEADO' => 'required|integer',
+        'ID_ESTADO_PEDIDO' => 'required|integer',
+        'TOTAL_PRODUCTO' => 'required|numeric',
+        'FECHA_ENTREGA' => 'nullable|date', 
+    ]);
 
-            if ($request->routeIs('admin.*')) {
-                return redirect()->route('admin.pedidos.index')
-                                 ->with('success', 'Pedido creado correctamente (Admin).');
-            }
+    // 1. Forzamos la fecha de ingreso con hora actual para Java
+    $fechaIngreso = now()->format('Y-m-d H:i:s');
 
-            return redirect()->route('pedidos.index')
-                             ->with('success', 'Pedido creado correctamente (Empleado).');
-
-        } catch (Exception $e) {
-            
-            return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
-        }
+    // 2. Si hay fecha de entrega, le añadimos hora (final del día)
+    $fechaEntrega = $request->input('FECHA_ENTREGA');
+    if ($fechaEntrega && strlen($fechaEntrega) == 10) {
+        $fechaEntrega .= ' 23:59:59';
     }
 
+    $dataApi = [
+        'cliente_id' => $request->input('ID_CLIENTE'), 
+        'empleado_id' => $request->input('ID_EMPLEADO'),
+        'estado_pedido_id' => $request->input('ID_ESTADO_PEDIDO'),
+        'total_producto' => $request->input('TOTAL_PRODUCTO'),
+        'fecha_ingreso' => $fechaIngreso, // Enviamos la hora exacta
+        'fecha_entrega' => $fechaEntrega ?: null, 
+    ];
+
+    try {
+        $this->apiService->crearPedido($dataApi); 
+
+        $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
+        return redirect()->route($route)->with('success', 'Pedido creado correctamente.');
+
+    } catch (Exception $e) {
+        return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
+    }
+}
 
     public function edit($id)
     {
@@ -100,22 +101,27 @@ class PedidosController extends Controller
 
     
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'ID_CLIENTE' => 'required|integer',
-            'ID_EMPLEADO' => 'required|integer',
-            'ID_ESTADO_PEDIDO' => 'required|integer',
-            'TOTAL_PRODUCTO' => 'required|numeric',
-            'FECHA_ENTREGA' => 'nullable|date', 
-        ]);
+{
+    $request->validate([
+        'ID_CLIENTE' => 'required|integer',
+        'ID_EMPLEADO' => 'required|integer',
+        'ID_ESTADO_PEDIDO' => 'required|integer',
+        'TOTAL_PRODUCTO' => 'required|numeric',
+        'FECHA_ENTREGA' => 'nullable|date', 
+    ]);
 
-        $dataApi = [
-            'id_CLIENTE' => $request->input('ID_CLIENTE'),
-            'id_EMPLEADO' => $request->input('ID_EMPLEADO'),
-            'id_ESTADO_PEDIDO' => $request->input('ID_ESTADO_PEDIDO'),
-            'total_PRODUCTO' => $request->input('TOTAL_PRODUCTO'),
-            'fecha_ENTREGA' => $request->input('FECHA_ENTREGA'), 
-        ];
+    $fechaEntrega = $request->input('FECHA_ENTREGA');
+    if ($fechaEntrega && strlen($fechaEntrega) == 10) {
+        $fechaEntrega .= ' 23:59:59';
+    }
+
+    $dataApi = [
+        'cliente_id' => $request->input('ID_CLIENTE'),
+        'empleado_id' => $request->input('ID_EMPLEADO'),
+        'estado_pedido_id' => $request->input('ID_ESTADO_PEDIDO'),
+        'total_producto' => $request->input('TOTAL_PRODUCTO'),
+        'fecha_entrega' => $fechaEntrega ?: null, 
+    ];
 
         try {
             $this->apiService->actualizarPedido($id, $dataApi); 
@@ -176,26 +182,41 @@ class PedidosController extends Controller
     }
     
     public function dashboardEmpleado()
-    {
-        $pedidos = [];
-        $pedidosHoy = 0;
-        $pedidosPendientes = 0;
-        $productosDisponibles = 0;
-        $totalPedidos = 0;
+{
+    $pedidos = [];
+    $pedidosHoy = 0;
+    $pedidosPendientes = 0;
+    $totalPedidos = 0;
+    $productosDisponibles = 0; // Este valor podrías traerlo de otro servicio de productos
+
+    try {
+        $pedidos = $this->apiService->obtenerPedidos();
+        $totalPedidos = count($pedidos);
+
+        // Lógica para contar pedidos de hoy y pendientes
+        $fechaActual = now()->format('Y-m-d');
         
-        try {
-            $pedidos = $this->apiService->obtenerPedidos();
-            $totalPedidos = count($pedidos); 
-        } catch (Exception $e) {
-          
+        foreach ($pedidos as $pedido) {
+            // Contar pedidos de hoy
+            if (isset($pedido['fecha_ingreso']) && str_contains($pedido['fecha_ingreso'], $fechaActual)) {
+                $pedidosHoy++;
+            }
+            // Contar pendientes (Asumiendo que ID_ESTADO_PEDIDO = 1 es Pendiente)
+            if (isset($pedido['estado_pedido_id']) && $pedido['estado_pedido_id'] == 1) {
+                $pedidosPendientes++;
+            }
         }
 
-        return view('dashboards.employee', compact(
-            'pedidos', 
-            'pedidosHoy', 
-            'pedidosPendientes', 
-            'productosDisponibles', 
-            'totalPedidos' 
-        ));
+    } catch (Exception $e) {
+        // Silenciamos o logueamos el error
     }
+
+    return view('dashboards.employee', compact(
+        'pedidos', 
+        'pedidosHoy', 
+        'pedidosPendientes', 
+        'productosDisponibles', 
+        'totalPedidos' 
+    ));
+}
 }
