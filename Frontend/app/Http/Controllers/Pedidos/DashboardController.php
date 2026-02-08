@@ -16,24 +16,26 @@ class DashboardController extends Controller
     }
 
     public function index()
-    {
-        // Obtenemos el ID 8 de la sesión
-        $clienteId = session('usuario.id');
-        
-        if (!$clienteId) {
-            return redirect()->route('login')->with('error', 'Sesión expirada.');
-        }
-
-        try {
-            // Llamamos a Java
-            $pedidos = $this->pedidosApiService->obtenerPedidosPorCliente($clienteId);
-            
-            // Retornamos la vista correcta según tu estructura de carpetas
-            return view('dashboards.client', compact('pedidos'));
-            
-        } catch (\Exception $e) {
-            return view('dashboards.client', ['pedidos' => []])
-                   ->with('error', 'No se pudo conectar con el servicio de pedidos.');
-        }
+{
+    $clienteId = session('usuario.id');
+    
+    if (!$clienteId) {
+        return redirect()->route('login')->with('error', 'Sesión expirada.');
     }
+
+    try {
+        $pedidosRaw = $this->pedidosApiService->obtenerPedidosPorCliente($clienteId);
+        
+        // IMPORTANTE: Ordenamos por 'id_PEDIDO' que es lo que manda tu Java
+        $pedidos = collect($pedidosRaw)->sortByDesc(function($item) {
+            return $item['id_PEDIDO'] ?? $item['ID_PEDIDO'] ?? 0;
+        })->values()->all();
+        
+        return view('dashboards.client', compact('pedidos'));
+        
+    } catch (\Exception $e) {
+        return view('dashboards.client', ['pedidos' => []])
+               ->with('error', 'Error: ' . $e->getMessage());
+    }
+}
 }

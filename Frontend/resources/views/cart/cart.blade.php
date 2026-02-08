@@ -814,18 +814,34 @@ body {
         }
 
         function updateQuantity(id, change) {
-            const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
-            if (input) {
-                const currentValue = parseInt(input.value);
-                const newValue = currentValue + change;
-                const maxValue = parseInt(input.max) || 999;
-                if (newValue >= 1 && newValue <= maxValue) {
-                    input.value = newValue;
-                    updateCartTotals();
-                }
-            }
-        }
+    const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
+    if (input) {
+        const currentValue = parseInt(input.value);
+        const newValue = currentValue + change;
+        const maxValue = parseInt(input.max) || 999;
+        
+        if (newValue >= 1 && newValue <= maxValue) {
+            input.value = newValue;
+            updateCartTotals();
 
+            // ESTA ES LA PARTE CLAVE:
+            fetch('{{ route('api.carrito.actualizar') }}', { // Nombre exacto de tu web.php
+                method: 'PATCH', // Método exacto de tu web.php
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id: id,
+                    cantidad: newValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Sincronizado con éxito"))
+            .catch(error => console.error('Error:', error));
+        }
+    }
+}
         function updateCartTotals() {
             let subtotal = 0;
             document.querySelectorAll('.cart-item').forEach(item => {

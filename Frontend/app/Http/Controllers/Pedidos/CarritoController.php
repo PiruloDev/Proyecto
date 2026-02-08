@@ -171,31 +171,20 @@ class CarritoController extends Controller
     }
 
     public function actualizar(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|integer',
-            'cantidad' => 'required|integer|min:0',
-        ]);
+{
+    $carrito = session()->get('carrito', []);
+    $id = $request->id;
+    $cantidad = $request->cantidad;
 
-        $id = $request->id;
-        $cantidad = $request->cantidad;
-        $carrito = session()->get('carrito', []);
-
-        if (!isset($carrito[$id])) {
-            return response()->json(['success' => false, 'message' => 'Producto no encontrado en el carrito.'], 404);
-        }
-
-        if ($cantidad === 0) {
-            unset($carrito[$id]);
-            session()->put('carrito', $carrito);
-            return response()->json(['success' => true, 'message' => 'Producto eliminado del carrito.']);
-        }
-
-        // Lógica de actualización normal (cantidad > 0)
+    if (isset($carrito[$id])) {
         $carrito[$id]['cantidad'] = $cantidad;
-        session()->put('carrito', $carrito);
-        return response()->json(['success' => true, 'message' => 'Cantidad actualizada.']);
+        session()->put('carrito', $carrito); // Esto actualiza la "memoria" del servidor
+        
+        return response()->json(['success' => true]);
     }
+
+    return response()->json(['success' => false], 404);
+}
 
     public function remover($id)
     {

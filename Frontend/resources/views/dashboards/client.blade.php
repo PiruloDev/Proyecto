@@ -14,7 +14,6 @@
 @php
     $pedidos = $pedidos ?? [];
     $totalPedidos = count($pedidos);
-    $pedidosInvertidos = array_reverse($pedidos);
     $pedidosPendientes = 0;
 
     foreach ($pedidos as $pedido) {
@@ -27,14 +26,14 @@
 
     $pedidosRecientes = array_slice($pedidos, 0, 5);
 
-    function formatApiDate($dateString) {
-        if (empty($dateString) || $dateString == 'N/A') return 'Pendiente';
-
-        try {
-            // Carbon es la librería de fechas de Laravel, es mucho más potente
-            return \Carbon\Carbon::parse($dateString)->format('d/m/Y h:i A');
-        } catch (\Exception $e) {
-            return $dateString;
+    if (!function_exists('formatApiDate')) {
+        function formatApiDate($dateString) {
+            if (empty($dateString) || $dateString == 'N/A') return 'Pendiente';
+            try {
+                return \Carbon\Carbon::parse($dateString)->format('d/m/Y h:i A');
+            } catch (\Exception $e) {
+                return $dateString;
+            }
         }
     }
 @endphp
