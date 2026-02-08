@@ -465,12 +465,83 @@ html {
 /* ============================================
    Responsive Design
    ============================================ */
+
+/* Hamburger Button */
+.btn-hamburger {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1050;
+    background: var(--panaderia-marron-principal);
+    color: white;
+    border: none;
+    border-radius: var(--panaderia-radius-sm);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--panaderia-shadow-md);
+    transition: all var(--panaderia-transition-normal);
+    cursor: pointer;
+}
+
+.btn-hamburger:hover {
+    background: var(--panaderia-marron-hover, #6d4930);
+    transform: scale(1.05);
+}
+
+/* Close Sidebar Button */
+.btn-close-sidebar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--panaderia-transition-normal);
+    z-index: 10;
+}
+
+.btn-close-sidebar:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.1);
+}
+
+/* Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity var(--panaderia-transition-normal);
+}
+
+.sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
         left: -100%;
         transition: left var(--panaderia-transition-normal);
         z-index: 1000;
+        width: 260px;
     }
 
     .sidebar.show {
@@ -479,6 +550,7 @@ html {
 
     .main-content {
         padding: 1rem;
+        padding-top: 70px;
     }
 
     .stats-grid,

@@ -214,3 +214,22 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
     margin-bottom: 30px;
     font-size: 16px;
 }
+
+/* Enlace de recuperar contraseña */
+.forgot-password-link {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.forgot-password-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.forgot-password-link a:hover {
+    text-decoration: underline;
+    color: var(--primary-hover);
+}

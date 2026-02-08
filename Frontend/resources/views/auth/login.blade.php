@@ -49,10 +49,8 @@
             <input type="password" id="password" name="password" required placeholder="Ingrese su contraseña">
         </div>
 
-        <div class="forgot-password-link" style="text-align: right; margin-bottom: 15px;">
-            <a href="{{ url('/recuperar-contrasena') }}" style="color: #b8860b; text-decoration: none; font-size: 14px;">
-                ¿Olvidaste tu contraseña?
-            </a>
+        <div class="forgot-password-link">
+            <a href="{{ route('reset-password') }}">¿Olvidaste tu contraseña?</a>
         </div>
 
         <button type="submit" class="btn">

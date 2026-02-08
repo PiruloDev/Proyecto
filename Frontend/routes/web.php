@@ -64,6 +64,7 @@ Route::prefix('api/auth')->group(function () {
 
 // Logout
 Route::post('/logout', function () {
+    session()->flush();
     return redirect()->route('home');
 })->name('logout');
 

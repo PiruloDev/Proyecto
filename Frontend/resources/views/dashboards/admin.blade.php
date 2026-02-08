@@ -15,7 +15,7 @@
         @include('components.admin-sidebar')
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Gestión de Panadería</h1>
             </div>
@@ -169,28 +169,7 @@
             return;
         }
 
-        // Actualizar nombre y rol en el sidebar
-        const adminNameElement = document.getElementById('admin-name');
-        const adminRoleElement = document.getElementById('admin-role');
-
-        if (adminNameElement && userData && userData.nombre) {
-            adminNameElement.textContent = userData.nombre;
-        }
-
-        if (adminRoleElement && userRole) {
-            adminRoleElement.textContent = userRole.charAt(0) + userRole.slice(1).toLowerCase();
-        }
-
         console.log('Dashboard Admin - Usuario autenticado:', userData);
-
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-            });
-        }
     });
 </script>
 @endpush

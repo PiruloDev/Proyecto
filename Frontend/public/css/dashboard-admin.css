@@ -329,17 +329,90 @@ html {
 }
 
 /* ============================================
+   Hamburger Button
+   ============================================ */
+.btn-hamburger {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 999;
+    background: var(--panaderia-marron-principal);
+    color: white;
+    border: none;
+    border-radius: var(--panaderia-radius-sm);
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: var(--panaderia-shadow-md);
+    transition: all var(--panaderia-transition-normal);
+}
+
+.btn-hamburger:hover {
+    background: var(--panaderia-marron-hover);
+    transform: scale(1.05);
+}
+
+/* Close button inside sidebar */
+.btn-close-sidebar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 1001;
+    transition: color var(--panaderia-transition-fast);
+}
+
+.btn-close-sidebar:hover {
+    color: white;
+}
+
+/* Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity var(--panaderia-transition-normal);
+}
+
+.sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+/* ============================================
    Responsive Design
    ============================================ */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
-        left: -100%;
+        left: -280px;
+        top: 0;
+        width: 260px;
+        height: 100vh;
         transition: left var(--panaderia-transition-normal);
         z-index: 1000;
+        overflow-y: auto;
     }
 
     .sidebar.show {
         left: 0;
+    }
+
+    .main-content {
+        padding-top: 70px;
     }
 }

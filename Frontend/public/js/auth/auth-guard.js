@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const isLoginPage = window.location.pathname === '/login';
 const isRegisterPage = window.location.pathname === '/register';
-const isAuthRequiredPage = window.location.pathname === '/acceso-requerido'; // <--- NUEVA LÍNEA
+const isAuthRequiredPage = window.location.pathname === '/acceso-requerido';
+const isResetPasswordPage = window.location.pathname === '/recuperar-contrasena';
 const isPublicPage = window.location.pathname === '/' ||
-                         window.location.pathname === '/menu' ||
-                         window.location.pathname.startsWith('/productos') ||
-                         isAuthRequiredPage;
-
-    if (!isLoginPage && !isRegisterPage && !isPublicPage) {
+                         window.location.pathname === '/menu' ||
+                         window.location.pathname.startsWith('/productos') ||
+                         isAuthRequiredPage ||
+                         isResetPasswordPage;
         if (!AuthManager.isAuthenticated()) {
             console.warn('Usuario no autenticado, redirigiendo al login');
             AuthManager.redirectToLogin();

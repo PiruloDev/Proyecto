@@ -41,8 +41,19 @@
 
 <div class="container-fluid">
     <div class="row">
+        <!-- Overlay mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Hamburger Button -->
+        <button class="btn btn-hamburger d-md-none" type="button" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+
         <nav class="col-md-3 col-lg-2 d-md-block sidebar">
             <div class="sidebar-content">
+                <button class="btn-close-sidebar d-md-none" id="sidebarClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
                 <div class="sidebar-brand">
                     <img src="{{ asset('images/logoprincipal.jpg') }}" alt="Logo Panadería" class="sidebar-logo">
                     <h5>Portal Cliente</h5>
@@ -86,21 +97,86 @@
                             <small id="client-role" class="text-muted">Cliente</small>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}" class="logout-form">
-                        @csrf
-                        <button type="submit" class="logout-btn">
-                            <i class="bi bi-box-arrow-right"></i>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                    <button type="button" class="logout-btn" id="logoutBtn" data-logout>
+                        <i class="bi bi-box-arrow-right"></i>
+                        Cerrar Sesión
+                    </button>
                 </div>
             </div>
         </nav>
 
+        {{-- JS autónomo del sidebar (logout + hamburger + overlay) --}}
+        <script>
+        (function() {
+            function initClientSidebar() {
+                // Actualizar nombre del cliente
+                if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
+                    var userData = AuthManager.getUserData();
+                    var userRole = AuthManager.getRole();
+
+                    var clientNameEl = document.getElementById('client-name');
+                    var clientRoleEl = document.getElementById('client-role');
+
+                    if (clientNameEl && userData && userData.nombre) {
+                        clientNameEl.textContent = userData.nombre;
+                    }
+                    if (clientRoleEl && userRole) {
+                        clientRoleEl.textContent = (userRole === 'CLIENTE' || userRole === 'CLIENT') ? 'Cliente' : userRole;
+                    }
+                }
+
+                // Logout
+                var logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                            AuthManager.clearAuth();
+                            window.location.replace('/');
+                        }
+                    });
+                }
+
+                // Sidebar toggle mobile
+                var sidebarToggle = document.getElementById('sidebarToggle');
+                var sidebar = document.querySelector('.sidebar');
+                var sidebarOverlay = document.getElementById('sidebarOverlay');
+                var sidebarClose = document.getElementById('sidebarClose');
+
+                function openSidebar() {
+                    if (sidebar) sidebar.classList.add('show');
+                    if (sidebarOverlay) sidebarOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeSidebar() {
+                    if (sidebar) sidebar.classList.remove('show');
+                    if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+
+                if (sidebarToggle) sidebarToggle.addEventListener('click', openSidebar);
+                if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+                if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+
+                // Cerrar sidebar al hacer click en nav-link (mobile)
+                document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth < 768) closeSidebar();
+                    });
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initClientSidebar);
+            } else {
+                initClientSidebar();
+            }
+        })();
+        </script>
+
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-            <button class="btn btn-outline-primary d-md-none mb-3" type="button" id="sidebarToggle">
-                <i class="bi bi-list"></i> Menú
-            </button>
 
             @if(session('error'))
                 <div class="alert alert-danger" role="alert">
@@ -257,22 +333,9 @@
 
         console.log('Dashboard Cliente - Usuario autenticado:', userData);
 
-        // Actualizar nombre y rol en sidebar
-        const clientNameElement = document.getElementById('client-name');
-        const clientRoleElement = document.getElementById('client-role');
-
-        if (clientNameElement && userData && userData.nombre) {
-            clientNameElement.textContent = userData.nombre;
-        }
-
-        if (clientRoleElement && userRole) {
-            clientRoleElement.textContent = userRole === 'CLIENTE' || userRole === 'CLIENT' ? 'Cliente' : userRole;
-        }
-
+        // Navegación por secciones (hash)
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.sidebar');
         const navLinkTriggers = document.querySelectorAll('.nav-link-trigger');
 
         function showSection(sectionId) {
@@ -281,12 +344,6 @@
             if (targetSection) {
                 targetSection.style.display = 'block';
             }
-        }
-
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-            });
         }
 
         navLinks.forEach(link => {
