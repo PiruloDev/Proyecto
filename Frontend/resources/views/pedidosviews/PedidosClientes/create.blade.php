@@ -62,7 +62,8 @@
 
                     <div class="col-md-6">
                         <label for="ID_CLIENTE" class="form-label">ID Cliente</label>
-                        <input type="number" class="form-control" id="ID_CLIENTE" name="ID_CLIENTE" value="{{ old('ID_CLIENTE') }}" required> 
+                        {{-- min="1" evita negativos en flechas, onkeypress evita escribir el signo '-' --}}
+                        <input type="number" min="1" onkeypress="return event.charCode >= 48" class="form-control" id="ID_CLIENTE" name="ID_CLIENTE" value="{{ old('ID_CLIENTE') }}" required> 
                         @error('ID_CLIENTE')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -70,7 +71,7 @@
 
                     <div class="col-md-6">
                         <label for="ID_EMPLEADO" class="form-label">ID Empleado</label>
-                        <input type="number" class="form-control" id="ID_EMPLEADO" name="ID_EMPLEADO" value="{{ old('ID_EMPLEADO') }}" required>
+                        <input type="number" min="1" onkeypress="return event.charCode >= 48" class="form-control" id="ID_EMPLEADO" name="ID_EMPLEADO" value="{{ old('ID_EMPLEADO') }}" required>
                         @error('ID_EMPLEADO')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -78,7 +79,7 @@
 
                     <div class="col-md-6">
                         <label for="ID_ESTADO_PEDIDO" class="form-label">ID Estado Pedido</label>
-                        <input type="number" class="form-control" id="ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" value="{{ old('ID_ESTADO_PEDIDO') }}" required>
+                        <input type="number" min="1" onkeypress="return event.charCode >= 48" class="form-control" id="ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" value="{{ old('ID_ESTADO_PEDIDO') }}" required>
                         @error('ID_ESTADO_PEDIDO')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -94,7 +95,8 @@
 
                     <div class="col-md-6">
                         <label for="TOTAL_PRODUCTO" class="form-label">Total Producto</label>
-                        <input type="number" step="0.01" class="form-control" id="TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" value="{{ old('TOTAL_PRODUCTO') }}" required>
+                        {{-- min="0" permite que sea gratis o con valor positivo --}}
+                        <input type="number" step="0.01" min="0" onkeypress="return event.charCode >= 48 || event.charCode == 46" class="form-control" id="TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" value="{{ old('TOTAL_PRODUCTO') }}" required>
                         @error('TOTAL_PRODUCTO')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror

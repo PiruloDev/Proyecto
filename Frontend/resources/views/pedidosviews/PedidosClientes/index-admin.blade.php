@@ -13,23 +13,18 @@
 <div class="container-fluid">
     <div class="row">
         
-        {{-- ================================================= --}}
         {{-- SIDEBAR FIJO DEL ADMINISTRADOR --}}
-        {{-- ================================================= --}}
         @include('components.admin-sidebar') 
         
         {{-- CONTENIDO PRINCIPAL --}}
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
             
-            {{-- Título y Botones de Acción --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2">Listado de Pedidos (Panel de Administración)</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    {{-- Botón Crear Pedido - Abre el modal (ya no es un enlace de ruta) --}}
-                    <button type="button" class="btn btn-primary me-2" id="btn-create-pedido">
+                    <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
                         <i class="fas fa-plus"></i> Crear Pedido
                     </button>
-                    {{-- Botón Recargar - USA RUTA DE ADMIN --}}
                     <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-sync"></i> Recargar Listado
                     </a>
@@ -38,140 +33,143 @@
 
             {{-- MENSAJES DE SESIÓN --}}
             @if (session('success'))
-                <div class="alert alert-success my-3">{{ session('success') }}</div>
-            @endif  
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif  
 
             @if (session('error'))
-                <div class="alert alert-danger my-3">{{ session('error') }}</div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
             
             <section id="listado-pedidos" class="mb-5">
                 <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle shadow-sm rounded-3">
+                    <table class="table table-hover table-bordered align-middle shadow-sm rounded-3">
                         <thead class="table-light">
-    <tr>
-        <th>ID</th>
-        <th>Cliente</th>  {{-- Antes Cliente ID --}}
-        <th>Empleado</th> {{-- Antes Empleado ID --}}
-        <th>Estado</th>   {{-- Antes Estado ID --}}
-        <th>Total</th>
-        <th>Ingreso</th>
-        <th>Entrega</th>
-        <th>Acciones</th>
-    </tr>
-</thead>
-
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Empleado</th>
+                                <th>Estado</th>
+                                <th>Total</th>
+                                <th>Ingreso</th>
+                                <th>Entrega</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
                         <tbody>
-    @forelse($pedidos as $pedido)
-        <tr>
-            <td>{{ $pedido['id_PEDIDO'] }}</td>
-            
-            {{-- Mostramos el nombre, si no existe, mostramos el ID --}}
-            <td>{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['cliente_id'] }}</td>
-            <td>{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['empleado_id'] }}</td>
-            <td>
-                <span class="badge bg-info text-dark">
-                    {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
-                </span>
-            </td>
+                            @forelse($pedidos as $pedido)
+                                <tr>
+                                    <td>{{ $pedido['id_PEDIDO'] }}</td>
+                                    <td>{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['cliente_id'] }}</td>
+                                    <td>{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['empleado_id'] }}</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
+                                        </span>
+                                    </td>
+                                    {{-- Resaltar en rojo si el total llegara a ser negativo por error previo --}}
+                                    <td class="{{ ($pedido['total_producto'] < 0) ? 'text-danger fw-bold' : '' }}">
+                                        ${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}
+                                    </td>
+                                    <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
+                                    <td>{{ $pedido['fecha_entrega'] ?? 'N/A' }}</td>
 
-            <td>${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}</td>
-            <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
-            <td>{{ $pedido['fecha_entrega'] ?? 'N/A' }}</td>
+                                    <td class="text-center text-nowrap">
+                                        <button type="button" 
+                                            class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
+                                            data-pedido="{{ json_encode($pedido) }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
 
-            <td class="text-nowrap">
-                {{-- El botón de editar se mantiene igual porque el JSON completo ya va en data-pedido --}}
-                <button type="button" 
-                    class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#pedidoModal"
-                    data-pedido="{{ json_encode($pedido) }}">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-
-                <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar?')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </form>
-            </td>
-        </tr>
-    @empty
-        {{-- ... --}}
-    @endforelse
-</tbody>
+                                        <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este pedido?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">No se encontraron pedidos registrados.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                     </table>
                 </div>
             </section>
-
         </main>
-
     </div>
 </div>
 
-{{-- ================================================= --}}
 {{-- MODAL ÚNICO PARA CREAR Y EDITAR PEDIDO --}}
-{{-- ================================================= --}}
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="pedidoModalLabel">Crear/Editar Pedido</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="background: #a67c52; border-radius: 12px 12px 0 0;">
+                <h5 class="modal-title" id="pedidoModalLabel">Gestión de Pedido</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="pedidoForm" method="POST" action="">
                 @csrf
-                {{-- Campo oculto para el método PUT/PATCH en edición (el script lo cambia) --}}
                 <input type="hidden" name="_method" value="POST" id="formMethod"> 
                 
                 <div class="modal-body row g-3">
                     <input type="hidden" name="id_PEDIDO" id="modal_id_PEDIDO">
 
                     <div class="col-md-6">
-                        <label for="modal_ID_CLIENTE" class="form-label">ID Cliente</label>
-                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
+                        <label for="modal_ID_CLIENTE" class="form-label fw-bold">ID Cliente</label>
+                        {{-- min="1" y bloqueo de teclado --}}
+                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="modal_ID_EMPLEADO" class="form-label">ID Empleado</label>
-                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
+                        <label for="modal_ID_EMPLEADO" class="form-label fw-bold">ID Empleado</label>
+                        {{-- min="1" y bloqueo de teclado --}}
+                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="modal_ID_ESTADO_PEDIDO" class="form-label">ID Estado Pedido</label>
-                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
+                        <label for="modal_ID_ESTADO_PEDIDO" class="form-label fw-bold">ID Estado Pedido</label>
+                        {{-- min="1" y bloqueo de teclado --}}
+                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
                     
                     <div class="col-md-6">
-                        <label for="modal_FECHA_ENTREGA" class="form-label">Fecha de Entrega (Opcional)</label>
+                        <label for="modal_FECHA_ENTREGA" class="form-label fw-bold">Fecha de Entrega</label>
                         <input type="date" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
                     </div>
 
                     <div class="col-md-6">
-                        <label for="modal_TOTAL_PRODUCTO" class="form-label">Total Producto</label>
-                        <input type="number" step="0.01" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" required>
+                        <label for="modal_TOTAL_PRODUCTO" class="form-label fw-bold">Total Producto ($)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            {{-- min="0", step para decimales y bloqueo de tecla "-" --}}
+                            <input type="number" step="0.01" min="0" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" 
+                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46" required>
+                        </div>
+                        <div class="form-text small">No se permiten valores negativos.</div>
                     </div>
-
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="modalSubmitButton">Guardar</button>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn text-white" id="modalSubmitButton" style="background: #a67c52;">Guardar Pedido</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-{{-- FIN DEL MODAL --}}
 
 @endsection
 
-{{-- ================================================= --}}
-{{-- SCRIPTS PARA MANEJAR EL MODAL Y EL FORMULARIO --}}
-{{-- ================================================= --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -185,42 +183,37 @@
         // Función para preparar el modal para CREAR
         function setupCreate() {
             modalTitle.textContent = 'Crear Nuevo Pedido';
-            // Configura la acción para STORE (POST)
             form.action = "{{ route('admin.pedidos.store') }}";
             formMethod.value = 'POST';
-            form.reset(); // Limpia los campos del formulario
+            form.reset();
+            // Asegurar que el total empiece en 0 si está vacío
+            document.getElementById('modal_TOTAL_PRODUCTO').value = 0;
         }
 
-        // 1. Configurar botón "Crear Pedido"
-        createButton.addEventListener('click', function(e) {
+        // Configurar botón "Crear Pedido"
+        createButton.addEventListener('click', function() {
             setupCreate();
             modal.show();
         });
 
-        // 2. Configurar botones "Editar" en la tabla
+        // Configurar botones "Editar"
         document.querySelectorAll('.btn-edit-pedido').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Obtener datos del pedido desde el atributo data-pedido (JSON)
+            button.addEventListener('click', function() {
                 const pedidoData = JSON.parse(this.getAttribute('data-pedido'));
                 
                 modalTitle.textContent = 'Editar Pedido #' + pedidoData.id_PEDIDO;
-                
-                // Configurar la acción del formulario para UPDATE (PUT)
-                // Se construye la URL: /admin/pedidos/{id}
                 form.action = "{{ url('admin/pedidos') }}/" + pedidoData.id_PEDIDO;
                 formMethod.value = 'PUT'; 
 
-                // Llenar los campos del modal
+                // Llenar campos
                 document.getElementById('modal_id_PEDIDO').value = pedidoData.id_PEDIDO || '';
                 document.getElementById('modal_ID_CLIENTE').value = pedidoData.id_CLIENTE || '';
                 document.getElementById('modal_ID_EMPLEADO').value = pedidoData.id_EMPLEADO || '';
                 document.getElementById('modal_ID_ESTADO_PEDIDO').value = pedidoData.id_ESTADO_PEDIDO || '';
-                document.getElementById('modal_TOTAL_PRODUCTO').value = pedidoData.total_PRODUCTO || '';
+                document.getElementById('modal_TOTAL_PRODUCTO').value = pedidoData.total_PRODUCTO || 0;
                 
-                // Manejo de la fecha: Asegurar formato YYYY-MM-DD para el input type="date"
+                // Formatear fecha para el input date
                 if (pedidoData.fecha_ENTREGA) {
-                    // Si el valor es una fecha de BD completa (timestamp), la formateamos
                     const date = new Date(pedidoData.fecha_ENTREGA);
                     const formattedDate = date.toISOString().split('T')[0];
                     document.getElementById('modal_FECHA_ENTREGA').value = formattedDate;
@@ -230,6 +223,11 @@
 
                 modal.show();
             });
+        });
+
+        // Validación Extra: Si el usuario pega un valor negativo con el mouse, lo forzamos a 0
+        document.getElementById('modal_TOTAL_PRODUCTO').addEventListener('change', function() {
+            if (this.value < 0) this.value = 0;
         });
     });
 </script>

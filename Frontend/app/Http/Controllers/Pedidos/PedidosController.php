@@ -45,58 +45,47 @@ class PedidosController extends Controller
         return view('pedidosviews.PedidosClientes.create', compact('estados'));
     }
 
-   public function store(Request $request)
-{
-    // 1. Validación de los datos del encabezado
-    $request->validate([
-        'ID_CLIENTE' => 'required|integer',
-        'ID_EMPLEADO' => 'required|integer',
-        'ID_ESTADO_PEDIDO' => 'required|integer',
-        'TOTAL_PRODUCTO' => 'required|numeric',
-    ]);
+public function store(Request $request)
+    {
+        // Validación estricta para evitar negativos
+        $request->validate([
+            'ID_CLIENTE'       => 'required|integer|min:1',
+            'ID_EMPLEADO'      => 'required|integer|min:1',
+            'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
+            'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
+        ]);
 
-    // 2. EXTRAER EL CARRITO DE LA SESIÓN
-    $carrito = session('carrito', []);
-    $detallesApi = [];
+        $carrito = session('carrito', []);
+        $detallesApi = [];
 
-    // Convertimos cada ítem del carrito al formato que Java espera
-    foreach ($carrito as $item) {
-        $detallesApi[] = [
-            'idProducto'       => (int)$item['id'],
-            'cantidadProducto' => (int)$item['cantidad'],
-            'precioUnitario'   => (float)$item['precio'],
-            'subtotal'         => (float)($item['precio'] * $item['cantidad'])
+        foreach ($carrito as $item) {
+            $detallesApi[] = [
+                'idProducto'       => (int)$item['id'],
+                'cantidadProducto' => (int)$item['cantidad'],
+                'precioUnitario'   => (float)$item['precio'],
+                'subtotal'         => (float)($item['precio'] * $item['cantidad'])
+            ];
+        }
+
+        $dataApi = [
+            'cliente_id'       => (int)$request->input('ID_CLIENTE'), 
+            'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
+            'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
+            'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
+            'fecha_ingreso'    => now()->format('Y-m-d H:i:s'),
+            'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
+            'detalles'         => $detallesApi,
         ];
+
+        try {
+            $this->apiService->crearPedido($dataApi); 
+            session()->forget('carrito');
+            $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
+            return redirect()->route($route)->with('success', 'Pedido creado exitosamente.');
+        } catch (Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
+        }
     }
-
-    // 3. Construir el paquete completo para Java
-    $dataApi = [
-        'cliente_id'       => (int)$request->input('ID_CLIENTE'), 
-        'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
-        'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
-        'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
-        'fecha_ingreso'    => now()->format('Y-m-d H:i:s'),
-        'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
-        'detalles'         => $detallesApi, // <--- ¡AQUÍ VAN LOS PRODUCTOS!
-    ];
-
-    // LOG DE CONTROL: Para que verifiques en tu consola si ahora sí se van los detalles
-    \Log::info("Enviando pedido a API Java con detalles: ", $dataApi);
-
-    try {
-        $this->apiService->crearPedido($dataApi); 
-
-        // Si se creó con éxito, limpiamos el carrito
-        session()->forget('carrito');
-
-        $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
-        return redirect()->route($route)->with('success', 'Pedido creado exitosamente con sus productos.');
-
-    } catch (Exception $e) {
-        \Log::error("Error en API Java: " . $e->getMessage());
-        return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
-    }
-}
 
     public function edit($id)
     {
@@ -114,14 +103,15 @@ class PedidosController extends Controller
     }
 
     
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
+    // Aplicamos la misma restricción para las ediciones
     $request->validate([
-        'ID_CLIENTE' => 'required|integer',
-        'ID_EMPLEADO' => 'required|integer',
-        'ID_ESTADO_PEDIDO' => 'required|integer',
-        'TOTAL_PRODUCTO' => 'required|numeric',
-        'FECHA_ENTREGA' => 'nullable|date', 
+        'ID_CLIENTE'       => 'required|integer|min:1',
+        'ID_EMPLEADO'      => 'required|integer|min:1',
+        'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
+        'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
+        'FECHA_ENTREGA'    => 'nullable|date', 
     ]);
 
     $fechaEntrega = $request->input('FECHA_ENTREGA');
@@ -201,30 +191,43 @@ class PedidosController extends Controller
     $pedidosHoy = 0;
     $pedidosPendientes = 0;
     $totalPedidos = 0;
-    $productosDisponibles = 0; // Este valor podrías traerlo de otro servicio de productos
+    $productosDisponibles = 0;
 
     try {
+        // 1. Obtener Pedidos
         $pedidos = $this->apiService->obtenerPedidos();
         $totalPedidos = count($pedidos);
 
-        // Lógica para contar pedidos de hoy y pendientes
+        // 2. Obtener Productos (Para que no marque 0 en stock)
+        $productosRaw = $this->apiService->obtenerProductos();
+        $productosDisponibles = collect($productosRaw)->filter(function($prod) {
+            // Buscamos la llave del stock que devuelve tu API de Java
+            $stock = $prod['stockActual'] ?? $prod['STOCK_ACTUAL'] ?? 0;
+            return $stock > 0;
+        })->count();
+
+        // 3. Lógica de conteo de fechas y estados
         $fechaActual = now()->format('Y-m-d');
         
         foreach ($pedidos as $pedido) {
-            // Contar pedidos de hoy
-            if (isset($pedido['fecha_ingreso']) && str_contains($pedido['fecha_ingreso'], $fechaActual)) {
+            // Verificamos fecha (ajusta 'fecha_ingreso' si en Java llega diferente)
+            $fechaIngreso = $pedido['fecha_ingreso'] ?? $pedido['fechaIngreso'] ?? '';
+            if (str_contains($fechaIngreso, $fechaActual)) {
                 $pedidosHoy++;
             }
-            // Contar pendientes (Asumiendo que ID_ESTADO_PEDIDO = 1 es Pendiente)
-            if (isset($pedido['estado_pedido_id']) && $pedido['estado_pedido_id'] == 1) {
+            
+            // Verificamos estado pendiente (ID 1)
+            $estadoId = $pedido['estado_pedido_id'] ?? $pedido['idEstadoPedido'] ?? 0;
+            if ($estadoId == 1) {
                 $pedidosPendientes++;
             }
         }
 
     } catch (Exception $e) {
-        // Silenciamos o logueamos el error
+        \Log::error("Error en dashboardEmpleado: " . $e->getMessage());
     }
 
+    // Retornamos la vista con todos los datos calculados
     return view('dashboards.employee', compact(
         'pedidos', 
         'pedidosHoy', 

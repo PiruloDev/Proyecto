@@ -12,14 +12,14 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Component -->
         @include('components.employee-sidebar')
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
 
             <div class="section-content" id="dashboard-section">
                 <div class="welcome-section mb-4">
-                    <h2>Bienvenido, Empleado!</h2>
+                    {{-- Cambiamos el texto estático por el nombre del usuario --}}
+                    <h2 id="welcome-name">¡Bienvenido, Carga...!</h2>
                     <p>Panel de control del empleado</p>
                 </div>
 
@@ -80,7 +80,6 @@
                                 <i class="bi bi-plus-circle fs-1 text-primary mb-3"></i>
                                 <h5>Crear Pedido</h5>
                                 <p class="text-muted">Registrar un nuevo pedido</p>
-                                {{-- ENLACE CORREGIDO: a la vista de creación --}}
                                 <a href="{{ route('pedidos.create') }}" class="btn btn-primary w-100">Crear</a>
                             </div>
                         </div>
@@ -89,26 +88,24 @@
                                 <i class="bi bi-list-check fs-1 text-success mb-3"></i>
                                 <h5>Ver Pedidos</h5>
                                 <p class="text-muted">Revisar pedidos pendientes</p>
-                                {{-- ENLACE CORREGIDO: a la vista de índice/listado --}}
                                 <a href="{{ route('pedidos.index') }}" class="btn btn-success w-100">Ver</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Aquí irían otras secciones del dashboard (pedidos, productos, perfil) --}}
-
-                <div class="section-content" id="pedidos-section" style="display: none;">
+                {{-- Secciones de navegación --}}
+                <div class="section-content-inner" id="pedidos-section" style="display: none;">
                     <h3>Gestión de Pedidos</h3>
-                    <p>Contenido para gestionar pedidos. Incluiría la tabla de pedidos pendientes, etc.</p>
+                    <p>Contenido para gestionar pedidos...</p>
                 </div>
 
-                <div class="section-content" id="productos-section" style="display: none;">
+                <div class="section-content-inner" id="productos-section" style="display: none;">
                     <h3>Productos</h3>
                     <p>Contenido para visualizar productos disponibles.</p>
                 </div>
 
-                <div class="section-content" id="perfil-section" style="display: none;">
+                <div class="section-content-inner" id="perfil-section" style="display: none;">
                     <h3>Mi Perfil</h3>
                     <p>Contenido de la información del empleado.</p>
                 </div>
@@ -130,18 +127,27 @@
         const userData = AuthManager.getUserData();
         const userRole = AuthManager.getRole();
 
+        // Verificación de Rol
         if (userRole !== 'EMPLEADO') {
-            console.warn('Usuario no autorizado para dashboard empleado');
             const correctDashboard = AuthManager.getDashboardRoute(userRole);
             window.location.href = correctDashboard;
             return;
         }
 
-        console.log('Dashboard Empleado - Usuario autenticado:', userData);
+        // --- DINAMISMO DEL NOMBRE ---
+        // Aquí insertamos el nombre del usuario en el H2
+        const welcomeTitle = document.getElementById('welcome-name');
+        if (userData && (userData.nombre || userData.name)) {
+            welcomeTitle.innerText = `¡Bienvenido, ${userData.nombre || userData.name}!`;
+        } else {
+            welcomeTitle.innerText = `¡Bienvenido, Empleado!`;
+        }
 
-        // Navegación por secciones (hash)
+        console.log('Dashboard Empleado Cargado:', userData);
+
+        // Navegación por secciones
         const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('.section-content');
+        const sections = document.querySelectorAll('.section-content-inner');
 
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
@@ -157,17 +163,22 @@
 
                     const sectionId = href.substring(1) + '-section';
                     const targetSection = document.getElementById(sectionId);
-                    if (targetSection) {
+                    
+                    // Mostramos el dashboard solo si es la raíz o si no hay sección específica
+                    const dashboardMain = document.querySelector('.orders-section');
+                    const statsMain = document.querySelector('.row.g-3.mb-4');
+                    
+                    if (href === '#inicio') {
+                        dashboardMain.style.display = 'block';
+                        statsMain.style.display = 'flex';
+                    } else if (targetSection) {
+                        dashboardMain.style.display = 'none';
+                        statsMain.style.display = 'none';
                         targetSection.style.display = 'block';
                     }
                 }
             });
         });
-
-        const dashboardSection = document.getElementById('dashboard-section');
-        if (dashboardSection) {
-            dashboardSection.style.display = 'block';
-        }
     });
 </script>
 @endpush

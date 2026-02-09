@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pedidos\CarritoController;
 use App\Http\Controllers\Reportes\OrdenSalidaController;
 use App\Http\Controllers\Pedidos\DashboardController;
+use App\Http\Controllers\Pedidos\DashboardEmpleadoController;
 // ============================================
 // RUTAS PÚBLICAS - El Castillo del Pan
 // ============================================
@@ -89,15 +90,7 @@ Route::get('/dashboard/cliente', [PedidosController::class, 'dashboardCliente'])
     ->name('dashboard.cliente');
 
 // Dashboard Empleado
-Route::get('/dashboardempleado', function () {
-    $pedidosHoy = 0;
-    $pedidosPendientes = 0;
-    $productosDisponibles = 0;
-    $totalPedidos = 0;
-    return view('dashboards.employee', compact('pedidosHoy', 'pedidosPendientes', 'productosDisponibles', 'totalPedidos'));
-})->name('dashboard.employee');
-
-// Dashboard Admin
+Route::get('/dashboardempleado', [PedidosController::class, 'dashboardEmpleado'])->name('dashboard.employee');// Dashboard Admin
 Route::get('/dashboardadmin', function () {
     $totalProductos = 0;
     $productosActivos = 0;

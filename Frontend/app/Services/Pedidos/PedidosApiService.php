@@ -130,4 +130,14 @@ public function obtenerTodosLosDetalles()
         return $data;
     } catch (Exception $e) { }
 }
+
+public function obtenerTodosLosPedidos()
+{
+    try {
+        // Usamos la baseUrl (http://localhost:8080/pedidos) que ya tienes definida
+        return Http::get($this->baseUrl)->throw()->json();
+    } catch (Exception $e) {
+        throw new Exception("Error al obtener el listado global de pedidos de la API.");
+    }
+}
 }
