@@ -5,26 +5,63 @@
 @push('styles')
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
+<style>
+    .order-card {
+        transition: transform 0.2s;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .detail-table thead th {
+        background-color: #f8f9fa;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        padding: 12px;
+    }
+    .logout-btn {
+        color: #dc3545;
+        transition: all 0.3s;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .logout-btn:hover {
+        background: rgba(220, 53, 69, 0.1);
+        color: #a71d2a;
+    }
+    .empty-state-icon {
+        font-size: 2.5rem;
+        color: #dee2e6;
+        display: block;
+        margin-bottom: 10px;
+    }
+</style>
 @endpush
-
-@section('body-class', '')
 
 @section('content')
 
 @php
-    $pedidos = $pedidos ?? [];
-    $totalPedidos = count($pedidos);
+    // Convertimos a colección para asegurar el uso de métodos de Laravel
+    $pedidosCol = collect($pedidos ?? []);
+    $totalPedidos = $pedidosCol->count();
     $pedidosPendientes = 0;
 
-    foreach ($pedidos as $pedido) {
-        // Java usa ID_ESTADO_PEDIDO según tu log de éxito
-        $estadoId = $pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0;
+    foreach ($pedidosCol as $pedido) {
+        // Buscamos el ID de estado en múltiples formatos por si la API varía
+        $estadoId = $pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? $pedido['estado_pedido_id'] ?? 0;
         if ((int)$estadoId === 1) {
             $pedidosPendientes++;
         }
     }
 
-    $pedidosRecientes = array_slice($pedidos, 0, 5);
+    $pedidosRecientes = $pedidosCol->take(5);
 
     if (!function_exists('formatApiDate')) {
         function formatApiDate($dateString) {
@@ -40,10 +77,8 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Overlay mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- Hamburger Button -->
         <button class="btn btn-hamburger d-md-none" type="button" id="sidebarToggle">
             <i class="bi bi-list"></i>
         </button>
@@ -59,150 +94,79 @@
                 </div>
                 <div class="px-3 mb-3">
                     <a href="{{ route('menu') }}" class="btn btn-explore w-100">
-                        <i class="bi bi-compass"></i>
-                        Explorar Productos
+                        <i class="bi bi-compass"></i> Explorar Productos
                     </a>
                 </div>
                 <div class="sidebar-divider"></div>
 
                 <ul class="nav flex-column">
-                    <div class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link active" href="#dashboard" data-section="dashboard">
-                            <i class="bi bi-house"></i>
-                            Dashboard
+                            <i class="bi bi-house"></i> Inicio
                         </a>
-                    </div>
-                    <div class="nav-item">
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#pedidos" data-section="pedidos">
-                            <i class="bi bi-cart-check"></i>
-                            Mis Pedidos
+                            <i class="bi bi-cart-check"></i> Mis Pedidos
                         </a>
-                    </div>
-                    <div class="nav-item">
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#detalles-general" data-section="detalles-general">
+                            <i class="bi bi-journal-text"></i> Desglose Total
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#mi-cuenta" data-section="mi-cuenta">
-                            <i class="bi bi-person-circle"></i>
-                            Mi Perfil
+                            <i class="bi bi-person-circle"></i> Mi Perfil
                         </a>
-                    </div>
+                    </li>
                 </ul>
 
                 <div class="sidebar-divider"></div>
 
                 <div class="sidebar-user">
-                    <div class="user-info">
-                        <i class="bi bi-person-circle"></i>
+                    <div class="user-info mb-2">
+                        <i class="bi bi-person-circle fs-4 me-2"></i>
                         <div class="d-flex flex-column">
-                            <span id="client-name" class="fw-bold">Cliente</span>
-                            <small id="client-role" class="text-muted">Cliente</small>
+                            <span class="fw-bold">{{ session('usuario.nombre', 'Usuario') }}</span>
+                            <small class="text-muted">Cliente</small>
                         </div>
                     </div>
-                    <button type="button" class="logout-btn" id="logoutBtn" data-logout>
-                        <i class="bi bi-box-arrow-right"></i>
-                        Cerrar Sesión
-                    </button>
+                    
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="logout-btn btn btn-link text-decoration-none text-start">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
 
-        {{-- JS autónomo del sidebar (logout + hamburger + overlay) --}}
-        <script>
-        (function() {
-            function initClientSidebar() {
-                // Actualizar nombre del cliente
-                if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
-                    var userData = AuthManager.getUserData();
-                    var userRole = AuthManager.getRole();
-
-                    var clientNameEl = document.getElementById('client-name');
-                    var clientRoleEl = document.getElementById('client-role');
-
-                    if (clientNameEl && userData && userData.nombre) {
-                        clientNameEl.textContent = userData.nombre;
-                    }
-                    if (clientRoleEl && userRole) {
-                        clientRoleEl.textContent = (userRole === 'CLIENTE' || userRole === 'CLIENT') ? 'Cliente' : userRole;
-                    }
-                }
-
-                // Logout
-                var logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                            AuthManager.clearAuth();
-                            window.location.replace('/');
-                        }
-                    });
-                }
-
-                // Sidebar toggle mobile
-                var sidebarToggle = document.getElementById('sidebarToggle');
-                var sidebar = document.querySelector('.sidebar');
-                var sidebarOverlay = document.getElementById('sidebarOverlay');
-                var sidebarClose = document.getElementById('sidebarClose');
-
-                function openSidebar() {
-                    if (sidebar) sidebar.classList.add('show');
-                    if (sidebarOverlay) sidebarOverlay.classList.add('show');
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function closeSidebar() {
-                    if (sidebar) sidebar.classList.remove('show');
-                    if (sidebarOverlay) sidebarOverlay.classList.remove('show');
-                    document.body.style.overflow = '';
-                }
-
-                if (sidebarToggle) sidebarToggle.addEventListener('click', openSidebar);
-                if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
-                if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
-
-                // Cerrar sidebar al hacer click en nav-link (mobile)
-                document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
-                    link.addEventListener('click', function() {
-                        if (window.innerWidth < 768) closeSidebar();
-                    });
-                });
-            }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initClientSidebar);
-            } else {
-                initClientSidebar();
-            }
-        })();
-        </script>
-
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-
             @if(session('error'))
-                <div class="alert alert-danger" role="alert">
-                    {{ session('error') }}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             <div class="section-content" id="dashboard-section" style="display: block;">
                 <div class="welcome-section">
-                    <h2>Bienvenido, Cliente!</h2>
-                    <p>Aquí puedes gestionar tus pedidos y explorar nuestros deliciosos productos</p>
+                    <h2>Bienvenido, {{ session('usuario.nombre', 'Cliente') }}</h2>
+                    <p>Resumen de actividad para {{ $totalPedidos }} pedidos registrados.</p>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="card-icon">
-                            <i class="bi bi-cart-check"></i>
-                        </div>
+                        <div class="card-icon"><i class="bi bi-cart-check"></i></div>
                         <div class="card-content">
                             <div class="stat-number">{{ $totalPedidos }}</div>
                             <div class="stat-label">Total Pedidos</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="card-icon">
-                            <i class="bi bi-clock"></i>
-                        </div>
+                        <div class="card-icon"><i class="bi bi-clock"></i></div>
                         <div class="card-content">
                             <div class="stat-number">{{ $pedidosPendientes }}</div>
                             <div class="stat-label">Pendientes</div>
@@ -210,100 +174,142 @@
                     </div>
                 </div>
 
-              <div class="orders-section">
-    <div class="section-header mb-4">
-        <h4><i class="bi bi-receipt"></i> Pedidos Recientes</h4>
-    </div>
-
-    @if($totalPedidos > 0)
-        <div class="orders-list">
-            @foreach($pedidosRecientes as $pedido)
-                <div class="order-item shadow-sm mb-3 p-3 border rounded">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="order-info">
-                            <h6 class="fw-bold">Pedido #{{ $pedido['ID_PEDIDO'] ?? $pedido['id_PEDIDO'] ?? 'N/A' }}</h6>
-                            <p class="text-muted small mb-1">
-                                <i class="bi bi-calendar3"></i> {{ formatApiDate($pedido['FECHA_INGRESO'] ?? $pedido['fecha_INGRESO'] ?? null) }}
-                            </p>
-                            <p class="fw-bold mb-0 text-primary">
-                                Total: ${{ number_format($pedido['TOTAL_PRODUCTO'] ?? $pedido['total_PRODUCTO'] ?? 0, 2) }}
-                            </p>
+                <div class="orders-section mt-4">
+                    <h4><i class="bi bi-receipt"></i> Pedidos Recientes</h4>
+                    @forelse($pedidosRecientes as $pedido)
+                        <div class="order-item shadow-sm mb-3 p-3 border rounded bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['idPedido'] ?? $pedido['ID_PEDIDO'] }}</h6>
+                                    <small class="text-muted">{{ formatApiDate($pedido['fecha_INGRESO'] ?? $pedido['fecha_ingreso'] ?? null) }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-primary">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['total_producto'] ?? 0, 0) }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="order-status-badge">
-                            <span class="badge rounded-pill
-                                @if(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 1) bg-warning text-dark
-                                @elseif(($pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 0) == 3) bg-success
-                                @else bg-info @endif">
-                                Estado: {{ $pedido['ID_ESTADO_PEDIDO'] ?? $pedido['id_ESTADO_PEDIDO'] ?? 'Pendiente' }}
-                            </span>
+                    @empty
+                        <div class="text-center py-4 bg-light rounded">
+                            <p class="text-muted mb-0">No hay pedidos recientes.</p>
                         </div>
-                    </div>
+                    @endforelse
                 </div>
-            @endforeach
-        </div>
-    @else
-        {{-- Vista simplificada cuando no hay pedidos --}}
-        <div class="p-4 border rounded bg-light text-center">
-            <p class="text-muted mb-0">No se encontraron pedidos recientes en tu historial.</p>
-        </div>
-    @endif
-</div>
             </div>
 
             <div class="section-content" id="pedidos-section" style="display: none;">
-                <h3 class="mb-4">Todos Mis Pedidos</h3>
-
-                @if($totalPedidos > 0)
+                <h3 class="mb-4">Historial de Pedidos</h3>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover orders-table">
-                        <thead>
+                    <table class="table table-hover bg-white shadow-sm rounded">
+                        <thead class="table-dark">
                             <tr>
-                                <th>ID Pedido</th>
+                                <th>ID</th>
                                 <th>Fecha Ingreso</th>
                                 <th>Total</th>
-                                <th>Estado ID</th>
+                                <th>Estado</th>
                                 <th>Fecha Entrega</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pedidos as $pedido)
-                                <tr>
-                                    <td>#{{ $pedido['id_PEDIDO'] ?? 'N/A' }}</td>
-                                    <td>{{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</td>
-                                    <td>${{ number_format($pedido['total_PRODUCTO'] ?? 0, 2) }}</td>
-                                    <td>
-                                        <span class="badge
-                                            @if(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 1) bg-warning text-dark
-                                            @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 2) bg-info
-                                            @elseif(($pedido['id_ESTADO_PEDIDO'] ?? 0) === 3) bg-success
-                                            @else bg-secondary
-                                            @endif
-                                        ">
-                                            {{ $pedido['id_ESTADO_PEDIDO'] ?? 'N/A' }}
-                                        </span>
-                                    </td>
-                                    <td>{{ formatApiDate($pedido['fecha_ENTREGA'] ?? null) }}</td>
-                                </tr>
+                            @foreach($pedidosCol as $p)
+                            <tr>
+                                <td>#{{ $p['id_PEDIDO'] ?? $p['idPedido'] ?? $p['ID_PEDIDO'] }}</td>
+                                <td>{{ formatApiDate($p['fecha_INGRESO'] ?? $p['fecha_ingreso'] ?? null) }}</td>
+                                <td>${{ number_format($p['total_PRODUCTO'] ?? $p['total_producto'] ?? 0, 0) }}</td>
+                                <td><span class="badge bg-info">Recibido</span></td>
+                                <td>{{ formatApiDate($p['fecha_ENTREGA'] ?? $p['fecha_entrega'] ?? null) }}</td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                @else
-                    <div class="alert alert-info">No tienes pedidos registrados.</div>
-                @endif
             </div>
+
+            <div class="section-content" id="detalles-general-section" style="display: none;">
+                <h3 class="mb-4">Desglose de Productos por Pedido</h3>
+                
+                @forelse($pedidosCol as $pedido)
+                    <div class="card order-card shadow-sm mb-4 border-0">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">
+                                <i class="bi bi-box-seam me-2"></i>Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['idPedido'] ?? $pedido['ID_PEDIDO'] }}
+                            </span>
+                            <span class="badge bg-light text-primary">
+                                {{ formatApiDate($pedido['fecha_INGRESO'] ?? $pedido['fecha_ingreso'] ?? null) }}
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table detail-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Producto</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Precio Unit.</th>
+                                        <th class="text-end pe-4">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php 
+                                        // Extraemos los productos ya procesados por el DashboardController
+                                        $items = collect($pedido['productos'] ?? []); 
+                                    @endphp
+                                    
+                                    @forelse($items as $item)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <i class="bi bi-dot text-primary fs-4"></i>
+                                            {{ $item['nombre'] ?? 'Producto Desconocido' }}
+                                        </td>
+                                        <td class="text-center">{{ $item['cantidad'] ?? 0 }}</td>
+                                        <td class="text-end">${{ number_format($item['precio'] ?? 0, 0) }}</td>
+                                        <td class="text-end pe-4 fw-bold text-primary">
+                                            ${{ number_format($item['subtotal'] ?? 0, 0) }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="bi bi-info-circle empty-state-icon"></i>
+                                            No se encontraron productos detallados para este pedido.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-light text-end pe-4">
+                            <span class="text-muted me-2">Monto Total:</span>
+                            <span class="h5 mb-0 fw-bold text-dark">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['total_producto'] ?? 0, 0) }}</span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <i class="bi bi-info-circle me-2"></i>Aún no tienes pedidos para mostrar.
+                    </div>
+                @endforelse
+            </div>
+
             <div class="section-content" id="mi-cuenta-section" style="display: none;">
-                <div class="account-box">
-                    <h3>Configuración</h3>
-                    <div class="profile-actions">
-                        <a class="action-btn">
-                            <i class="bi bi-phone"></i>
-                            Cambiar Teléfono
-                        </a>
-                        <a class="action-btn">
-                            <i class="bi bi-shield-lock"></i>
-                            Cambiar Contraseña
-                        </a>
+                <div class="card border-0 shadow-sm p-4">
+                    <h3>Mi Perfil</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 5rem; color: #dee2e6;"></i>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="text-muted small d-block">Nombre completo</label>
+                                <span class="h5 text-capitalize">{{ session('usuario.nombre') }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted small d-block">Correo de contacto</label>
+                                <span class="h5">{{ session('usuario.email') }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted small d-block">Tipo de usuario</label>
+                                <span class="badge bg-secondary">CLIENTE REGISTRADO</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -315,69 +321,50 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        if (!AuthManager.isAuthenticated()) {
-            AuthManager.redirectToLogin();
-            return;
-        }
-
-        const userData = AuthManager.getUserData();
-        const userRole = AuthManager.getRole();
-
-        if (userRole !== 'CLIENTE' && userRole !== 'CLIENT') {
-            console.warn('Usuario no autorizado para dashboard cliente');
-            const correctDashboard = AuthManager.getDashboardRoute(userRole);
-            window.location.href = correctDashboard;
-            return;
-        }
-
-        console.log('Dashboard Cliente - Usuario autenticado:', userData);
-
-        // Navegación por secciones (hash)
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');
-        const navLinkTriggers = document.querySelectorAll('.nav-link-trigger');
 
         function showSection(sectionId) {
             sections.forEach(s => s.style.display = 'none');
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.style.display = 'block';
+            const target = document.getElementById(sectionId + '-section');
+            if (target) {
+                target.style.display = 'block';
+                // Animación simple de entrada
+                target.style.opacity = 0;
+                setTimeout(() => { target.style.opacity = 1; target.style.transition = 'opacity 0.3s'; }, 10);
             }
         }
 
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
-                if (href && href.startsWith('#')) {
-                    e.preventDefault();
-
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-
-                    const sectionId = href.substring(1) + '-section';
-                    showSection(sectionId);
+                if(!href || !href.startsWith('#')) return;
+                
+                e.preventDefault();
+                const sectionName = this.getAttribute('data-section');
+                
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                showSection(sectionName);
+                
+                // Cerrar sidebar en dispositivos móviles tras click
+                if(window.innerWidth < 768) {
+                    document.querySelector('.sidebar').classList.remove('show');
+                    document.getElementById('sidebarOverlay').classList.remove('show');
                 }
             });
         });
 
-        navLinkTriggers.forEach(trigger => {
-            trigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetSection = this.getAttribute('data-section');
-                const sectionId = targetSection + '-section';
+        // Lógica de apertura/cierre de Sidebar
+        const toggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const close = document.getElementById('sidebarClose');
 
-                navLinks.forEach(l => {
-                    l.classList.remove('active');
-                    if (l.getAttribute('data-section') === targetSection) {
-                        l.classList.add('active');
-                    }
-                });
-
-                showSection(sectionId);
-            });
-        });
-
-        showSection('dashboard-section');
+        if(toggle) toggle.addEventListener('click', () => { sidebar.classList.add('show'); overlay.classList.add('show'); });
+        if(overlay) overlay.addEventListener('click', () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); });
+        if(close) close.addEventListener('click', () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); });
     });
 </script>
 @endpush

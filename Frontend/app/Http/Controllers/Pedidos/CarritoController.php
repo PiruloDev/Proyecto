@@ -219,35 +219,49 @@ class CarritoController extends Controller
         ], 400);
     }
 
-    // 1. VERIFICACIÓN CRÍTICA: ¿Hay un usuario logueado?
     $clienteId = session('usuario.id'); 
 
     if (!$clienteId) {
         return response()->json([
             'success' => false,
-            'message' => 'Sesión no válida. Por favor, inicie sesión nuevamente para comprar.'
-        ], 401); // 401 es Unauthorized
+            'message' => 'Sesión no válida. Por favor, inicie sesión nuevamente.'
+        ], 401);
     }
 
     try {
-        $totalGeneral = array_reduce($carrito, function ($sum, $item) {
-            return $sum + ($item['precio'] * $item['cantidad']);
-        }, 0);
+        // 1. Calculamos el total y ARMAMOS LA LISTA DE DETALLES
+        $detallesParaJava = [];
+        $totalGeneral = 0;
 
-        // 2. PAYLOAD: Aseguramos que las llaves coincidan con el Modelo de Java
+        foreach ($carrito as $item) {
+            $subtotal = (float)$item['precio'] * (int)$item['cantidad'];
+            $totalGeneral += $subtotal;
+
+            // Formato exacto que espera tu servicio Java
+            $detallesParaJava[] = [
+                'idProducto'       => (int) $item['id'],
+                'cantidadProducto' => (int) $item['cantidad'],
+                'precioUnitario'   => (float) $item['precio'],
+                'subtotal'         => (float) $subtotal
+            ];
+        }
+
+        // 2. PAYLOAD COMPLETO: Ahora incluimos la llave 'detalles'
         $payload = [
-    'cliente_id'       => (int) $clienteId, 
-    'empleado_id'      => 1, 
-    'estado_pedido_id' => 1, 
-    'total_producto'   => (float) $totalGeneral 
-];
+            'cliente_id'       => (int) $clienteId, 
+            'empleado_id'      => 1, 
+            'estado_pedido_id' => 1, 
+            'total_producto'   => (float) $totalGeneral,
+            'detalles'         => $detallesParaJava // <--- ¡ESTO ES LO QUE FALTABA!
+        ];
 
-        Log::info('Enviando pedido a API Java:', $payload);
+        Log::info('Enviando pedido COMPLETO a API Java:', $payload);
 
-        // 3. LLAMADA AL SERVICIO: Usamos el que acabas de arreglar
-        $response = $this->pedidosApiService->crearPedidoCheckout($payload);
+        // 3. LLAMADA AL SERVICIO
+        // Nota: Asegúrate de usar 'crearPedido' o el método que soporte el objeto completo
+        $response = $this->pedidosApiService->crearPedido($payload);
 
-        // 4. LIMPIEZA: Solo si la API respondió bien
+        // 4. LIMPIEZA
         session()->forget('carrito');
 
         return response()->json([

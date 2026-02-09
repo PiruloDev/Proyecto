@@ -47,39 +47,53 @@ class PedidosController extends Controller
 
    public function store(Request $request)
 {
+    // 1. Validación de los datos del encabezado
     $request->validate([
         'ID_CLIENTE' => 'required|integer',
         'ID_EMPLEADO' => 'required|integer',
         'ID_ESTADO_PEDIDO' => 'required|integer',
         'TOTAL_PRODUCTO' => 'required|numeric',
-        'FECHA_ENTREGA' => 'nullable|date', 
     ]);
 
-    // 1. Forzamos la fecha de ingreso con hora actual para Java
-    $fechaIngreso = now()->format('Y-m-d H:i:s');
+    // 2. EXTRAER EL CARRITO DE LA SESIÓN
+    $carrito = session('carrito', []);
+    $detallesApi = [];
 
-    // 2. Si hay fecha de entrega, le añadimos hora (final del día)
-    $fechaEntrega = $request->input('FECHA_ENTREGA');
-    if ($fechaEntrega && strlen($fechaEntrega) == 10) {
-        $fechaEntrega .= ' 23:59:59';
+    // Convertimos cada ítem del carrito al formato que Java espera
+    foreach ($carrito as $item) {
+        $detallesApi[] = [
+            'idProducto'       => (int)$item['id'],
+            'cantidadProducto' => (int)$item['cantidad'],
+            'precioUnitario'   => (float)$item['precio'],
+            'subtotal'         => (float)($item['precio'] * $item['cantidad'])
+        ];
     }
 
+    // 3. Construir el paquete completo para Java
     $dataApi = [
-        'cliente_id' => $request->input('ID_CLIENTE'), 
-        'empleado_id' => $request->input('ID_EMPLEADO'),
-        'estado_pedido_id' => $request->input('ID_ESTADO_PEDIDO'),
-        'total_producto' => $request->input('TOTAL_PRODUCTO'),
-        'fecha_ingreso' => $fechaIngreso, // Enviamos la hora exacta
-        'fecha_entrega' => $fechaEntrega ?: null, 
+        'cliente_id'       => (int)$request->input('ID_CLIENTE'), 
+        'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
+        'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
+        'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
+        'fecha_ingreso'    => now()->format('Y-m-d H:i:s'),
+        'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
+        'detalles'         => $detallesApi, // <--- ¡AQUÍ VAN LOS PRODUCTOS!
     ];
+
+    // LOG DE CONTROL: Para que verifiques en tu consola si ahora sí se van los detalles
+    \Log::info("Enviando pedido a API Java con detalles: ", $dataApi);
 
     try {
         $this->apiService->crearPedido($dataApi); 
 
+        // Si se creó con éxito, limpiamos el carrito
+        session()->forget('carrito');
+
         $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
-        return redirect()->route($route)->with('success', 'Pedido creado correctamente.');
+        return redirect()->route($route)->with('success', 'Pedido creado exitosamente con sus productos.');
 
     } catch (Exception $e) {
+        \Log::error("Error en API Java: " . $e->getMessage());
         return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
     }
 }

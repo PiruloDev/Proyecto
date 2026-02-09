@@ -119,4 +119,15 @@ class PedidosApiService
             throw new Exception("Error al obtener los pedidos del cliente {$clienteId} de la API.");
         }
     }
+
+    protected $detallesUrl = 'http://localhost:8080/detalles-pedidos'; // URL de tu nuevo Controller en Java
+
+public function obtenerTodosLosDetalles()
+{
+    try {
+        return Http::get($this->detallesUrl)->throw()->json();
+    } catch (Exception $e) {
+        throw new Exception("Error al obtener los detalles de pedidos.");
+    }
+}
 }

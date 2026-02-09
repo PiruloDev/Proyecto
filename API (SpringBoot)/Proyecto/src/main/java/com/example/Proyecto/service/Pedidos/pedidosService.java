@@ -1,14 +1,16 @@
 package com.example.Proyecto.service.Pedidos;
 
 import com.example.Proyecto.model.Pedidos;
+import com.example.Proyecto.service.DetallePedidos.DetallePedidos;
+import com.example.Proyecto.service.DetallePedidos.DetallePedidosService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.*;
 import java.util.List;
@@ -19,8 +21,12 @@ public class pedidosService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // 1. Inyectamos el servicio de detalles para poder guardar los productos del carrito
+    @Autowired
+    private DetallePedidosService detallePedidosService;
+
     /* =====================================================
-       VALIDAR EXISTENCIA (Asegúrate que la tabla sea 'clientes')
+       VALIDAR EXISTENCIA
        ===================================================== */
     private boolean clienteExiste(long idCliente) {
         try {
@@ -42,7 +48,6 @@ public class pedidosService {
         pedido.setID_EMPLEADO(rs.getLong("ID_EMPLEADO"));
         pedido.setID_ESTADO_PEDIDO(rs.getLong("ID_ESTADO_PEDIDO"));
 
-        // Estos son los nombres que ya logramos que funcionaran
         pedido.setNombreCliente(rs.getString("CLI_NOMBRE"));
         pedido.setNombreEmpleado(rs.getString("EMP_NOMBRE"));
         pedido.setNombreEstado(rs.getString("EST_NOMBRE"));
@@ -56,9 +61,6 @@ public class pedidosService {
         return pedido;
     };
 
-    /* =========================
-       SQL DE CONSULTA
-       ========================= */
     private final String SQL_SELECT_CON_NOMBRES =
             "SELECT p.*, c.NOMBRE_CLI AS CLI_NOMBRE, e.NOMBRE_EMPLEADO AS EMP_NOMBRE, s.NOMBRE_ESTADO AS EST_NOMBRE " +
                     "FROM pedidos p " +
@@ -82,28 +84,28 @@ public class pedidosService {
         return jdbcTemplate.query(SQL_SELECT_CON_NOMBRES + " WHERE p.ID_CLIENTE = ?", pedidoRowMapper, clienteId);
     }
 
-    /* =========================
-       CREAR PEDIDO (REVISADO)
-       ========================= */
+    /* =====================================================
+       2. CREAR PEDIDO (CON GUARDADO DE DETALLES AUTOMÁTICO)
+       ===================================================== */
+    @Transactional
     public int crearPedido(Pedidos pedido) {
-        // Si la validación falla, revisa si el ID del cliente que envías desde Laravel existe en la DB
+        // Validación de cliente
         if (!clienteExiste(pedido.getID_CLIENTE())) {
             throw new RuntimeException("Error: El cliente con ID " + pedido.getID_CLIENTE() + " no existe.");
         }
 
-        // Usamos minúsculas 'pedidos' para evitar errores de case-sensitivity en Linux/Windows
         String sql = "INSERT INTO pedidos (ID_CLIENTE, ID_EMPLEADO, ID_ESTADO_PEDIDO, FECHA_INGRESO, FECHA_ENTREGA, TOTAL_PRODUCTO) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
+        // A. Insertamos el encabezado del pedido
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, pedido.getID_CLIENTE());
             ps.setLong(2, pedido.getID_EMPLEADO());
             ps.setLong(3, pedido.getID_ESTADO_PEDIDO());
 
-            // Fecha de ingreso automática si viene nula
             Timestamp fechaIn = (pedido.getFECHA_INGRESO() != null)
                     ? Timestamp.valueOf(pedido.getFECHA_INGRESO())
                     : new Timestamp(System.currentTimeMillis());
@@ -119,12 +121,20 @@ public class pedidosService {
             return ps;
         }, keyHolder);
 
-        return (keyHolder.getKey() != null) ? keyHolder.getKey().intValue() : 0;
+        // B. Obtenemos el ID generado (ej: el 99)
+        int idPedidoGenerado = (keyHolder.getKey() != null) ? keyHolder.getKey().intValue() : 0;
+
+        // C. NUEVO: Si el pedido se creó, guardamos sus productos automáticamente
+        if (idPedidoGenerado > 0 && pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
+            for (DetallePedidos detalle : pedido.getDetalles()) {
+                detalle.setIdPedido(idPedidoGenerado); // Vinculamos cada producto al ID del pedido
+                detallePedidosService.crearDetallePedido(detalle); // Guardamos en detalle_pedidos
+            }
+        }
+
+        return idPedidoGenerado;
     }
 
-    /* =========================
-       ACTUALIZAR Y ELIMINAR
-       ========================= */
     public void actualizarPedido(Long id, Pedidos nuevosDatos) {
         String sql = "UPDATE pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, FECHA_ENTREGA = ?, TOTAL_PRODUCTO = ? WHERE ID_PEDIDO = ?";
         jdbcTemplate.update(sql, nuevosDatos.getID_CLIENTE(), nuevosDatos.getID_EMPLEADO(), nuevosDatos.getID_ESTADO_PEDIDO(),

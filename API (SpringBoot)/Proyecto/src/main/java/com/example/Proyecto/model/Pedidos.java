@@ -1,18 +1,20 @@
 package com.example.Proyecto.model;
 
+import com.example.Proyecto.service.DetallePedidos.DetallePedidos;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Pedidos {
 
     private int ID_PEDIDO;
 
-    // IDs de referencia (Mapeados para Laravel)
+    // IDs de referencia (Mapeados para recibir datos de Laravel)
     @JsonProperty("cliente_id")
     private long ID_CLIENTE;
 
@@ -34,7 +36,7 @@ public class Pedidos {
 
     // --- MANEJO DE FECHAS (FORMATO FLEXIBLE) ---
     @JsonProperty("fecha_ingreso")
-    @JsonFormat(pattern = "yyyy-MM-dd[ HH:mm:ss]") // [ ] hace que la hora sea opcional
+    @JsonFormat(pattern = "yyyy-MM-dd[ HH:mm:ss]")
     private LocalDateTime FECHA_INGRESO;
 
     @JsonProperty("fecha_entrega")
@@ -43,6 +45,10 @@ public class Pedidos {
 
     @JsonProperty("total_producto")
     private BigDecimal TOTAL_PRODUCTO;
+
+    // --- RELACIÓN CON DETALLES (Agregado para guardado automático) ---
+    @JsonProperty("detalles")
+    private List<DetallePedidos> detalles;
 
     // --- CONSTRUCTOR VACÍO ---
     public Pedidos() {}
@@ -61,7 +67,6 @@ public class Pedidos {
     public long getID_ESTADO_PEDIDO() { return ID_ESTADO_PEDIDO; }
     public void setID_ESTADO_PEDIDO(long ID_ESTADO_PEDIDO) { this.ID_ESTADO_PEDIDO = ID_ESTADO_PEDIDO; }
 
-    // Getters y Setters de los nombres (Para el JOIN de la base de datos)
     public String getNombreCliente() { return nombreCliente; }
     public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
 
@@ -79,4 +84,8 @@ public class Pedidos {
 
     public BigDecimal getTOTAL_PRODUCTO() { return TOTAL_PRODUCTO; }
     public void setTOTAL_PRODUCTO(BigDecimal TOTAL_PRODUCTO) { this.TOTAL_PRODUCTO = TOTAL_PRODUCTO; }
+
+    // Getters y Setters de la lista de detalles
+    public List<DetallePedidos> getDetalles() { return detalles; }
+    public void setDetalles(List<DetallePedidos> detalles) { this.detalles = detalles; }
 }
