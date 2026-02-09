@@ -26,10 +26,10 @@
 @section('content')
 @include('partials.navbar')
 
-<!-- Sección de Productos por Categorías -->
+
 <section class="py-5">
     <div class="container">
-        <!-- Barra de Búsqueda -->
+        
         <div class="row mb-5 justify-content-center">
             <div class="col-lg-8">
                 <div class="search-container text-center">
@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <!-- Contenedor de Productos -->
+       
 <div class="row" id="product-container">
     @forelse($productos ?? [] as $producto)
         <div class="col-lg-4 col-md-6 mb-4 product-card-item"
@@ -53,27 +53,27 @@
             <div class="product-card card h-100 shadow-sm border-0 card-hover">
                 <div class="card-img-container position-relative">
                     @php
-                        // Intentar obtener la imagen del producto de varias formas
+                       
                         $imagenProducto = null;
 
-                        // Prioridad 1: Campo 'imagen' o 'IMAGEN' del producto
+                        
                         if (isset($producto->imagen) && !empty($producto->imagen)) {
                             $imagenProducto = $producto->imagen;
                         } elseif (isset($producto->IMAGEN) && !empty($producto->IMAGEN)) {
                             $imagenProducto = $producto->IMAGEN;
                         }
-                        // Prioridad 2: Campo 'IMAGEN_PRODUCTO' o 'imagen_producto'
+                        
                         elseif (isset($producto->IMAGEN_PRODUCTO) && !empty($producto->IMAGEN_PRODUCTO)) {
                             $imagenProducto = $producto->IMAGEN_PRODUCTO;
                         } elseif (isset($producto->imagen_producto) && !empty($producto->imagen_producto)) {
                             $imagenProducto = $producto->imagen_producto;
                         }
-                        // Prioridad 3: Usar imagen por defecto basada en categoría o nombre
+                        
                         else {
-                            $imagenProducto = 'jugo.jpg'; // Imagen por defecto
+                            $imagenProducto = 'jugo.jpg'; 
                         }
 
-                        // Construir la ruta completa de la imagen
+                        
                         $rutaImagen = asset('images/' . $imagenProducto);
                         $imagenDefault = asset('images/jugo.jpg');
                     @endphp
@@ -146,7 +146,6 @@
     </div>
 </section>
 
-<!-- Sección de Llamada a la Acción -->
 <section class="py-5 bg-success text-white text-center">
     <div class="container">
         <div class="row justify-content-center text-center">
@@ -175,14 +174,13 @@
 @include('partials.auth-scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-/* Estilo simple para manejar la ocultación en la búsqueda */
+
 .product-card-item.hidden {display: none;}
 </style>
 <script>
-    // Función centralizada para manejar la adición al carrito
+    
     async function agregarProductoAlCarrito(idProducto, nombreProducto) {
         try {
-            // 1. Iniciar la llamada API para agregar a la sesión de Laravel
             const response = await fetch(`/api/carrito/agregar/${idProducto}`, {
                 method: "POST",
                 headers: {
@@ -191,52 +189,51 @@
                 }
             });
 
-            // 2. Intentar parsear la respuesta JSON (puede fallar si hay errores de red o servidor)
             const data = await response.json();
 
             if (data.success) {
-                // Éxito: Muestra una notificación rápida (Toast)
-                Swal.fire({
+
+            Swal.fire({
                     icon: 'success',
-                    title: '¡Producto Agregado!',
-                    text: `${nombreProducto} ha sido añadido al carrito. Redirigiendo...`,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
+                    title: '¡Añadido al pedido!',
+                    text: `Has agregado "${nombreProducto}" con éxito.`,
+                    showCancelButton: true,
+                    confirmButtonColor: '#bb9467', 
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-shopping-cart"></i> Ir al carrito',
+                    cancelButtonText: 'Seguir comprando',
+                    reverseButtons: true
+                }).then((result) => {
+                    
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('carrito.index') }}";
+                    }
+                   
                 });
 
-                // 3. Redirección CORREGIDA: Apunta a la vista del carrito (ruta index del CarritoController)
-                setTimeout(() => {
-                    // CAMBIAR 'nombre-ruta-del-carrito' por la ruta real que apunta a CarritoController@index
-                    window.location.href = "{{ route('carrito.index') }}";
-                }, 1500);
-
             } else {
-                // Manejo de errores de la API (ej: producto no encontrado, error de conexión al backend de Java, etc.)
                 Swal.fire({
                     icon: 'error',
                     title: 'Error al agregar',
-                    text: data.message || 'Ocurrió un error desconocido al agregar el producto.',
+                    text: data.message || 'Ocurrió un error al intentar agregar el producto.',
                     confirmButtonColor: '#bb9467',
                 });
             }
         } catch (error) {
-            // Error de red
-            console.error('Error de red al agregar producto:', error);
+            console.error('Error de red:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error de Conexión',
-                text: 'No se pudo contactar con el servidor. Verifica tu backend y conexión.',
+                text: 'No se pudo contactar con el servidor.',
                 confirmButtonColor: '#bb9467',
             });
         }
+    
     }
 
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Lógica de búsqueda (sin cambios)
+       
         const searchInput = document.getElementById('productSearchInput');
         const productContainer = document.getElementById('product-container');
         const productCards = productContainer.getElementsByClassName('product-card-item');
@@ -254,14 +251,12 @@
             }
         });
 
-        // Event listener para el botón "Agregar pedido" (sin cambios, llama a la función corregida)
         const addToCartButtons = document.querySelectorAll('.btn-agregar-pedido');
         addToCartButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const productId = this.dataset.productoId;
                 const productName = this.dataset.productoNombre;
 
-                // Llama a la función que ahora agrega y redirige al carrito
                 agregarProductoAlCarrito(productId, productName);
             });
         });

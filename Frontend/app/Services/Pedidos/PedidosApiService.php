@@ -98,7 +98,7 @@ class PedidosApiService
             'Accept' => 'application/json',
         ])
         ->asJson() 
-        ->post($this->baseUrl, $payload) // Enviamos el payload con cliente_id, etc.
+        ->post($this->baseUrl, $payload) 
         ->throw()
         ->json();
     } catch (\Exception $e) {
@@ -125,9 +125,9 @@ class PedidosApiService
 public function obtenerTodosLosDetalles()
 {
     try {
-        return Http::get($this->detallesUrl)->throw()->json();
-    } catch (Exception $e) {
-        throw new Exception("Error al obtener los detalles de pedidos.");
-    }
+        $data = Http::get($this->detallesUrl)->throw()->json();
+        \Log::info("Detalles desde API Java:", $data); // Esto te dirá exactamente cómo se llaman las llaves
+        return $data;
+    } catch (Exception $e) { }
 }
 }
