@@ -6,7 +6,7 @@
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
 <style>
-    
+    /* Mantenimiento exacto de tu diseño original */
     .sidebar {
         display: flex;
         flex-direction: column;
@@ -46,7 +46,6 @@
         color: #ffffff !important;
     }
 
-    /* 2. Diseño de Precios y Tarjetas */
     .order-item-header {
         display: flex;
         justify-content: space-between;
@@ -80,19 +79,32 @@
 @php
     $pedidosCol = collect($pedidos ?? []);
     $totalPedidos = $pedidosCol->count();
+    
     $pedidosPendientes = $pedidosCol->filter(function($p) {
-        $estadoId = $p['ID_ESTADO_PEDIDO'] ?? $p['id_ESTADO_PEDIDO'] ?? 0;
+        $estadoId = $p['id_estado_pedido'] ?? $p['ID_ESTADO_PEDIDO'] ?? 0;
         return (int)$estadoId === 1;
     })->count();
 
     $pedidosRecientes = $pedidosCol->take(5);
 
-    if (!function_exists('formatApiDate')) {
-        function formatApiDate($dateString) {
-            if (empty($dateString) || $dateString == 'N/A') return 'Pendiente';
-            try {
-                return \Carbon\Carbon::parse($dateString)->format('d/m/Y h:i A');
-            } catch (\Exception $e) { return $dateString; }
+    /**
+     * FUNCIÓN DE FECHA COMPATIBLE CON DASHBOARD EMPLEADO
+     * Busca claves en mayúsculas y minúsculas y maneja nulos de la API
+     */
+    if (!function_exists('safeFormatDate')) {
+        function safeFormatDate($pedido, $posiblesClaves) {
+            foreach ($posiblesClaves as $clave) {
+                $valor = $pedido[$clave] ?? null;
+                
+                if (!empty($valor) && $valor !== 'N/A' && $valor !== 'null') {
+                    try {
+                        return \Carbon\Carbon::parse($valor)->format('d/m/Y h:i A');
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+            }
+            return 'Pendiente';
         }
     }
 @endphp
@@ -161,6 +173,7 @@
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             
+            {{-- SECCIÓN INICIO --}}
             <div class="section-content" id="dashboard-section" style="display: block;">
                 <div class="welcome-section">
                     <h2>Bienvenido, {{ session('usuario.nombre', 'Cliente') }}</h2>
@@ -191,9 +204,9 @@
                             <div class="order-item-header">
                                 <div>
                                     <h6 class="fw-bold mb-0">Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['ID_PEDIDO'] }}</h6>
-                                    <small class="text-muted">{{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</small>
+                                    <small class="text-muted">{{ safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO', 'fecha_ingreso']) }}</small>
                                 </div>
-                                <div class="price-badge">${{ number_format($pedido['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</div>
+                                <div class="price-badge">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</div>
                             </div>
                         </div>
                     @empty
@@ -202,6 +215,7 @@
                 </div>
             </div>
 
+            {{-- SECCIÓN MIS PEDIDOS --}}
             <div class="section-content" id="pedidos-section" style="display: none;">
                 <h3 class="mb-4">Historial de Pedidos</h3>
                 <div class="table-responsive">
@@ -219,10 +233,23 @@
                             @foreach($pedidosCol as $p)
                             <tr>
                                 <td>#{{ $p['id_PEDIDO'] ?? $p['ID_PEDIDO'] }}</td>
-                                <td>{{ formatApiDate($p['fecha_INGRESO'] ?? null) }}</td>
-                                <td class="fw-bold">${{ number_format($p['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
-                                <td><span class="badge bg-info">Recibido</span></td>
-                                <td>{{ formatApiDate($p['fecha_ENTREGA'] ?? null) }}</td>
+                                <td>{{ safeFormatDate($p, ['fecha_INGRESO', 'FECHA_INGRESO', 'fecha_ingreso']) }}</td>
+                                <td class="fw-bold">${{ number_format($p['total_PRODUCTO'] ?? $p['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
+                                <td>
+                                    @php
+                                        $idEstado = (int)($p['id_estado_pedido'] ?? $p['ID_ESTADO_PEDIDO'] ?? 1);
+                                        $badgeColor = match($idEstado) {
+                                            1 => 'bg-info', 2 => 'bg-warning', 3 => 'bg-success', default => 'bg-secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $badgeColor }}">
+                                        {{ $p['nombre_estado'] ?? $p['NOMBRE_ESTADO'] ?? 'Recibido' }}
+                                    </span>
+                                </td>
+                                {{-- IMPLEMENTACIÓN CORREGIDA DE FECHA DE ENTREGA --}}
+                                <td class="fw-bold text-primary">
+                                    {{ safeFormatDate($p, ['fecha_ENTREGA', 'FECHA_ENTREGA', 'fecha_entrega']) }}
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -230,13 +257,14 @@
                 </div>
             </div>
 
+            {{-- SECCIÓN DETALLES --}}
             <div class="section-content" id="detalles-general-section" style="display: none;">
                 <h3 class="mb-4">Detalle de Productos por Pedido</h3>
                 @foreach($pedidosCol as $pedido)
                     <div class="card order-card shadow-sm mb-4 border-0">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between">
+                        <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #a67c52;">
                             <span class="fw-bold"><i class="bi bi-box-seam me-2"></i>Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['ID_PEDIDO'] }}</span>
-                            <span>{{ formatApiDate($pedido['fecha_INGRESO'] ?? null) }}</span>
+                            <span>Ingreso: {{ safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO']) }}</span>
                         </div>
                         <div class="card-body p-0">
                             <table class="table detail-table mb-0">
@@ -249,26 +277,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $items = collect($pedido['productos'] ?? []); @endphp
+                                    @php $items = collect($pedido['productos'] ?? $pedido['PRODUCTOS'] ?? []); @endphp
                                     @foreach($items as $item)
                                     <tr>
-                                        <td class="ps-4"><i class="bi bi-dot text-primary fs-4"></i>{{ $item['nombre'] }}</td>
-                                        <td class="text-center">{{ $item['cantidad'] }}</td>
-                                        <td class="text-end">${{ number_format($item['precio'], 0, ',', '.') }}</td>
-                                        <td class="text-end pe-4 fw-bold text-primary">${{ number_format($item['subtotal'], 0, ',', '.') }}</td>
+                                        <td class="ps-4"><i class="bi bi-dot fs-4" style="color: #a67c52;"></i>{{ $item['nombre'] ?? $item['NOMBRE'] }}</td>
+                                        <td class="text-center">{{ $item['cantidad'] ?? $item['CANTIDAD'] }}</td>
+                                        <td class="text-end text-muted">${{ number_format($item['precio'] ?? $item['PRECIO'] ?? 0, 0, ',', '.') }}</td>
+                                        <td class="text-end pe-4 fw-bold" style="color: #a67c52;">${{ number_format($item['subtotal'] ?? $item['SUBTOTAL'] ?? 0, 0, ',', '.') }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer bg-light text-end pe-4">
-                            <span class="text-muted me-2">Monto Total:</span>
-                            <span class="h5 mb-0 fw-bold">${{ number_format($pedido['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</span>
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center px-4">
+                            <span class="text-muted small">Entrega: {{ safeFormatDate($pedido, ['fecha_ENTREGA', 'FECHA_ENTREGA']) }}</span>
+                            <div>
+                                <span class="text-muted me-2">Monto Total:</span>
+                                <span class="h5 mb-0 fw-bold">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
+            {{-- SECCIÓN PERFIL --}}
             <div class="section-content" id="mi-cuenta-section" style="display: none;">
                 <div class="card border-0 shadow-sm p-4">
                     <h3>Mi Perfil</h3>
@@ -321,7 +353,6 @@
             });
         });
 
-       
         const toggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('sidebarOverlay');
