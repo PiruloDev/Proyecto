@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+
 @section('title', 'Dashboard Empleado - Panadería')
 
 @push('styles')
@@ -163,11 +164,11 @@
 
                     const sectionId = href.substring(1) + '-section';
                     const targetSection = document.getElementById(sectionId);
-                    
+
                     // Mostramos el dashboard solo si es la raíz o si no hay sección específica
                     const dashboardMain = document.querySelector('.orders-section');
                     const statsMain = document.querySelector('.row.g-3.mb-4');
-                    
+
                     if (href === '#inicio') {
                         dashboardMain.style.display = 'block';
                         statsMain.style.display = 'flex';

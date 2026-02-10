@@ -18,5 +18,9 @@
         "titleBar.inactiveBackground": "#1857a499",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#1857a4"
+    "peacock.color": "#1857a4",
+    "sonarlint.connectedMode.project": {
+        "connectionId": "ProyectoP&C",
+        "projectKey": "d19c5a5c72dc3d2b5edc26409e83bd5cc8dd3d56"
+    }
 }

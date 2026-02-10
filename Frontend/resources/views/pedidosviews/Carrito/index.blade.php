@@ -21,7 +21,7 @@
             </thead>
             <tbody id="tbodyCarrito">
                 <tr>
-                    <td colspan="6" class="text-center">Cargando...</td> 
+                    <td colspan="6" class="text-center">Cargando...</td>
                 </tr>
             </tbody>
         </table>
@@ -41,20 +41,20 @@
 @endsection
 
 {{-- CORRECTO: Usar @push('scripts') --}}
-@push('scripts') 
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     console.log('--- 1. Script Carrito Iniciado ---');
 
     const CSRF_TOKEN = '{{ csrf_token() }}';
-    
+
 // ==========================
 // CARGAR CARRITO (GET)
 // ==========================
 async function cargarCarrito() {
     try {
         const res = await fetch("/api/carrito");
-        
+
         if (!res.ok) {
             const errorText = await res.text();
             console.error('Error del servidor al cargar:', errorText);
@@ -65,9 +65,9 @@ async function cargarCarrito() {
         const items = data.items;
 
         const tbody = document.getElementById("tbodyCarrito");
-        tbody.innerHTML = ""; 
+        tbody.innerHTML = "";
 
-        if (items.length === 0) { 
+        if (items.length === 0){
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center">¡El carrito está vacío!</td>
@@ -77,12 +77,12 @@ async function cargarCarrito() {
         }
 
         // --- Rellenar Tabla ---
-        items.forEach(item => { 
+        items.forEach(item => {
             tbody.innerHTML += `
                 <tr id="fila-${item.id}">
                     <td>${item.id}</td>
                     <td>${item.producto}</td>
-                    <td>$${item.precio}</td> 
+                    <td>$${item.precio}</td>
                     <td>
                         <div class="input-group input-group-sm">
                             <button class="btn btn-sm btn-secondary" onclick="actualizarCantidad(${item.id}, ${item.cantidad - 1})">-</button>
@@ -90,7 +90,7 @@ async function cargarCarrito() {
                             <button class="btn btn-sm btn-primary" onclick="actualizarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
                         </div>
                     </td>
-                    <td>$${item.subtotal}</td> 
+                    <td>$${item.subtotal}</td>
                     <td>
                         {{-- 🔥 LLAMADA CORREGIDA: Ahora llama a la función JS remover() --}}
                         <button class="btn btn-sm btn-danger" onclick="remover(${item.id})">
@@ -118,25 +118,25 @@ async function cargarCarrito() {
 async function actualizarCantidad(id, cantidad) {
     if (cantidad < 0) {
         // Esto previene que se envíe cantidad negativa si el controlador no lo valida.
-        return; 
+        return;
     }
 
     try {
         const res = await fetch("/api/carrito/actualizar", {
-            method: "POST", 
-            headers: { 
-                "Content-Type": "application/json", 
-                "X-CSRF-TOKEN": CSRF_TOKEN 
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": CSRF_TOKEN
             },
-            body: JSON.stringify({ 
-                id: id, 
-                cantidad: cantidad, 
-                _method: 'PATCH' 
-            }) 
+            body: JSON.stringify({
+                id: id,
+                cantidad: cantidad,
+                _method: 'PATCH'
+            })
         });
 
         const data = await res.json();
-        
+
         // Si el controlador nos devuelve éxito, recargamos la tabla
         if (data.success) {
             // El controlador ya maneja la eliminación si cantidad es 0.
@@ -167,7 +167,7 @@ async function remover(id) {
         if (!confirmResult.isConfirmed) return;
 
         // 🔥 CORRECCIÓN: Usamos el endpoint PATCH con cantidad 0, que ya funciona
-        actualizarCantidad(id, 0); 
+        actualizarCantidad(id, 0);
 
     } catch (error) {
         console.error('Error al solicitar la eliminación:', error);
@@ -187,17 +187,18 @@ async function checkout() {
             Swal.showLoading();
         }
     });
-    
+
     try {
-        const res = await fetch("/api/carrito/checkout", { 
+        const res = await fetch("/api/carrito/checkout", {
             method: "POST",
             headers: { "X-CSRF-TOKEN": CSRF_TOKEN }
         });
-        
+
         const data = await res.json();
         if (data.success) {
             Swal.fire('¡Pedido Exitoso!', data.message, 'success');
-            cargarCarrito(); 
+            cargarCarrito();
+
         } else {
             Swal.fire('Error al Finalizar', data.message, 'error');
         }

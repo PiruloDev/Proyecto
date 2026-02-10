@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userRole !== 'ADMIN' && userRole !== 'ADMINISTRADOR') {
         alert('No tienes permisos para acceder a esta página');
         const correctDashboard = AuthManager.getDashboardRoute(userRole);
-        window.location.href = correctDashboard;
+        globalThis.location.href = correctDashboard;
         return;
     }
 

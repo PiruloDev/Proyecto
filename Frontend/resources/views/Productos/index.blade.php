@@ -374,13 +374,13 @@
 
     function filtrarProductos() {
         const busqueda = (document.getElementById('buscarProducto').value || '').toLowerCase();
-        const categoriaFiltro = document.getElementById('filtroCategoria').value; 
+        const categoriaFiltro = document.getElementById('filtroCategoria').value;
         const estado = document.getElementById('filtroEstado').value;
 
         const filas = document.querySelectorAll('#tablaProductos tr[data-id]');
         filas.forEach(fila => {
             const nombre = (fila.getAttribute('data-nombre') || '').toLowerCase();
-            const categoriaIdProducto = fila.getAttribute('data-categoria') || ''; 
+            const categoriaIdProducto = fila.getAttribute('data-categoria') || '';
             const estadoProducto = fila.getAttribute('data-estado') || '';
 
             const cumpleBusqueda = nombre.includes(busqueda);
@@ -394,7 +394,7 @@
     function limpiarFormulario() {
         const form = document.getElementById('formProducto');
         if (form) form.reset();
-        
+
         // Restaura el action y method a POST
         document.getElementById('methodField').value = 'POST';
         document.getElementById('formProducto').action = '{{ route("productos.store") }}';
@@ -406,7 +406,7 @@
     function editarProducto(producto) {
         console.log('=== EDITANDO PRODUCTO ===');
         console.log('Producto recibido:', producto);
-        
+
         // Extraer datos del producto (funciona con ambos formatos)
         const id = producto['Id Producto:'] ?? producto.ID_PRODUCTO ?? '';
         const nombre = producto['Nombre Producto:'] ?? producto.NOMBRE_PRODUCTO ?? '';
@@ -415,7 +415,7 @@
         const descripcion = producto['Descripcion Producto:'] ?? producto.DESCRIPCION_PRODUCTO ?? '';
         const marca = producto['Marca Producto:'] ?? producto.TIPO_PRODUCTO_MARCA ?? 'Propio';
         const categoria = producto['Id Categoria Producto:'] ?? producto.ID_CATEGORIA_PRODUCTO ?? '';
-        
+
         // ⚠️ IMPORTANTE: Determinar el estado correctamente
         let activo = false;
         if (producto.ACTIVO !== undefined) {
@@ -423,12 +423,12 @@
         } else if (producto['ACTIVO'] !== undefined) {
             activo = producto['ACTIVO'] === true || producto['ACTIVO'] === 1 || producto['ACTIVO'] === '1';
         }
-        
+
         console.log('Datos extraídos:', {
             id, nombre, precio, stock, descripcion, marca, activo, categoria
         });
         console.log('Estado determinado:', activo ? 'activo' : 'inactivo');
-        
+
         // Cambiar título y método
         document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
         document.getElementById('methodField').value = 'PATCH';
@@ -441,11 +441,11 @@
         document.getElementById('descripcionProducto').value = descripcion || '';
         document.getElementById('marcaProducto').value = marca || 'Propio';
         document.getElementById('categoriaProducto').value = categoria;
-        
+
         // ⚠️ IMPORTANTE: Establecer el estado correctamente
         const estadoSelect = document.getElementById('estadoProducto');
         estadoSelect.value = activo ? 'activo' : 'inactivo';
-        
+
         console.log('Estado SELECT después de asignar:', estadoSelect.value);
 
         // Mostrar el modal
@@ -460,17 +460,17 @@
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `/productos/${id}`;
-        
+
         const token = document.createElement('input');
         token.type = 'hidden';
         token.name = '_token';
         token.value = '{{ csrf_token() }}';
-        
+
         const method = document.createElement('input');
         method.type = 'hidden';
         method.name = '_method';
         method.value = 'DELETE';
-        
+
         form.appendChild(token);
         form.appendChild(method);
         document.body.appendChild(form);
@@ -490,9 +490,9 @@
         const cont = document.getElementById('detalleProductoContenido');
         cont.innerHTML = `
             <div class="text-center mb-3">
-                <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}" 
-                     alt="${producto['Nombre Producto:'] ?? ''}" 
-                     class="img-fluid rounded" 
+                <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}"
+                     alt="${producto['Nombre Producto:'] ?? ''}"
+                     class="img-fluid rounded"
                      style="max-height:250px;"
                      onerror="this.src='https://via.placeholder.com/250'">
             </div>
@@ -505,49 +505,49 @@
                 <div class="col-6">
                     <p>#${producto['Id Producto:'] ?? '-'}</p>
                 </div>
-                
+
                 <div class="col-6">
                     <p><strong><i class="bi bi-grid"></i> Categoría:</strong></p>
                 </div>
                 <div class="col-6">
                     <p><span class="badge bg-info text-dark">${categoriaNombre}</span></p>
                 </div>
-                
+
                 <div class="col-6">
                     <p><strong><i class="bi bi-currency-dollar"></i> Precio:</strong></p>
                 </div>
                 <div class="col-6">
                     <p class="text-success fw-bold">$${new Intl.NumberFormat('es-CO').format(parseFloat(producto['Precio:'] || 0))} COP</p>
                 </div>
-                
+
                 <div class="col-6">
                     <p><strong><i class="bi bi-box"></i> Stock:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Stock Minímo:'] ?? '0'} unidades</p>
                 </div>
-                
+
                 <div class="col-6">
                     <p><strong><i class="bi bi-tag"></i> Marca:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Marca Producto:'] ?? 'Sin marca'}</p>
                 </div>
-                
+
                 <div class="col-6">
                     <p><strong><i class="bi bi-calendar"></i> Vencimiento:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Fecha Vencimiento:'] ?? 'N/A'}</p>
                 </div>
-                
+
                 <div class="col-12">
                     <p><strong><i class="bi bi-file-text"></i> Descripción:</strong></p>
                     <p class="text-muted">${producto['Descripcion Producto:'] ?? 'Sin descripción'}</p>
                 </div>
             </div>
         `;
-        
+
         var modal = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
         modal.show();
     }
