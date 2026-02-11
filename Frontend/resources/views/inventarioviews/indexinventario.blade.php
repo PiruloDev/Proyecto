@@ -1,4 +1,4 @@
-{{-- resources/views/dashboard/inventario.blade.php (Versión Compacta) --}}
+{{-- resources/views/dashboard/inventario.blade.php --}}
 
 @extends('layouts.app') 
 
@@ -11,23 +11,37 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-    /* Estilo específico para las tarjetas de acceso rápido compactas */
+    /* Asegura que todas las cards tengan la misma altura exacta para que las filas no se rompan */
     .compact-module-card {
         transition: transform 0.2s, box-shadow 0.2s;
-        min-height: 180px; /* Altura mínima para mantener uniformidad */
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Importante para el encuadre */
+        min-height: 200px; 
     }
+    
     .compact-module-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
     }
+
+    /* Ajuste de iconos para que no se desborden en pantallas pequeñas */
     .compact-module-card .card-icon {
-        font-size: 2.5rem; /* Icono más pequeño */
+        font-size: 2.2rem;
     }
-    .compact-module-card h5 {
-        font-size: 1rem; /* Título un poco más pequeño */
+
+    /* Forzar que el pie de la card (el botón) siempre esté al fondo */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
-    .compact-module-card p {
-        font-size: 0.75rem; /* Descripción pequeña */
+
+    /* Padding superior para que el contenido no choque con el botón de hamburguesa en móvil */
+    @media (max-width: 768px) {
+        main {
+            padding-top: 60px;
+        }
     }
 </style>
 @endpush
@@ -36,7 +50,7 @@
 <div class="container-fluid">
     <div class="row">
         
-        {{-- Side Bar: Usa el componente que has definido --}}
+        {{-- Side Bar: Se mantiene intacto según tu requerimiento --}}
         @include('components.admin-sidebar') 
         
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
@@ -46,22 +60,24 @@
                 <h1 class="h2"> Módulo de Inventario</h1>
             </div>
 
-            
             <h3 class="mb-3 mt-4 text-primary">Accesos Directos</h3>
             
-            {{-- FILA 1: Inventario y Catálogos --}}
-            <div class="row g-4 mb-4">
+            {{-- SECCIÓN: Inventario y Catálogos --}}
+            {{-- row-cols-1 (móvil), row-cols-sm-2 (tablet), row-cols-lg-4 (escritorio) --}}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-4">
                 
-                {{-- Card 1: Inventario de Ingredientes --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                {{-- Card 1: Inventario de Ingredientes (Ruta original 1) --}}
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('ingredientes.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="fas fa-boxes-stacked card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Inventario</h5>
-                                <p class="text-muted flex-grow-1 small">Stock de Ingredientes.</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-boxes-stacked card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Inventario</h5>
+                                    <p class="text-muted small">Stock de Ingredientes.</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Ver Stock</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Ver Stock</span>
                                 </div>
                             </div>
                         </a>
@@ -69,15 +85,17 @@
                 </div>
 
                 {{-- Card 2: Categorías de Ingredientes --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('categorias-ingredientes.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="bi bi-tag card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Clasificación</h5>
-                                <p class="text-muted flex-grow-1 small">Organización de Ingredientes.</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="bi bi-tag card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Clasificación</h5>
+                                    <p class="text-muted small">Organización de Ingredientes.</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Gestionar</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Gestionar</span>
                                 </div>
                             </div>
                         </a>
@@ -85,15 +103,17 @@
                 </div>
                 
                 {{-- Card 3: Recetario --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('recetas.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="fas fa-book-open card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Recetario</h5>
-                                <p class="text-muted flex-grow-1 small">Definición de productos (BOM).</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-book-open card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Recetario</h5>
+                                    <p class="text-muted small">Definición de productos (BOM).</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Gestionar</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Gestionar</span>
                                 </div>
                             </div>
                         </a>
@@ -101,35 +121,35 @@
                 </div>
 
                 {{-- Card 4: Producción --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('produccion.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="fas fa-cookie-cutter card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Fabricación</h5>
-                                <p class="text-muted flex-grow-1 small">Órdenes de Producción.</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-cookie-cutter card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Fabricación</h5>
+                                    <p class="text-muted small">Órdenes de Producción.</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Ver Órdenes</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Ver Órdenes</span>
                                 </div>
                             </div>
                         </a>
                     </div>
                 </div>
-            </div>
-            
-            {{-- FILA 2: Compras --}}
-            <div class="row g-4 mb-5">
-                
+
                 {{-- Card 5: Proveedores --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('proveedores.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="fas fa-truck-moving card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Proveedores</h5>
-                                <p class="text-muted flex-grow-1 small">Directorio de Compras.</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-truck-moving card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Proveedores</h5>
+                                    <p class="text-muted small">Directorio de Compras.</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Ver Listado</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Ver Listado</span>
                                 </div>
                             </div>
                         </a>
@@ -137,44 +157,44 @@
                 </div>
                 
                 {{-- Card 6: Pedidos a Proveedores --}}
-                <div class="col-6 col-lg-3"> {{-- Cámbiado a col-lg-3 --}}
-                    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
                         <a href="{{ route('pedidoproveedores.index') }}" class="text-decoration-none text-dark h-100">
-                            <div class="card-body text-center d-flex flex-column p-3">
-                                <i class="fas fa-receipt card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                                <h5 class="mt-2">Pedidos de Compra</h5>
-                                <p class="text-muted flex-grow-1 small">Seguimiento de Órdenes.</p>
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-receipt card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Pedidos de Compra</h5>
+                                    <p class="text-muted small">Seguimiento de Órdenes.</p>
+                                </div>
                                 <div class="d-flex justify-content-center mt-auto">
-                                    <span class="btn btn-sm btn-outline-dark">Ver Órdenes</span>
+                                    <span class="btn btn-sm btn-outline-dark w-100">Ver Órdenes</span>
                                 </div>
                             </div>
                         </a>
                     </div>
                 </div>
-                
-            </div>
-            
-            {{-- Card 1: Inventario de Ingredientes --}}
-<div class="col-6 col-lg-3">
-    <div class="card glass-card border-0 rounded-4 shadow-sm h-100 compact-module-card">
-        {{-- Cambiar esta línea: --}}
-        <a href="{{ route('ingredientes.inventario') }}" class="text-decoration-none text-dark h-100">
-            <div class="card-body text-center d-flex flex-column p-3">
-                <i class="fas fa-boxes-stacked card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
-                <h5 class="mt-2">Inventario</h5>
-                <p class="text-muted flex-grow-1 small">Stock de Ingredientes.</p>
-                <div class="d-flex justify-content-center mt-auto">
-                    <span class="btn btn-sm btn-outline-dark">Ver Stock</span>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
 
-            {{-- Aquí puedes agregar otros gráficos o widgets más grandes --}}
+                {{-- Card 7: Inventario Alternativo (Ruta original 2) --}}
+                <div class="col">
+                    <div class="card glass-card border-0 rounded-4 shadow-sm compact-module-card">
+                        <a href="{{ route('ingredientes.inventario') }}" class="text-decoration-none text-dark h-100">
+                            <div class="card-body text-center p-3">
+                                <div>
+                                    <i class="fas fa-warehouse card-icon mb-2" style="color: var(--panaderia-marron-principal);"></i>
+                                    <h5 class="mt-2">Almacén Central</h5>
+                                    <p class="text-muted small">Gestión Física de Stock.</p>
+                                </div>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <span class="btn btn-sm btn-outline-dark w-100">Control Físico</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div> {{-- Fin de la rejilla de tarjetas --}}
 
         </main>
     </div>
 </div>
-
 @endsection
