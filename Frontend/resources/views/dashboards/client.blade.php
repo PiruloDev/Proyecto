@@ -6,50 +6,60 @@
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
 <style>
-    /* Mantenimiento exacto de tu diseño original */
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        background-color: #8d734d;
+    /* --- ESTRUCTURA DE SCROLL (Mantenida) --- */
+    body, html {
+        height: 100%;
+        overflow: hidden; 
     }
 
-    .sidebar-content {
-        flex-grow: 1;
+    .container-fluid, .row {
+        height: 100vh;
+    }
+
+    .sidebar {
+        height: 100vh;
+        position: sticky;
+        top: 0;
         display: flex;
         flex-direction: column;
+        background-color: #8d734d; 
+    }
+
+    .main-content {
+        height: 100vh;
+        overflow-y: auto; 
+        padding-bottom: 50px;
+    }
+
+    /* --- ESTILOS DE NAVEGACIÓN --- */
+    .nav-link {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        font-weight: bold;
     }
 
     .sidebar-user {
-        margin-top: auto;
+        margin-top: auto; 
         padding: 20px 15px;
-        background: rgba(0, 0, 0, 0.15);
+        background: rgba(0, 0, 0, 0.15); 
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .logout-btn-custom {
-        color: #ffbaba !important;
+        color: #ffbaba !important; 
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 186, 186, 0.2);
         padding: 10px 15px;
         border-radius: 8px;
         width: 100%;
         text-align: left;
-        transition: all 0.3s;
         display: flex;
         align-items: center;
         text-decoration: none;
-    }
-
-    .logout-btn-custom:hover {
-        background: rgba(255, 186, 186, 0.15);
-        color: #ffffff !important;
-    }
-
-    .order-item-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
 
     .price-badge {
@@ -58,18 +68,6 @@
         padding: 6px 14px;
         border-radius: 20px;
         font-weight: 700;
-        font-size: 1rem;
-    }
-
-    .order-card {
-        transition: transform 0.2s;
-        border-radius: 12px;
-        border: 1px solid #eee;
-    }
-
-    .order-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
     }
 </style>
 @endpush
@@ -79,7 +77,7 @@
 @php
     $pedidosCol = collect($pedidos ?? []);
     $totalPedidos = $pedidosCol->count();
-
+    
     $pedidosPendientes = $pedidosCol->filter(function($p) {
         $estadoId = $p['id_estado_pedido'] ?? $p['ID_ESTADO_PEDIDO'] ?? 0;
         return (int)$estadoId === 1;
@@ -87,39 +85,20 @@
 
     $pedidosRecientes = $pedidosCol->take(5);
 
-    /**
-     * FUNCIÓN DE FECHA COMPATIBLE CON DASHBOARD EMPLEADO
-     * Busca claves en mayúsculas y minúsculas y maneja nulos de la API
-     */
     if (!function_exists('safeFormatDate')) {
         function safeFormatDate($pedido, $posiblesClaves) {
             foreach ($posiblesClaves as $clave) {
                 $valor = $pedido[$clave] ?? null;
-
-                if (!empty($valor) && $valor !== 'N/A' && $valor !== 'null') {
+                if (!empty($valor) && $valor !== 'N/A' && $valor !== 'null' && $valor !== 'NULL') {
                     try {
                         return \Carbon\Carbon::parse($valor)->format('d/m/Y h:i A');
-                    } catch (\Exception $e) {
-                        continue;
-                    }
+                    } catch (\Exception $e) { continue; }
                 }
             }
-            return 'Pendiente';
+            return '<span class="text-pendiente">Pendiente</span>';
         }
     }
 @endphp
-
-<script>
-    // Verificación inmediata antes de renderizar
-    (function() {
-        const logoutFlag = sessionStorage.getItem('logout_flag');
-        if (logoutFlag === 'true') {
-            // Limpiar todo el sessionStorage
-            sessionStorage.clear();
-            window.location.replace('/login');
-        }
-    })();
-</script>
 
 <div class="container-fluid">
     <div class="row">
@@ -144,22 +123,22 @@
 
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard" data-section="dashboard">
+                        <a class="nav-link active" data-section="dashboard">
                             <i class="bi bi-house"></i> Inicio
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#pedidos" data-section="pedidos">
+                        <a class="nav-link" data-section="pedidos">
                             <i class="bi bi-cart-check"></i> Mis Pedidos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#detalles-general" data-section="detalles-general">
+                        <a class="nav-link" data-section="detalles-general">
                             <i class="bi bi-journal-text"></i> Detalle de Pedidos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#mi-cuenta" data-section="mi-cuenta">
+                        <a class="nav-link" data-section="mi-cuenta">
                             <i class="bi bi-person-circle"></i> Mi Perfil
                         </a>
                     </li>
@@ -184,8 +163,7 @@
         </nav>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-
-            {{-- SECCIÓN INICIO --}}
+            
             <div class="section-content" id="dashboard-section" style="display: block;">
                 <div class="welcome-section">
                     <h2>Bienvenido, {{ session('usuario.nombre', 'Cliente') }}</h2>
@@ -216,7 +194,7 @@
                             <div class="order-item-header">
                                 <div>
                                     <h6 class="fw-bold mb-0">Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['ID_PEDIDO'] }}</h6>
-                                    <small class="text-muted">{{ safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO', 'fecha_ingreso']) }}</small>
+                                    <small class="text-muted">{!! safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO']) !!}</small>
                                 </div>
                                 <div class="price-badge">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</div>
                             </div>
@@ -227,7 +205,6 @@
                 </div>
             </div>
 
-            {{-- SECCIÓN MIS PEDIDOS --}}
             <div class="section-content" id="pedidos-section" style="display: none;">
                 <h3 class="mb-4">Historial de Pedidos</h3>
                 <div class="table-responsive">
@@ -245,7 +222,7 @@
                             @foreach($pedidosCol as $p)
                             <tr>
                                 <td>#{{ $p['id_PEDIDO'] ?? $p['ID_PEDIDO'] }}</td>
-                                <td>{{ safeFormatDate($p, ['fecha_INGRESO', 'FECHA_INGRESO', 'fecha_ingreso']) }}</td>
+                                <td>{!! safeFormatDate($p, ['fecha_INGRESO', 'FECHA_INGRESO']) !!}</td>
                                 <td class="fw-bold">${{ number_format($p['total_PRODUCTO'] ?? $p['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
                                 <td>
                                     @php
@@ -258,10 +235,7 @@
                                         {{ $p['nombre_estado'] ?? $p['NOMBRE_ESTADO'] ?? 'Recibido' }}
                                     </span>
                                 </td>
-                                {{-- IMPLEMENTACIÓN CORREGIDA DE FECHA DE ENTREGA --}}
-                                <td class="fw-bold text-primary">
-                                    {{ safeFormatDate($p, ['fecha_ENTREGA', 'FECHA_ENTREGA', 'fecha_entrega']) }}
-                                </td>
+                                <td>{!! safeFormatDate($p, ['fecha_ENTREGA', 'FECHA_ENTREGA']) !!}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -269,14 +243,13 @@
                 </div>
             </div>
 
-            {{-- SECCIÓN DETALLES --}}
             <div class="section-content" id="detalles-general-section" style="display: none;">
                 <h3 class="mb-4">Detalle de Productos por Pedido</h3>
                 @foreach($pedidosCol as $pedido)
                     <div class="card order-card shadow-sm mb-4 border-0">
                         <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #a67c52;">
                             <span class="fw-bold"><i class="bi bi-box-seam me-2"></i>Pedido #{{ $pedido['id_PEDIDO'] ?? $pedido['ID_PEDIDO'] }}</span>
-                            <span>Ingreso: {{ safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO']) }}</span>
+                            <span>{!! safeFormatDate($pedido, ['fecha_INGRESO', 'FECHA_INGRESO']) !!}</span>
                         </div>
                         <div class="card-body p-0">
                             <table class="table detail-table mb-0">
@@ -302,7 +275,7 @@
                             </table>
                         </div>
                         <div class="card-footer bg-light d-flex justify-content-between align-items-center px-4">
-                            <span class="text-muted small">Entrega: {{ safeFormatDate($pedido, ['fecha_ENTREGA', 'FECHA_ENTREGA']) }}</span>
+                            <small class="text-muted">Entrega: {!! safeFormatDate($pedido, ['fecha_ENTREGA', 'FECHA_ENTREGA']) !!}</small>
                             <div>
                                 <span class="text-muted me-2">Monto Total:</span>
                                 <span class="h5 mb-0 fw-bold">${{ number_format($pedido['total_PRODUCTO'] ?? $pedido['TOTAL_PRODUCTO'] ?? 0, 0, ',', '.') }}</span>
@@ -312,7 +285,6 @@
                 @endforeach
             </div>
 
-            {{-- SECCIÓN PERFIL --}}
             <div class="section-content" id="mi-cuenta-section" style="display: none;">
                 <div class="card border-0 shadow-sm p-4">
                     <h3>Mi Perfil</h3>
@@ -340,73 +312,65 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Verificar si se hizo logout explícito
-        if (typeof AuthManager !== 'undefined') {
-            if (AuthManager.wasLoggedOut()) {
-                AuthManager.clearAuth();
-                window.location.replace('/login');
-                return;
-            }
-
-            if (!AuthManager.isAuthenticated()) {
-                AuthManager.redirectToLogin();
-                return;
-            }
-
-            const userData = AuthManager.getUserData();
-            const userRole = AuthManager.getRole();
-
-            if (userRole !== 'CLIENTE' && userRole !== 'CLIENT') {
-                console.warn('Usuario no autorizado para dashboard cliente');
-                const correctDashboard = AuthManager.getDashboardRoute(userRole);
-                window.location.href = correctDashboard;
-                return;
-            }
-
-            console.log('Dashboard Cliente - Usuario autenticado:', userData);
-        }
-
-        const navLinks = document.querySelectorAll('.nav-link');
+        // --- SELECTORES ---
+        const navLinks = document.querySelectorAll('.nav-link[data-section]');
         const sections = document.querySelectorAll('.section-content');
+        const mainContent = document.querySelector('.main-content');
 
+        // --- FUNCIÓN PARA MOSTRAR SECCIONES ---
         function showSection(sectionId) {
+            // Ocultar todo
             sections.forEach(s => s.style.display = 'none');
+            
+            // Mostrar la correcta
             const target = document.getElementById(sectionId + '-section');
             if (target) {
                 target.style.display = 'block';
-                target.style.opacity = 0;
-                setTimeout(() => { target.style.opacity = 1; target.style.transition = 'opacity 0.3s'; }, 10);
+                // Reset del scroll del contenedor principal cada vez que cambias
+                mainContent.scrollTop = 0;
             }
         }
 
+        // --- EVENTOS DE CLIC ---
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if(!href || !href.startsWith('#')) return;
                 e.preventDefault();
-                const sectionName = this.getAttribute('data-section');
+                
+                // Actualizar estado activo en el menú
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
+
+                // Cambiar sección
+                const sectionName = this.getAttribute('data-section');
                 showSection(sectionName);
+
+                // Cerrar sidebar en móviles si está abierto
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                }
             });
         });
 
+        // --- TOGGLE PARA MÓVILES (Hamburgesa) ---
         const toggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        if(toggle) toggle.onclick = () => { sidebar.classList.toggle('show'); overlay.classList.toggle('show'); };
-        if(overlay) overlay.onclick = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); };
 
-        // Manejar el logout y limpiar la autenticación del cliente
-        const logoutForm = document.querySelector('form[action="{{ route('logout') }}"]');
-        if (logoutForm) {
-            logoutForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Usar el método logout de AuthManager que maneja todo
-                if (typeof AuthManager !== 'undefined') {
-                    AuthManager.logout();
-                }
-            });
+        if(toggle) {
+            toggle.onclick = () => {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            };
+        }
+
+        if(overlay) {
+            overlay.onclick = () => {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            };
         }
     });
 </script>

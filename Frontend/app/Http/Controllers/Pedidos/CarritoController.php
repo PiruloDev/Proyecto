@@ -21,9 +21,6 @@ class CarritoController extends Controller
         $this->pedidosApiService = $pedidosApiService;
     }
 
-    /**
-     * Devuelve la vista principal del carrito.
-     */
     public function index()
     {
         $carrito = session()->get('carrito', []);
@@ -48,17 +45,12 @@ class CarritoController extends Controller
         return view('cart.cart', compact('cartItems', 'subtotal'));
     }
 
-    /**
-     * Obtiene el contenido completo del carrito desde la sesión y lo devuelve como JSON.
-     * Método: GET /api/carrito
-     */
     public function obtenerCarrito()
     {
         $carrito = session()->get('carrito', []);
 
         Log::info('Carrito leído en obtenerCarrito:', ['contenido_leido' => $carrito]);
 
-        // Calcula el total general
         $totalGeneral = array_reduce($carrito, function ($sum, $item) {
             return $sum + ((float)$item['precio'] * $item['cantidad']);
         }, 0);
@@ -139,7 +131,7 @@ class CarritoController extends Controller
         Log::info('Carrito ANTES de agregar (ID: ' . $productoId . '):', ['carrito' => $carrito]);
 
         if (isset($carrito[$productoId])) {
-            // Incrementar cantidad pero ACTUALIZAR todos los datos del producto
+            
             $carrito[$productoId]['cantidad']++;
             $carrito[$productoId]['nombre'] = $nombreProducto;
             $carrito[$productoId]['descripcion'] = $descripcionProducto;
@@ -170,34 +162,52 @@ class CarritoController extends Controller
         ]);
     }
 
-    public function actualizar(Request $request)
+   public function actualizar(Request $request)
 {
-    $carrito = session()->get('carrito', []);
-    $id = $request->id;
-    $cantidad = $request->cantidad;
+    
+    \Log::info('--- Intento de actualización de carrito ---');
+    \Log::info('Datos recibidos:', $request->all());
 
-    if (isset($carrito[$id])) {
-        $carrito[$id]['cantidad'] = $cantidad;
-        session()->put('carrito', $carrito); // Esto actualiza la "memoria" del servidor
+    try {
+        $carrito = session()->get('carrito', []);
+        $id = $request->id;
+        $cantidad = $request->cantidad;
+
+        if (isset($carrito[$id])) {
+            $carrito[$id]['cantidad'] = $cantidad;
+            session()->put('carrito', $carrito);
+            \Log::info("Producto $id actualizado a $cantidad");
+            return response()->json(['success' => true]);
+        }
         
-        return response()->json(['success' => true]);
-    }
+        \Log::error("ID $id no encontrado en el carrito. IDs existentes: " . implode(',', array_keys($carrito)));
+        return response()->json(['success' => false, 'message' => 'No encontrado'], 404);
 
-    return response()->json(['success' => false], 404);
+    } catch (\Exception $e) {
+        \Log::error('ERROR CRÍTICO EN CARRITO: ' . $e->getMessage());
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
 }
 
     public function remover($id)
-    {
-        $carrito = session()->get('carrito', []);
+{
+    $carrito = session()->get('carrito', []);
 
-        if (isset($carrito[$id])) {
-            unset($carrito[$id]);
-            session()->put('carrito', $carrito);
-            return response()->json(['success' => true, 'message' => 'Producto eliminado del carrito.']);
-        }
-
-        return response()->json(['success' => false, 'message' => 'Producto no encontrado en el carrito.'], 404);
+    if (isset($carrito[$id])) {
+        unset($carrito[$id]);
+        session()->put('carrito', $carrito);
+        
+        return response()->json([
+            'success' => true, 
+            'message' => 'Producto eliminado correctamente.'
+        ]);
     }
+
+    return response()->json([
+        'success' => false, 
+        'message' => 'El producto no existía en el carrito.'
+    ], 404);
+}
 
     public function vaciar()
     {
@@ -208,28 +218,21 @@ class CarritoController extends Controller
         ]);
     }
 
-  public function checkout()
+ public function checkout()
 {
     $carrito = session()->get('carrito', []);
 
     if (empty($carrito)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'El carrito está vacío.'
-        ], 400);
+        return response()->json(['success' => false, 'message' => 'El carrito está vacío.'], 400);
     }
 
     $clienteId = session('usuario.id'); 
 
     if (!$clienteId) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Sesión no válida. Por favor, inicie sesión nuevamente.'
-        ], 401);
+        return response()->json(['success' => false, 'message' => 'Sesión no válida.'], 401);
     }
 
     try {
-        // 1. Calculamos el total y ARMAMOS LA LISTA DE DETALLES
         $detallesParaJava = [];
         $totalGeneral = 0;
 
@@ -237,7 +240,7 @@ class CarritoController extends Controller
             $subtotal = (float)$item['precio'] * (int)$item['cantidad'];
             $totalGeneral += $subtotal;
 
-            // Formato exacto que espera tu servicio Java
+            // Mantenemos tus llaves originales: idProducto, cantidadProducto, etc.
             $detallesParaJava[] = [
                 'idProducto'       => (int) $item['id'],
                 'cantidadProducto' => (int) $item['cantidad'],
@@ -246,22 +249,19 @@ class CarritoController extends Controller
             ];
         }
 
-        // 2. PAYLOAD COMPLETO: Ahora incluimos la llave 'detalles'
+        // PAYLOAD: Asegúrate de que el empleado_id 1 exista en tu DB
         $payload = [
             'cliente_id'       => (int) $clienteId, 
-            'empleado_id'      => 1, 
+            'empleado_id'      => 1, // Si falla, verifica que tengas un empleado con ID 1
             'estado_pedido_id' => 1, 
-            'total_producto'   => (float) $totalGeneral,
-            'detalles'         => $detallesParaJava // <--- ¡ESTO ES LO QUE FALTABA!
+            'total_producto'   => (float) $totalGeneral, // Enviamos el total para evitar el NULL
+            'detalles'         => $detallesParaJava 
         ];
 
-        Log::info('Enviando pedido COMPLETO a API Java:', $payload);
+        Log::info('Enviando pedido a Java:', $payload);
 
-        // 3. LLAMADA AL SERVICIO
-        // Nota: Asegúrate de usar 'crearPedido' o el método que soporte el objeto completo
         $response = $this->pedidosApiService->crearPedido($payload);
 
-        // 4. LIMPIEZA
         session()->forget('carrito');
 
         return response()->json([
@@ -272,11 +272,7 @@ class CarritoController extends Controller
 
     } catch (Exception $e) {
         Log::error('Error en Checkout:', ['error' => $e->getMessage()]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Error al procesar el pedido: ' . $e->getMessage()
-        ], 500);
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
 }
