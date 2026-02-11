@@ -29,7 +29,7 @@
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 // Usar el método logout de AuthManager que maneja todo
                 AuthManager.logout();
             });

@@ -11,7 +11,7 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
-        background-color: #8d734d; 
+        background-color: #8d734d;
     }
 
     .sidebar-content {
@@ -21,14 +21,14 @@
     }
 
     .sidebar-user {
-        margin-top: auto; 
+        margin-top: auto;
         padding: 20px 15px;
-        background: rgba(0, 0, 0, 0.15); 
+        background: rgba(0, 0, 0, 0.15);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .logout-btn-custom {
-        color: #ffbaba !important; 
+        color: #ffbaba !important;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 186, 186, 0.2);
         padding: 10px 15px;
@@ -66,7 +66,7 @@
         border-radius: 12px;
         border: 1px solid #eee;
     }
-    
+
     .order-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
@@ -79,7 +79,7 @@
 @php
     $pedidosCol = collect($pedidos ?? []);
     $totalPedidos = $pedidosCol->count();
-    
+
     $pedidosPendientes = $pedidosCol->filter(function($p) {
         $estadoId = $p['id_estado_pedido'] ?? $p['ID_ESTADO_PEDIDO'] ?? 0;
         return (int)$estadoId === 1;
@@ -95,7 +95,7 @@
         function safeFormatDate($pedido, $posiblesClaves) {
             foreach ($posiblesClaves as $clave) {
                 $valor = $pedido[$clave] ?? null;
-                
+
                 if (!empty($valor) && $valor !== 'N/A' && $valor !== 'null') {
                     try {
                         return \Carbon\Carbon::parse($valor)->format('d/m/Y h:i A');
@@ -184,7 +184,7 @@
         </nav>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-            
+
             {{-- SECCIÓN INICIO --}}
             <div class="section-content" id="dashboard-section" style="display: block;">
                 <div class="welcome-section">

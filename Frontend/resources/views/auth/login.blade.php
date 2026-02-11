@@ -172,7 +172,7 @@
         if (typeof AuthManager !== 'undefined' && AuthManager.wasLoggedOut()) {
             AuthManager.clearAuthComplete();
         }
-        
+
         resetButton();
     });
 </script>
