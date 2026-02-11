@@ -5,36 +5,65 @@ namespace App\Http\Controllers\Inventario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Inventario\IngredientesService;
+use App\Services\Inventario\ProveedoresService;
+use App\Services\Inventario\CategoriaIngredientesService;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log; 
 
 class IngredientesController extends Controller
 {
     protected $ingredientesService;
+    protected $proveedoresService;
+    protected $categoriasService;
 
-
-    public function __construct(IngredientesService $ingredientesService /*, ProveedorService $proveedorService, CategoriaService $categoriaService */)
-    {
+    // Inyectamos los 3 servicios necesarios
+    public function __construct(
+        IngredientesService $ingredientesService, 
+        ProveedoresService $proveedoresService, 
+        CategoriaIngredientesService $categoriasService
+    ) {
         $this->ingredientesService = $ingredientesService;
-
+        $this->proveedoresService = $proveedoresService;
+        $this->categoriasService = $categoriasService;
     }
 
- 
     public function index()
-    {
-        $response = $this->ingredientesService->obtenerIngredientes();
+{
+    $resIngredientes = $this->ingredientesService->obtenerIngredientes();
+    $resProveedores = $this->proveedoresService->obtenerProveedores();
+    $resCategorias = $this->categoriasService->obtenerCategoriasIngredientes();
 
-        if (!$response['success']) {
-            $errorMessage = $response['error'] ?? 'Error desconocido al obtener ingredientes.';
-            // Retorna a la vista con un mensaje de error
-            return view('inventarioviews.ingredientes.index', ['ingredientes' => []])
-                   ->with('error', 'Error al cargar ingredientes: ' . $errorMessage);
-        }
-        
-        $ingredientes = $response['data'] ?? [];
-        
-        return view('inventarioviews.ingredientes.index', compact('ingredientes'));
+    if (!$resIngredientes['success']) {
+        return view('inventarioviews.ingredientes.index', [
+            'ingredientes' => [],
+            'proveedores' => [],
+            'categorias' => []
+        ])->with('error', 'Error al cargar ingredientes: ' . ($resIngredientes['error'] ?? 'Error desconocido'));
     }
+
+    // --- NORMALIZACIÓN DE DATOS ---
+    // Mapeamos los ingredientes para asegurar que tengan 'idCategoria'
+    $ingredientes = collect($resIngredientes['data'] ?? [])->map(function($ing) {
+        $ing['idCategoria'] = $ing['idCategoria'] ?? $ing['id_categoria'] ?? $ing['id'] ?? 0;
+        $ing['idProveedor'] = $ing['idProveedor'] ?? $ing['id_proveedor'] ?? $ing['id'] ?? 0;
+        return $ing;
+    })->toArray();
+
+    // Mapeamos las categorías para asegurar que tengan 'idCategoria' y 'nombreCategoria'
+    $categorias = collect($resCategorias['data'] ?? [])->map(function($cat) {
+        return [
+            'idCategoria' => $cat['idCategoria'] ?? $cat['id'] ?? 0,
+            'nombreCategoria' => $cat['nombreCategoria'] ?? $cat['nombre'] ?? 'Sin nombre'
+        ];
+    })->toArray();
+    // ------------------------------
+
+    return view('inventarioviews.ingredientes.index', [
+        'ingredientes' => $ingredientes,
+        'proveedores'  => $resProveedores['data'] ?? [],
+        'categorias'   => $categorias
+    ]);
+}
 
     public function inventario()
 {
@@ -57,7 +86,7 @@ class IngredientesController extends Controller
      */
     public function create()
     {
-        return view('inventarioviews.ingredientes.create');
+        return view('ingredientes.index');
     }
     
     /**
