@@ -26,11 +26,7 @@
         <tag/>
         <url/>
     </scm>
-    <properties>
-        <java.version>21</java.version>
-    </properties>
     <dependencies>
-    
         <!--JWT-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -79,14 +75,14 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        
+
         <!-- SpringDoc OpenAPI (Swagger) para Spring Boot 3.x -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.7.0</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -111,6 +107,34 @@
                     <source>21</source>
                     <target>21</target>
                 </configuration>
+            </plugin>
+
+            <!-- Plugin de SonarQube -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>4.0.0.4121</version>
+            </plugin>
+
+            <!-- Plugin JaCoCo para cobertura de código -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

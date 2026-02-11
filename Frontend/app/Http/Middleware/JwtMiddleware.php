@@ -20,6 +20,11 @@ class JwtMiddleware
         $token = $request->bearerToken();
 
         if (!$token) {
+            // Si no hay bearer token, intentar obtenerlo de la sesión
+            $token = session('token');
+        }
+
+        if (!$token) {
             return response()->json([
                 'success' => false,
                 'mensaje' => 'Token no proporcionado'
@@ -29,9 +34,11 @@ class JwtMiddleware
         $validation = $this->authService->validarToken($token);
 
         if (!$validation['success'] || !$validation['valido']) {
+            // Token inválido o en blacklist - limpiar sesión
+            session()->flush();
             return response()->json([
                 'success' => false,
-                'mensaje' => 'Token inválido o expirado'
+                'mensaje' => 'Token inválido, expirado o revocado'
             ], 401);
         }
 

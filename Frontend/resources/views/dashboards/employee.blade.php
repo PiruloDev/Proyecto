@@ -11,6 +11,17 @@
 @section('body-class', '')
 
 @section('content')
+<script>
+    // Verificación inmediata antes de renderizar
+    (function() {
+        const logoutFlag = sessionStorage.getItem('logout_flag');
+        if (logoutFlag === 'true') {
+            // Limpiar todo el sessionStorage
+            sessionStorage.clear();
+            window.location.replace('/login');
+        }
+    })();
+</script>
 <div class="container-fluid">
     <div class="row">
         @include('components.employee-sidebar')
@@ -120,6 +131,13 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Verificar si se hizo logout explícito
+        if (AuthManager.wasLoggedOut()) {
+            AuthManager.clearAuth();
+            window.location.replace('/login');
+            return;
+        }
+
         if (!AuthManager.isAuthenticated()) {
             AuthManager.redirectToLogin();
             return;

@@ -109,6 +109,18 @@
     }
 @endphp
 
+<script>
+    // Verificación inmediata antes de renderizar
+    (function() {
+        const logoutFlag = sessionStorage.getItem('logout_flag');
+        if (logoutFlag === 'true') {
+            // Limpiar todo el sessionStorage
+            sessionStorage.clear();
+            window.location.replace('/login');
+        }
+    })();
+</script>
+
 <div class="container-fluid">
     <div class="row">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -328,6 +340,32 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Verificar si se hizo logout explícito
+        if (typeof AuthManager !== 'undefined') {
+            if (AuthManager.wasLoggedOut()) {
+                AuthManager.clearAuth();
+                window.location.replace('/login');
+                return;
+            }
+
+            if (!AuthManager.isAuthenticated()) {
+                AuthManager.redirectToLogin();
+                return;
+            }
+
+            const userData = AuthManager.getUserData();
+            const userRole = AuthManager.getRole();
+
+            if (userRole !== 'CLIENTE' && userRole !== 'CLIENT') {
+                console.warn('Usuario no autorizado para dashboard cliente');
+                const correctDashboard = AuthManager.getDashboardRoute(userRole);
+                window.location.href = correctDashboard;
+                return;
+            }
+
+            console.log('Dashboard Cliente - Usuario autenticado:', userData);
+        }
+
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('.section-content');
 
@@ -358,6 +396,18 @@
         const overlay = document.getElementById('sidebarOverlay');
         if(toggle) toggle.onclick = () => { sidebar.classList.toggle('show'); overlay.classList.toggle('show'); };
         if(overlay) overlay.onclick = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); };
+
+        // Manejar el logout y limpiar la autenticación del cliente
+        const logoutForm = document.querySelector('form[action="{{ route('logout') }}"]');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Usar el método logout de AuthManager que maneja todo
+                if (typeof AuthManager !== 'undefined') {
+                    AuthManager.logout();
+                }
+            });
+        }
     });
 </script>
 @endpush

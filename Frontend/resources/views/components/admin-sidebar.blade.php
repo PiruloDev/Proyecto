@@ -56,29 +56,28 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('reportes.*') || request()->routeIs('estadisticas.*') ? 'active' : '' }}"
+                <a class="nav-link {{ request()->routeIs('reportes.*') || request()->routeIs('ordenes.salida.*') ? 'active' : '' }}"
                    href="{{ route('ordenes.salida.index') }}">
-                    <i class="bi bi-graph-up"></i>
+                    <i class="bi bi-receipt"></i>
+                    Órdenes de Salida
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('productos.*') ? 'active' : '' }}"
+                   href="{{ route('productos.index') }}">
+                    <i class="bi bi-box-seam"></i>
+                    Productos
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('estadisticas.*') ? 'active' : '' }}"
+                   href="{{ route('estadisticas.index') }}">
+                    <i class="bi bi-graph-up-arrow"></i>
                     Estadísticas
                 </a>
             </div>
-            <div class="nav-item">
-    <a class="nav-link {{ request()->routeIs('productos.*') ? 'active' : '' }}"
-       href="{{ route('productos.index') }}">
-        <i class="bi bi-box-seam"></i>
-        Productos
-    </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="bi bi-gear"></i>
-                    Ajustes
-                </a>
-            </div>
         </ul>
-
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-user">
             <div class="user-info">
                 <i class="bi bi-person-circle"></i>
@@ -121,8 +120,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                    AuthManager.clearAuth();
-                    window.location.replace('/');
+                    AuthManager.logout();
                 }
             });
         }

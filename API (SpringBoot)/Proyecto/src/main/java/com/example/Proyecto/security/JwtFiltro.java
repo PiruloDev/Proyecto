@@ -12,6 +12,7 @@ import java.util.Map;
 public class JwtFiltro extends OncePerRequestFilter {
 
     private JwtUtilidad jwtUtilidad;
+    private TokenBlacklist tokenBlacklist;
 
     public JwtFiltro() {
         this.jwtUtilidad = new JwtUtilidad();
@@ -19,6 +20,10 @@ public class JwtFiltro extends OncePerRequestFilter {
 
     public void setJwtUtilidad(JwtUtilidad jwtUtilidad) {
         this.jwtUtilidad = jwtUtilidad;
+    }
+
+    public void setTokenBlacklist(TokenBlacklist tokenBlacklist) {
+        this.tokenBlacklist = tokenBlacklist;
     }
 
     @Override
@@ -30,6 +35,7 @@ public class JwtFiltro extends OncePerRequestFilter {
 
         if (requestPath.equals("/auth/login") ||
                 requestPath.equals("/auth/test") ||
+                requestPath.equals("/auth/logout") ||
                 requestPath.startsWith("/auth/registro/") ||
                 requestPath.equals("/reset-pass") ||
                 requestPath.equals("/reset-pass/health") ||
@@ -42,6 +48,14 @@ public class JwtFiltro extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
+            // Verificar blacklist primero
+            if (tokenBlacklist != null && tokenBlacklist.isBlacklisted(token)) {
+                respuesta.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                respuesta.setContentType("application/json");
+                respuesta.getWriter().write("{\"error\": \"Token revocado\", \"revoked\": true}");
+                return;
+            }
 
             if (!jwtUtilidad.validarToken(token)) {
                 respuesta.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

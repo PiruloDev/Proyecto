@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'jwt.auth' => \App\Http\Middleware\JwtMiddleware::class,
+            'page.auth' => \App\Http\Middleware\CheckPageAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

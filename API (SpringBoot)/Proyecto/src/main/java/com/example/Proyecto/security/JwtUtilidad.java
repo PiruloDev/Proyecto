@@ -3,6 +3,7 @@ package com.example.Proyecto.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,9 @@ public class JwtUtilidad {
 
     private final String CLAVE_SECRETA = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
     private final SecretKey key = Keys.hmacShaKeyFor(CLAVE_SECRETA.getBytes());
+
+    @Autowired
+    private TokenBlacklist tokenBlacklist;
 
 
     public String generarToken(Map<String, Object> userInfo) {
@@ -43,10 +47,32 @@ public class JwtUtilidad {
 
     public boolean validarToken(String token) {
         try {
+            // Verificar si el token está en la blacklist
+            if (tokenBlacklist != null && tokenBlacklist.isBlacklisted(token)) {
+                System.out.println("[JwtUtilidad] Token rechazado: está en blacklist");
+                return false;
+            }
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    /**
+     * Invalida un token añadiéndolo a la blacklist.
+     */
+    public void invalidarToken(String token) {
+        if (tokenBlacklist != null) {
+            try {
+                Claims claims = Jwts.parser().verifyWith(key).build()
+                        .parseSignedClaims(token).getPayload();
+                long expiration = claims.getExpiration().getTime();
+                tokenBlacklist.addToBlacklist(token, expiration);
+            } catch (Exception e) {
+                // Si no se puede parsear, añadir con expiración por defecto
+                tokenBlacklist.addToBlacklist(token);
+            }
         }
     }
 

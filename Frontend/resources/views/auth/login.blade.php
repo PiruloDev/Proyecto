@@ -168,6 +168,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Asegurar que si llegamos al login después de logout, todo esté limpio
+        if (typeof AuthManager !== 'undefined' && AuthManager.wasLoggedOut()) {
+            AuthManager.clearAuthComplete();
+        }
+        
         resetButton();
     });
 </script>

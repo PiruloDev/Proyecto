@@ -1,11 +1,13 @@
 const AuthManager = {
     TOKEN_KEY: 'access_token',
     USER_KEY: 'user_data',
+    LOGOUT_FLAG: 'logout_flag',
     REFRESH_INTERVAL: 30 * 60 * 1000,
     refreshTimer: null,
 
     saveToken(token) {
         sessionStorage.setItem(this.TOKEN_KEY, token);
+        sessionStorage.removeItem(this.LOGOUT_FLAG); // Limpiar flag de logout al iniciar sesión
         this.startRefreshTimer();
     },
 
@@ -26,6 +28,21 @@ const AuthManager = {
         sessionStorage.removeItem(this.TOKEN_KEY);
         sessionStorage.removeItem(this.USER_KEY);
         this.stopRefreshTimer();
+    },
+
+    clearAuthComplete() {
+        sessionStorage.removeItem(this.TOKEN_KEY);
+        sessionStorage.removeItem(this.USER_KEY);
+        sessionStorage.removeItem(this.LOGOUT_FLAG);
+        this.stopRefreshTimer();
+    },
+
+    markLogout() {
+        sessionStorage.setItem(this.LOGOUT_FLAG, 'true');
+    },
+
+    wasLoggedOut() {
+        return sessionStorage.getItem(this.LOGOUT_FLAG) === 'true';
     },
 
     isAuthenticated() {
@@ -134,26 +151,134 @@ const AuthManager = {
 
     async logout() {
         console.log('Cerrando sesión y limpiando tokens...');
+
+        const token = this.getToken();
+
+        // 1. Invalidar token en el backend (blacklist) ANTES de limpiar storage
+        if (token) {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                });
+                console.log('Token invalidado en el backend (blacklist)');
+            } catch (error) {
+                console.error('Error al invalidar token en backend:', error);
+            }
+        }
+
+        // 2. Marcar logout y limpiar todo el almacenamiento local
+        this.markLogout();
         this.clearAuth();
 
-        history.pushState(null, null, location.href);
-        window.location.replace('/');
+        // 3. Limpiar todo sessionStorage y localStorage por seguridad
+        sessionStorage.clear();
+        sessionStorage.setItem(this.LOGOUT_FLAG, 'true');
+
+        // 4. Enviar POST para cerrar sesión en Laravel (flush session server-side)
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            if (csrfToken) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/logout';
+                form.style.display = 'none';
+
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                window.location.replace('/login');
+            }
+        } catch (error) {
+            console.error('Error al cerrar sesión en el servidor:', error);
+            window.location.replace('/login');
+        }
     },
 
     init() {
+        // Si se detecta que se hizo logout, limpiar completamente
+        if (this.wasLoggedOut()) {
+            this.clearAuthComplete();
+            // Siempre redirigir al login después de logout, sin excepciones
+            if (window.location.pathname !== '/login') {
+                window.location.replace('/login');
+                return;
+            }
+        }
+
         if (this.isAuthenticated()) {
             this.startRefreshTimer();
             console.log('AuthManager inicializado con sesión activa');
+        } else {
+            // Si no hay sesión y se intenta acceder a una página protegida
+            const protectedPaths = ['/dashboardadmin', '/dashboardempleado', '/dashboardcliente',
+                                    '/inventario', '/pedidos', '/empleados', '/clientes',
+                                    '/estadisticas', '/reportes', '/admin', '/carrito'];
+            if (protectedPaths.some(path => window.location.pathname.startsWith(path))) {
+                window.location.replace('/login');
+                return;
+            }
         }
 
         window.addEventListener('beforeunload', () => {
             this.stopRefreshTimer();
         });
 
-        history.pushState(null, null, location.href);
-        window.addEventListener('popstate', () => {
-            history.pushState(null, null, location.href);
+        // Manejar bfcache: cuando el navegador restaura la página desde caché (botón Atrás)
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                // La página fue restaurada desde bfcache
+                if (this.wasLoggedOut() || !this.isAuthenticated()) {
+                    console.log('[AuthManager] Página restaurada de caché sin sesión, redirigiendo...');
+                    window.location.replace('/login');
+                    return;
+                }
+            }
+            // Incluso sin bfcache, verificar estado
+            if (this.wasLoggedOut()) {
+                this.clearAuthComplete();
+                window.location.replace('/login');
+            }
         });
+
+        // Prevenir navegación hacia atrás en páginas protegidas
+        const protectedPaths = ['/dashboardadmin', '/dashboardempleado', '/dashboardcliente',
+                                '/inventario', '/pedidos', '/empleados', '/clientes',
+                                '/estadisticas', '/reportes', '/admin', '/carrito'];
+        const isProtectedPage = protectedPaths.some(path => window.location.pathname.startsWith(path));
+
+        if (isProtectedPage) {
+            // Reemplazar el estado actual para prevenir navegación hacia atrás
+            history.pushState(null, null, location.href);
+
+            window.addEventListener('popstate', (event) => {
+                if (this.wasLoggedOut() || !this.isAuthenticated()) {
+                    history.pushState(null, null, '/login');
+                    window.location.replace('/login');
+                } else {
+                    // Con sesión activa, mantener en la página
+                    history.pushState(null, null, location.href);
+                }
+            });
+        } else {
+            // En páginas no protegidas, solo manejar si hubo logout
+            window.addEventListener('popstate', (event) => {
+                if (this.wasLoggedOut()) {
+                    window.location.replace('/login');
+                }
+            });
+        }
     }
 };
 

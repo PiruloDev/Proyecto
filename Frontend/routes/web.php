@@ -17,6 +17,7 @@ use App\Http\Controllers\Usuarios\ClienteController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pedidos\CarritoController;
 use App\Http\Controllers\Reportes\OrdenSalidaController;
+use App\Http\Controllers\Estadisticas\EstadisticasController;
 use App\Http\Controllers\Pedidos\DashboardController;
 use App\Http\Controllers\Pedidos\DashboardEmpleadoController;
 // ============================================
@@ -63,11 +64,30 @@ Route::prefix('api/auth')->group(function () {
     Route::post('/validar', [App\Http\Controllers\Auth\AuthController::class, 'validarToken']);
 });
 
-// Logout
+// Logout - invalida token en backend y limpia sesión
 Route::post('/logout', function () {
+    $token = session('token');
+
+    // Invalidar token en el API (blacklist)
+    if ($token) {
+        app(\App\Services\AuthService::class)->logout($token);
+    }
+
     session()->flush();
-    return redirect()->route('home');
+    return redirect()->route('login')->with('logout', true);
 })->name('logout');
+
+// API logout - endpoint para llamadas AJAX desde el frontend
+Route::post('/api/auth/logout', function (\Illuminate\Http\Request $request) {
+    $token = $request->bearerToken() ?? session('token');
+
+    if ($token) {
+        app(\App\Services\AuthService::class)->logout($token);
+    }
+
+    session()->flush();
+    return response()->json(['success' => true, 'mensaje' => 'Sesión cerrada']);
+});
 
 // Reset Password
 Route::get('/recuperar-contrasena', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showRequestForm'])->name('reset-password');
@@ -75,8 +95,10 @@ Route::post('/api/recuperar-contrasena/validate-email', [App\Http\Controllers\Au
 Route::post('/api/recuperar-contrasena/update', [App\Http\Controllers\Auth\ResetPasswordController::class, 'updatePassword'])->name('reset-password.update');
 
 // ============================================
-// DASHBOARDS (sin autenticación por ahora)
+// DASHBOARDS (protegidos con autenticación JWT)
 // ============================================
+
+Route::middleware(['page.auth'])->group(function () {
 
 // Dashboard Cliente
 Route::get('/dashboardcliente', function () {
@@ -99,6 +121,8 @@ Route::get('/dashboardadmin', function () {
     $pedidosHoy = 0;
     return view('dashboards.admin', compact('totalProductos', 'productosActivos', 'empleadosActivos', 'clientesActivos', 'pedidosHoy'));
 })->name('dashboard.admin');
+
+}); // Fin del grupo page.auth para dashboards
 
 // ============================================
 // MÓDULO DE INVENTARIO (COMPLETAMENTE MODULAR)
@@ -330,6 +354,15 @@ Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.ind
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
 
 // =================================================================
+// ESTADÍSTICAS
+// =================================================================
+
+Route::prefix('estadisticas')->group(function() {
+    Route::get('/', [EstadisticasController::class, 'index'])
+        ->name('estadisticas.index');
+});
+
+// =================================================================
 // REPORTES
 // =================================================================
 
@@ -384,6 +417,6 @@ Route::get('/acceso-requerido', function () {
 })->name('auth.required');
 
 // DASHBOARD CONTROLLER PEDIDOS CLIENTE
-Route::get('/dashboardcliente', [DashboardController::class, 'index'])->name('dashboard.cliente');
+Route::get('/dashboardcliente', [DashboardController::class, 'index'])->name('dashboard.cliente')->middleware('page.auth');
 
 require __DIR__.'/settings.php';

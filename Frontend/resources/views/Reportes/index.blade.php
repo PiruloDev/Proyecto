@@ -1,326 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Estadísticas - Panadería')
+@section('title', 'Órdenes de Salida - Panadería')
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet">
-<style>
-    body {
-        background: linear-gradient(135deg, #FFF8E7 0%, #FFE9D0 100%);
-    }
-
-    .btn-nuevo {
-        background: #a67c52;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-nuevo:hover {
-        background: #8b6745;
-        color: white;
-    }
-
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1.25rem;
-        margin-top: 1.5rem;
-    }
-
-    .orden-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0 2px 4px rgba(139, 90, 43, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid #F5E6D3;
-    }
-
-    .orden-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(139, 90, 43, 0.2);
-    }
-
-    .card-header-custom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid #F5E6D3;
-    }
-
-    .orden-id {
-        background: #a67c52;
-        color: white;
-        padding: 0.35rem 0.75rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .card-body-custom {
-        margin: 1rem 0;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #FFF8E7;
-    }
-
-    .info-row:last-child {
-        border-bottom: none;
-    }
-
-    .info-label {
-        color: #8B5A2B;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .info-value {
-        color: #5C4033;
-        font-size: 0.9rem;
-    }
-
-    .total-factura {
-        background: #FFF8E7;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        text-align: center;
-    }
-
-    .total-label {
-        color: #8B5A2B;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .total-amount {
-        color: #5C4033;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .card-actions {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 1rem;
-    }
-
-    .btn-action {
-        flex: 1;
-        padding: 0.75rem;
-        border-radius: 10px;
-        border: none;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .btn-editar {
-        background: #46a169;
-        color: white;
-    }
-
-    .btn-editar:hover {
-        background: #3d8f5a;
-        color: white;
-    }
-
-    .btn-eliminar {
-        background: #fc7272;
-        color: white;
-    }
-
-    .btn-eliminar:hover {
-        background: #f85252;
-        color: white;
-    }
-
-    .alert {
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        font-weight: 500;
-    }
-
-    .alert-success {
-        background: #D4EDDA;
-        color: #155724;
-        border: 2px solid #C3E6CB;
-    }
-
-    .alert-error {
-        background: #F8D7DA;
-        color: #721C24;
-        border: 2px solid #F5C6CB;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(139, 90, 43, 0.15);
-    }
-
-    .empty-icon {
-        font-size: 4rem;
-        color: #D4A574;
-        margin-bottom: 1rem;
-    }
-
-    .empty-text {
-        color: #8B5A2B;
-        font-size: 1.2rem;
-        font-weight: 500;
-    }
-
-    .fecha-badge {
-        background: #FFF8E7;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.85rem;
-        color: #8B5A2B;
-    }
-
-    #modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 9998;
-        display: none;
-    }
-
-    #modal-overlay.show {
-        display: block;
-    }
-
-    #modal-box {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #FFF8E7;
-        padding: 2.5rem;
-        border-radius: 15px;
-        width: 90%;
-        max-width: 550px;
-        box-shadow: 0 10px 40px rgba(139, 90, 43, 0.5);
-        z-index: 9999;
-        max-height: 90vh;
-        overflow-y: auto;
-        display: none;
-    }
-
-    #modal-box.show {
-        display: block;
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #D4A574;
-    }
-
-    .modal-header h2 {
-        color: #8B5A2B;
-        font-size: 1.75rem;
-        margin: 0;
-    }
-
-    .btn-close-modal {
-        background: none;
-        border: none;
-        font-size: 2.5rem;
-        color: #8B5A2B;
-        cursor: pointer;
-        line-height: 1;
-        padding: 0;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-    }
-
-    .btn-close-modal:hover {
-        background: rgba(139, 90, 43, 0.1);
-        color: #5C4033;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #8B5A2B;
-        font-size: 1rem;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 0.85rem;
-        border-radius: 10px;
-        border: 2px solid #D4A574;
-        box-sizing: border-box;
-        font-size: 1rem;
-        background: white;
-        transition: all 0.3s ease;
-    }
-
-    .form-group input:focus {
-        outline: none;
-        border-color: #B8935F;
-        box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
-    }
-
-    .btn-submit {
-        background: #a67c52;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        width: 100%;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-    }
-
-    .btn-submit:hover {
-        background: #8b6745;
-    }
-</style>
+<link href="{{ asset('css/reportes-estadisticas.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -330,11 +16,11 @@
         @include('components.admin-sidebar')
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2"><i class="bi bi-graph-up me-2"></i>Estadísticas y Reportes</h1>
-                <button onclick="abrirModal()" class="btn-nuevo">
-                    <i class="bi bi-plus-circle me-1"></i> Nueva Orden
+                <h1 class="h2"><i class="bi bi-receipt me-2"></i>Órdenes de Salida</h1>
+                <button class="btn-nuevo" onclick="abrirModal()">
+                    <i class="bi bi-plus-circle me-1"></i>Nueva Orden
                 </button>
             </div>
 
@@ -342,6 +28,9 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
+            {{-- ============================
+                 ÓRDENES DE SALIDA
+                 ============================ --}}
             @if($ventas && count($ventas) > 0)
                 <div class="cards-grid">
             @foreach($ventas as $venta)
@@ -368,10 +57,10 @@
                     </div>
                 </div>
             @endforeach
+            </div>
             @else
-                <div class="empty-state">
-                    <div class="empty-icon">📦</div>
-                    <p class="empty-text">No hay órdenes de salida</p>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>No hay órdenes de salida disponibles.
                 </div>
             @endif
         </main>

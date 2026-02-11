@@ -1,20 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const isLoginPage = window.location.pathname === '/login';
-const isRegisterPage = window.location.pathname === '/register';
-const isAuthRequiredPage = window.location.pathname === '/acceso-requerido';
-const isResetPasswordPage = window.location.pathname === '/recuperar-contrasena';
-const isPublicPage = window.location.pathname === '/' ||
-                         window.location.pathname === '/menu' ||
-                         window.location.pathname.startsWith('/productos') ||
+    const currentPath = window.location.pathname;
+    const isLoginPage = currentPath === '/login';
+    const isRegisterPage = currentPath === '/register';
+    const isAuthRequiredPage = currentPath === '/acceso-requerido';
+    const isResetPasswordPage = currentPath === '/recuperar-contrasena';
+    const isPublicPage = currentPath === '/' ||
+                         currentPath === '/menu' ||
+                         currentPath.startsWith('/productos') ||
                          isAuthRequiredPage ||
                          isResetPasswordPage;
+
+    // Si el usuario cerró sesión, limpiar todo y quedar en login
+    if (AuthManager.wasLoggedOut()) {
+        AuthManager.clearAuthComplete();
+        if (!isLoginPage && !isPublicPage && !isRegisterPage) {
+            window.location.replace('/login');
+            return;
+        }
+    }
+
+    // Páginas protegidas: verificar autenticación
+    if (!isPublicPage && !isLoginPage && !isRegisterPage) {
         if (!AuthManager.isAuthenticated()) {
             console.warn('Usuario no autenticado, redirigiendo al login');
             AuthManager.redirectToLogin();
             return;
         }
 
-        const currentPath = window.location.pathname;
         const userRole = AuthManager.getRole();
         const expectedDashboard = AuthManager.getDashboardRoute(userRole);
 
@@ -24,7 +36,8 @@ const isPublicPage = window.location.pathname === '/' ||
         }
     }
 
-    if ((isLoginPage || isRegisterPage) && AuthManager.isAuthenticated()) {
+    // Si ya está autenticado e intenta ir al login/register, redirigir al dashboard
+    if ((isLoginPage || isRegisterPage) && AuthManager.isAuthenticated() && !AuthManager.wasLoggedOut()) {
         const userRole = AuthManager.getRole();
         const dashboard = AuthManager.getDashboardRoute(userRole);
         console.log('Usuario ya autenticado, redirigiendo al dashboard');
@@ -32,42 +45,41 @@ const isPublicPage = window.location.pathname === '/' ||
     }
 });
 
+// Manejar navegación hacia atrás (popstate)
 window.addEventListener('popstate', function(event) {
-    const isDashboardPage = window.location.pathname.includes('/dashboard');
-    const isLoginPage = window.location.pathname === '/login';
-    const isHomePage = window.location.pathname === '/';
+    const currentPath = window.location.pathname;
+    const isDashboardPage = currentPath.includes('/dashboard');
 
+    // Si se hizo logout, siempre redirigir al login
+    if (AuthManager.wasLoggedOut()) {
+        AuthManager.clearAuthComplete();
+        window.location.replace('/login');
+        return;
+    }
+
+    // Si intenta acceder a dashboard sin autenticación
     if (isDashboardPage && !AuthManager.isAuthenticated()) {
         console.log('Intento de acceso a dashboard sin autenticación, bloqueando...');
         window.location.replace('/login');
         return;
     }
-
-    if (isDashboardPage && AuthManager.isAuthenticated()) {
-        console.log('Navegación hacia atrás detectada desde dashboard, cerrando sesión...');
-        AuthManager.clearAuth();
-        window.location.replace('/');
-        return;
-    }
-
-    if (isLoginPage && AuthManager.isAuthenticated()) {
-        console.log('Navegación hacia atrás al login, cerrando sesión...');
-        AuthManager.clearAuth();
-    }
-
-    if (isHomePage) {
-        AuthManager.clearAuth();
-        console.log('Regreso al homepage, sesión limpiada');
-    }
 });
 
+// Manejar bfcache del navegador (pageshow)
 window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
-        const isDashboardPage = window.location.pathname.includes('/dashboard');
+        const currentPath = window.location.pathname;
+        const isDashboardPage = currentPath.includes('/dashboard');
+        const isProtectedPage = isDashboardPage ||
+                                currentPath.startsWith('/inventario') ||
+                                currentPath.startsWith('/pedidos') ||
+                                currentPath.startsWith('/empleados') ||
+                                currentPath.startsWith('/admin');
 
-        if (isDashboardPage) {
-            if (!AuthManager.isAuthenticated()) {
+        if (isProtectedPage) {
+            if (AuthManager.wasLoggedOut() || !AuthManager.isAuthenticated()) {
                 console.log('Cache del navegador detectado sin autenticación, redirigiendo...');
+                AuthManager.clearAuthComplete();
                 window.location.replace('/login');
             }
         }

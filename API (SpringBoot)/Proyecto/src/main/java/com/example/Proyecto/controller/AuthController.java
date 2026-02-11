@@ -238,4 +238,35 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    @Operation(summary = "Cerrar sesión", description = "Invalida el token JWT añadiéndolo a la blacklist")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Sesión cerrada exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Token no proporcionado")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(
+        @Parameter(description = "Header de autorización con formato: Bearer {token}", required = true)
+        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                jwtUtilidad.invalidarToken(token);
+                response.put("success", true);
+                response.put("mensaje", "Sesión cerrada exitosamente. Token invalidado.");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", true);
+                response.put("mensaje", "No se proporcionó token, sesión cerrada.");
+                return ResponseEntity.ok(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("mensaje", "Error al cerrar sesión: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

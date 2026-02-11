@@ -29,8 +29,9 @@
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                AuthManager.clearAuth();
-                window.location.href = '{{ route('home') }}';
+                
+                // Usar el método logout de AuthManager que maneja todo
+                AuthManager.logout();
             });
         }
     }

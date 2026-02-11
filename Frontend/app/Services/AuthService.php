@@ -101,16 +101,16 @@ class AuthService
             Log::info('=== REGISTRO REQUEST ===');
             Log::info('Endpoint: ' . env('API_BASE_URL', 'http://localhost:8080') . $endpoint);
             Log::info('Data recibida:', $data);
-            
+
             $payload = [
                 'nombre' => $data['nombre'],
                 'email' => $data['email'],
                 'telefono' => $data['telefono'] ?? null,
                 'contrasena' => $data['password']
             ];
-            
+
             Log::info('Payload a enviar:', $payload);
-            
+
             $response = Http::timeout(10)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post(env('API_BASE_URL', 'http://localhost:8080') . $endpoint, $payload);
@@ -129,7 +129,7 @@ class AuthService
 
             $error = $response->json();
             Log::error('Error en registro:', $error);
-            
+
             return [
                 'success' => false,
                 'mensaje' => $error['mensaje'] ?? $error['error'] ?? 'Error al registrar usuario',
@@ -176,6 +176,32 @@ class AuthService
                 'valido' => false,
                 'mensaje' => 'Error de conexión'
             ];
+        }
+    }
+
+    /**
+     * Cierra sesión invalidando el token en el backend (blacklist).
+     */
+    public function logout($token)
+    {
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token
+                ])
+                ->post(env('API_BASE_URL', 'http://localhost:8080') . '/auth/logout');
+
+            if ($response->successful()) {
+                Log::info('Token invalidado exitosamente en el backend');
+                return ['success' => true];
+            }
+
+            Log::warning('No se pudo invalidar el token en el backend: ' . $response->body());
+            return ['success' => false];
+        } catch (\Exception $e) {
+            Log::error('Error al invalidar token: ' . $e->getMessage());
+            return ['success' => false];
         }
     }
 }
