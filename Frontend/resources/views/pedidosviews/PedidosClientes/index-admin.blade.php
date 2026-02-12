@@ -7,48 +7,98 @@
     <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> 
     <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+      
+        body, html {
+            height: 100%;
+            overflow: hidden; 
+        }
+
+        .container-fluid, .row {
+            height: 100vh;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-content {
+            height: 100vh;
+            overflow-y: auto; 
+            background-color: #fdfaf6;
+            padding: 0 !important;
+        }
+
+        .sticky-header-section {
+            position: sticky;
+            top: 0;
+            z-index: 150; 
+            background-color: #fdfaf6; 
+            padding: 1.5rem 1.5rem 0 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        .table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 103px; 
+            z-index: 100;
+            background-color: #ffffff !important;
+            border-bottom: 2px solid #dee2e6 !important;
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+        }
+
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #dee2e6 !important;
+        }
+    </style>
 @endpush
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
         
-        {{-- SIDEBAR FIJO DEL ADMINISTRADOR --}}
         @include('components.admin-sidebar') 
         
-        {{-- CONTENIDO PRINCIPAL --}}
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2">Listado de Pedidos (Panel de Administración)</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
-                        <i class="fas fa-plus"></i> Crear Pedido
-                    </button>
-                    <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-sync"></i> Recargar Listado
-                    </a>
+            <div class="sticky-header-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <h1 class="h2">Listado de Pedidos (Panel de Administración)</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
+                            <i class="fas fa-plus"></i> Crear Pedido
+                        </button>
+                        <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-sync"></i> Recargar Listado
+                        </a>
+                    </div>
                 </div>
+
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif  
+
+                <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
             </div>
 
-            {{-- MENSAJES DE SESIÓN --}}
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif  
-
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-            
-            <section id="listado-pedidos" class="mb-5">
-                <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
-
+            <section id="listado-pedidos" class="mb-5 mt-3">
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered align-middle shadow-sm rounded-3">
                         <thead class="table-light">
@@ -74,7 +124,6 @@
                                             {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
                                         </span>
                                     </td>
-                                    {{-- Resaltar en rojo si el total llegara a ser negativo por error previo --}}
                                     <td class="{{ ($pedido['total_producto'] < 0) ? 'text-danger fw-bold' : '' }}">
                                         ${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}
                                     </td>
@@ -110,7 +159,6 @@
     </div>
 </div>
 
-{{-- MODAL ÚNICO PARA CREAR Y EDITAR PEDIDO --}}
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius: 12px;">
@@ -127,19 +175,16 @@
 
                     <div class="col-md-6">
                         <label for="modal_ID_CLIENTE" class="form-label fw-bold">ID Cliente</label>
-                        {{-- min="1" y bloqueo de teclado --}}
                         <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
 
                     <div class="col-md-6">
                         <label for="modal_ID_EMPLEADO" class="form-label fw-bold">ID Empleado</label>
-                        {{-- min="1" y bloqueo de teclado --}}
                         <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
 
                     <div class="col-md-6">
                         <label for="modal_ID_ESTADO_PEDIDO" class="form-label fw-bold">ID Estado Pedido</label>
-                        {{-- min="1" y bloqueo de teclado --}}
                         <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" min="1" onkeypress="return event.charCode >= 48" required>
                     </div>
                     
@@ -152,7 +197,6 @@
                         <label for="modal_TOTAL_PRODUCTO" class="form-label fw-bold">Total Producto ($)</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            {{-- min="0", step para decimales y bloqueo de tecla "-" --}}
                             <input type="number" step="0.01" min="0" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" 
                                    onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46" required>
                         </div>
@@ -180,23 +224,19 @@
         const formMethod = document.getElementById('formMethod');
         const createButton = document.getElementById('btn-create-pedido');
 
-        // Función para preparar el modal para CREAR
         function setupCreate() {
             modalTitle.textContent = 'Crear Nuevo Pedido';
             form.action = "{{ route('admin.pedidos.store') }}";
             formMethod.value = 'POST';
             form.reset();
-            // Asegurar que el total empiece en 0 si está vacío
             document.getElementById('modal_TOTAL_PRODUCTO').value = 0;
         }
 
-        // Configurar botón "Crear Pedido"
         createButton.addEventListener('click', function() {
             setupCreate();
             modal.show();
         });
 
-        // Configurar botones "Editar"
         document.querySelectorAll('.btn-edit-pedido').forEach(button => {
             button.addEventListener('click', function() {
                 const pedidoData = JSON.parse(this.getAttribute('data-pedido'));
@@ -205,14 +245,12 @@
                 form.action = "{{ url('admin/pedidos') }}/" + pedidoData.id_PEDIDO;
                 formMethod.value = 'PUT'; 
 
-                // Llenar campos
                 document.getElementById('modal_id_PEDIDO').value = pedidoData.id_PEDIDO || '';
                 document.getElementById('modal_ID_CLIENTE').value = pedidoData.id_CLIENTE || '';
                 document.getElementById('modal_ID_EMPLEADO').value = pedidoData.id_EMPLEADO || '';
                 document.getElementById('modal_ID_ESTADO_PEDIDO').value = pedidoData.id_ESTADO_PEDIDO || '';
                 document.getElementById('modal_TOTAL_PRODUCTO').value = pedidoData.total_PRODUCTO || 0;
                 
-                // Formatear fecha para el input date
                 if (pedidoData.fecha_ENTREGA) {
                     const date = new Date(pedidoData.fecha_ENTREGA);
                     const formattedDate = date.toISOString().split('T')[0];
@@ -225,7 +263,6 @@
             });
         });
 
-        // Validación Extra: Si el usuario pega un valor negativo con el mouse, lo forzamos a 0
         document.getElementById('modal_TOTAL_PRODUCTO').addEventListener('change', function() {
             if (this.value < 0) this.value = 0;
         });

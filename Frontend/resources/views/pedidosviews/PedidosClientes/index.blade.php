@@ -7,6 +7,55 @@
     <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> 
     <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .container-fluid, .row {
+            height: 100vh;
+        }
+
+        .main-content {
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #fdfaf6;
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sticky-header-section {
+            position: sticky;
+            top: 0;
+            z-index: 1020; 
+            background-color: #fdfaf6;
+            padding: 1.5rem 2rem 0 2rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table-responsive {
+            overflow: visible !important; 
+            padding: 1rem 2rem 2rem 2rem;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 105px; 
+            z-index: 1010;
+            background-color: #ffffff !important;
+            border-bottom: 2px solid #dee2e6 !important;
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            border-collapse: separate !important;
+            border-spacing: 0;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -23,31 +72,39 @@
             @include('components.employee-sidebar') 
         @endif
         
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2">Listado de Pedidos</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <button type="button" class="btn btn-primary me-2" id="btn-create-pedido">
-                        <i class="fas fa-plus"></i> Crear Pedido
-                    </button>
-                    <a href="{{ route('pedidos.index') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-sync"></i> Recargar Listado
-                    </a>
+            <div class="sticky-header-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+                    <h1 class="h2">Listado de Pedidos</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
+                            <i class="fas fa-plus"></i> Crear Pedido
+                        </button>
+                        <a href="{{ route('pedidos.index') }}" class="btn btn-outline-primary bg-white shadow-sm">
+                            <i class="fas fa-sync"></i> Recargar Listado
+                        </a>
+                    </div>
                 </div>
+
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif  
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
+                <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
             </div>
 
-            @if (session('success'))
-                <div class="alert alert-success my-3">{{ session('success') }}</div>
-            @endif  
-
-            @if (session('error'))
-                <div class="alert alert-danger my-3">{{ session('error') }}</div>
-            @endif
-            
-            <section id="listado-pedidos" class="mb-5">
-                <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
-
+            <section id="listado-pedidos">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped align-middle shadow-sm rounded-3">
                         <thead class="table-light">
@@ -59,7 +116,7 @@
                                 <th>Total</th>
                                 <th>Ingreso</th>
                                 <th>Entrega</th>
-                                <th>Acciones</th>
+                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
 
@@ -67,8 +124,6 @@
                             @forelse($pedidos as $pedido)
                                 <tr>
                                     <td>{{ $pedido['id_PEDIDO'] }}</td>
-                                    
-                                    {{-- Nombres en lugar de IDs --}}
                                     <td>{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['id_CLIENTE'] }}</td>
                                     <td>{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['id_EMPLEADO'] }}</td>
                                     <td>
@@ -76,18 +131,17 @@
                                             {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['id_ESTADO_PEDIDO'] }}
                                         </span>
                                     </td>
-
                                     <td>${{ number_format($pedido['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
                                     <td>{{ $pedido['fecha_INGRESO'] ?? 'N/A' }}</td>
                                     <td>{{ $pedido['fecha_ENTREGA'] ?? 'N/A' }}</td>
 
-                                    <td class="text-nowrap">
+                                    <td class="text-center text-nowrap">
                                         <button type="button" 
                                             class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#pedidoModal"
                                             data-pedido="{{ json_encode($pedido) }}">
-                                            <i class="fas fa-edit"></i> Editar
+                                            <i class="fas fa-edit"></i>
                                         </button>
 
                                         <form method="POST" action="{{ route('pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
@@ -101,7 +155,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center">No hay pedidos registrados.</td>
+                                    <td colspan="8" class="text-center py-4">No hay pedidos registrados.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -112,13 +166,12 @@
     </div>
 </div>
 
-{{-- MODAL PARA CREAR Y EDITAR --}}
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background: #a67c52; color: white;">
                 <h5 class="modal-title" id="pedidoModalLabel">Gestionar Pedido</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="pedidoForm" method="POST" action="">
                 @csrf
@@ -129,7 +182,6 @@
 
                     <div class="col-md-6">
                         <label for="modal_ID_CLIENTE" class="form-label">ID Cliente</label>
-                        {{-- min="1" previene números negativos y cero --}}
                         <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" min="1" required>
                     </div>
 
@@ -150,13 +202,12 @@
 
                     <div class="col-md-6">
                         <label for="modal_TOTAL_PRODUCTO" class="form-label">Total Producto</label>
-                        {{-- min="0" para el monto total --}}
                         <input type="number" step="0.01" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" min="0" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="modalSubmitButton">Guardar Cambios</button>
+                    <button type="submit" class="btn text-white" style="background: #a67c52;" id="modalSubmitButton">Guardar Cambios</button>
                 </div>
             </form>
         </div>
@@ -174,7 +225,6 @@
         const formMethod = document.getElementById('formMethod');
         const createButton = document.getElementById('btn-create-pedido');
 
-        // Bloqueo manual de entrada de negativos
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('keypress', function(e) {
                 if (e.key === '-' || e.key === 'e') {
