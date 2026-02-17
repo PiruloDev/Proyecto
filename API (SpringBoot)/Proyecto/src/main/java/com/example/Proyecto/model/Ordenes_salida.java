@@ -12,14 +12,22 @@ public class Ordenes_salida {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idFactura;
 
+    private String nombreCliente;
+    private int idFactura;
     private int idCliente;
     private int idPedido;
     private LocalDateTime fechaFacturacion;
     private double totalFactura;
 
     // Getters y Setters
+
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+    public void setNombreCliente(String nombreCliente) {
+        this.nombreCliente = nombreCliente;
+    }
     public int getIdFactura() {
         return idFactura;
     }

@@ -19,11 +19,21 @@ public class Ordenes_salidaService {
     }
 
     public List<Ordenes_salida> obtenerOrdenesSalida() {
-        String sql = "SELECT ID_FACTURA, ID_CLIENTE, ID_PEDIDO, FECHA_FACTURACION, TOTAL_FACTURA FROM ordenes_salida";
+        String sql = """
+                SELECT\s
+                    o.ID_FACTURA,
+                    o.ID_CLIENTE,
+                    o.ID_PEDIDO,
+                    o.FECHA_FACTURACION,
+                    o.TOTAL_FACTURA,
+                    c.NOMBRE_CLI AS nombre_cliente
+                FROM ordenes_salida o
+                LEFT JOIN clientes c ON o.ID_CLIENTE = c.ID_CLIENTE
+    """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
 
-            java.sql.Timestamp timestamp = rs.getTimestamp("FECHA_FACTURACION");
+            Timestamp timestamp = rs.getTimestamp("FECHA_FACTURACION");
             LocalDateTime fecha = (timestamp != null) ? timestamp.toLocalDateTime() : null;
 
             Ordenes_salida orden = new Ordenes_salida();
@@ -32,6 +42,7 @@ public class Ordenes_salidaService {
             orden.setIdPedido(rs.getInt("ID_PEDIDO"));
             orden.setFechaFacturacion(fecha);
             orden.setTotalFactura(rs.getDouble("TOTAL_FACTURA"));
+            orden.setNombreCliente(rs.getString("nombre_cliente"));
 
             return orden;
         });
