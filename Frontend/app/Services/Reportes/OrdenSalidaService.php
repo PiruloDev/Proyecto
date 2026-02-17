@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\Reportes;
 
-use App\Models\Reportes\ReportesVentas;
+use App\Models\Reportes\OrdenSalida;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +13,7 @@ class OrdenSalidaService {
      */
     public function obtenerVentas() {
         try {
-            return ReportesVentas::with(['cliente', 'pedido'])
+            return OrdenSalida::with(['cliente', 'pedido'])
                 ->masRecientes()
                 ->get();
         } catch (Exception $e) {
@@ -31,7 +31,7 @@ class OrdenSalidaService {
                 return ['error' => 'ID inválido'];
             }
 
-            $venta = ReportesVentas::with(['cliente', 'pedido'])->find($id);
+            $venta = OrdenSalida::with(['cliente', 'pedido'])->find($id);
             
             if (!$venta) {
                 return ['error' => 'Venta no encontrada'];
@@ -67,7 +67,7 @@ class OrdenSalidaService {
                 return ['error' => 'Formato de fecha inválido. Use formato ISO 8601 (YYYY-MM-DDTHH:mm:ss)'];
             }
 
-            $venta = ReportesVentas::create($datos);
+            $venta = OrdenSalida::create($datos);
             
             DB::commit();
             
@@ -90,7 +90,7 @@ class OrdenSalidaService {
                 return ['error' => 'ID inválido'];
             }
 
-            $venta = ReportesVentas::find($id);
+            $venta = OrdenSalida::find($id);
             
             if (!$venta) {
                 return ['error' => 'Venta no encontrada'];
@@ -129,7 +129,7 @@ class OrdenSalidaService {
                 return ['error' => 'ID inválido'];
             }
 
-            $venta = ReportesVentas::find($id);
+            $venta = OrdenSalida::find($id);
             
             if (!$venta) {
                 return ['error' => 'Venta no encontrada'];
@@ -156,7 +156,7 @@ class OrdenSalidaService {
                 return ['error' => 'ID de cliente inválido'];
             }
             
-            return ReportesVentas::porCliente($idCliente)
+            return OrdenSalida::porCliente($idCliente)
                 ->with(['pedido'])
                 ->masRecientes()
                 ->get();
@@ -175,7 +175,7 @@ class OrdenSalidaService {
                 return ['error' => 'Formato de fecha inválido'];
             }
             
-            return ReportesVentas::porRangoFechas($fechaInicio, $fechaFin)
+            return OrdenSalida::porRangoFechas($fechaInicio, $fechaFin)
                 ->with(['cliente', 'pedido'])
                 ->masRecientes()
                 ->get();
@@ -190,7 +190,7 @@ class OrdenSalidaService {
      */
     public function obtenerEstadisticas($fechaInicio = null, $fechaFin = null) {
         try {
-            $query = ReportesVentas::query();
+            $query = OrdenSalida::query();
 
             if ($fechaInicio && $fechaFin) {
                 $query->porRangoFechas($fechaInicio, $fechaFin);

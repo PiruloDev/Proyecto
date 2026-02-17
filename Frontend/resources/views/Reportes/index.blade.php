@@ -40,7 +40,10 @@
                         <span class="fecha-badge">{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('d/m/Y H:i') }}</span>
                     </div>
                     <div class="card-body-custom">
-                        <div class="info-row"><span class="info-label">Cliente:</span><span class="info-value">{{ $venta->ID_CLIENTE }}</span></div>
+                        <div class="info-row">
+    <span class="info-label">Cliente:</span>
+    <span class="info-value">{{ $venta->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</span>
+</div>
                         <div class="info-row"><span class="info-label">Pedido:</span><span class="info-value">{{ $venta->ID_PEDIDO }}</span></div>
                         <div class="total-factura">
                             <div class="total-label">TOTAL FACTURA</div>
@@ -48,7 +51,13 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn-action btn-editar" onclick="editarModal({{ $venta->ID_FACTURA }}, {{ $venta->ID_CLIENTE }}, {{ $venta->ID_PEDIDO }}, '{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('Y-m-d\TH:i') }}', {{ $venta->TOTAL_FACTURA }})">Editar</button>
+                        <button class="btn-action btn-editar" onclick="editarModal(
+{{ $venta->ID_FACTURA }},
+{{ $venta->ID_CLIENTE }},
+{{ $venta->ID_PEDIDO }},
+'{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('Y-m-d\TH:i') }}',
+{{ $venta->TOTAL_FACTURA }}
+)">Editar</button>
                         <form action="{{ route('ordenes.salida.destroy',$venta->ID_FACTURA) }}" method="POST" style="flex: 1;">
                             @csrf
                             @method('DELETE')
