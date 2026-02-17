@@ -119,6 +119,7 @@ class ProductoController extends Controller
 
             Log::info('=== DATOS VALIDADOS ===', $validated);
 
+            // IMPORTANTE: Mapear exactamente como espera el @JsonProperty del POJO de Spring Boot
             $data = [
                 'ID_PRODUCTO' => (int)$id,
                 'NOMBRE_PRODUCTO' => $validated['nombre'],
@@ -133,7 +134,7 @@ class ProductoController extends Controller
                 'FECHA_INGRESO_PRODUCTO' => now()->format('Y-m-d'),
             ];
 
-            Log::info('=== DATOS A ENVIAR A API ===', $data);
+            Log::info('=== DATOS A ENVIAR A API (formato @JsonProperty) ===', $data);
 
             $response = Http::timeout(10)
                 ->withHeaders([

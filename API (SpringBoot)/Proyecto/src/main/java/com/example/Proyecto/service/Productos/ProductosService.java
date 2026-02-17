@@ -173,8 +173,7 @@ public class ProductosService {
                 "PRECIO_PRODUCTO = ?, " +
                 "FECHA_VENCIMIENTO_PRODUCTO = ?, " +
                 "TIPO_PRODUCTO_MARCA = ?, " +
-                "ACTIVO = ?, " +
-                "IMAGEN_URL_PRODUCTO = ? " +
+                "ACTIVO = ? " +
                 "WHERE ID_PRODUCTO = ?";
         try {
             System.out.println("=== ACTUALIZANDO PRODUCTO ===");
@@ -202,7 +201,6 @@ public class ProductosService {
                     fechaVencimiento,
                     pojoProductos.getMarcaProducto(),
                     pojoProductos.isActivo(),
-                    pojoProductos.getImagenUrl(),
                     pojoProductos.getId()
             );
 

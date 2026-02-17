@@ -5,12 +5,9 @@
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+<link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet">
 
 <style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-    }
     .producto-img {
         width: 60px;
         height: 60px;
@@ -24,243 +21,254 @@
     .table-actions {
         white-space: nowrap;
     }
-    .search-section {
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    .stats-card {
+        background: linear-gradient(135deg, #a67c52 0%, #8b6745 100%);
+        border-radius: 12px;
         color: white;
-        padding: 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
+    }
+    .filter-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .main-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 </style>
 @endpush
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Component -->
+        @include('components.admin-sidebar')
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
+            <div class="content-wrapper">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="h3 mb-1"><i class="bi bi-box-seam"></i> Gestión de Productos</h2>
+                        <p class="text-muted mb-0">Administra el catálogo de productos de tu panadería</p>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
+                        <i class="bi bi-plus-circle"></i> Nuevo Producto
+                    </button>
+                </div>
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+                <!-- Mensajes de Alerta -->
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-    @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i>
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-    <!-- HEADER -->
-    <div class="search-section d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-            <h1 class="h2 mb-2"><i class="bi bi-box-seam"></i> Gestión de Productos</h1>
-            <p class="mb-0 opacity-75">Administra el catálogo de productos de tu panadería</p>
-        </div>
-        <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
-            <i class="bi bi-plus-circle"></i> Nuevo Producto
-        </button>
-    </div>
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-    <!-- FILTROS -->
-    <div class="card glass-card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar por nombre...">
+                <!-- Estadísticas rápidas -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center py-3">
+                                <i class="bi bi-box-seam" style="font-size: 2.5rem;"></i>
+                                <h2 class="mt-2 mb-0" id="totalProductos">{{ isset($productos) ? count($productos) : 0 }}</h2>
+                                <p class="mb-0 small">Total Productos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center py-3">
+                                <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                                <h2 class="mt-2 mb-0" id="productosActivos">{{ isset($productos) ? count($productos) : 0 }}</h2>
+                                <p class="mb-0 small">Productos Activos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center py-3">
+                                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem;"></i>
+                                <h2 class="mt-2 mb-0" id="stockBajo">
+                                    {{ isset($productos) ? collect($productos)->filter(function($p){ return isset($p['Stock Minímo:']) && (int)$p['Stock Minímo:'] <= 10 && (int)$p['Stock Minímo:'] > 0; })->count() : 0 }}
+                                </h2>
+                                <p class="mb-0 small">Stock Bajo</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center py-3">
+                                <i class="bi bi-cash-coin" style="font-size: 2.5rem;"></i>
+                                <h2 class="mt-2 mb-0" id="valorInventario">
+                                    ${{ isset($productos) ? number_format( collect($productos)->sum(function($p){ return (float)($p['Precio:'] ?? 0) * ((int)($p['Stock Minímo:'] ?? 0)); }), 0, ',', '.') : 0 }}
+                                </h2>
+                                <p class="mb-0 small">Valor Inventario</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <select id="filtroCategoria" class="form-select">
-                        <option value="">📦 Todas las categorías</option>
-                        @foreach ($categorias as $id => $nombre)
-                            <option value="{{ $id }}">{{ $nombre }}</option>
-                        @endforeach
-                    </select>
+                <!-- Filtros -->
+                <div class="card filter-card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar por nombre...">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <select id="filtroCategoria" class="form-select">
+                                    <option value="">📦 Todas las categorías</option>
+                                    @foreach ($categorias as $id => $nombre)
+                                        <option value="{{ $id }}">{{ $nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <select id="filtroEstado" class="form-select">
+                                    <option value="">Todos los estados</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <button onclick="limpiarFiltros()" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <select id="filtroEstado" class="form-select">
-                        <option value="">Todos los estados</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                    </select>
-                </div>
+                <!-- Tabla de Productos -->
+                <div class="card main-card">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Listado de Productos</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">ID</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Descripción</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Marca</th>
+                                        <th>Estado</th>
+                                        <th class="text-center pe-4">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaProductos">
+                                    @if(isset($productos) && count($productos) > 0)
+                                        @foreach($productos as $producto)
+                                            <tr
+                                                data-id="{{ $producto['Id Producto:'] ?? '' }}"
+                                                data-nombre="{{ $producto['Nombre Producto:'] ?? '' }}"
+                                                data-categoria="{{ $producto['Id Categoria Producto:'] ?? '' }}"
+                                                data-estado="{{ isset($producto['ACTIVO']) ? ($producto['ACTIVO'] ? 'activo' : 'inactivo') : 'activo' }}"
+                                            >
+                                                <td class="ps-4"><strong>#{{ $producto['Id Producto:'] ?? '' }}</strong></td>
 
-                <div class="col-md-2">
-                    <button onclick="limpiarFiltros()" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-clockwise"></i> Limpiar
-                    </button>
+                                                <td><strong>{{ $producto['Nombre Producto:'] ?? '-' }}</strong></td>
+
+                                                <td class="align-middle">
+                                                    <span class="badge bg-info text-dark">
+                                                        @php
+                                                            $categoriaId = $producto['Id Categoria Producto:'] ?? null;
+                                                            $categoriaNombre = $categorias[$categoriaId] ?? 'N/A';
+                                                        @endphp
+                                                        {{ $categoriaNombre }}
+                                                    </span>
+                                                </td>
+
+                                                <td><small>{{ Str::limit($producto['Descripcion Producto:'] ?? '', 50) }}</small></td>
+
+                                                <td><strong>${{ number_format((float)($producto['Precio:'] ?? 0), 0, ',', '.') }}</strong></td>
+
+                                                <td>
+                                                    @php $stockVal = isset($producto['Stock Minímo:']) ? (int)$producto['Stock Minímo:'] : 0; @endphp
+                                                    @if($stockVal <= 10 && $stockVal > 0)
+                                                        <span class="badge bg-warning text-dark">{{ $stockVal }}</span>
+                                                    @elseif($stockVal == 0)
+                                                        <span class="badge bg-danger">{{ $stockVal }}</span>
+                                                    @else
+                                                        <span class="badge bg-success">{{ $stockVal }}</span>
+                                                    @endif
+                                                </td>
+
+                                                <td>{{ $producto['Marca Producto:'] ?? '-' }}</td>
+
+                                                <td>
+                                                    @if(isset($producto['ACTIVO']) && $producto['ACTIVO'])
+                                                        <span class="badge bg-success">Activo</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">Inactivo</span>
+                                                    @endif
+                                                </td>
+
+                                                <td class="text-center table-actions pe-4">
+                                                    <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles('{{ $producto['Id Producto:'] ?? '' }}')" title="Ver detalles">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-success btn-action me-1" onclick='editarProducto(@json($producto))' title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-danger btn-action" onclick="eliminarProducto('{{ $producto['Id Producto:'] ?? '' }}', '{{ addslashes($producto['Nombre Producto:'] ?? '') }}')" title="Eliminar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="9" class="text-center py-5">
+                                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                                <p class="text-muted mt-2">No hay productos registrados</p>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Estadísticas rápidas -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card glass-card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-box-seam fs-2 text-primary"></i>
-                    <h3 class="mt-2 mb-0" id="totalProductos">{{ isset($productos) ? count($productos) : 0 }}</h3>
-                    <small class="text-muted">Total Productos</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card glass-card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-check-circle fs-2 text-success"></i>
-                    <h3 class="mt-2 mb-0" id="productosActivos">{{ isset($productos) ? count($productos) : 0 }}</h3>
-                    <small class="text-muted">Productos Activos</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card glass-card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
-                    <h3 class="mt-2 mb-0" id="stockBajo">
-                        {{ isset($productos) ? collect($productos)->filter(function($p){ return isset($p['Stock Minímo:']) && (int)$p['Stock Minímo:'] <= 10 && (int)$p['Stock Minímo:'] > 0; })->count() : 0 }}
-                    </h3>
-                    <small class="text-muted">Stock Bajo</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card glass-card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-cash-coin fs-2 text-info"></i>
-                    <h3 class="mt-2 mb-0" id="valorInventario">
-                        ${{ isset($productos) ? number_format( collect($productos)->sum(function($p){ return (float)($p['Precio:'] ?? 0) * ((int)($p['Stock Minímo:'] ?? 0)); }), 0, ',', '.') : 0 }}
-                    </h3>
-                    <small class="text-muted">Valor Inventario</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TABLA -->
-    <div class="card glass-card border-0 shadow-sm">
-        <div class="card-header bg-white border-0">
-            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Listado de Productos</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Marca</th>
-                            <th>Estado</th>
-                            <th class="text-center pe-4">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaProductos">
-                        @if(isset($productos) && count($productos) > 0)
-                            @foreach($productos as $producto)
-                                <tr
-                                    data-id="{{ $producto['Id Producto:'] ?? '' }}"
-                                    data-nombre="{{ $producto['Nombre Producto:'] ?? '' }}"
-                                    data-categoria="{{ $producto['Id Categoria Producto:'] ?? '' }}"
-                                    data-estado="{{ isset($producto['ACTIVO']) ? ($producto['ACTIVO'] ? 'activo' : 'inactivo') : 'activo' }}"
-                                >
-                                    <td class="ps-4"><strong>#{{ $producto['Id Producto:'] ?? '' }}</strong></td>
-
-                                    <td><strong>{{ $producto['Nombre Producto:'] ?? '-' }}</strong></td>
-
-                                    <td class="align-middle">
-                                        <span class="badge bg-info text-dark">
-                                            @php
-                                                $categoriaId = $producto['Id Categoria Producto:'] ?? null;
-                                                $categoriaNombre = $categorias[$categoriaId] ?? 'N/A';
-                                            @endphp
-                                            {{ $categoriaNombre }}
-                                        </span>
-                                    </td>
-
-                                    <td><small>{{ Str::limit($producto['Descripcion Producto:'] ?? '', 50) }}</small></td>
-
-                                    <td><strong>${{ number_format((float)($producto['Precio:'] ?? 0), 0, ',', '.') }}</strong></td>
-
-                                    <td>
-                                        @php $stockVal = isset($producto['Stock Minímo:']) ? (int)$producto['Stock Minímo:'] : 0; @endphp
-                                        @if($stockVal <= 10 && $stockVal > 0)
-                                            <span class="badge bg-warning text-dark">{{ $stockVal }}</span>
-                                        @elseif($stockVal == 0)
-                                            <span class="badge bg-danger">{{ $stockVal }}</span>
-                                        @else
-                                            <span class="badge bg-success">{{ $stockVal }}</span>
-                                        @endif
-                                    </td>
-
-                                    <td>{{ $producto['Marca Producto:'] ?? '-' }}</td>
-
-                                    <td>
-                                        @if(isset($producto['ACTIVO']) && $producto['ACTIVO'])
-                                            <span class="badge bg-success">Activo</span>
-                                        @else
-                                            <span class="badge bg-secondary">Inactivo</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="text-center table-actions pe-4">
-                                        <button class="btn btn-sm btn-info btn-action me-1" onclick="verDetalles('{{ $producto['Id Producto:'] ?? '' }}')" title="Ver detalles">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        <button class="btn btn-sm btn-warning btn-action me-1" onclick='editarProducto(@json($producto))' title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-
-                                        <button class="btn btn-sm btn-danger btn-action" onclick="eliminarProducto('{{ $producto['Id Producto:'] ?? '' }}', '{{ addslashes($producto['Nombre Producto:'] ?? '') }}')" title="Eliminar">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
-                                <td colspan="9" class="text-center py-5">
-                                    <i class="bi bi-inbox fs-1 text-muted"></i>
-                                    <p class="text-muted mt-2">No hay productos registrados</p>
-                                </td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Botón volver -->
-    <div class="mt-4">
-        <a href="{{ route('dashboard.admin') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Volver al Dashboard
-        </a>
+        </main>
     </div>
 </div>
 
@@ -268,13 +276,11 @@
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            {{-- ✅ CAMBIADO: action inicial apunta a productos.store --}}
             <form id="formProducto" method="POST" action="{{ route('productos.store') }}">
                 @csrf
-                {{-- ✅ CAMBIADO: _method oculto con valor POST por defecto --}}
                 <input type="hidden" name="_method" id="methodField" value="POST">
 
-                <div class="modal-header" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color:white;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #a67c52 0%, #8b6745 100%); color:white;">
                     <h5 class="modal-title" id="modalTitulo"><i class="bi bi-box-seam"></i> Nuevo Producto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -330,7 +336,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" style="background:#8B4513; border: none;">
+                    <button type="submit" class="btn btn-primary" style="background:#a67c52; border: none;">
                         <i class="bi bi-save"></i> Guardar
                     </button>
                 </div>
@@ -343,7 +349,7 @@
 <div class="modal fade" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color:white;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #a67c52 0%, #8b6745 100%); color:white;">
                 <h5 class="modal-title"><i class="bi bi-info-circle"></i> Detalles del Producto</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -374,13 +380,13 @@
 
     function filtrarProductos() {
         const busqueda = (document.getElementById('buscarProducto').value || '').toLowerCase();
-        const categoriaFiltro = document.getElementById('filtroCategoria').value;
+        const categoriaFiltro = document.getElementById('filtroCategoria').value; 
         const estado = document.getElementById('filtroEstado').value;
 
         const filas = document.querySelectorAll('#tablaProductos tr[data-id]');
         filas.forEach(fila => {
             const nombre = (fila.getAttribute('data-nombre') || '').toLowerCase();
-            const categoriaIdProducto = fila.getAttribute('data-categoria') || '';
+            const categoriaIdProducto = fila.getAttribute('data-categoria') || ''; 
             const estadoProducto = fila.getAttribute('data-estado') || '';
 
             const cumpleBusqueda = nombre.includes(busqueda);
@@ -394,8 +400,7 @@
     function limpiarFormulario() {
         const form = document.getElementById('formProducto');
         if (form) form.reset();
-
-        // Restaura el action y method a POST
+        
         document.getElementById('methodField').value = 'POST';
         document.getElementById('formProducto').action = '{{ route("productos.store") }}';
         document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-box-seam"></i> Nuevo Producto';
@@ -406,8 +411,7 @@
     function editarProducto(producto) {
         console.log('=== EDITANDO PRODUCTO ===');
         console.log('Producto recibido:', producto);
-
-        // Extraer datos del producto (funciona con ambos formatos)
+        
         const id = producto['Id Producto:'] ?? producto.ID_PRODUCTO ?? '';
         const nombre = producto['Nombre Producto:'] ?? producto.NOMBRE_PRODUCTO ?? '';
         const precio = producto['Precio:'] ?? producto.PRECIO_PRODUCTO ?? 0;
@@ -415,40 +419,35 @@
         const descripcion = producto['Descripcion Producto:'] ?? producto.DESCRIPCION_PRODUCTO ?? '';
         const marca = producto['Marca Producto:'] ?? producto.TIPO_PRODUCTO_MARCA ?? 'Propio';
         const categoria = producto['Id Categoria Producto:'] ?? producto.ID_CATEGORIA_PRODUCTO ?? '';
-
-        // ⚠️ IMPORTANTE: Determinar el estado correctamente
+        
         let activo = false;
         if (producto.ACTIVO !== undefined) {
             activo = producto.ACTIVO === true || producto.ACTIVO === 1 || producto.ACTIVO === '1';
         } else if (producto['ACTIVO'] !== undefined) {
             activo = producto['ACTIVO'] === true || producto['ACTIVO'] === 1 || producto['ACTIVO'] === '1';
         }
-
+        
         console.log('Datos extraídos:', {
             id, nombre, precio, stock, descripcion, marca, activo, categoria
         });
         console.log('Estado determinado:', activo ? 'activo' : 'inactivo');
-
-        // Cambiar título y método
+        
         document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
         document.getElementById('methodField').value = 'PATCH';
         document.getElementById('formProducto').action = '/productos/' + id;
 
-        // Llenar los campos del formulario
         document.getElementById('nombreProducto').value = nombre;
         document.getElementById('precioProducto').value = precio;
         document.getElementById('stockProducto').value = stock;
         document.getElementById('descripcionProducto').value = descripcion || '';
         document.getElementById('marcaProducto').value = marca || 'Propio';
         document.getElementById('categoriaProducto').value = categoria;
-
-        // ⚠️ IMPORTANTE: Establecer el estado correctamente
+        
         const estadoSelect = document.getElementById('estadoProducto');
         estadoSelect.value = activo ? 'activo' : 'inactivo';
-
+        
         console.log('Estado SELECT después de asignar:', estadoSelect.value);
 
-        // Mostrar el modal
         new bootstrap.Modal(document.getElementById('modalProducto')).show();
     }
 
@@ -460,17 +459,17 @@
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `/productos/${id}`;
-
+        
         const token = document.createElement('input');
         token.type = 'hidden';
         token.name = '_token';
         token.value = '{{ csrf_token() }}';
-
+        
         const method = document.createElement('input');
         method.type = 'hidden';
         method.name = '_method';
         method.value = 'DELETE';
-
+        
         form.appendChild(token);
         form.appendChild(method);
         document.body.appendChild(form);
@@ -490,9 +489,9 @@
         const cont = document.getElementById('detalleProductoContenido');
         cont.innerHTML = `
             <div class="text-center mb-3">
-                <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}"
-                     alt="${producto['Nombre Producto:'] ?? ''}"
-                     class="img-fluid rounded"
+                <img src="${producto['Imagen Producto:'] ?? 'https://via.placeholder.com/250'}" 
+                     alt="${producto['Nombre Producto:'] ?? ''}" 
+                     class="img-fluid rounded" 
                      style="max-height:250px;"
                      onerror="this.src='https://via.placeholder.com/250'">
             </div>
@@ -505,49 +504,49 @@
                 <div class="col-6">
                     <p>#${producto['Id Producto:'] ?? '-'}</p>
                 </div>
-
+                
                 <div class="col-6">
                     <p><strong><i class="bi bi-grid"></i> Categoría:</strong></p>
                 </div>
                 <div class="col-6">
                     <p><span class="badge bg-info text-dark">${categoriaNombre}</span></p>
                 </div>
-
+                
                 <div class="col-6">
                     <p><strong><i class="bi bi-currency-dollar"></i> Precio:</strong></p>
                 </div>
                 <div class="col-6">
                     <p class="text-success fw-bold">$${new Intl.NumberFormat('es-CO').format(parseFloat(producto['Precio:'] || 0))} COP</p>
                 </div>
-
+                
                 <div class="col-6">
                     <p><strong><i class="bi bi-box"></i> Stock:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Stock Minímo:'] ?? '0'} unidades</p>
                 </div>
-
+                
                 <div class="col-6">
                     <p><strong><i class="bi bi-tag"></i> Marca:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Marca Producto:'] ?? 'Sin marca'}</p>
                 </div>
-
+                
                 <div class="col-6">
                     <p><strong><i class="bi bi-calendar"></i> Vencimiento:</strong></p>
                 </div>
                 <div class="col-6">
                     <p>${producto['Fecha Vencimiento:'] ?? 'N/A'}</p>
                 </div>
-
+                
                 <div class="col-12">
                     <p><strong><i class="bi bi-file-text"></i> Descripción:</strong></p>
                     <p class="text-muted">${producto['Descripcion Producto:'] ?? 'Sin descripción'}</p>
                 </div>
             </div>
         `;
-
+        
         var modal = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
         modal.show();
     }
