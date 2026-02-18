@@ -7,6 +7,7 @@ public class DetallePedidos {
     private int idDetalle;
     private int idPedido;
     private int idProducto;
+    private String nombreProducto; // <-- AGREGAR SOLO ESTO
     private int cantidadProducto;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;
@@ -30,4 +31,8 @@ public class DetallePedidos {
 
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+
+    public String getNombreProducto() { return nombreProducto; }
+    public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
+
 }

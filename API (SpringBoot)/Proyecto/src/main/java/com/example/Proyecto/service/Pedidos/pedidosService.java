@@ -69,7 +69,21 @@ public class pedidosService {
                     "LEFT JOIN estado_pedidos s ON p.ID_ESTADO_PEDIDO = s.ID_ESTADO_PEDIDO ";
 
     public List<Pedidos> obtenerPedidos() {
-        return jdbcTemplate.query(SQL_SELECT_CON_NOMBRES + " ORDER BY p.ID_PEDIDO DESC", pedidoRowMapper);
+        List<Pedidos> lista = jdbcTemplate.query(SQL_SELECT_CON_NOMBRES + " ORDER BY p.ID_PEDIDO DESC", pedidoRowMapper);
+
+        if (lista != null) {
+            for (Pedidos pedido : lista) {
+                try {
+                    // Intentamos cargar los detalles. Si falla, el Dashboard no se cae.
+                    pedido.setDetalles(detallePedidosService.obtenerDetallesPorPedido(pedido.getID_PEDIDO()));
+                } catch (Exception e) {
+                    // Solo registramos el error en consola pero permitimos que el Dashboard cargue
+                    System.err.println("Aviso: No se pudieron cargar detalles para el pedido #" + pedido.getID_PEDIDO());
+                    pedido.setDetalles(new java.util.ArrayList<>());
+                }
+            }
+        }
+        return lista;
     }
 
     public Pedidos obtenerPedidoPorId(Long id) {
@@ -89,46 +103,60 @@ public class pedidosService {
        ===================================================== */
     @Transactional
     public int crearPedido(Pedidos pedido) {
-        // Validación de cliente
+        // 1. Validación de cliente (Tu lógica actual)
         if (!clienteExiste(pedido.getID_CLIENTE())) {
             throw new RuntimeException("Error: El cliente con ID " + pedido.getID_CLIENTE() + " no existe.");
         }
 
+        // --- VALIDACIÓN DE STOCK REAL ---
+        if (pedido.getDetalles() != null) {
+            for (DetallePedidos detalle : pedido.getDetalles()) {
+                // Usamos el nombre de la columna de tu Pojo: PRODUCTO_STOCK_MIN
+                String sqlStock = "SELECT PRODUCTO_STOCK_MIN FROM productos WHERE ID_PRODUCTO = ?";
+
+                try {
+                    Integer stockActual = jdbcTemplate.queryForObject(sqlStock, Integer.class, detalle.getIdProducto());
+
+                    if (stockActual < detalle.getCantidadProducto()) {
+                        throw new RuntimeException("No hay suficiente pan/producto. Disponible: " + stockActual);
+                    }
+                } catch (EmptyResultDataAccessException e) {
+                    throw new RuntimeException("El producto con ID " + detalle.getIdProducto() + " no existe en el inventario.");
+                }
+            }
+        }
+
+        // 2. [TU CÓDIGO ORIGINAL] INSERT DEL PEDIDO
         String sql = "INSERT INTO pedidos (ID_CLIENTE, ID_EMPLEADO, ID_ESTADO_PEDIDO, FECHA_INGRESO, FECHA_ENTREGA, TOTAL_PRODUCTO) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        // A. Insertamos el encabezado del pedido
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, pedido.getID_CLIENTE());
             ps.setLong(2, pedido.getID_EMPLEADO());
             ps.setLong(3, pedido.getID_ESTADO_PEDIDO());
-
-            Timestamp fechaIn = (pedido.getFECHA_INGRESO() != null)
-                    ? Timestamp.valueOf(pedido.getFECHA_INGRESO())
-                    : new Timestamp(System.currentTimeMillis());
+            Timestamp fechaIn = (pedido.getFECHA_INGRESO() != null) ? Timestamp.valueOf(pedido.getFECHA_INGRESO()) : new Timestamp(System.currentTimeMillis());
             ps.setTimestamp(4, fechaIn);
-
-            if (pedido.getFECHA_ENTREGA() == null) {
-                ps.setNull(5, Types.TIMESTAMP);
-            } else {
-                ps.setTimestamp(5, Timestamp.valueOf(pedido.getFECHA_ENTREGA()));
-            }
-
+            if (pedido.getFECHA_ENTREGA() == null) { ps.setNull(5, Types.TIMESTAMP); }
+            else { ps.setTimestamp(5, Timestamp.valueOf(pedido.getFECHA_ENTREGA())); }
             ps.setBigDecimal(6, pedido.getTOTAL_PRODUCTO());
             return ps;
         }, keyHolder);
 
-        // B. Obtenemos el ID generado (ej: el 99)
         int idPedidoGenerado = (keyHolder.getKey() != null) ? keyHolder.getKey().intValue() : 0;
 
-        // C. NUEVO: Si el pedido se creó, guardamos sus productos automáticamente
+        // 3. GUARDAR DETALLES Y DESCONTAR STOCK
         if (idPedidoGenerado > 0 && pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
             for (DetallePedidos detalle : pedido.getDetalles()) {
-                detalle.setIdPedido(idPedidoGenerado); // Vinculamos cada producto al ID del pedido
-                detallePedidosService.crearDetallePedido(detalle); // Guardamos en detalle_pedidos
+                // A. Vinculamos al pedido
+                detalle.setIdPedido(idPedidoGenerado);
+                detallePedidosService.crearDetallePedido(detalle);
+
+                // B. [DESCUENTO] Actualizamos la columna PRODUCTO_STOCK_MIN
+                String sqlUpdateStock = "UPDATE productos SET PRODUCTO_STOCK_MIN = PRODUCTO_STOCK_MIN - ? WHERE ID_PRODUCTO = ?";
+                jdbcTemplate.update(sqlUpdateStock, detalle.getCantidadProducto(), detalle.getIdProducto());
             }
         }
 
@@ -141,8 +169,24 @@ public class pedidosService {
                 nuevosDatos.getFECHA_ENTREGA() != null ? Timestamp.valueOf(nuevosDatos.getFECHA_ENTREGA()) : null,
                 nuevosDatos.getTOTAL_PRODUCTO(), id);
     }
-
     public void eliminarPedido(Long id) {
+        // 1. Obtener los detalles del pedido antes de borrar nada
+        // Usamos el detallePedidosService o una consulta directa para saber qué devolver
+        List<DetallePedidos> detalles = detallePedidosService.obtenerDetallesPorPedido(id.intValue());
+
+        if (detalles != null) {
+            for (DetallePedidos detalle : detalles) {
+                // 2. Devolvemos el stock al producto
+                // Usamos la misma columna: PRODUCTO_STOCK_MIN
+                String sqlUpdateStock = "UPDATE productos SET PRODUCTO_STOCK_MIN = PRODUCTO_STOCK_MIN + ? WHERE ID_PRODUCTO = ?";
+                jdbcTemplate.update(sqlUpdateStock, detalle.getCantidadProducto(), detalle.getIdProducto());
+            }
+        }
+
+        // 3. Eliminar los detalles (si tu DB no tiene ON DELETE CASCADE)
+        jdbcTemplate.update("DELETE FROM detalle_pedidos WHERE ID_PEDIDO = ?", id);
+
+        // 4. Eliminar el encabezado del pedido
         jdbcTemplate.update("DELETE FROM pedidos WHERE ID_PEDIDO = ?", id);
     }
 }

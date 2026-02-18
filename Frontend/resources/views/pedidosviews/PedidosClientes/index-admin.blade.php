@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-      
         body, html {
             height: 100%;
             overflow: hidden; 
@@ -202,6 +201,27 @@
                         </div>
                         <div class="form-text small">No se permiten valores negativos.</div>
                     </div>
+
+                    <div class="col-12 mt-4">
+                        <h6 class="border-bottom pb-2 fw-bold text-secondary">
+                            <i class="fas fa-shopping-basket me-2"></i>Artículos del Pedido
+                        </h6>
+                        <div class="table-responsive border rounded">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Producto</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end">Precio Unit.</th>
+                                        <th class="text-end pe-3">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detalles-pedido-body">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
@@ -223,6 +243,7 @@
         const modalTitle = document.getElementById('pedidoModalLabel');
         const formMethod = document.getElementById('formMethod');
         const createButton = document.getElementById('btn-create-pedido');
+        const detallesBody = document.getElementById('detalles-pedido-body');
 
         function setupCreate() {
             modalTitle.textContent = 'Crear Nuevo Pedido';
@@ -230,6 +251,7 @@
             formMethod.value = 'POST';
             form.reset();
             document.getElementById('modal_TOTAL_PRODUCTO').value = 0;
+            detallesBody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted italic">Los artículos se agregan después de crear el pedido.</td></tr>';
         }
 
         createButton.addEventListener('click', function() {
@@ -258,6 +280,27 @@
                 } else {
                     document.getElementById('modal_FECHA_ENTREGA').value = '';
                 }
+
+                // Cargar Detalles en la tabla del modal
+                detallesBody.innerHTML = '';
+if (pedidoData.detalles && pedidoData.detalles.length > 0) {
+    pedidoData.detalles.forEach(detalle => {
+        // PRIORIDAD: Intentamos mostrar nombreProducto, si no existe, mostramos el ID
+        const nombreAMostrar = detalle.nombreProducto ? detalle.nombreProducto : `Producto ID: ${detalle.idProducto}`;
+        
+        const fila = `
+            <tr>
+                <td class="ps-3">${nombreAMostrar}</td>
+                <td class="text-center fw-bold">${detalle.cantidadProducto}</td>
+                <td class="text-end">$${Number(detalle.precioUnitario).toLocaleString('es-CO')}</td>
+                <td class="text-end pe-3 fw-bold">$${Number(detalle.subtotal).toLocaleString('es-CO')}</td>
+            </tr>
+        `;
+        detallesBody.insertAdjacentHTML('beforeend', fila);
+    });
+} else {
+    detallesBody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted">No hay productos registrados para este pedido.</td></tr>';
+}
 
                 modal.show();
             });

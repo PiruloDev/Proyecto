@@ -64,4 +64,28 @@ public class DetallePedidosService {
         String sql = "DELETE FROM Detalle_Pedidos WHERE ID_DETALLE = ?";
         return jdbcTemplate.update(sql, idDetalle);
     }
+
+    public List<DetallePedidos> obtenerDetallesPorPedido(int idPedido) {
+        // Usamos el nombre exacto de la tabla de tu imagen: detalle_pedidos
+        String sql = "SELECT d.*, p.NOMBRE_PRODUCTO " +
+                "FROM detalle_pedidos d " +
+                "INNER JOIN productos p ON d.ID_PRODUCTO = p.ID_PRODUCTO " +
+                "WHERE d.ID_PEDIDO = ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            DetallePedidos detalle = new DetallePedidos();
+            // Ajustado a los nombres exactos de tu Pojo y tu imagen de BD
+            detalle.setIdDetalle(rs.getInt("ID_DETALLE"));
+            detalle.setIdPedido(rs.getInt("ID_PEDIDO"));
+            detalle.setIdProducto(rs.getInt("ID_PRODUCTO"));
+            detalle.setCantidadProducto(rs.getInt("CANTIDAD_PRODUCTO"));
+            detalle.setPrecioUnitario(rs.getBigDecimal("PRECIO_UNITARIO"));
+            detalle.setSubtotal(rs.getBigDecimal("SUBTOTAL"));
+
+            // Esto llena el campo nuevo que creamos
+            detalle.setNombreProducto(rs.getString("NOMBRE_PRODUCTO"));
+
+            return detalle;
+        }, idPedido);
+    }
 }
