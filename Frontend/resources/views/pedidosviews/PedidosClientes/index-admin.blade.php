@@ -9,71 +9,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body, html {
-            height: 100%;
-            overflow: hidden; 
-        }
-
-        .container-fluid, .row {
-            height: 100vh;
-        }
-
-        .sidebar {
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .main-content {
-            height: 100vh;
-            overflow-y: auto; 
-            background-color: #fdfaf6;
-            padding: 0 !important;
-        }
-
-        .sticky-header-section {
-            position: sticky;
-            top: 0;
-            z-index: 150; 
-            background-color: #fdfaf6; 
-            padding: 1.5rem 1.5rem 0 1.5rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .table-responsive {
-            overflow: visible !important;
-            padding: 0 1.5rem 1.5rem 1.5rem;
-        }
-
-        .table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-        }
-
-        .table thead th {
-            position: sticky;
-            top: 103px; 
-            z-index: 100;
-            background-color: #ffffff !important;
-            border-bottom: 2px solid #dee2e6 !important;
-            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
-        }
-
-        .table-bordered th, .table-bordered td {
-            border: 1px solid #dee2e6 !important;
-        }
+        body, html { height: 100%; overflow: hidden; }
+        .container-fluid, .row { height: 100vh; }
+        .sidebar { height: 100vh; position: sticky; top: 0; z-index: 1000; }
+        .main-content { height: 100vh; overflow-y: auto; background-color: #fdfaf6; padding: 0 !important; }
+        .sticky-header-section { position: sticky; top: 0; z-index: 150; background-color: #fdfaf6; padding: 1.5rem 1.5rem 0 1.5rem; border-bottom: 1px solid #dee2e6; }
+        .table-responsive { overflow: visible !important; padding: 0 1.5rem 1.5rem 1.5rem; }
+        .table { border-collapse: separate !important; border-spacing: 0 !important; }
+        .table thead th { position: sticky; top: 103px; z-index: 100; background-color: #ffffff !important; border-bottom: 2px solid #dee2e6 !important; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
+        .table-bordered th, .table-bordered td { border: 1px solid #dee2e6 !important; }
+        .btn-quitar { border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; }
     </style>
 @endpush
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        
         @include('components.admin-sidebar') 
         
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-            
             <div class="sticky-header-section">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                     <h1 class="h2">Listado de Pedidos (Panel de Administración)</h1>
@@ -123,32 +77,23 @@
                                             {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
                                         </span>
                                     </td>
-                                    <td class="{{ ($pedido['total_producto'] < 0) ? 'text-danger fw-bold' : '' }}">
-                                        ${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}
-                                    </td>
+                                    <td>${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}</td>
                                     <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
                                     <td>{{ $pedido['fecha_entrega'] ?? 'N/A' }}</td>
-
                                     <td class="text-center text-nowrap">
-                                        <button type="button" 
-                                            class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
-                                            data-pedido="{{ json_encode($pedido) }}">
+                                        <button type="button" class="btn btn-warning btn-sm me-1 btn-edit-pedido" data-pedido="{{ json_encode($pedido) }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
-
                                         <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este pedido?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro?')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-4 text-muted">No se encontraron pedidos registrados.</td>
-                                </tr>
+                                <tr><td colspan="8" class="text-center py-4 text-muted">No hay pedidos.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -158,54 +103,44 @@
     </div>
 </div>
 
-<div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
+<div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius: 12px;">
             <div class="modal-header text-white" style="background: #a67c52; border-radius: 12px 12px 0 0;">
                 <h5 class="modal-title" id="pedidoModalLabel">Gestión de Pedido</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form id="pedidoForm" method="POST" action="">
+            <form id="pedidoForm" method="POST">
                 @csrf
                 <input type="hidden" name="_method" value="POST" id="formMethod"> 
-                
                 <div class="modal-body row g-3">
                     <input type="hidden" name="id_PEDIDO" id="modal_id_PEDIDO">
-
                     <div class="col-md-6">
-                        <label for="modal_ID_CLIENTE" class="form-label fw-bold">ID Cliente</label>
-                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" min="1" onkeypress="return event.charCode >= 48" required>
+                        <label class="form-label fw-bold">ID Cliente</label>
+                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
                     </div>
-
                     <div class="col-md-6">
-                        <label for="modal_ID_EMPLEADO" class="form-label fw-bold">ID Empleado</label>
-                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" min="1" onkeypress="return event.charCode >= 48" required>
+                        <label class="form-label fw-bold">ID Empleado</label>
+                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
                     </div>
-
                     <div class="col-md-6">
-                        <label for="modal_ID_ESTADO_PEDIDO" class="form-label fw-bold">ID Estado Pedido</label>
-                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" min="1" onkeypress="return event.charCode >= 48" required>
+                        <label class="form-label fw-bold">ID Estado Pedido</label>
+                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
                     </div>
-                    
                     <div class="col-md-6">
-                        <label for="modal_FECHA_ENTREGA" class="form-label fw-bold">Fecha de Entrega</label>
+                        <label class="form-label fw-bold">Fecha de Entrega</label>
                         <input type="date" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
                     </div>
-
                     <div class="col-md-6">
-                        <label for="modal_TOTAL_PRODUCTO" class="form-label fw-bold">Total Producto ($)</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" step="0.01" min="0" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" 
-                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46" required>
-                        </div>
-                        <div class="form-text small">No se permiten valores negativos.</div>
+                        <label class="form-label fw-bold">Total Producto ($)</label>
+                        <input type="number" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" readonly>
                     </div>
 
                     <div class="col-12 mt-4">
-                        <h6 class="border-bottom pb-2 fw-bold text-secondary">
-                            <i class="fas fa-shopping-basket me-2"></i>Artículos del Pedido
-                        </h6>
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                            <h6 class="fw-bold text-secondary mb-0"><i class="fas fa-shopping-basket me-2"></i>Artículos</h6>
+                            <button type="button" class="btn btn-sm btn-success" id="btn-agregar-fila"><i class="fas fa-plus"></i> Añadir</button>
+                        </div>
                         <div class="table-responsive border rounded">
                             <table class="table table-sm table-striped mb-0">
                                 <thead class="table-light">
@@ -214,100 +149,169 @@
                                         <th class="text-center">Cant.</th>
                                         <th class="text-end">Precio Unit.</th>
                                         <th class="text-end pe-3">Subtotal</th>
+                                        <th class="text-center"></th>
                                     </tr>
                                 </thead>
-                                <tbody id="detalles-pedido-body">
-                                    </tbody>
+                                <tbody id="detalles-pedido-body"></tbody>
                             </table>
                         </div>
                     </div>
-
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn text-white" id="modalSubmitButton" style="background: #a67c52;">Guardar Pedido</button>
+                    <button type="submit" class="btn text-white" style="background: #a67c52;">Guardar Pedido</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
+    let listaProductosGlobal = [];
+
+    async function cargarProductosDesdeJava() {
+        try {
+            const response = await fetch('http://localhost:8080/productos');
+            const data = await response.json();
+            listaProductosGlobal = data.map(p => ({
+                id: p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
+                nombre: p.nombre_PRODUCTO || p.nombreProducto || p["Nombre Producto:"],
+                precio: p.precio_UNITARIO || p.precio || p["Precio:"] || 0
+            }));
+        } catch (error) {
+            console.error("Error productos:", error);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        const modalElement = document.getElementById('pedidoModal');
-        const modal = new bootstrap.Modal(modalElement);
+        cargarProductosDesdeJava();
+
+        const modal = new bootstrap.Modal(document.getElementById('pedidoModal'));
         const form = document.getElementById('pedidoForm');
-        const modalTitle = document.getElementById('pedidoModalLabel');
-        const formMethod = document.getElementById('formMethod');
-        const createButton = document.getElementById('btn-create-pedido');
         const detallesBody = document.getElementById('detalles-pedido-body');
 
-        function setupCreate() {
-            modalTitle.textContent = 'Crear Nuevo Pedido';
-            form.action = "{{ route('admin.pedidos.store') }}";
-            formMethod.value = 'POST';
-            form.reset();
-            document.getElementById('modal_TOTAL_PRODUCTO').value = 0;
-            detallesBody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted italic">Los artículos se agregan después de crear el pedido.</td></tr>';
+        function agregarFila(detalle = null) {
+            // Eliminar mensaje de "Añada productos" si existe
+            const emptyRow = detallesBody.querySelector('tr td[colspan]');
+            if (emptyRow) detallesBody.innerHTML = '';
+
+            const selectedId = detalle ? (detalle.id_PRODUCTO || detalle.idProducto || detalle.ID_PRODUCTO) : '';
+            const cantidad = detalle ? (detalle.cantidad_PRODUCTO || detalle.cantidadProducto || detalle.CANTIDAD_PRODUCTO) : 1;
+            const precio = detalle ? (detalle.precio_UNITARIO || detalle.precioUnitario || detalle.PRECIO_UNITARIO) : 0;
+            const subtotal = detalle ? (detalle.subtotal || (precio * cantidad)) : 0;
+
+            let opciones = listaProductosGlobal.map(p => 
+                `<option value="${p.id}" data-precio="${p.precio}" ${p.id == selectedId ? 'selected' : ''}>${p.nombre}</option>`
+            ).join('');
+
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>
+                    <select name="productos[]" class="form-select form-select-sm select-producto" required>
+                        <option value="">Seleccione...</option>
+                        ${opciones}
+                    </select>
+                </td>
+                <td><input type="number" name="cantidades[]" class="form-control form-control-sm text-center input-cantidad" value="${cantidad}" min="1" required></td>
+                <td class="text-end align-middle">
+                    <span class="precio-unit text-muted">$${Number(precio).toLocaleString('es-CO')}</span>
+                    <input type="hidden" name="precios_unitarios[]" class="input-precio-unitario" value="${precio}">
+                </td>
+                <td class="text-end align-middle">
+                    <span class="subtotal-fila fw-bold">$${Number(subtotal).toLocaleString('es-CO')}</span>
+                    <input type="hidden" name="subtotales[]" class="input-subtotal" value="${subtotal}">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-quitar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>`;
+            
+            detallesBody.appendChild(fila);
+            actualizarTotalPedido();
         }
 
-        createButton.addEventListener('click', function() {
-            setupCreate();
+        function actualizarTotalPedido() {
+            let totalGeneral = 0;
+            document.querySelectorAll('.input-subtotal').forEach(input => {
+                totalGeneral += parseFloat(input.value) || 0;
+            });
+            document.getElementById('modal_TOTAL_PRODUCTO').value = totalGeneral;
+        }
+
+        // Evento para el botón Añadir
+        document.getElementById('btn-agregar-fila').onclick = function(e) {
+            e.preventDefault();
+            agregarFila();
+        };
+
+        document.getElementById('btn-create-pedido').addEventListener('click', () => {
+            document.getElementById('pedidoModalLabel').textContent = 'Crear Nuevo Pedido';
+            form.action = "{{ route('admin.pedidos.store') }}";
+            document.getElementById('formMethod').value = 'POST';
+            form.reset();
+            detallesBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Añada productos.</td></tr>';
             modal.show();
         });
 
-        document.querySelectorAll('.btn-edit-pedido').forEach(button => {
-            button.addEventListener('click', function() {
-                const pedidoData = JSON.parse(this.getAttribute('data-pedido'));
+        detallesBody.addEventListener('input', (e) => {
+            if (e.target.classList.contains('select-producto') || e.target.classList.contains('input-cantidad')) {
+                const fila = e.target.closest('tr');
+                const select = fila.querySelector('.select-producto');
+                const cant = parseInt(fila.querySelector('.input-cantidad').value) || 0;
+                const precio = parseFloat(select.options[select.selectedIndex]?.dataset.precio) || 0;
+                const subtotal = precio * cant;
                 
-                modalTitle.textContent = 'Editar Pedido #' + pedidoData.id_PEDIDO;
-                form.action = "{{ url('admin/pedidos') }}/" + pedidoData.id_PEDIDO;
-                formMethod.value = 'PUT'; 
-
-                document.getElementById('modal_id_PEDIDO').value = pedidoData.id_PEDIDO || '';
-                document.getElementById('modal_ID_CLIENTE').value = pedidoData.id_CLIENTE || '';
-                document.getElementById('modal_ID_EMPLEADO').value = pedidoData.id_EMPLEADO || '';
-                document.getElementById('modal_ID_ESTADO_PEDIDO').value = pedidoData.id_ESTADO_PEDIDO || '';
-                document.getElementById('modal_TOTAL_PRODUCTO').value = pedidoData.total_PRODUCTO || 0;
+                fila.querySelector('.precio-unit').textContent = `$${Number(precio).toLocaleString('es-CO')}`;
+                fila.querySelector('.subtotal-fila').textContent = `$${Number(subtotal).toLocaleString('es-CO')}`;
+                fila.querySelector('.input-precio-unitario').value = precio;
+                fila.querySelector('.input-subtotal').value = subtotal;
                 
-                if (pedidoData.fecha_ENTREGA) {
-                    const date = new Date(pedidoData.fecha_ENTREGA);
-                    const formattedDate = date.toISOString().split('T')[0];
-                    document.getElementById('modal_FECHA_ENTREGA').value = formattedDate;
-                } else {
-                    document.getElementById('modal_FECHA_ENTREGA').value = '';
-                }
-
-                // Cargar Detalles en la tabla del modal
-                detallesBody.innerHTML = '';
-if (pedidoData.detalles && pedidoData.detalles.length > 0) {
-    pedidoData.detalles.forEach(detalle => {
-        // PRIORIDAD: Intentamos mostrar nombreProducto, si no existe, mostramos el ID
-        const nombreAMostrar = detalle.nombreProducto ? detalle.nombreProducto : `Producto ID: ${detalle.idProducto}`;
-        
-        const fila = `
-            <tr>
-                <td class="ps-3">${nombreAMostrar}</td>
-                <td class="text-center fw-bold">${detalle.cantidadProducto}</td>
-                <td class="text-end">$${Number(detalle.precioUnitario).toLocaleString('es-CO')}</td>
-                <td class="text-end pe-3 fw-bold">$${Number(detalle.subtotal).toLocaleString('es-CO')}</td>
-            </tr>
-        `;
-        detallesBody.insertAdjacentHTML('beforeend', fila);
-    });
-} else {
-    detallesBody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted">No hay productos registrados para este pedido.</td></tr>';
-}
-
-                modal.show();
-            });
+                actualizarTotalPedido();
+            }
         });
 
-        document.getElementById('modal_TOTAL_PRODUCTO').addEventListener('change', function() {
-            if (this.value < 0) this.value = 0;
+        detallesBody.addEventListener('click', (e) => {
+            const btnQuitar = e.target.closest('.btn-quitar');
+            if (btnQuitar) {
+                btnQuitar.closest('tr').remove();
+                if (detallesBody.children.length === 0) {
+                    detallesBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Añada productos.</td></tr>';
+                }
+                actualizarTotalPedido();
+            }
+        });
+
+        // Evento para editar
+        document.addEventListener('click', function(e) {
+            const btnEdit = e.target.closest('.btn-edit-pedido');
+            if (btnEdit) {
+                const data = JSON.parse(btnEdit.getAttribute('data-pedido'));
+                document.getElementById('pedidoModalLabel').textContent = 'Editar Pedido #' + data.id_PEDIDO;
+                form.action = "{{ url('admin/pedidos') }}/" + data.id_PEDIDO;
+                document.getElementById('formMethod').value = 'PUT';
+
+                document.getElementById('modal_id_PEDIDO').value = data.id_PEDIDO;
+                document.getElementById('modal_ID_CLIENTE').value = data.id_CLIENTE || data.ID_CLIENTE;
+                document.getElementById('modal_ID_EMPLEADO').value = data.id_EMPLEADO || data.ID_EMPLEADO;
+                document.getElementById('modal_ID_ESTADO_PEDIDO').value = data.id_ESTADO_PEDIDO || data.ID_ESTADO_PEDIDO;
+                document.getElementById('modal_TOTAL_PRODUCTO').value = data.total_PRODUCTO || data.TOTAL_PRODUCTO;
+                
+                if (data.fecha_ENTREGA) {
+                    document.getElementById('modal_FECHA_ENTREGA').value = new Date(data.fecha_ENTREGA).toISOString().split('T')[0];
+                }
+
+                detallesBody.innerHTML = '';
+                const detalles = data.detalles || data.detalle_pedidos || [];
+                if (detalles.length > 0) {
+                    detalles.forEach(d => agregarFila(d));
+                } else {
+                    detallesBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Sin detalles.</td></tr>';
+                }
+                modal.show();
+            }
         });
     });
 </script>

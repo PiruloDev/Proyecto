@@ -7,7 +7,7 @@ public class DetallePedidos {
     private int idDetalle;
     private int idPedido;
     private int idProducto;
-    private String nombreProducto; // <-- AGREGAR SOLO ESTO
+    private String nombreProducto;
     private int cantidadProducto;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;

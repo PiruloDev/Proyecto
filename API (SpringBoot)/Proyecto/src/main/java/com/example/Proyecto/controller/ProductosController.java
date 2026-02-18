@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RequestMapping("/productos")
 @RestController
+@CrossOrigin(origins = "*")
 @Tag(name = "Productos", description = "Gestión de productos de panadería")
 public class ProductosController {
 
