@@ -93,10 +93,7 @@ function setupLogoutButton() {
     logoutButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                AuthManager.logout();
-            }
+            AuthManager.logout();
         });
     });
 

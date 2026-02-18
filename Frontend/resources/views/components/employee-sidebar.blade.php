@@ -89,10 +89,7 @@
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                    AuthManager.clearAuth();
-                    window.location.replace('/');
-                }
+                AuthManager.logout();
             });
         }
 

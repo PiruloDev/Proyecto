@@ -154,7 +154,7 @@ const AuthManager = {
 
         const token = this.getToken();
 
-        // 1. Invalidar token en el backend (blacklist) ANTES de limpiar storage
+        // 1. Invalidar token en el backend (blacklist) y cerrar sesión Laravel
         if (token) {
             try {
                 await fetch('/api/auth/logout', {
@@ -179,31 +179,8 @@ const AuthManager = {
         sessionStorage.clear();
         sessionStorage.setItem(this.LOGOUT_FLAG, 'true');
 
-        // 4. Enviar POST para cerrar sesión en Laravel (flush session server-side)
-        try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-            if (csrfToken) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/logout';
-                form.style.display = 'none';
-
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = csrfToken;
-                form.appendChild(csrfInput);
-
-                document.body.appendChild(form);
-                form.submit();
-            } else {
-                window.location.replace('/login');
-            }
-        } catch (error) {
-            console.error('Error al cerrar sesión en el servidor:', error);
-            window.location.replace('/login');
-        }
+        // 4. Redirigir al login directamente
+        window.location.replace('/login');
     },
 
     init() {
