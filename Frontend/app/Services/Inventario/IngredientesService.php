@@ -3,6 +3,7 @@
 namespace App\Services\Inventario;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class IngredientesService
 {
@@ -10,23 +11,22 @@ class IngredientesService
 
     public function __construct()
     {
-        // Obtiene la URL base de la API desde el archivo .env
+        // Prioriza la URL del .env, usa localhost:8080 como respaldo
         $this->baseUrl = env('API_BASE_URL', 'http://localhost:8080'); 
     }
 
     /**
-     * Helper para obtener el cliente HTTP. (Sin token de autorización).
-     * @return \Illuminate\Http\Client\PendingRequest
+     * Cliente HTTP configurado para JSON
      */
     protected function getApiClient()
     {
-        // Se eliminó la lógica del token JWT.
-        // Crea un cliente HTTP con la configuración base.
-        return Http::baseUrl($this->baseUrl);
+        return Http::baseUrl($this->baseUrl)
+            ->acceptJson()
+            ->contentType('application/json');
     }
     
     /**
-     * Helper privado para filtrar y asegurar que solo se envían los 4 campos principales.
+     * Filtra los datos para que coincidan EXACTAMENTE con el modelo Ingredientes.java
      */
     private function filterIngredienteData(array $data): array
     {
@@ -37,235 +37,115 @@ class IngredientesService
             'referenciaIngrediente'
         ];
         
-        // Retorna un array que solo contiene las claves especificadas
-        return array_intersect_key($data, array_flip($allowedKeys));
+        // Extraemos solo los campos permitidos
+        $filtered = array_intersect_key($data, array_flip($allowedKeys));
+
+        // Aseguramos que los IDs sean tratados como enteros (Long en Java)
+        if (isset($filtered['idProveedor'])) $filtered['idProveedor'] = (int)$filtered['idProveedor'];
+        if (isset($filtered['idCategoria'])) $filtered['idCategoria'] = (int)$filtered['idCategoria'];
+
+        return $filtered;
     }
 
-    // =========================================================================
-    // GET: OBTENER Los ingredientes con su cantidad (GET /ingredientes/cantidad)
-    // =========================================================================
-    
+    // --- MÉTODOS DE OBTENCIÓN ---
 
     public function obtenerIngredientesSimple(): array
-{
-    try {
-        $response = $this->getApiClient()->get('/ingredientes/cantidad');
-
-        if ($response->successful()) {
-            return [
-                'success' => true,
-                'data' => $response->json()
-            ];
+    {
+        try {
+            $response = $this->getApiClient()->get('/ingredientes/cantidad');
+            return $response->successful() 
+                ? ['success' => true, 'data' => $response->json()]
+                : ['success' => false, 'error' => 'Error API: ' . $response->status()];
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
         }
-
-        return [
-            'success' => false,
-            'error' => $response->json()['error'] ?? 'Error al obtener inventario simple (' . $response->status() . ')'
-        ];
-
-    } catch (\Exception $e) {
-        return [
-            'success' => false,
-            'error' => 'No se pudo conectar con el servidor: ' . $e->getMessage()
-        ];
     }
-}
 
-
-    // =========================================================================
-    // CRUD: OBTENER TODOS (GET /ingredientes/lista)
-    // =========================================================================
-    
-    /**
-     * Obtiene el listado de ingredientes (DTO optimizado) desde la API.
-     * @return array Retorna un array con 'success' y 'data' o 'error'.
-     */
     public function obtenerIngredientes(): array
     {
         try {
-            // Consume el endpoint optimizado
             $response = $this->getApiClient()->get('/ingredientes/lista'); 
-
-            if ($response->successful()) {
-                return [
-                    'success' => true, 
-                    'data' => $response->json()
-                ];
-            }
-
-            return [
-                'success' => false,
-                'error' => $response->json()['error'] ?? 'Error desconocido al obtener ingredientes (' . $response->status() . ')'
-            ];
-
+            return $response->successful()
+                ? ['success' => true, 'data' => $response->json()]
+                : ['success' => false, 'error' => 'Error al obtener lista'];
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'No se pudo conectar con el servidor de la API: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 
-    // =========================================================================
-    // CRUD: CREAR (POST /crearingrediente)
-    // =========================================================================
-
+    // --- MÉTODOS DE CREACIÓN Y EDICIÓN (CRÍTICOS) ---
 
     public function agregarIngredientes(array $data): array
     {
         try {
             $payload = $this->filterIngredienteData($data); 
 
+            // LOG PARA DEPURACIÓN: Revisa storage/logs/laravel.log
+            Log::debug("Enviando a Spring Boot (Crear):", $payload);
+
             $response = $this->getApiClient()->post('/crearingrediente', $payload);
 
             if ($response->successful()) {
-                return [
-                    'success' => true,
-                    'response' => $response->body()
-                ];
+                return ['success' => true, 'response' => $response->body()];
             }
 
-            return [
-                'success' => false,
-                'error' => $response->json()['error'] ?? 'Error al guardar el ingrediente (' . $response->status() . ')'
-            ];
+            Log::error("Spring Boot rechazó la creación:", ['status' => $response->status(), 'body' => $response->body()]);
+            return ['success' => false, 'error' => $response->body() ?: 'Error ' . $response->status()];
 
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'Fallo de conexión al intentar crear: ' . $e->getMessage()
-            ];
+            Log::error("Fallo de conexión en agregarIngredientes: " . $e->getMessage());
+            return ['success' => false, 'error' => 'Error de conexión con el servidor backend'];
         }
     }
-
-    // =========================================================================
-    // CRUD: ACTUALIZAR (PUT /ingrediente/{id})
-    // =========================================================================
 
     public function actualizarIngrediente(int $id, array $data): array
     {
         try {
             $payload = $this->filterIngredienteData($data); 
+            
+            Log::debug("Enviando a Spring Boot (Actualizar ID $id):", $payload);
 
             $response = $this->getApiClient()->put("/ingrediente/{$id}", $payload);
 
             if ($response->successful()) {
-                return [
-                    'success' => true,
-                    'response' => $response->body()
-                ];
+                return ['success' => true, 'response' => $response->body()];
             }
 
-            return [
-                'success' => false,
-                'error' => $response->json()['error'] ?? 'Error al actualizar el ingrediente (' . $response->status() . ')'
-            ];
+            return ['success' => false, 'error' => 'No se pudo actualizar'];
 
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'Fallo de conexión al intentar actualizar: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
-
-    // =========================================================================
-    // CRUD: ELIMINAR (DELETE /ingrediente/{id})
-    // =========================================================================
 
     public function eliminarIngrediente(int $id): array
     {
         try {
             $response = $this->getApiClient()->delete("/ingrediente/{$id}");
-
-            if ($response->successful()) {
-                return [
-                    'success' => true,
-                    'response' => $response->body()
-                ];
-            }
-
-            return [
-                'success' => false,
-                'error' => $response->json()['error'] ?? 'Error al eliminar el ingrediente (' . $response->status() . ')'
-            ];
-
+            return $response->successful()
+                ? ['success' => true, 'response' => $response->body()]
+                : ['success' => false, 'error' => 'Error al eliminar'];
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'Fallo de conexión al intentar eliminar: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
-    
-    // =========================================================================
-    // ACTUALIZACIÓN PARCIAL DE CANTIDAD (PATCH /{id}/cantidad) - Se mantiene para stock
-    // =========================================================================
 
-    public function actualizarCantidadIngrediente(int $id, array $data): array
-    {
-        try {
-            $payload = array_intersect_key($data, array_flip(['cantidadIngrediente']));
-
-            $response = $this->getApiClient()->patch("/{$id}/cantidad", $payload);
-
-            if ($response->successful()) {
-                return [
-                    'success' => true,
-                    'response' => $response->body()
-                ];
-            }
-
-            return [
-                'success' => false,
-                'error' => $response->json()['error'] ?? 'Error al actualizar la cantidad (' . $response->status() . ')'
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'Fallo de conexión al intentar actualizar la cantidad: ' . $e->getMessage()
-            ];
-        }
-    }
+    // --- GESTIÓN DE STOCK ---
 
     public function ingresarStock(int $id, array $data): array
-{
-    try {
-        // La API espera un objeto JSON como: {"cantidadIngresada": 10.5}
-        // Usamos array_intersect_key para asegurar que solo enviamos el campo necesario.
-        $payload = array_intersect_key($data, array_flip(['cantidadIngresada']));
+    {
+        try {
+            // Spring espera {"cantidadIngresada": valor}
+            $payload = ['cantidadIngresada' => (float)$data['cantidadIngresada']];
 
-        // Realiza la petición POST al endpoint de Spring Boot
-        $response = $this->getApiClient()->post("/ingredientes/{$id}/ingreso", $payload);
+            $response = $this->getApiClient()->post("/ingredientes/{$id}/ingreso", $payload);
 
-        if ($response->successful()) {
-            return [
-                'success' => true,
-                'response' => $response->body() // El backend retorna un String de éxito.
-            ];
+            return $response->successful()
+                ? ['success' => true, 'response' => $response->body()]
+                : ['success' => false, 'error' => $response->body()];
+
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => 'Error de conexión stock'];
         }
-        
-        // Manejo de errores 4xx o 5xx del backend.
-        // El body puede ser un simple string de error o un JSON.
-        $errorMessage = $response->body() ?? 'Error desconocido al reponer stock (' . $response->status() . ')';
-
-        // Intenta obtener el mensaje de error del cuerpo JSON si está disponible
-        if ($response->json() && isset($response->json()['error'])) {
-            $errorMessage = $response->json()['error'];
-        }
-
-        return [
-            'success' => false,
-            'error' => $errorMessage
-        ];
-
-    } catch (\Exception $e) {
-        return [
-            'success' => false,
-            'error' => 'Fallo de conexión al intentar ingresar stock: ' . $e->getMessage()
-        ];
     }
-}
-
 }
