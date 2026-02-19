@@ -32,12 +32,6 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link" href="#productos" data-section="productos">
-                    <i class="bi bi-box-seam"></i>
-                    Ver Productos
-                </a>
-            </div>
-            <div class="nav-item">
                 <a class="nav-link" href="#perfil" data-section="perfil">
                     <i class="bi bi-person-circle"></i>
                     Mi Perfil
