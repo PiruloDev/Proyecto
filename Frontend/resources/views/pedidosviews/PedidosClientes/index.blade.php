@@ -9,16 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        
-        body, html {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .container-fluid, .row {
-            height: 100vh;
-        }
-
+        body, html { height: 100%; overflow: hidden; }
+        .container-fluid, .row { height: 100vh; }
         .main-content {
             height: 100vh;
             overflow-y: auto;
@@ -27,7 +19,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .sticky-header-section {
             position: sticky;
             top: 0;
@@ -36,24 +27,13 @@
             padding: 1.5rem 2rem 0 2rem;
             border-bottom: 1px solid #dee2e6;
         }
-
-        .table-responsive {
-            overflow: visible !important; 
-            padding: 1rem 2rem 2rem 2rem;
-        }
-
+        .table-responsive { padding: 1rem 2rem 2rem 2rem; }
         .table thead th {
             position: sticky;
-            top: 105px; 
+            top: 0; 
             z-index: 1010;
             background-color: #ffffff !important;
             border-bottom: 2px solid #dee2e6 !important;
-            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
-        }
-
-        .table {
-            border-collapse: separate !important;
-            border-spacing: 0;
         }
     </style>
 @endpush
@@ -78,11 +58,12 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                     <h1 class="h2">Listado de Pedidos</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
+                        {{-- CAMBIO 1: Botón ahora es un link a la vista create --}}
+                        <a href="{{ route('pedidos.create') }}" class="btn btn-primary me-2" style="background: #a67c52; border: none;">
                             <i class="fas fa-plus"></i> Crear Pedido
-                        </button>
+                        </a>
                         <a href="{{ route('pedidos.index') }}" class="btn btn-outline-primary bg-white shadow-sm">
-                            <i class="fas fa-sync"></i> Recargar Listado
+                            <i class="fas fa-sync"></i> Recargar
                         </a>
                     </div>
                 </div>
@@ -93,13 +74,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif  
-
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
                 
                 <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
             </div>
@@ -114,7 +88,6 @@
                                 <th>Empleado</th>
                                 <th>Estado</th>
                                 <th>Total</th>
-                                <th>Ingreso</th>
                                 <th>Entrega</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
@@ -131,23 +104,20 @@
                                             {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['id_ESTADO_PEDIDO'] }}
                                         </span>
                                     </td>
-                                    <td>${{ number_format($pedido['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
-                                    <td>{{ $pedido['fecha_INGRESO'] ?? 'N/A' }}</td>
+                                    <td class="fw-bold text-success">${{ number_format($pedido['total_PRODUCTO'] ?? 0, 0, ',', '.') }}</td>
                                     <td>{{ $pedido['fecha_ENTREGA'] ?? 'N/A' }}</td>
 
                                     <td class="text-center text-nowrap">
-                                        <button type="button" 
-                                            class="btn btn-warning btn-sm me-1 btn-edit-pedido" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#pedidoModal"
-                                            data-pedido="{{ json_encode($pedido) }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                        {{-- CAMBIO 2: El botón de editar ahora es un link a la vista edit --}}
+                                        <a href="{{ route('pedidos.edit', $pedido['id_PEDIDO']) }}" 
+                                           class="btn btn-warning btn-sm me-1 shadow-sm">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
 
                                         <form method="POST" action="{{ route('pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este pedido?')">
+                                            <button type="submit" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('¿Está seguro de eliminar este pedido?')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -155,7 +125,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">No hay pedidos registrados.</td>
+                                    <td colspan="7" class="text-center py-4 text-muted">No hay pedidos registrados.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -165,107 +135,13 @@
         </main>
     </div>
 </div>
-
-<div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background: #a67c52; color: white;">
-                <h5 class="modal-title" id="pedidoModalLabel">Gestionar Pedido</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="pedidoForm" method="POST" action="">
-                @csrf
-                <input type="hidden" name="_method" value="POST" id="formMethod"> 
-                
-                <div class="modal-body row g-3">
-                    <input type="hidden" name="id_PEDIDO" id="modal_id_PEDIDO">
-
-                    <div class="col-md-6">
-                        <label for="modal_ID_CLIENTE" class="form-label">ID Cliente</label>
-                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" min="1" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="modal_ID_EMPLEADO" class="form-label">ID Empleado</label>
-                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" min="1" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="modal_ID_ESTADO_PEDIDO" class="form-label">ID Estado Pedido</label>
-                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" min="1" required>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label for="modal_FECHA_ENTREGA" class="form-label">Fecha de Entrega</label>
-                        <input type="date" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="modal_TOTAL_PRODUCTO" class="form-label">Total Producto</label>
-                        <input type="number" step="0.01" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" min="0" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn text-white" style="background: #a67c52;" id="modalSubmitButton">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
+{{-- CAMBIO 3: Eliminamos todo el JS del Modal que ya no se usa --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const modalElement = document.getElementById('pedidoModal');
-        const modal = new bootstrap.Modal(modalElement);
-        const form = document.getElementById('pedidoForm');
-        const modalTitle = document.getElementById('pedidoModalLabel');
-        const formMethod = document.getElementById('formMethod');
-        const createButton = document.getElementById('btn-create-pedido');
-
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === '-' || e.key === 'e') {
-                    e.preventDefault();
-                }
-            });
-            input.addEventListener('input', function() {
-                if (this.value < 0) this.value = 1;
-            });
-        });
-
-        createButton.addEventListener('click', function() {
-            modalTitle.textContent = 'Crear Nuevo Pedido';
-            form.action = "{{ route('pedidos.store') }}";
-            formMethod.value = 'POST';
-            form.reset();
-            modal.show();
-        });
-
-        document.querySelectorAll('.btn-edit-pedido').forEach(button => {
-            button.addEventListener('click', function() {
-                const pedidoData = JSON.parse(this.getAttribute('data-pedido'));
-                modalTitle.textContent = 'Editar Pedido #' + pedidoData.id_PEDIDO;
-                form.action = "{{ url('pedidos') }}/" + pedidoData.id_PEDIDO;
-                formMethod.value = 'PUT'; 
-
-                document.getElementById('modal_id_PEDIDO').value = pedidoData.id_PEDIDO || '';
-                document.getElementById('modal_ID_CLIENTE').value = pedidoData.id_CLIENTE || '';
-                document.getElementById('modal_ID_EMPLEADO').value = pedidoData.id_EMPLEADO || '';
-                document.getElementById('modal_ID_ESTADO_PEDIDO').value = pedidoData.id_ESTADO_PEDIDO || '';
-                document.getElementById('modal_TOTAL_PRODUCTO').value = pedidoData.total_PRODUCTO || '';
-                
-                if (pedidoData.fecha_ENTREGA) {
-                    const date = new Date(pedidoData.fecha_ENTREGA);
-                    document.getElementById('modal_FECHA_ENTREGA').value = date.toISOString().split('T')[0];
-                } else {
-                    document.getElementById('modal_FECHA_ENTREGA').value = '';
-                }
-                modal.show();
-            });
-        });
+        console.log("Listado de pedidos cargado.");
     });
 </script>
 @endpush

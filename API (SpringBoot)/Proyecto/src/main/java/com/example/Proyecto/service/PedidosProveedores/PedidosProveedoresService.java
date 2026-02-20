@@ -2,8 +2,11 @@ package com.example.Proyecto.service.PedidosProveedores;
 
 import com.example.Proyecto.model.PedidosProveedores;
 import com.example.Proyecto.model.DetallePedidoProveedores;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,12 +14,15 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+
 
 @Service
 public class PedidosProveedoresService {
@@ -196,5 +202,33 @@ public class PedidosProveedoresService {
         // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
         String sql = "DELETE FROM pedidos_proveedores WHERE ID_PEDIDO_PROV = ?";
         return jdbcTemplate.update(sql, idPedidoProv);
+    }
+    @Transactional
+    public void marcarComoEntregado(int idPedidoProv) {
+        // 1. Obtener el pedido completo con sus detalles
+        PedidosProveedores pedido = obtenerPedidoConDetalles(idPedidoProv);
+
+        if (pedido == null) {
+            throw new RuntimeException("Pedido no encontrado");
+        }
+
+        // 2. Validar que no haya sido entregado previamente para evitar duplicar stock
+        if ("ENTREGADO".equalsIgnoreCase(pedido.getEstadoPedido())) {
+            throw new IllegalStateException("Este pedido ya ha sido marcado como ENTREGADO anteriormente.");
+        }
+
+        // 3. Actualizar el stock de cada ingrediente en el detalle
+        String sqlUpdateStock = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
+
+        for (DetallePedidoProveedores detalle : pedido.getDetalles()) {
+            jdbcTemplate.update(sqlUpdateStock,
+                    detalle.getCantidad(),
+                    detalle.getIdIngrediente()
+            );
+        }
+
+        // 4. Cambiar el estado del pedido a 'ENTREGADO'
+        String sqlUpdateEstado = "UPDATE PEDIDOS_PROVEEDORES SET ESTADO_PEDIDO = 'ENTREGADO' WHERE ID_PEDIDO_PROV = ?";
+        jdbcTemplate.update(sqlUpdateEstado, idPedidoProv);
     }
 }
