@@ -1,5 +1,6 @@
 package com.example.Proyecto.service.Inventario;
 
+import com.example.Proyecto.dto.RecetaDetalleDTO;
 import com.example.Proyecto.dto.RecetaRequest;
 import com.example.Proyecto.model.RecetaProducto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,4 +159,53 @@ public class RecetasService {
             throw new IllegalArgumentException("No se pudo eliminar la receta con ID de Producto " + idProducto);
         }
     }
+
+    // Modificación en RecetasService.java
+    public List<RecetaDetalleDTO> obtenerTodasLasRecetasOptimizadas() {
+        String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
+                "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, u.NOMBRE_UNIDAD " +
+                "FROM RECETAS_DETALLE rd " +
+                "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA " +
+                "JOIN PRODUCTOS p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
+                "LEFT JOIN INGREDIENTES i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                "LEFT JOIN UNIDADES_MEDIDA u ON rd.ID_UNIDAD = u.ID_UNIDAD";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            RecetaDetalleDTO dto = new RecetaDetalleDTO();
+            dto.setIdReceta(rs.getLong("ID_RECETA"));
+            dto.setIdProducto(rs.getLong("ID_PRODUCTO"));
+            dto.setNombreProducto(rs.getString("NOMBRE_PRODUCTO"));
+            dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+            dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+            dto.setCantidadRequerida(rs.getBigDecimal("CANTIDAD_REQUERIDA"));
+            dto.setNombreUnidad(rs.getString("NOMBRE_UNIDAD"));
+            return dto;
+        });
+    }
+
+    public List<RecetaDetalleDTO> obtenerRecetaOptimizadaPorProducto(Long idProducto) {
+        String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
+                "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, " +
+                "rd.ID_UNIDAD, u.NOMBRE_UNIDAD " +
+                "FROM RECETAS_DETALLE rd " +
+                "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA " +
+                "JOIN PRODUCTOS p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
+                "LEFT JOIN INGREDIENTES i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                "LEFT JOIN UNIDADES_MEDIDA u ON rd.ID_UNIDAD = u.ID_UNIDAD " +
+                "WHERE r.ID_PRODUCTO = ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            RecetaDetalleDTO dto = new RecetaDetalleDTO();
+            dto.setIdReceta(rs.getLong("ID_RECETA"));
+            dto.setIdProducto(rs.getLong("ID_PRODUCTO"));
+            dto.setNombreProducto(rs.getString("NOMBRE_PRODUCTO"));
+            dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+            dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+            dto.setCantidadRequerida(rs.getBigDecimal("CANTIDAD_REQUERIDA"));
+            dto.setIdUnidad(rs.getLong("ID_UNIDAD")); // ← esta línea faltaba
+            dto.setNombreUnidad(rs.getString("NOMBRE_UNIDAD"));
+            return dto;
+        }, idProducto);
+    }
+
 }

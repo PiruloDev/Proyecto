@@ -3,120 +3,97 @@
 namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Services\Inventario\RecetasService;
 use App\Services\Productos\ProductoService; 
-use App\Services\Inventario\IngredientesService; // Asumiendo este nombre
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class RecetasController extends Controller
 {
     protected $recetasService;
-    protected $productoService;
-    protected $ingredienteService;
+    protected $productosService;
 
-    /**
-     * Inyección de servicios necesarios.
-     */
-    public function __construct(
-        RecetasService $recetasService,
-        ProductoService $productoService,
-        IngredientesService $ingredienteService
-    ) {
+    public function __construct(RecetasService $recetasService, ProductoService $productosService)
+    {
         $this->recetasService = $recetasService;
-        $this->productoService = $productoService;
-        $this->ingredienteService = $ingredienteService;
+        $this->productosService = $productosService;
     }
 
-    /**
-     * Listado de recetas y catálogos para creación.
-     */
     public function index()
     {
-        // 1. Obtener las recetas del backend (Spring)
-        $response = $this->recetasService->obtenerTodasLasRecetas();
-        $recetas = $response['data'] ?? [];
+        $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
+        $productos = $this->productosService->obtenerProductos(); 
 
-        // 2. Obtener Productos del Service local (para el select del modal)
-        $productos = $this->productoService->obtenerProductos();
-
-        // 3. Obtener Ingredientes del Service (para el detalle dinámico)
-        $resIng = $this->ingredienteService->obtenerIngredientes();
-        $ingredientesCatalogo = $resIng['data'] ?? [];
-
-        if (!$response['success']) {
-            Log::error('Error al cargar recetas: ' . ($response['error'] ?? 'Sin detalle'));
-            return view('inventarioviews.recetas.index', compact('recetas', 'productos', 'ingredientesCatalogo'))
-                   ->with('error', 'Error al sincronizar con el servidor de producción.');
+        try {
+            $responseIng = Http::get('http://localhost:8080/recetas/lista-modal');
+            $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
+        } catch (\Exception $e) {
+            $ingredientesParaModal = []; 
         }
-        
-        return view('inventarioviews.recetas.index', compact('recetas', 'productos', 'ingredientesCatalogo'));
+
+        if (!$resRecetas['success']) {
+            return back()->with('error', $resRecetas['error']);
+        }
+
+        return view('inventarioviews.recetas.index', [
+            'recetas'      => $resRecetas['data'],
+            'productos'    => $productos,
+            'ingredientes' => $ingredientesParaModal 
+        ]);
     }
 
-    public function show(int $idProducto)
+    public function show($idProducto)
     {
-        $response = $this->recetasService->obtenerRecetaPorIdProducto($idProducto);
+        $res = $this->recetasService->obtenerRecetaPorIdProducto($idProducto);
 
-        if (!$response['success']) {
-            return Redirect::route('recetas.index')->with('error', $response['error']);
+        // ✅ Cargar ingredientes para el select del modal de edición
+        try {
+            $responseIng = Http::get('http://localhost:8080/recetas/lista-modal');
+            $ingredientes = $responseIng->successful() ? $responseIng->json() : [];
+        } catch (\Exception $e) {
+            $ingredientes = [];
         }
-        
-        $detalles = $response['data'];
-        return view('inventarioviews.recetas.show', compact('detalles', 'idProducto'));
+
+        if ($res['success']) {
+            return view('inventarioviews.recetas.show', [
+                'detalles'     => $res['data'],
+                'idProducto'   => $idProducto,
+                'ingredientes' => $ingredientes, // ✅ ahora disponible en la vista
+            ]);
+        }
+
+        return redirect()->route('recetas.index')->with('error', $res['error']);
+    }
+
+    // ✅ Método update que faltaba completamente
+    public function update(Request $request, $idProducto)
+    {
+        $res = $this->recetasService->actualizarReceta($idProducto, $request->all());
+
+        if ($res['success']) {
+            return redirect()
+                ->route('recetas.show', $idProducto)
+                ->with('success', 'Receta actualizada correctamente');
+        }
+
+        return back()->with('error', $res['error'] ?? 'Error al actualizar la receta');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'idProducto' => 'required|integer|min:1', 
-            'ingredientes' => 'required|array|min:1',
-            'ingredientes.*.idIngrediente' => 'required|integer',
-            'ingredientes.*.cantidadNecesaria' => 'required|numeric|min:0.001',
-            'ingredientes.*.idUnidad' => 'required|integer',
-        ]);
-        
-        $payload = [
-            'idProducto' => (int)$request->input('idProducto'),
-            'ingredientes' => $request->input('ingredientes') 
-        ];
-
-        $response = $this->recetasService->crearReceta($payload);
-
-        if ($response['success']) {
-            return Redirect::route('recetas.index')->with('success', $response['mensaje']);
+        $res = $this->recetasService->crearReceta($request->all());
+        if ($res['success']) {
+            return redirect()->route('recetas.index')->with('success', 'Receta creada correctamente');
         }
-
-        return Redirect::back()->withInput()->with('error', 'Fallo al crear receta: ' . $response['error']);
+        return back()->with('error', $res['error'] ?? 'Error al crear receta');
     }
 
-    public function update(Request $request, int $idProducto)
+    public function destroy($idProducto)
     {
-        $request->validate([
-            'ingredientes' => 'required|array|min:1',
-            'ingredientes.*.idIngrediente' => 'required|integer',
-            'ingredientes.*.cantidadNecesaria' => 'required|numeric|min:0.001',
-            'ingredientes.*.idUnidad' => 'required|integer',
-        ]);
-        
-        $payload = ['ingredientes' => $request->input('ingredientes')];
-        $response = $this->recetasService->actualizarReceta($idProducto, $payload);
-
-        if ($response['success']) {
-            return Redirect::route('recetas.index')->with('success', $response['mensaje']);
+        $res = $this->recetasService->eliminarReceta($idProducto);
+        if ($res['success']) {
+            return redirect()->route('recetas.index')->with('success', 'Receta eliminada');
         }
-
-        return Redirect::back()->withInput()->with('error', 'Fallo al actualizar receta: ' . $response['error']);
-    }
-
-    public function destroy(int $idProducto)
-    {
-        $response = $this->recetasService->eliminarReceta($idProducto);
-
-        if ($response['success']) {
-            return Redirect::route('recetas.index')->with('success', $response['mensaje']);
-        }
-        
-        return Redirect::back()->with('error', 'No se pudo eliminar: ' . $response['error']);
+        return back()->with('error', 'No se pudo eliminar la receta');
     }
 }

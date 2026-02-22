@@ -1,5 +1,6 @@
 package com.example.Proyecto.controller;
 
+import com.example.Proyecto.dto.RecetaDetalleDTO;
 import com.example.Proyecto.dto.RecetaRequest;
 import com.example.Proyecto.model.RecetaProducto;
 import com.example.Proyecto.service.Inventario.RecetasService;
@@ -125,5 +126,24 @@ public class RecetasController {
             response.put("error", "Error interno al eliminar la receta: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    // En RecetasController.java
+    @Operation(summary = "Obtener todas las recetas optimizadas", description = "Retorna recetas con nombres de productos e ingredientes")
+    @GetMapping("/optimizadas")
+    public ResponseEntity<List<RecetaDetalleDTO>> obtenerTodasLasRecetasOptimizadas() {
+        List<RecetaDetalleDTO> todasLasRecetas = recetasService.obtenerTodasLasRecetasOptimizadas();
+        return ResponseEntity.ok(todasLasRecetas);
+    }
+
+    @Operation(summary = "Obtener receta optimizada por producto")
+    @GetMapping("/optimizadas/producto/{idProducto}")
+    public ResponseEntity<List<RecetaDetalleDTO>> obtenerRecetaOptimizadaPorProducto(
+            @PathVariable Long idProducto) {
+        List<RecetaDetalleDTO> receta = recetasService.obtenerRecetaOptimizadaPorProducto(idProducto);
+        if (receta.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(receta);
     }
 }

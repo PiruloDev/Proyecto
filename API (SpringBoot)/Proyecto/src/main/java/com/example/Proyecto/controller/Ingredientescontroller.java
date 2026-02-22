@@ -1,5 +1,6 @@
 package com.example.Proyecto.controller;
 
+import com.example.Proyecto.dto.IngredienteDetalleDTO;
 import com.example.Proyecto.model.Ingredientes;
 import com.example.Proyecto.dto.IngresoStockRequest;
 import com.example.Proyecto.dto.IngredienteListadoDTO;
@@ -177,5 +178,11 @@ public class Ingredientescontroller {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al ingresar stock: " + e.getMessage());
         }
+    }
+
+
+    @GetMapping("/recetas/lista-modal")
+    public List<IngredienteDetalleDTO> ListaModal() {
+        return ingredientesService.obtenerIngredientesParaModal();
     }
 }
