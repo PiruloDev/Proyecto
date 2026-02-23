@@ -116,33 +116,66 @@
     const totalSpan = document.getElementById('total-general-span');
     const totalInput = document.getElementById('TOTAL_PRODUCTO_INPUT');
 
-    async function cargarProductosAPI() {
+    // 1. CARGAR PRODUCTOS Y LUEGO RENDERIZAR
+    async function inicializarVista() {
         try {
+            // Llamamos a la API de Java
             const response = await fetch('http://localhost:8080/productos');
             const data = await response.json();
+            
             listaProductosGlobal = data.map(p => ({
                 id: p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
                 nombre: p.nombre_PRODUCTO || p.nombreProducto || p["Nombre Producto:"],
                 precio: parseFloat(p.precio_UNITARIO || p.precio || p["Precio:"] || 0)
             }));
-            renderizarDetallesExistentes();
-        } catch (e) { console.error("Error al cargar productos:", e); }
-    }
 
-    function renderizarDetallesExistentes() {
-        const detalles = @json($pedido['detalles'] ?? $pedido['detalle_pedidos'] ?? []);
-        detallesBody.innerHTML = '';
-        if (detalles.length > 0) {
-            detalles.forEach(d => agregarFila(d));
-        } else {
-            agregarFila();
+            console.log("Productos cargados:", listaProductosGlobal);
+            
+            // SOLO cuando los productos ya están en la variable global, renderizamos
+            renderizarDetallesExistentes();
+        } catch (e) { 
+            console.error("Error al cargar productos:", e); 
+            alert("No se pudieron cargar los productos de la base de datos.");
         }
     }
 
-    function agregarFila(detalle = null) {
-        const prodId = detalle ? (detalle.id_PRODUCTO || detalle.idProducto) : '';
-        const cant = detalle ? (detalle.cantidad_PRODUCTO || detalle.cantidad || 1) : 1;
-        const precio = detalle ? (detalle.precio_UNITARIO || detalle.precioUnitario || 0) : 0;
+    function renderizarDetallesExistentes() {
+    // 1. Capturamos el objeto completo para debug
+    const pedidoCompleto = @json($pedido);
+    console.log("Datos del pedido recibidos:", pedidoCompleto);
+
+    // 2. Buscamos detalles probando todas las combinaciones posibles de nombres de clave
+    const detalles = pedidoCompleto.detalles || 
+                     pedidoCompleto.detalle_pedidos || 
+                     pedidoCompleto.detallePedidos || 
+                     pedidoCompleto.detalles_pedido || [];
+    
+    detallesBody.innerHTML = '';
+
+    if (detalles && detalles.length > 0) {
+        detalles.forEach(d => {
+            // Solo agregamos la fila si tiene un ID de producto válido
+            const idProd = d.id_PRODUCTO || d.idProducto || d.id_producto;
+            if (idProd) {
+                agregarFila(d);
+            }
+        });
+    } else {
+        // Si es un pedido nuevo o no tiene items, una fila vacía por defecto
+        agregarFila();
+    }
+    actualizarCalculos();
+}
+
+  function agregarFila(detalle = null) {
+    // Soporte para id_PRODUCTO, idProducto, id_producto
+    const prodId = detalle ? (detalle.id_PRODUCTO || detalle.idProducto || detalle.id_producto) : '';
+    // Soporte para cantidad_PRODUCTO, cantidad, cantidadProducto
+    const cant = detalle ? (detalle.cantidad_PRODUCTO || detalle.cantidad || detalle.cantidadProducto || 1) : 1;
+        
+        // Buscamos el precio actual en nuestra lista global para que sea exacto
+        const productoEncontrado = listaProductosGlobal.find(p => p.id == prodId);
+        const precio = productoEncontrado ? productoEncontrado.precio : 0;
         const subtotal = precio * cant;
 
         const fila = document.createElement('tr');
@@ -156,35 +189,59 @@
                         </option>`).join('')}
                 </select>
             </td>
-            <td><input type="number" name="cantidades[]" class="form-control input-cantidad" value="${cant}" min="1"></td>
-            <td>$<span class="txt-precio">${precio.toLocaleString()}</span></td>
-            <td class="fw-bold text-dark">$<span class="txt-subtotal">${subtotal.toLocaleString()}</span></td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm btn-quitar">×</button></td>
+            <td>
+                <input type="number" name="cantidades[]" class="form-control input-cantidad" value="${cant}" min="1">
+            </td>
+            <td>$<span class="txt-precio">${precio.toLocaleString('es-CO')}</span></td>
+            <td class="fw-bold text-dark">$<span class="txt-subtotal">${subtotal.toLocaleString('es-CO')}</span></td>
+            <td>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-quitar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </td>
         `;
         detallesBody.appendChild(fila);
-        actualizarCalculos();
     }
 
     function actualizarCalculos() {
         let totalAcumulado = 0;
         detallesBody.querySelectorAll('tr').forEach(fila => {
             const select = fila.querySelector('.select-producto');
-            const precio = parseFloat(select.selectedOptions[0]?.dataset.precio || 0);
+            const selectedOption = select.selectedOptions[0];
+            
+            const precio = parseFloat(selectedOption?.dataset.precio || 0);
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value || 0);
             const subtotal = precio * cantidad;
 
-            fila.querySelector('.txt-precio').textContent = precio.toLocaleString();
-            fila.querySelector('.txt-subtotal').textContent = subtotal.toLocaleString();
+            fila.querySelector('.txt-precio').textContent = precio.toLocaleString('es-CO');
+            fila.querySelector('.txt-subtotal').textContent = subtotal.toLocaleString('es-CO');
             totalAcumulado += subtotal;
         });
-        totalSpan.textContent = totalAcumulado.toLocaleString();
+        
+        totalSpan.textContent = totalAcumulado.toLocaleString('es-CO');
         totalInput.value = totalAcumulado;
     }
 
-    document.addEventListener('DOMContentLoaded', cargarProductosAPI);
-    document.getElementById('btn-agregar-fila').onclick = () => agregarFila();
-    detallesBody.oninput = (e) => { if (e.target.matches('.select-producto, .input-cantidad')) actualizarCalculos(); };
-    detallesBody.onclick = (e) => { if (e.target.closest('.btn-quitar')) { e.target.closest('tr').remove(); actualizarCalculos(); } };
+    // EVENTOS
+    document.addEventListener('DOMContentLoaded', inicializarVista);
+
+    document.getElementById('btn-agregar-fila').onclick = () => {
+        agregarFila();
+        actualizarCalculos();
+    };
+
+    detallesBody.oninput = (e) => { 
+        if (e.target.matches('.select-producto, .input-cantidad')) {
+            actualizarCalculos();
+        } 
+    };
+
+    detallesBody.onclick = (e) => { 
+        if (e.target.closest('.btn-quitar')) { 
+            e.target.closest('tr').remove(); 
+            actualizarCalculos(); 
+        } 
+    };
 </script>
 @endpush
 

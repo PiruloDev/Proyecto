@@ -134,48 +134,54 @@ public function store(Request $request)
     
    public function update(Request $request, $id)
 {
-    // Aplicamos la misma restricción para las ediciones
+    // 1. Validación (Asegúrate de incluir productos)
     $request->validate([
         'ID_CLIENTE'       => 'required|integer|min:1',
         'ID_EMPLEADO'      => 'required|integer|min:1',
         'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
         'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
-        'FECHA_ENTREGA'    => 'nullable|date', 
+        'FECHA_ENTREGA'    => 'nullable|date',
+        'productos'        => 'required|array', // Validamos que el array de productos llegue
     ]);
 
+    // 2. Procesar Fecha
     $fechaEntrega = $request->input('FECHA_ENTREGA');
     if ($fechaEntrega && strlen($fechaEntrega) == 10) {
         $fechaEntrega .= ' 23:59:59';
     }
 
-    $dataApi = [
-        'cliente_id' => $request->input('ID_CLIENTE'),
-        'empleado_id' => $request->input('ID_EMPLEADO'),
-        'estado_pedido_id' => $request->input('ID_ESTADO_PEDIDO'),
-        'total_producto' => $request->input('TOTAL_PRODUCTO'),
-        'fecha_entrega' => $fechaEntrega ?: null, 
-    ];
-
-        try {
-            $this->apiService->actualizarPedido($id, $dataApi); 
-
-            
-            if ($request->routeIs('admin.*')) {
-                return redirect()->route('admin.pedidos.index')
-                                 ->with('success', "Pedido con ID $id actualizado correctamente (Admin).");
-            }
-            
-            
-            return redirect()->route('pedidos.index')
-                             ->with('success', "Pedido con ID $id actualizado correctamente (Empleado).");
-
-        } catch (Exception $e) {
-            
-            return redirect()->back()->withInput()->with('error', 'Error al actualizar pedido: ' . $e->getMessage());
-        }
+    // 3. RECONSTRUIR EL ARRAY DE DETALLES (Igual que en el store)
+    $detallesApi = [];
+    foreach ($request->input('productos') as $key => $productoId) {
+        $detallesApi[] = [
+            'idProducto'       => (int)$productoId,
+            'cantidadProducto' => (int)$request->input('cantidades')[$key],
+            'precioUnitario'   => (float)($request->input('precios_unitarios')[$key] ?? 0),
+            'subtotal'         => (float)($request->input('subtotales')[$key] ?? 0)
+        ];
     }
 
-    
+    // 4. PREPARAR PAYLOAD COMPLETO PARA JAVA
+    $dataApi = [
+        'cliente_id'       => (int)$request->input('ID_CLIENTE'),
+        'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
+        'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
+        'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
+        'fecha_entrega'    => $fechaEntrega ?: null,
+        'detalles'         => $detallesApi, // <--- ESTO ES LO QUE FALTABA
+    ];
+
+    try {
+        // Enviar a la API
+        $this->apiService->actualizarPedido($id, $dataApi); 
+
+        $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
+        return redirect()->route($route)->with('success', "Pedido #$id actualizado con sus productos correctamente.");
+
+    } catch (Exception $e) {
+        return redirect()->back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
+    }
+}
     public function destroy($id, Request $request)
     {
         try {
