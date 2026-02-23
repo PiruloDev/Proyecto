@@ -88,7 +88,22 @@ public class pedidosService {
 
     public Pedidos obtenerPedidoPorId(Long id) {
         try {
-            return jdbcTemplate.queryForObject(SQL_SELECT_CON_NOMBRES + " WHERE p.ID_PEDIDO = ?", pedidoRowMapper, id);
+            // 1. Buscamos el encabezado del pedido
+            Pedidos pedido = jdbcTemplate.queryForObject(SQL_SELECT_CON_NOMBRES + " WHERE p.ID_PEDIDO = ?", pedidoRowMapper, id);
+
+            if (pedido != null) {
+                try {
+                    // 2. ¡ESTA ES LA LÍNEA QUE FALTA!
+                    // Cargamos los detalles usando el ID del pedido encontrado
+                    pedido.setDetalles(detallePedidosService.obtenerDetallesPorPedido(pedido.getID_PEDIDO()));
+
+                    System.out.println("Detalles cargados para el pedido #" + id + ": " + pedido.getDetalles().size());
+                } catch (Exception e) {
+                    System.err.println("Error al cargar detalles para el pedido individual #" + id);
+                    pedido.setDetalles(new java.util.ArrayList<>());
+                }
+            }
+            return pedido;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
