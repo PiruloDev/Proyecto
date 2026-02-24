@@ -1,7 +1,7 @@
 // Archivo: Proveedores.java
 package com.example.Proyecto.service.Proveedores;
 
-public class Proveedores {
+public class    Proveedores {
     private int idProveedor;
     private String nombreProv;
     private String telefonoProv;

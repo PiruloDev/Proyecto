@@ -217,6 +217,8 @@ Route::prefix('/inventario/pedidos-proveedores')->group(function () {
     // 5. Eliminar (Destroy - DELETE)
     Route::delete('/delete/{id}', [PedidosProveedoresController::class, 'destroy'])
          ->name('pedidoproveedores.destroy');
+    Route::patch('/{id}/entregar', [PedidosProveedoresController::class, 'entregar'])
+     ->name('pedidoproveedores.entregar');     
 });
 
 

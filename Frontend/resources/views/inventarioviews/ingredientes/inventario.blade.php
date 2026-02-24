@@ -2,7 +2,7 @@
 
 @extends('layouts.app')
 
-@section('title', 'Inventario de Ingredientes')
+@section('title', 'Inventario de Ingredientes - El Castillo del Pan')
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -11,36 +11,74 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
+    /* Contenedor Principal con Scroll Interno */
+    .main-content {
+        height: 100vh;
+        overflow-y: auto;
+        background-color: #fdfbf9;
+        padding-bottom: 50px;
+    }
+
+    /* Cards de Inventario */
     .inventory-card {
         transition: all 0.3s ease;
-        border-left: 4px solid var(--panaderia-marron-principal);
+        border: none;
+        border-radius: 20px !important;
+        background: white;
+        border-left: 6px solid #d7ccc8; /* Color por defecto */
     }
     .inventory-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(93, 64, 55, 0.1) !important;
     }
-    .stock-badge {
-        font-size: 1.3rem;
-        font-weight: 600;
-        padding: 0.5em 0.8em;
-    }
-    .low-stock { border-left-color: #dc3545 !important; }
-    .medium-stock { border-left-color: #ffc107 !important; }
-    .good-stock { border-left-color: #28a745 !important; }
 
-    /* Mejora de scroll para stats en móviles */
-    @media (max-width: 768px) {
-        .stats-scroll {
-            display: flex;
-            overflow-x: auto;
-            padding-bottom: 15px;
-            gap: 15px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .stats-scroll .col-md-4 {
-            flex: 0 0 85%;
-        }
+    /* Estados de Stock */
+    .low-stock { border-left-color: #dc3545 !important; }    /* Rojo */
+    .medium-stock { border-left-color: #ffc107 !important; } /* Amarillo */
+    .good-stock { border-left-color: #28a745 !important; }   /* Verde */
+
+    .stock-badge {
+        font-size: 1.1rem;
+        font-weight: 700;
+        padding: 8px 15px;
+        border-radius: 12px;
     }
+
+    /* Buscador Estilizado */
+    .search-wrapper {
+        position: relative;
+        max-width: 450px;
+    }
+    .search-wrapper i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #8d6e63;
+    }
+    .search-input {
+        padding-left: 50px !important;
+        border-radius: 50px !important;
+        height: 48px;
+        border: 1px solid #d7ccc8 !important;
+    }
+
+    /* Botones y Filtros */
+    .btn-marca {
+        background-color: #5d4037 !important;
+        color: white !important;
+        border: none;
+        border-radius: 10px;
+    }
+    .btn-filter.active {
+        background-color: #5d4037 !important;
+        color: white !important;
+        border-color: #5d4037 !important;
+    }
+
+    /* Scrollbar */
+    .main-content::-webkit-scrollbar { width: 6px; }
+    .main-content::-webkit-scrollbar-thumb { background: #d7ccc8; border-radius: 10px; }
 </style>
 @endpush
 
@@ -50,126 +88,125 @@
         
         @include('components.admin-sidebar')
         
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pb-5">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             
-            {{-- Header Responsivo --}}
-            <div class="d-flex justify-content-between flex-wrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2 mb-2 mb-md-0">
-                    <i class="fas fa-boxes-stacked me-2" style="color: var(--panaderia-marron-principal);"></i>
-                    Inventario
-                </h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="{{ route('ingredientes.index') }}" class="btn btn-sm btn-outline-secondary shadow-sm">
-                        <i class="fas fa-list me-1"></i> <span class="d-none d-sm-inline">Vista Completa</span>
+            {{-- HEADER --}}
+            <div class="d-flex justify-content-between align-items-center pt-4 pb-2 mb-4 border-bottom">
+                <div>
+                    <h1 class="h2 fw-bold" style="color: #3e2723;">
+                        <i class="fas fa-boxes-stacked me-2"></i>Control de Inventario
+                    </h1>
+                    <p class="text-muted small">Supervisa y repon stock de ingredientes en tiempo real.</p>
+                </div>
+                <div class="btn-group shadow-sm">
+                    <a href="{{ route('ingredientes.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-1"></i> Lista Completa
                     </a>
                 </div>
             </div>
 
-            {{-- Contenedor de Alertas --}}
-            <div id="alertPlaceholder">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-            </div>
+            {{-- ALERTAS --}}
+            @if (session('success') || request('success'))
+                <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 15px;">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') ?? request('success') }}
+                </div>
+            @endif
 
-            {{-- Estadísticas Rápidas (Scrollable en mobile) --}}
-            <div class="row g-3 mb-4 stats-scroll">
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="text-muted mb-1 small text-uppercase fw-bold">Total Ingredientes</p>
-                                    <h3 class="mb-0">{{ count($ingredientes) }}</h3>
-                                </div>
-                                <i class="fas fa-cubes fa-2x text-primary opacity-25"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="text-muted mb-1 small text-uppercase fw-bold">Stock Bajo</p>
-                                    <h3 class="mb-0 text-danger">
-                                        {{ collect($ingredientes)->filter(fn($i) => $i['cantidadIngrediente'] < 10)->count() }}
-                                    </h3>
-                                </div>
-                                <i class="fas fa-exclamation-triangle fa-2x text-danger opacity-25"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="text-muted mb-1 small text-uppercase fw-bold">Stock Disponible</p>
-                                    <h3 class="mb-0 text-success">
-                                        {{ collect($ingredientes)->filter(fn($i) => $i['cantidadIngrediente'] >= 10)->count() }}
-                                    </h3>
-                                </div>
-                                <i class="fas fa-check-circle fa-2x text-success opacity-25"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Buscador y Filtros Adaptativos --}}
+            {{-- ESTADÍSTICAS RÁPIDAS --}}
             <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-light p-3 me-3 text-brown">
+                                <i class="fas fa-database fa-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0 small fw-bold text-uppercase">Total Items</p>
+                                <h4 class="fw-bold mb-0">{{ count($ingredientes) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-danger-soft p-3 me-3 text-danger">
+                                <i class="fas fa-arrow-down fa-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0 small fw-bold text-uppercase">Stock Bajo</p>
+                                <h4 class="fw-bold mb-0 text-danger">
+                                    {{ collect($ingredientes)->filter(fn($i) => ($i['cantidadIngrediente'] ?? 0) < 10)->count() }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-success-soft p-3 me-3 text-success">
+                                <i class="fas fa-check-double fa-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0 small fw-bold text-uppercase">Stock Óptimo</p>
+                                <h4 class="fw-bold mb-0 text-success">
+                                    {{ collect($ingredientes)->filter(fn($i) => ($i['cantidadIngrediente'] ?? 0) >= 10)->count() }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- BUSCADOR Y FILTROS --}}
+            <div class="row g-3 mb-4 align-items-center">
                 <div class="col-12 col-lg-6">
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Buscar ingrediente...">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control search-input shadow-sm" placeholder="Buscar por nombre o código...">
                     </div>
                 </div>
                 <div class="col-12 col-lg-6 text-lg-end">
-                    <div class="btn-group w-100 w-lg-auto shadow-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary active btn-filter" onclick="filterStock('all', this)">Todos</button>
-                        <button type="button" class="btn btn-outline-danger btn-filter" onclick="filterStock('low', this)">Bajo</button>
-                        <button type="button" class="btn btn-outline-success btn-filter" onclick="filterStock('good', this)">Óptimo</button>
+                    <div class="btn-group shadow-sm bg-white p-1" style="border-radius: 12px; border: 1px solid #d7ccc8;">
+                        <button class="btn btn-filter active px-4" onclick="filterStock('all', this)">Todos</button>
+                        <button class="btn btn-filter text-danger px-4" onclick="filterStock('low', this)">Bajo</button>
+                        <button class="btn btn-filter text-success px-4" onclick="filterStock('good', this)">Óptimo</button>
                     </div>
                 </div>
             </div>
 
-            {{-- Grid de Cards --}}
-            <div class="row g-3" id="ingredientesContainer">
+            {{-- GRID DE CARDS --}}
+            <div class="row g-4" id="ingredientesContainer">
                 @forelse ($ingredientes as $ingrediente)
                     @php
                         $cantidad = $ingrediente['cantidadIngrediente'] ?? 0;
                         $stockClass = $cantidad < 10 ? 'low-stock' : ($cantidad < 50 ? 'medium-stock' : 'good-stock');
-                        $stockBadgeClass = $cantidad < 10 ? 'bg-danger' : ($cantidad < 50 ? 'bg-warning' : 'bg-success');
+                        $badgeClass = $cantidad < 10 ? 'bg-danger' : ($cantidad < 50 ? 'bg-warning text-dark' : 'bg-success');
                     @endphp
                     
-                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3 ingredient-item" data-stock="{{ $cantidad }}" data-name="{{ strtolower($ingrediente['nombreIngrediente']) }}">
-                        <div class="card inventory-card border-0 shadow-sm h-100 {{ $stockClass }}">
-                            <div class="card-body d-flex flex-column">
+                    <div class="col-12 col-sm-6 col-xl-3 ingredient-item" data-stock="{{ $cantidad }}" data-name="{{ strtolower($ingrediente['nombreIngrediente']) }}">
+                        <div class="card inventory-card shadow-sm h-100 {{ $stockClass }}">
+                            <div class="card-body p-4 d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <h5 class="card-title fw-bold mb-0 text-dark">{{ $ingrediente['nombreIngrediente'] }}</h5>
-                                    <span class="badge {{ $stockBadgeClass }} stock-badge shadow-sm">{{ number_format($cantidad, 1) }}</span>
+                                    <h5 class="fw-bold mb-0 text-brown" style="color: #5d4037;">{{ $ingrediente['nombreIngrediente'] }}</h5>
+                                    <span class="badge {{ $badgeClass }} stock-badge shadow-sm">{{ number_format($cantidad, 1) }}</span>
                                 </div>
                                 
-                                <p class="text-muted small mb-4">Código: #{{ $ingrediente['idIngrediente'] }}</p>
+                                <p class="text-muted small mb-4">
+                                    <i class="fas fa-barcode me-1"></i> ID: #{{ $ingrediente['idIngrediente'] }}
+                                </p>
                                 
                                 <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                                    <button type="button" class="btn btn-success btn-sm btn-ingreso-stock px-3" 
+                                    <button type="button" class="btn btn-success btn-sm px-3 rounded-pill" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#ingresoStockModal"
                                             data-id="{{ $ingrediente['idIngrediente'] }}" 
                                             data-name="{{ $ingrediente['nombreIngrediente'] }}">
                                         <i class="fas fa-plus-circle me-1"></i> Reponer
                                     </button>
-                                    <a href="{{ route('ingredientes.index') }}" class="btn btn-sm btn-light border text-primary">
-                                        <i class="fas fa-eye"></i>
+                                    <a href="{{ route('ingredientes.index') }}" class="btn btn-sm btn-light rounded-circle" title="Ver detalles">
+                                        <i class="fas fa-eye text-brown"></i>
                                     </a>
                                 </div>
                             </div>
@@ -177,7 +214,8 @@
                     </div>
                 @empty
                     <div class="col-12 text-center py-5">
-                        <p class="text-muted">No se encontraron ingredientes.</p>
+                        <i class="fas fa-box-open fa-3x text-muted opacity-25 mb-3"></i>
+                        <p class="text-muted">No se encontraron ingredientes en el inventario.</p>
                     </div>
                 @endforelse
             </div>
@@ -185,27 +223,31 @@
     </div>
 </div>
 
-{{-- El modal y los scripts se mantienen igual para asegurar funcionamiento AJAX --}}
+{{-- MODAL REPOSICIÓN --}}
 <div class="modal fade" id="ingresoStockModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="fas fa-truck-ramp-box me-2"></i> Reponer Stock</h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header bg-success text-white border-0 p-4" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fas fa-truck-loading me-2"></i> Reponer Inventario</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="formIngresoStock">
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" id="ingredienteId">
-                    <p class="mb-4">Ingresando stock para: <strong id="ingredienteNombreModal"></strong></p>
+                    <div class="text-center mb-4">
+                        <p class="text-muted mb-1">Ingrediente seleccionado:</p>
+                        <h4 class="fw-bold text-brown" id="ingredienteNombreModal"></h4>
+                    </div>
                     <div class="mb-3">
-                        <label class="form-label">Cantidad a Ingresar</label>
-                        <input type="number" step="0.01" min="0.01" class="form-control form-control-lg" id="cantidadIngresada" required>
-                        <div class="invalid-feedback" id="cantidadIngresadaFeedback">Ingrese una cantidad válida.</div>
+                        <label class="form-label fw-bold">Cantidad a Ingresar</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0.01" class="form-control form-control-lg text-center" id="cantidadIngresada" placeholder="0.00" required>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success" id="btnGuardarStock">Registrar Ingreso</button>
+                <div class="modal-footer border-0 p-4 bg-light" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success px-4 shadow" id="btnGuardarStock">Confirmar Ingreso</button>
                 </div>
             </form>
         </div>
@@ -214,12 +256,13 @@
 
 @push('scripts')
 <script>
-    // Búsqueda en tiempo real
+    // Buscador en tiempo real mejorado
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
         document.querySelectorAll('.ingredient-item').forEach(item => {
             const name = item.getAttribute('data-name');
-            item.style.display = name.includes(searchTerm) ? '' : 'none';
+            const code = item.textContent.toLowerCase();
+            item.style.display = (name.includes(searchTerm) || code.includes(searchTerm)) ? '' : 'none';
         });
     });
 
@@ -236,7 +279,7 @@
         });
     }
 
-    // Lógica AJAX para actualización de stock
+    // Modal data binding
     const modal = document.getElementById('ingresoStockModal');
     modal.addEventListener('show.bs.modal', function (event) {
         const btn = event.relatedTarget;
@@ -245,6 +288,7 @@
         document.getElementById('cantidadIngresada').value = '';
     });
 
+    // Fetch AJAX para stock
     document.getElementById('formIngresoStock').addEventListener('submit', function(e) {
         e.preventDefault();
         const id = document.getElementById('ingredienteId').value;
@@ -252,7 +296,7 @@
         const btnSave = document.getElementById('btnGuardarStock');
 
         btnSave.disabled = true;
-        btnSave.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
 
         fetch(`{{ url('/ingredientes') }}/${id}/ingresar-stock`, {
             method: 'POST',
@@ -269,8 +313,8 @@
         })
         .catch(error => {
             btnSave.disabled = false;
-            btnSave.textContent = 'Registrar Ingreso';
-            alert(error.message);
+            btnSave.textContent = 'Confirmar Ingreso';
+            alert('Error: ' + error.message);
         });
     });
 </script>

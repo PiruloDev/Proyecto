@@ -170,4 +170,22 @@ class PedidosProveedoresService
         }
     }
 
+    public function entregarPedido(int $id): array
+{
+    try {
+        $response = $this->getApiClient()->patch("/pedido/proveedores/{$id}/entregar");
+
+        if ($response->successful()) {
+            return ['success' => true, 'response' => $response->body()];
+        }
+
+        return [
+            'success' => false,
+            'error' => $response->body() ?? 'Error al entregar pedido (' . $response->status() . ')'
+        ];
+    } catch (\Exception $e) {
+        return ['success' => false, 'error' => 'Fallo de conexión: ' . $e->getMessage()];
+    }
+}
+
 }

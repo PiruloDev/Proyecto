@@ -1,7 +1,12 @@
 package com.example.Proyecto.service.Ingredientes;
 
+import com.example.Proyecto.dto.IngredienteDetalleDTO;
+import com.example.Proyecto.dto.IngredienteListadoDTO;
 import com.example.Proyecto.model.Ingredientes;
 import com.example.Proyecto.dto.IngredientesCantidad;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +19,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class IngredientesService {
@@ -75,9 +81,23 @@ public class IngredientesService {
         return jdbcTemplate.query(sql, ingredienteRowMapper);
     }
 
-    public List<Ingredientes> obtenerIngredientesParaListado() {
-        String sql = "SELECT ID_INGREDIENTE, ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, REFERENCIA_INGREDIENTE FROM Ingredientes";
-        return jdbcTemplate.query(sql, ingredienteListadoRowMapper);
+    public List<IngredienteListadoDTO> obtenerIngredientesParaListado() {
+        String sql = "SELECT i.ID_INGREDIENTE, i.ID_PROVEEDOR, i.ID_CATEGORIA, " +
+                "i.NOMBRE_INGREDIENTE, i.REFERENCIA_INGREDIENTE, " +
+                "u.ABREVIATURA_UNIDAD " +
+                "FROM Ingredientes i " +
+                "LEFT JOIN unidades_medida u ON i.ID_UNIDAD_MEDIDA = u.ID_UNIDAD";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            IngredienteListadoDTO dto = new IngredienteListadoDTO();
+            dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+            dto.setIdProveedor(rs.getLong("ID_PROVEEDOR"));
+            dto.setIdCategoria(rs.getLong("ID_CATEGORIA"));
+            dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+            dto.setReferenciaIngrediente(rs.getString("REFERENCIA_INGREDIENTE"));
+            dto.setAbreviaturaUnidad(rs.getString("ABREVIATURA_UNIDAD")); // ← nuevo
+            return dto;
+        });
     }
 
     public void crearIngrediente(Ingredientes ingrediente) {
@@ -169,5 +189,25 @@ public class IngredientesService {
         String sqlUpdate = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
 
         return jdbcTemplate.update(sqlUpdate, cantidadRepuesta, idIngrediente);
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<IngredienteDetalleDTO> obtenerIngredientesParaModal() {
+        // CORRECCIÓN: Se cambió i.id_unidad por i.ID_UNIDAD_MEDIDA que es el nombre real en tu DB
+        String sql = "SELECT i.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, u.ABREVIATURA_UNIDAD, u.ID_UNIDAD " +
+                "FROM ingredientes i " +
+                "INNER JOIN unidades_medida u ON i.ID_UNIDAD_MEDIDA = u.ID_UNIDAD";
+
+        Query query = entityManager.createNativeQuery(sql);
+        List<Object[]> resultados = query.getResultList();
+
+        return resultados.stream().map(row -> new IngredienteDetalleDTO(
+                ((Number) row[0]).longValue(),
+                (String) row[1],
+                (String) row[2],
+                ((Number) row[3]).longValue()
+        )).collect(Collectors.toList());
     }
 }

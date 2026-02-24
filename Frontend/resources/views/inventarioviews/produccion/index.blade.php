@@ -57,7 +57,7 @@
                         <thead class="table-dark"> {{-- Cabecera oscura para más impacto --}}
                             <tr>
                                 <th>ID Producción</th>
-                                <th>ID Producto</th>
+                                <th>Producto</th>
                                 <th>Cantidad Producida</th>
                                 <th>Fecha y Hora</th>
                                 <th style="width: 200px;" class="text-center">Acciones</th>
@@ -68,7 +68,8 @@
                             @forelse($historial as $registro)
                                 <tr>
                                     <td>{{ $registro['idProduccion'] }}</td>
-                                    <td>{{ $registro['idProducto'] }}</td>
+                                    <td>{{ $registro['nombreProducto'] ?? 'ID: ' . $registro['idProducto'] }}</td>
+
                                     <td><span class="badge bg-info text-dark">{{ number_format($registro['cantidadProducida'], 2) }}</span></td> 
                                     <td>
                                         @if(isset($registro['fechaProduccion']))
