@@ -33,13 +33,12 @@ class EstadoPedidoController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación (usa la clave del formulario)
+        
         $request->validate([
             'NOMBRE_ESTADO' => 'required|string|max:255',
         ]);
         
-        // 2. Mapeo: Convertir la clave del formulario (NOMBRE_ESTADO) 
-        //    a la clave que el API de Java espera (nombre_ESTADO)
+        
         $dataApi = [
             'nombre_ESTADO' => $request->input('NOMBRE_ESTADO')
         ];
@@ -66,13 +65,12 @@ class EstadoPedidoController extends Controller
 
     public function update(Request $request, $id)
     {
-        // 1. Validación
+       
         $request->validate([
             'NOMBRE_ESTADO' => 'required|string|max:255',
         ]);
         
-        // 2. Mapeo: Convertir la clave del formulario (NOMBRE_ESTADO) 
-        //    a la clave que el API de Java espera (nombre_ESTADO)
+        
         $dataApi = [
             'nombre_ESTADO' => $request->input('NOMBRE_ESTADO')
         ];

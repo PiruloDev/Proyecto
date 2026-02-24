@@ -240,7 +240,6 @@ class CarritoController extends Controller
             $subtotal = (float)$item['precio'] * (int)$item['cantidad'];
             $totalGeneral += $subtotal;
 
-            // Mantenemos tus llaves originales: idProducto, cantidadProducto, etc.
             $detallesParaJava[] = [
                 'idProducto'       => (int) $item['id'],
                 'cantidadProducto' => (int) $item['cantidad'],
@@ -249,12 +248,12 @@ class CarritoController extends Controller
             ];
         }
 
-        // PAYLOAD: Asegúrate de que el empleado_id 1 exista en tu DB
+        
         $payload = [
             'cliente_id'       => (int) $clienteId, 
-            'empleado_id'      => 1, // Si falla, verifica que tengas un empleado con ID 1
+            'empleado_id'      => 1, 
             'estado_pedido_id' => 1, 
-            'total_producto'   => (float) $totalGeneral, // Enviamos el total para evitar el NULL
+            'total_producto'   => (float) $totalGeneral, 
             'detalles'         => $detallesParaJava 
         ];
 
