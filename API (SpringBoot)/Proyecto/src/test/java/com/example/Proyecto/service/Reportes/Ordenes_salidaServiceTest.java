@@ -62,7 +62,7 @@ class Ordenes_salidaServiceTest {
         assertEquals(250.00, resultado.get(0).getTotalFactura(),
                 "El total de la factura debe coincidir");
 
-        // ── Imprimir resultados en consola ──
+
         System.out.println("=== TEST 1: obtenerOrdenesSalida ===");
         System.out.println("Cantidad de órdenes obtenidas: " + resultado.size());
         System.out.println("ID Factura     : " + resultado.get(0).getIdFactura());
@@ -92,7 +92,7 @@ class Ordenes_salidaServiceTest {
         // Assert
         assertTrue(resultado, "Debe retornar true cuando la inserción es exitosa");
 
-        // ── Imprimir resultados en consola ──
+
         System.out.println("=== TEST 2: agregarVenta (Exitoso) ===");
         System.out.println("Datos de la orden insertada:");
         System.out.println("ID Cliente     : " + ordenEjemplo.getIdCliente());
@@ -121,7 +121,7 @@ class Ordenes_salidaServiceTest {
         // Assert
         assertFalse(resultado, "Debe retornar false cuando ocurre un DataAccessException");
 
-        // ── Imprimir resultados en consola ──
+
         System.out.println("=== TEST 3: agregarVenta (Excepción) ===");
         System.out.println("Escenario      : Error de conexión simulado en BD");
         System.out.println("ID Cliente     : " + ordenEjemplo.getIdCliente());
@@ -150,7 +150,7 @@ class Ordenes_salidaServiceTest {
         assertEquals(1, resultado,
                 "Debe retornar 1 cuando la eliminación afecta exactamente una fila");
 
-        // ── Imprimir resultados en consola ──
+
         System.out.println("=== TEST 4: eliminarVenta ===");
         System.out.println("ID Factura eliminada : " + idFactura);
         System.out.println("Filas afectadas      : " + resultado);

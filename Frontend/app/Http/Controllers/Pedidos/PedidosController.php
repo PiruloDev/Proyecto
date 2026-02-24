@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pedidos;
 
+use App\Services\Reportes\OrdenSalidaService;
 use App\Http\Controllers\Controller;
 use App\Services\Pedidos\PedidosApiService; 
 use Illuminate\Http\Request;
@@ -11,10 +12,12 @@ use Exception;
 class PedidosController extends Controller
 {
     protected $apiService;
+    protected $ordenSalidaService;
 
-    public function __construct(PedidosApiService $apiService)
+    public function __construct(PedidosApiService $apiService, OrdenSalidaService $ordenSalidaService)
     {
-        $this->apiService = $apiService;
+    $this->apiService = $apiService;
+    $this->ordenSalidaService = $ordenSalidaService;
     }
 
     
@@ -94,21 +97,37 @@ public function store(Request $request)
         'detalles'         => $detallesApi,
     ];
 
-    try {
-        
-        $this->apiService->crearPedido($dataApi); 
+try {
+    $pedidoCreado = $this->apiService->crearPedido($dataApi);
 
-        
-        if (session()->has('carrito')) {
-            session()->forget('carrito');
+    
+    $idPedido  = $pedidoCreado['ID_PEDIDO']      ?? $pedidoCreado['id_pedido']      ?? null;
+    $idCliente = $pedidoCreado['cliente_id']      ?? $pedidoCreado['ID_CLIENTE']     ?? $dataApi['cliente_id'];
+    $total     = $pedidoCreado['total_producto']  ?? $pedidoCreado['TOTAL_PRODUCTO'] ?? $dataApi['total_producto'];
+
+    if ($idPedido && $idCliente) {
+        $resultadoOrden = $this->ordenSalidaService->agregarVenta([
+            'ID_CLIENTE'        => $idCliente,
+            'ID_PEDIDO'         => $idPedido,
+            'FECHA_FACTURACION' => now()->format('Y-m-d\TH:i:s'), 
+            'TOTAL_FACTURA'     => $total,
+        ]);
+
+        if (isset($resultadoOrden['error'])) {
+            \Log::warning("Pedido {$idPedido} creado pero falló la orden de salida: " . $resultadoOrden['error']);
         }
-
-        $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
-        return redirect()->route($route)->with('success', 'Pedido creado y stock actualizado en el sistema.');
-        
-    } catch (Exception $e) {
-        return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
     }
+
+    if (session()->has('carrito')) {
+        session()->forget('carrito');
+    }
+
+    $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
+    return redirect()->route($route)->with('success', 'Pedido creado y orden de salida generada correctamente.');
+
+} catch (Exception $e) {
+    return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
+}
 }
 
     public function edit($id)
