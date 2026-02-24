@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use App\Services\Inventario\IngredientesService;
 use App\Services\Inventario\ProveedoresService;
 use App\Services\Inventario\CategoriaIngredientesService;
@@ -27,42 +28,23 @@ class IngredientesController extends Controller
     }
 
     public function index()
-    {
-        // 1. Obtener datos de los servicios
-        $resIngredientes = $this->ingredientesService->obtenerIngredientes();
-        $resCategorias = $this->categoriasService->obtenerCategoriasIngredientes();
-        $resProveedores = $this->proveedoresService->obtenerProveedores();
+{
+    $resIngredientes = $this->ingredientesService->obtenerIngredientes();
+    $ingredientes = $resIngredientes['success'] ? $resIngredientes['data'] : [];
 
-        // 2. Normalización de Ingredientes
-        $ingredientes = collect($resIngredientes['data'] ?? [])->map(function($ing) {
-            return [
-                'idIngrediente' => $ing['idIngrediente'] ?? 0,
-                'nombreIngrediente' => $ing['nombreIngrediente'] ?? 'Sin nombre',
-                'referenciaIngrediente' => $ing['referenciaIngrediente'] ?? 'N/A',
-                'idCategoria' => $ing['idCategoria'] ?? 0,
-                'idProveedor' => $ing['idProveedor'] ?? 0,
-            ];
-        })->toArray();
-
-        // 3. Normalización de Categorías
-        $categorias = collect($resCategorias['data'] ?? [])->map(function($cat) {
-            return [
-                'idCategoria' => $cat['idCategoria'] ?? $cat['id'] ?? 0,
-                'nombreCategoria' => $cat['nombreCategoria'] ?? $cat['nombre'] ?? 'Sin nombre'
-            ];
-        })->toArray();
-
-        // 4. Normalización de Proveedores (Ajustado a tu Backend Java: nombreProv)
-        $proveedores = collect($resProveedores['data'] ?? [])->map(function($prov) {
-            return [
-                'idProveedor' => $prov['idProveedor'] ?? $prov['id'] ?? 0,
-                'nombreProv' => $prov['nombreProv'] ?? $prov['nombre'] ?? 'Sin nombre'
-            ];
-        })->toArray();
-
-        // 5. Retornar vista con los datos normalizados
-        return view('inventarioviews.ingredientes.index', compact('ingredientes', 'categorias', 'proveedores'));
+    // Proveedores y categorías (los que ya tienes)
+    try {
+        $proveedores = Http::get('http://localhost:8080/proveedores')->json() ?? [];
+        $categorias  = Http::get('http://localhost:8080/categorias/ingredientes')->json() ?? [];
+        $unidades    = Http::get('http://localhost:8080/unidades-medida')->json() ?? []; // ← nuevo
+    } catch (\Exception $e) {
+        $proveedores = $categorias = $unidades = [];
     }
+
+    return view('inventarioviews.ingredientes.index', compact(
+        'ingredientes', 'proveedores', 'categorias', 'unidades'
+    ));
+}
 
     public function inventario()
     {

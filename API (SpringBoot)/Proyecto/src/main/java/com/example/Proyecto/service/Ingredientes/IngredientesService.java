@@ -1,6 +1,7 @@
 package com.example.Proyecto.service.Ingredientes;
 
 import com.example.Proyecto.dto.IngredienteDetalleDTO;
+import com.example.Proyecto.dto.IngredienteListadoDTO;
 import com.example.Proyecto.model.Ingredientes;
 import com.example.Proyecto.dto.IngredientesCantidad;
 import jakarta.persistence.EntityManager;
@@ -80,9 +81,23 @@ public class IngredientesService {
         return jdbcTemplate.query(sql, ingredienteRowMapper);
     }
 
-    public List<Ingredientes> obtenerIngredientesParaListado() {
-        String sql = "SELECT ID_INGREDIENTE, ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, REFERENCIA_INGREDIENTE FROM Ingredientes";
-        return jdbcTemplate.query(sql, ingredienteListadoRowMapper);
+    public List<IngredienteListadoDTO> obtenerIngredientesParaListado() {
+        String sql = "SELECT i.ID_INGREDIENTE, i.ID_PROVEEDOR, i.ID_CATEGORIA, " +
+                "i.NOMBRE_INGREDIENTE, i.REFERENCIA_INGREDIENTE, " +
+                "u.ABREVIATURA_UNIDAD " +
+                "FROM Ingredientes i " +
+                "LEFT JOIN unidades_medida u ON i.ID_UNIDAD_MEDIDA = u.ID_UNIDAD";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            IngredienteListadoDTO dto = new IngredienteListadoDTO();
+            dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
+            dto.setIdProveedor(rs.getLong("ID_PROVEEDOR"));
+            dto.setIdCategoria(rs.getLong("ID_CATEGORIA"));
+            dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+            dto.setReferenciaIngrediente(rs.getString("REFERENCIA_INGREDIENTE"));
+            dto.setAbreviaturaUnidad(rs.getString("ABREVIATURA_UNIDAD")); // ← nuevo
+            return dto;
+        });
     }
 
     public void crearIngrediente(Ingredientes ingrediente) {

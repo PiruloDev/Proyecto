@@ -10,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -22,6 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT) // compatible con Mockito 5.x
 class RecetasServiceTest {
 
     @Mock
@@ -31,11 +35,9 @@ class RecetasServiceTest {
     private RecetasService recetasService;
 
     private RecetaDetalleDTO detalleDTO;
-    private RecetaProducto recetaProducto;
 
     @BeforeEach
     void setUp() {
-        // DTO optimizado de prueba
         detalleDTO = new RecetaDetalleDTO();
         detalleDTO.setIdReceta(10L);
         detalleDTO.setIdProducto(1L);
@@ -45,25 +47,18 @@ class RecetasServiceTest {
         detalleDTO.setCantidadRequerida(new BigDecimal("2.0000"));
         detalleDTO.setIdUnidad(2L);
         detalleDTO.setNombreUnidad("Gramo");
-
-        // Modelo plano de prueba
-        recetaProducto = new RecetaProducto();
-        recetaProducto.setIdReceta(10L);
-        recetaProducto.setIdProducto(1L);
-        recetaProducto.setIdIngrediente(1L);
-        recetaProducto.setCantidadRequerida(new BigDecimal("2.0000"));
-        recetaProducto.setIdUnidad(2L);
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PRUEBA 1: obtenerRecetaOptimizadaPorProducto devuelve datos correctos
+    // PRUEBA 1: obtenerRecetaOptimizadaPorProducto — producto existente
     // ─────────────────────────────────────────────────────────────
     @Test
     @DisplayName("Debe retornar receta optimizada con todos los campos para un producto existente")
     void obtenerRecetaOptimizadaPorProducto_cuandoExiste_retornaDatos() {
         // Arrange
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class), eq(1L)))
-                .thenReturn(List.of(detalleDTO));
+        doReturn(List.of(detalleDTO))
+                .when(jdbcTemplate)
+                .query(anyString(), any(RowMapper.class), eq(1L));
 
         // Act
         List<RecetaDetalleDTO> resultado = recetasService.obtenerRecetaOptimizadaPorProducto(1L);
@@ -74,19 +69,20 @@ class RecetasServiceTest {
         assertThat(resultado.get(0).getNombreIngrediente()).isEqualTo("Harina de Trigo");
         assertThat(resultado.get(0).getIdUnidad()).isEqualTo(2L);
         assertThat(resultado.get(0).getNombreUnidad()).isEqualTo("Gramo");
-        assertThat(resultado.get(0).getCantidadRequerida()).isEqualByComparingTo("2.0000");
+        assertThat(resultado.get(0).getCantidadRequerida())
+                .isEqualByComparingTo(new BigDecimal("2.0000"));
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PRUEBA 2: obtenerRecetaOptimizadaPorProducto retorna lista vacía
-    //           cuando el producto no tiene receta
+    // PRUEBA 2: obtenerRecetaOptimizadaPorProducto — producto sin receta
     // ─────────────────────────────────────────────────────────────
     @Test
     @DisplayName("Debe retornar lista vacía cuando el producto no tiene receta registrada")
     void obtenerRecetaOptimizadaPorProducto_cuandoNoExiste_retornaVacio() {
         // Arrange
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class), eq(99L)))
-                .thenReturn(List.of());
+        doReturn(List.of())
+                .when(jdbcTemplate)
+                .query(anyString(), any(RowMapper.class), eq(99L));
 
         // Act
         List<RecetaDetalleDTO> resultado = recetasService.obtenerRecetaOptimizadaPorProducto(99L);
@@ -96,14 +92,15 @@ class RecetasServiceTest {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PRUEBA 3: actualizarReceta lanza excepción si el producto no existe
+    // PRUEBA 3: actualizarReceta — producto inexistente lanza excepción
     // ─────────────────────────────────────────────────────────────
     @Test
     @DisplayName("Debe lanzar IllegalArgumentException al actualizar receta de producto inexistente")
     void actualizarReceta_cuandoProductoNoExiste_lanzaExcepcion() {
         // Arrange
-        when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), eq(99L)))
-                .thenThrow(new org.springframework.dao.EmptyResultDataAccessException(1));
+        doThrow(new EmptyResultDataAccessException(1))
+                .when(jdbcTemplate)
+                .queryForObject(anyString(), eq(Long.class), eq(99L));
 
         RecetaRequest request = new RecetaRequest();
         request.setIdProducto(99L);
@@ -116,23 +113,25 @@ class RecetasServiceTest {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PRUEBA 4: eliminarReceta ejecuta DELETE en encabezado y detalles
+    // PRUEBA 4: eliminarReceta — ejecuta DELETE en detalles y encabezado
     // ─────────────────────────────────────────────────────────────
     @Test
     @DisplayName("Debe eliminar detalles y encabezado de receta correctamente")
     void eliminarReceta_cuandoExiste_eliminaCorrectamente() {
-        // Arrange — simula que encuentra ID_RECETA = 10 para ID_PRODUCTO = 1
-        when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), eq(1L)))
-                .thenReturn(10L);
+        // Arrange — encuentra ID_RECETA = 10 para ID_PRODUCTO = 1
+        doReturn(10L)
+                .when(jdbcTemplate)
+                .queryForObject(anyString(), eq(Long.class), eq(1L));
 
-        // Simula que el DELETE del encabezado afecta 1 fila
-        when(jdbcTemplate.update(anyString(), eq(10L)))
-                .thenReturn(1);
+        // Simula DELETE exitoso (1 fila afectada)
+        doReturn(1)
+                .when(jdbcTemplate)
+                .update(anyString(), eq(10L));
 
         // Act
         recetasService.eliminarReceta(1L);
 
-        // Assert — verifica que se llamó update al menos 2 veces (detalles + encabezado)
-        verify(jdbcTemplate, atLeast(2)).update(anyString(), eq(10L));
+        // Assert — delete de detalles + delete de encabezado = 2 llamadas
+        verify(jdbcTemplate, times(2)).update(anyString(), eq(10L));
     }
 }

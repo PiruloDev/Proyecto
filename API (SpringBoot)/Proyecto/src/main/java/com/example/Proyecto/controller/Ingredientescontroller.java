@@ -54,10 +54,8 @@ public class Ingredientescontroller {
     @ApiResponse(responseCode = "200", description = "Lista completa obtenida exitosamente")
     @GetMapping("ingredientes/lista")
     public List<IngredienteListadoDTO> obtenerIngredientesListas() {
-        List<Ingredientes> listaCompleta = ingredientesService.obtenerTodosLosIngredientes();
-        return listaCompleta.stream()
-                .map(IngredienteListadoDTO::new)
-                .collect(Collectors.toList());
+        // ← usa el nuevo metodo con JOIN en lugar del constructor del modelo
+        return ingredientesService.obtenerIngredientesParaListado();
     }
 
     @Operation(summary = "Crear ingrediente", description = "Registra un nuevo ingrediente en el sistema")
