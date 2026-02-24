@@ -11,9 +11,12 @@
         .main-content { background-color: #fdfaf6; min-height: 100vh; overflow-y: auto; }
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .btn-quitar { border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; }
-        /* Ajuste para el color temático del Portal Empleado (Marrón/Dorado) */
         .btn-update { background-color: #ffc107; border: none; font-weight: bold; color: #212529; }
         .btn-update:hover { background-color: #e0a800; }
+        .text-success-custom { color: #28a745; }
+        .hidden-inputs { display: none; }
+        /* Estilo para cuando la tabla está vacía o cargando */
+        #detalles-body tr td { vertical-align: middle; }
     </style>
 @endpush
 
@@ -36,6 +39,7 @@
                 @method('PUT')
 
                 <div class="row g-4">
+                    {{-- Columna Izquierda: Info General --}}
                     <div class="col-lg-4">
                         <div class="card p-4">
                             <h5 class="text-secondary border-bottom pb-2 mb-3">Información del Pedido</h5>
@@ -47,7 +51,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">ID Empleado</label>
-                                <input type="number" class="form-control" name="ID_EMPLEADO" value="{{ $pedido['id_EMPLEADO'] }}" required readonly>
+                                <input type="number" class="form-control bg-light" name="ID_EMPLEADO" value="{{ $pedido['id_EMPLEADO'] }}" required readonly>
                             </div>
 
                             <div class="mb-3">
@@ -69,6 +73,7 @@
                         </div>
                     </div>
 
+                    {{-- Columna Derecha: Detalle de Productos --}}
                     <div class="col-lg-8">
                         <div class="card p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -84,13 +89,18 @@
                                         <tr>
                                             <th>Producto</th>
                                             <th width="120">Cantidad</th>
-                                            <th>Precio</th>
+                                            <th>Precio Unit.</th>
                                             <th>Subtotal</th>
                                             <th width="50"></th>
                                         </tr>
                                     </thead>
                                     <tbody id="detalles-body">
-                                        {{-- Sincronizado por JS --}}
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                                Sincronizando con inventario...
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -116,34 +126,76 @@
     const totalSpan = document.getElementById('total-general-span');
     const totalInput = document.getElementById('TOTAL_PRODUCTO_INPUT');
 
-    async function cargarProductosAPI() {
+    async function inicializarVista() {
         try {
+            console.log("Iniciando carga de productos desde Java...");
             const response = await fetch('http://localhost:8080/productos');
+            if (!response.ok) throw new Error("Fallo al conectar con Java");
+            
             const data = await response.json();
+            
+            // NORMALIZACIÓN AGRESIVA: Mapeamos cualquier posibilidad de nombre de campo
             listaProductosGlobal = data.map(p => ({
-                id: p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
-                nombre: p.nombre_PRODUCTO || p.nombreProducto || p["Nombre Producto:"],
-                precio: parseFloat(p.precio_UNITARIO || p.precio || p["Precio:"] || 0)
+                id: p["Id Producto:"] || p.id_PRODUCTO || p.idProducto || p.ID_PRODUCTO || p.id,
+                nombre: p["Nombre Producto:"] || p.nombre_PRODUCTO || p.nombreProducto || p.NOMBRE_PRODUCTO || p.nombre,
+                precio: parseFloat(p["Precio:"] || p.precio_UNITARIO || p.precio || p.PRECIO_UNITARIO || 0)
             }));
-            renderizarDetallesExistentes();
-        } catch (e) { console.error("Error al cargar productos:", e); }
-    }
 
-    function renderizarDetallesExistentes() {
-        const detalles = @json($pedido['detalles'] ?? $pedido['detalle_pedidos'] ?? []);
-        detallesBody.innerHTML = '';
-        if (detalles.length > 0) {
-            detalles.forEach(d => agregarFila(d));
-        } else {
-            agregarFila();
+            console.log("Inventario normalizado (Check ID y Nombre):", listaProductosGlobal);
+            
+            // Solo después de normalizar, intentamos renderizar el pedido
+            renderizarDetallesExistentes();
+
+        } catch (e) { 
+            console.error("Error crítico en inicializarVista:", e);
+            detallesBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error de conexión con el inventario (Java)</td></tr>';
         }
     }
 
+    function renderizarDetallesExistentes() {
+    const pedidoCompleto = @json($pedido);
+    console.log("--- DEBUG DE DATOS ---");
+    console.log("Objeto Pedido recibido:", pedidoCompleto);
+    
+    // Buscamos los detalles en todas las llaves posibles que devuelva tu API Java
+    const detalles = pedidoCompleto.detalles || 
+                     pedidoCompleto.detalle_pedidos || 
+                     pedidoCompleto.detallesPedido || 
+                     pedidoCompleto.lista_productos || [];
+
+    console.log("Detalles extraídos:", detalles);
+
+    detallesBody.innerHTML = '';
+
+    if (detalles && detalles.length > 0) {
+        detalles.forEach(d => {
+            console.log("Procesando detalle individual:", d);
+            agregarFila(d);
+        });
+    } else {
+        console.warn("ALERTA: El array de detalles llegó vacío desde el controlador.");
+        detallesBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No se encontraron artículos para este pedido en el sistema.</td></tr>';
+    }
+    actualizarCalculos();
+}
+
     function agregarFila(detalle = null) {
-        const prodId = detalle ? (detalle.id_PRODUCTO || detalle.idProducto) : '';
-        const cant = detalle ? (detalle.cantidad_PRODUCTO || detalle.cantidad || 1) : 1;
-        const precio = detalle ? (detalle.precio_UNITARIO || detalle.precioUnitario || 0) : 0;
-        const subtotal = precio * cant;
+        if (detallesBody.querySelector('td[colspan]')) detallesBody.innerHTML = '';
+
+        // Extraer el ID del producto que viene del detalle de Laravel
+        // Importante: Laravel suele enviar 'id_PRODUCTO' o 'id_producto'
+        const prodIdFromLaravel = detalle ? (detalle.id_PRODUCTO || detalle.id_producto || detalle.idProducto || detalle.ID_PRODUCTO) : '';
+        const cant = detalle ? (detalle.cantidad_PRODUCTO || detalle.cantidad_producto || detalle.cantidadProducto || 1) : 1;
+        
+        // Buscamos el producto en la lista de Java usando el ID de Laravel
+        const productoEncontrado = listaProductosGlobal.find(p => String(p.id) === String(prodIdFromLaravel));
+        
+        if (detalle && !productoEncontrado) {
+            console.error(`No se encontró el producto ID ${prodIdFromLaravel} en el inventario de Java.`);
+        }
+
+        const precioFinal = productoEncontrado ? productoEncontrado.precio : 0;
+        const subtotal = precioFinal * cant;
 
         const fila = document.createElement('tr');
         fila.innerHTML = `
@@ -151,40 +203,62 @@
                 <select name="productos[]" class="form-select select-producto" required>
                     <option value="">Seleccione...</option>
                     ${listaProductosGlobal.map(p => `
-                        <option value="${p.id}" data-precio="${p.precio}" ${p.id == prodId ? 'selected' : ''}>
+                        <option value="${p.id}" data-precio="${p.precio}" ${String(p.id) === String(prodIdFromLaravel) ? 'selected' : ''}>
                             ${p.nombre}
                         </option>`).join('')}
                 </select>
             </td>
-            <td><input type="number" name="cantidades[]" class="form-control input-cantidad" value="${cant}" min="1"></td>
-            <td>$<span class="txt-precio">${precio.toLocaleString()}</span></td>
-            <td class="fw-bold text-dark">$<span class="txt-subtotal">${subtotal.toLocaleString()}</span></td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm btn-quitar">×</button></td>
+            <td>
+                <input type="number" name="cantidades[]" class="form-control text-center input-cantidad" value="${cant}" min="1">
+            </td>
+            <td>$<span class="txt-precio">${Number(precioFinal).toLocaleString('es-CO')}</span></td>
+            <td class="fw-bold text-dark">$<span class="txt-subtotal">${Number(subtotal).toLocaleString('es-CO')}</span></td>
+            <td>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-quitar"><i class="bi bi-x-lg"></i></button>
+                <div class="hidden-inputs">
+                    <input type="hidden" name="precios_unitarios[]" value="${precioFinal}">
+                    <input type="hidden" name="subtotales[]" value="${subtotal}">
+                </div>
+            </td>
         `;
         detallesBody.appendChild(fila);
-        actualizarCalculos();
     }
 
     function actualizarCalculos() {
         let totalAcumulado = 0;
-        detallesBody.querySelectorAll('tr').forEach(fila => {
+        detallesBody.querySelectorAll('tr:not(:has(td[colspan]))').forEach(fila => {
             const select = fila.querySelector('.select-producto');
-            const precio = parseFloat(select.selectedOptions[0]?.dataset.precio || 0);
+            const selectedOption = select.options[select.selectedIndex];
+            const precio = parseFloat(selectedOption?.dataset.precio || 0);
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value || 0);
             const subtotal = precio * cantidad;
 
-            fila.querySelector('.txt-precio').textContent = precio.toLocaleString();
-            fila.querySelector('.txt-subtotal').textContent = subtotal.toLocaleString();
+            fila.querySelector('.txt-precio').textContent = precio.toLocaleString('es-CO');
+            fila.querySelector('.txt-subtotal').textContent = subtotal.toLocaleString('es-CO');
+            
+            fila.querySelector('.hidden-inputs').innerHTML = `
+                <input type="hidden" name="precios_unitarios[]" value="${precio}">
+                <input type="hidden" name="subtotales[]" value="${subtotal}">
+            `;
             totalAcumulado += subtotal;
         });
-        totalSpan.textContent = totalAcumulado.toLocaleString();
+        totalSpan.textContent = totalAcumulado.toLocaleString('es-CO');
         totalInput.value = totalAcumulado;
     }
 
-    document.addEventListener('DOMContentLoaded', cargarProductosAPI);
-    document.getElementById('btn-agregar-fila').onclick = () => agregarFila();
-    detallesBody.oninput = (e) => { if (e.target.matches('.select-producto, .input-cantidad')) actualizarCalculos(); };
-    detallesBody.onclick = (e) => { if (e.target.closest('.btn-quitar')) { e.target.closest('tr').remove(); actualizarCalculos(); } };
+    // Eventos
+    document.addEventListener('DOMContentLoaded', inicializarVista);
+    document.getElementById('btn-agregar-fila').addEventListener('click', () => agregarFila());
+    detallesBody.addEventListener('input', (e) => {
+        if (e.target.classList.contains('select-producto') || e.target.classList.contains('input-cantidad')) {
+            actualizarCalculos();
+        }
+    });
+    detallesBody.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-quitar')) {
+            e.target.closest('tr').remove();
+            actualizarCalculos();
+        }
+    });
 </script>
 @endpush
-

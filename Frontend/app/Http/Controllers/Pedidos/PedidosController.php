@@ -117,65 +117,88 @@ public function store(Request $request)
 }
 
     public function edit($id)
-    {
-        try {
-            $pedido = $this->apiService->obtenerPedidoPorId($id);
-            if (!$pedido) {
-                return redirect()->back()->with('error', 'Pedido no encontrado.');
-            }
-            
-            $estados = []; 
-            return view('pedidosviews.PedidosClientes.edit', compact('pedido', 'estados'));
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Error al cargar pedido: ' . $e->getMessage());
+{
+    try {
+        $pedido = $this->apiService->obtenerPedidoPorId($id);
+        
+        if (!$pedido) {
+            return redirect()->back()->with('error', 'Pedido no encontrado.');
         }
+
+        // --- SOLUCIÓN AQUÍ ---
+        // Si el pedido no trae los detalles, búscalos manualmente si tienes el método en el service
+        if (!isset($pedido['detalles']) || empty($pedido['detalles'])) {
+            // Intenta cargar los detalles desde otro método del service si existe
+            // $pedido['detalles'] = $this->apiService->obtenerDetallesDePedido($id);
+        }
+        // ---------------------
+
+        $estados = []; 
+        return view('pedidosviews.PedidosClientes.edit', compact('pedido', 'estados'));
+    } catch (Exception $e) {
+        return redirect()->back()->with('error', 'Error al cargar pedido: ' . $e->getMessage());
     }
+}
 
     
    public function update(Request $request, $id)
 {
-    // Aplicamos la misma restricción para las ediciones
+    // 1. Validación: Aseguramos que los arrays de productos lleguen completos
     $request->validate([
-        'ID_CLIENTE'       => 'required|integer|min:1',
-        'ID_EMPLEADO'      => 'required|integer|min:1',
-        'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
-        'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
-        'FECHA_ENTREGA'    => 'nullable|date', 
+        'ID_CLIENTE'       => 'required|integer',
+        'ID_EMPLEADO'      => 'required|integer',
+        'ID_ESTADO_PEDIDO' => 'required|integer',
+        'TOTAL_PRODUCTO'   => 'required|numeric',
+        'productos'        => 'required|array|min:1',
+        'cantidades'       => 'required|array',
     ]);
 
-    $fechaEntrega = $request->input('FECHA_ENTREGA');
-    if ($fechaEntrega && strlen($fechaEntrega) == 10) {
-        $fechaEntrega .= ' 23:59:59';
-    }
-
-    $dataApi = [
-        'cliente_id' => $request->input('ID_CLIENTE'),
-        'empleado_id' => $request->input('ID_EMPLEADO'),
-        'estado_pedido_id' => $request->input('ID_ESTADO_PEDIDO'),
-        'total_producto' => $request->input('TOTAL_PRODUCTO'),
-        'fecha_entrega' => $fechaEntrega ?: null, 
-    ];
-
-        try {
-            $this->apiService->actualizarPedido($id, $dataApi); 
-
-            
-            if ($request->routeIs('admin.*')) {
-                return redirect()->route('admin.pedidos.index')
-                                 ->with('success', "Pedido con ID $id actualizado correctamente (Admin).");
+    try {
+        // 2. Procesamos los detalles para la API de Java
+        $detallesApi = [];
+        foreach ($request->input('productos') as $key => $productoId) {
+            // Validamos que el producto no sea nulo (por si acaso quedó una fila vacía)
+            if (!empty($productoId)) {
+                $detallesApi[] = [
+                    // Estos nombres deben coincidir con tu Entity/DTO en Java
+                    'idProducto'       => (int)$productoId,
+                    'cantidadProducto' => (int)$request->input('cantidades')[$key],
+                    'precioUnitario'   => (float)($request->input('precios_unitarios')[$key] ?? 0),
+                    'subtotal'         => (float)($request->input('subtotales')[$key] ?? 0)
+                ];
             }
-            
-            
-            return redirect()->route('pedidos.index')
-                             ->with('success', "Pedido con ID $id actualizado correctamente (Empleado).");
-
-        } catch (Exception $e) {
-            
-            return redirect()->back()->withInput()->with('error', 'Error al actualizar pedido: ' . $e->getMessage());
         }
-    }
 
-    
+        // 3. Estructura de datos para enviar al Service
+        $dataApi = [
+            'id_pedido'        => (int)$id, // A veces Java necesita el ID dentro del cuerpo
+            'cliente_id'       => (int)$request->input('ID_CLIENTE'),
+            'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
+            'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
+            'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
+            'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
+            'detalles'         => $detallesApi,
+        ];
+
+        // 4. Llamada al servicio
+        $this->apiService->actualizarPedido($id, $dataApi);
+
+        // 5. Redirección inteligente según el rol/URL
+        $msg = "Pedido #{$id} actualizado correctamente.";
+        
+        if (str_contains($request->url(), 'admin')) {
+            return redirect()->route('admin.pedidos.index')->with('success', $msg);
+        }
+        
+        return redirect()->route('pedidos.index')->with('success', $msg);
+
+    } catch (Exception $e) {
+        \Log::error("Error actualizando pedido {$id}: " . $e->getMessage());
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'No se pudo actualizar el pedido: ' . $e->getMessage());
+    }
+}
     public function destroy($id, Request $request)
     {
         try {

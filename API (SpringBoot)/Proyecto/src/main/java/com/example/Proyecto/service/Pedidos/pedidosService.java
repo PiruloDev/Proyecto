@@ -88,7 +88,22 @@ public class pedidosService {
 
     public Pedidos obtenerPedidoPorId(Long id) {
         try {
-            return jdbcTemplate.queryForObject(SQL_SELECT_CON_NOMBRES + " WHERE p.ID_PEDIDO = ?", pedidoRowMapper, id);
+            // 1. Buscamos el encabezado del pedido
+            Pedidos pedido = jdbcTemplate.queryForObject(SQL_SELECT_CON_NOMBRES + " WHERE p.ID_PEDIDO = ?", pedidoRowMapper, id);
+
+            if (pedido != null) {
+                try {
+                    // 2. ¡ESTA ES LA LÍNEA QUE FALTA!
+                    // Cargamos los detalles usando el ID del pedido encontrado
+                    pedido.setDetalles(detallePedidosService.obtenerDetallesPorPedido(pedido.getID_PEDIDO()));
+
+                    System.out.println("Detalles cargados para el pedido #" + id + ": " + pedido.getDetalles().size());
+                } catch (Exception e) {
+                    System.err.println("Error al cargar detalles para el pedido individual #" + id);
+                    pedido.setDetalles(new java.util.ArrayList<>());
+                }
+            }
+            return pedido;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -163,11 +178,42 @@ public class pedidosService {
         return idPedidoGenerado;
     }
 
+    @Transactional // IMPORTANTE: Para que si algo falla, no se descuente stock a medias
     public void actualizarPedido(Long id, Pedidos nuevosDatos) {
-        String sql = "UPDATE pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, FECHA_ENTREGA = ?, TOTAL_PRODUCTO = ? WHERE ID_PEDIDO = ?";
-        jdbcTemplate.update(sql, nuevosDatos.getID_CLIENTE(), nuevosDatos.getID_EMPLEADO(), nuevosDatos.getID_ESTADO_PEDIDO(),
+        // 1. OBTENER DETALLES ANTIGUOS PARA DEVOLVER STOCK
+        List<DetallePedidos> detallesAntiguos = detallePedidosService.obtenerDetallesPorPedido(id.intValue());
+        if (detallesAntiguos != null) {
+            for (DetallePedidos det : detallesAntiguos) {
+                String sqlRestaurarStock = "UPDATE productos SET PRODUCTO_STOCK_MIN = PRODUCTO_STOCK_MIN + ? WHERE ID_PRODUCTO = ?";
+                jdbcTemplate.update(sqlRestaurarStock, det.getCantidadProducto(), det.getIdProducto());
+            }
+        }
+
+        // 2. BORRAR DETALLES ANTIGUOS
+        jdbcTemplate.update("DELETE FROM detalle_pedidos WHERE ID_PEDIDO = ?", id);
+
+        // 3. ACTUALIZAR ENCABEZADO DEL PEDIDO (Tu código original)
+        String sqlUpdatePedido = "UPDATE pedidos SET ID_CLIENTE = ?, ID_EMPLEADO = ?, ID_ESTADO_PEDIDO = ?, FECHA_ENTREGA = ?, TOTAL_PRODUCTO = ? WHERE ID_PEDIDO = ?";
+        jdbcTemplate.update(sqlUpdatePedido,
+                nuevosDatos.getID_CLIENTE(),
+                nuevosDatos.getID_EMPLEADO(),
+                nuevosDatos.getID_ESTADO_PEDIDO(),
                 nuevosDatos.getFECHA_ENTREGA() != null ? Timestamp.valueOf(nuevosDatos.getFECHA_ENTREGA()) : null,
-                nuevosDatos.getTOTAL_PRODUCTO(), id);
+                nuevosDatos.getTOTAL_PRODUCTO(),
+                id);
+
+        // 4. INSERTAR NUEVOS DETALLES Y DESCONTAR NUEVO STOCK
+        if (nuevosDatos.getDetalles() != null && !nuevosDatos.getDetalles().isEmpty()) {
+            for (DetallePedidos nuevoDetalle : nuevosDatos.getDetalles()) {
+                // A. Vincular al pedido actual
+                nuevoDetalle.setIdPedido(id.intValue());
+                detallePedidosService.crearDetallePedido(nuevoDetalle);
+
+                // B. Descontar stock
+                String sqlDescontarStock = "UPDATE productos SET PRODUCTO_STOCK_MIN = PRODUCTO_STOCK_MIN - ? WHERE ID_PRODUCTO = ?";
+                jdbcTemplate.update(sqlDescontarStock, nuevoDetalle.getCantidadProducto(), nuevoDetalle.getIdProducto());
+            }
+        }
     }
     public void eliminarPedido(Long id) {
         // 1. Obtener los detalles del pedido antes de borrar nada
