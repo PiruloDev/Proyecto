@@ -136,30 +136,35 @@ public class PedidosProveedoresService {
      * @return PedidosProveedores con su lista de detalles o null si no se encuentra.
      */
     public PedidosProveedores obtenerPedidoConDetalles(int idPedidoProv) {
-        // 1. Obtener el encabezado
-        // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
-        String sqlEncabezado = "SELECT * FROM pedidos_proveedores WHERE ID_PEDIDO_PROV = ?";
+        // ← JOIN con proveedores para traer el nombre
+        String sqlEncabezado =
+                "SELECT pp.*, p.NOMBRE_PROV " +
+                        "FROM pedidos_proveedores pp " +
+                        "LEFT JOIN Proveedores p ON pp.ID_PROVEEDOR = p.ID_PROVEEDOR " +
+                        "WHERE pp.ID_PEDIDO_PROV = ?";
+
         PedidosProveedores pedido;
         try {
-            pedido = jdbcTemplate.queryForObject(sqlEncabezado, pedidosProveedoresRowMapper, idPedidoProv);
+            pedido = jdbcTemplate.queryForObject(sqlEncabezado, (rs, rowNum) -> {
+                PedidosProveedores p = new PedidosProveedores();
+                p.setIdPedidoProv(rs.getInt("ID_PEDIDO_PROV"));
+                p.setIdProveedor(rs.getInt("ID_PROVEEDOR"));
+                p.setNumeroPedido(rs.getInt("NUMERO_PEDIDO"));
+                p.setFechaPedido(rs.getDate("FECHA_PEDIDO"));
+                p.setEstadoPedido(rs.getString("ESTADO_PEDIDO"));
+                p.setNombreProveedor(rs.getString("NOMBRE_PROV")); // ← nuevo
+                return p;
+            }, idPedidoProv);
         } catch (EmptyResultDataAccessException e) {
-            return null; // El pedido no existe
+            return null;
         }
 
-        // 2. Obtener los detalles del pedido, haciendo JOIN con la tabla de ingredientes para mostrar el nombre
-        // CORRECCIÓN: Nombre de tabla ajustado a la BD real (detalle_pedidos_proveedores)
-        String sqlDetalles = "SELECT dp.*, i.NOMBRE_INGREDIENTE FROM detalle_pedidos_proveedores dp " +
-                "JOIN Ingredientes i ON dp.ID_INGREDIENTE = i.ID_INGREDIENTE " +
-                "WHERE dp.ID_PEDIDO_PROV = ?";
+        String sqlDetalles =
+                "SELECT dp.*, i.NOMBRE_INGREDIENTE FROM detalle_pedidos_proveedores dp " +
+                        "JOIN Ingredientes i ON dp.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                        "WHERE dp.ID_PEDIDO_PROV = ?";
 
-        List<DetallePedidoProveedores> detalles = jdbcTemplate.query(
-                sqlDetalles,
-                detallePedidoProveedoresRowMapper,
-                idPedidoProv
-        );
-
-        // 3. Establecer los detalles en el encabezado
-        pedido.setDetalles(detalles);
+        pedido.setDetalles(jdbcTemplate.query(sqlDetalles, detallePedidoProveedoresRowMapper, idPedidoProv));
 
         return pedido;
     }
@@ -171,7 +176,7 @@ public class PedidosProveedoresService {
         return jdbcTemplate.query(sql, pedidosProveedoresRowMapper);
     }
 
-    // Este método ya no es usado por el controlador, pero se mantiene para compatibilidad
+    // Este metodo ya no es usado por el controlador, pero se mantiene para compatibilidad
     public void crearPedidoProveedor(PedidosProveedores pedido) {
         // CORRECCIÓN: Se recomienda usar el nombre de tabla en minúsculas (pedidos_proveedores) para consistencia con el SQL
         String sql = "INSERT INTO pedidos_proveedores (ID_PROVEEDOR, NUMERO_PEDIDO, FECHA_PEDIDO, ESTADO_PEDIDO) VALUES (?, ?, ?, ?)";

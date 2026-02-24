@@ -46,8 +46,20 @@ public class ProduccionService {
 
 
     public List<Produccion> obtenerTodoElHistorial() {
-        String sql = "SELECT * FROM produccion ORDER BY FECHA_PRODUCCION DESC";
-        return jdbcTemplate.query(sql, produccionRowMapper);
+        String sql = "SELECT p.*, pr.NOMBRE_PRODUCTO " +
+                "FROM produccion p " +
+                "LEFT JOIN productos pr ON p.ID_PRODUCTO = pr.ID_PRODUCTO " +
+                "ORDER BY p.FECHA_PRODUCCION DESC";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Produccion produccion = new Produccion();
+            produccion.setIdProduccion(rs.getLong("ID_PRODUCCION"));
+            produccion.setIdProducto(rs.getLong("ID_PRODUCTO"));
+            produccion.setNombreProducto(rs.getString("NOMBRE_PRODUCTO")); // ← nuevo
+            produccion.setCantidadProducida(rs.getBigDecimal("CANTIDAD_PRODUCIDA"));
+            produccion.setFechaProduccion(rs.getTimestamp("FECHA_PRODUCCION").toLocalDateTime());
+            return produccion;
+        });
     }
 
 

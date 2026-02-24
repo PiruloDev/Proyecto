@@ -12,6 +12,8 @@ public class Produccion {
 
     private Long idProduccion; // Clave primaria del registro de producción
     private Long idProducto;   // Clave foránea al producto que se elaboró
+
+    private String nombreProducto;
     private BigDecimal cantidadProducida; // Cantidad de unidades terminadas producidas
     private LocalDateTime fechaProduccion; // Fecha y hora en que se registró la producción
 
@@ -46,6 +48,8 @@ public class Produccion {
         this.idProducto = idProducto;
     }
 
+    public String getNombreProducto() { return nombreProducto; }
+    public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
     public BigDecimal getCantidadProducida() {
         return cantidadProducida;
     }
