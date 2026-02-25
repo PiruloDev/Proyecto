@@ -17,72 +17,64 @@ class ProduccionController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * Muestra el historial de registros de producción. (GET /produccion)
-     */
     public function index()
     {
         $response = $this->service->obtenerHistorial();
+        $historial = $response['success'] ? ($response['data'] ?? []) : [];
+
+        $recetasResponse = $this->service->obtenerRecetas();
+        $recetas = $recetasResponse['success'] ? ($recetasResponse['data'] ?? []) : [];
+
+        $productosConReceta = collect($recetas)
+            ->unique('idProducto')
+            ->values()
+            ->toArray();
 
         if (!$response['success']) {
-            $errorMessage = $response['error'] ?? 'Error desconocido al obtener el historial.';
-            return view('inventarioviews.produccion.index', ['historial' => []])
-                   ->with('error', 'Error al cargar historial de producción: ' . $errorMessage);
+            return view('inventarioviews.produccion.index',
+                        compact('historial', 'productosConReceta', 'recetas'))
+                   ->with('error', $response['error'] ?? 'Error al cargar historial');
         }
-        
-        $historial = $response['data'] ?? [];
-        
-        return view('inventarioviews.produccion.index', compact('historial'));
+
+        return view('inventarioviews.produccion.index',
+                    compact('historial', 'productosConReceta', 'recetas'));
     }
 
-    /**
-     * Registra una nueva producción. (POST /produccion/store)
-     */
     public function store(Request $request)
     {
-        // Validación de los campos obligatorios del DTO ProduccionRequest
         $request->validate([
-            'idProducto' => 'required|integer|min:1',
-            // Usamos 'numeric' para BigDecimal y permitimos valores fraccionarios
-            'cantidadProducida' => 'required|numeric|min:0.01', 
-            // Opcional, pero si se envía debe ser un array válido
-            'ingredientesDescontados' => 'nullable|array', 
-            // Validación de los detalles anidados (si se envían)
-            'ingredientesDescontados.*.idIngrediente' => 'required_with:ingredientesDescontados|integer',
-            'ingredientesDescontados.*.cantidadUsada' => 'required_with:ingredientesDescontados|numeric|min:0.01',
+            'idProducto'       => 'required|integer|min:1',
+            'cantidadProducida'=> 'required|numeric|min:0.01',
         ]);
-        
-        // El payload debe coincidir con el DTO ProduccionRequest de Spring
+
         $payload = [
-            'idProducto' => (int)$request->input('idProducto'),
-            'cantidadProducida' => (float)$request->input('cantidadProducida'), // Laravel envía float o string, Spring lo manejará como BigDecimal
-            'ingredientesDescontados' => $request->input('ingredientesDescontados') // Array de IngredienteDescontado DTOs
+            'idProducto'       => (int)$request->input('idProducto'),
+            'cantidadProducida'=> (float)$request->input('cantidadProducida'),
         ];
-        
+
         $response = $this->service->registrarProduccion($payload);
 
         if ($response['success']) {
             $idProduccion = $response['response']['idProduccion'] ?? 'N/A';
-            $mensaje = $response['response']['mensaje'] ?? 'Producción registrada con éxito.';
-            
-            return Redirect::route('produccion.index')->with('success', $mensaje . ' (ID: ' . $idProduccion . ')');
+            $mensaje      = $response['response']['mensaje'] ?? 'Producción registrada con éxito.';
+            return Redirect::route('produccion.index')
+                           ->with('success', $mensaje . ' (ID: ' . $idProduccion . ')');
         }
 
-        // Si falla, el service devuelve el mensaje de error del API de Spring
-        return Redirect::back()->withInput()->with('error', 'Fallo al registrar producción: ' . $response['error']);
+        return Redirect::back()->withInput()
+                       ->with('error', 'Fallo al registrar: ' . $response['error']);
     }
 
-    /**
-     * Elimina un registro de producción y revierte los cambios de inventario. (DELETE /produccion/delete/{id})
-     */
     public function destroy(int $id)
     {
         $response = $this->service->eliminarProduccion($id);
 
         if ($response['success']) {
-            return Redirect::route('produccion.index')->with('success', $response['response']);
+            return Redirect::route('produccion.index')
+                           ->with('success', $response['response']);
         }
-        
-        return Redirect::back()->with('error', 'No se pudo eliminar la producción: ' . $response['error']);
+
+        return Redirect::back()
+                       ->with('error', 'No se pudo eliminar: ' . $response['error']);
     }
 }

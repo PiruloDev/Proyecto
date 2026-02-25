@@ -124,4 +124,20 @@ class ProduccionService
             ];
         }
     }
+
+    public function obtenerRecetas(): array
+{
+    try {
+        $response = $this->getApiClient()->get('/inventario/recetas/optimizadas');
+
+        if ($response->successful()) {
+            return ['success' => true, 'data' => $response->json()];
+        }
+
+        return ['success' => false, 'error' => 'Error al obtener recetas (' . $response->status() . ')'];
+
+    } catch (\Exception $e) {
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
+}
 }

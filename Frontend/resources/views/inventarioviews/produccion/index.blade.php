@@ -1,103 +1,219 @@
-{{-- resources/views/inventarioviews/produccion/index.blade.php (Ajustado a Dashboard) --}}
+{{-- resources/views/inventarioviews/produccion/index.blade.php --}}
 
 @extends('layouts.app')
 
 @section('title', 'Gestión de Producción - El Castillo del Pan')
 
 @push('styles')
-    {{-- Estilos necesarios para la integración con el layout de dashboard --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> {{-- Aseguramos que se incluyan --}}
-    <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> {{-- Aseguramos que se incluyan --}}
+    <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        .main-content {
+            height: 100vh;
+            overflow-y: auto;
+            padding-bottom: 3rem;
+            background: linear-gradient(135deg, var(--panaderia-beige-claro) 0%, var(--panaderia-blanco-calido) 100%);
+        }
+
+        .tabla-historial thead {
+            background: linear-gradient(45deg, var(--panaderia-marron-hover), var(--panaderia-marron-principal));
+            color: white;
+        }
+
+        .tabla-historial tbody tr:hover {
+            background: rgba(139, 111, 71, 0.05);
+        }
+
+        .badge-cantidad {
+            background: linear-gradient(45deg, var(--panaderia-marron-principal), var(--panaderia-cafe-claro));
+            color: white;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-produccion {
+            background: var(--panaderia-marron-principal);
+            color: white;
+            border: none;
+            border-radius: var(--panaderia-radius-md);
+            transition: all var(--panaderia-transition-normal);
+        }
+
+        .btn-produccion:hover {
+            background: var(--panaderia-marron-hover);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--panaderia-shadow-lg);
+        }
+
+        .modal-content {
+            border-radius: var(--panaderia-radius-xl) !important;
+            border: none;
+        }
+
+        .modal-header-prod {
+            background: linear-gradient(45deg, var(--panaderia-marron-hover), var(--panaderia-marron-principal));
+            border-radius: var(--panaderia-radius-xl) var(--panaderia-radius-xl) 0 0;
+            padding: 1.5rem 2rem;
+        }
+
+        .paso-card {
+            background: white;
+            border-radius: var(--panaderia-radius-lg);
+            border: 1px solid var(--panaderia-beige-oscuro);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .paso-numero {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, var(--panaderia-marron-hover), var(--panaderia-marron-principal));
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+
+        .paso-titulo {
+            color: var(--panaderia-marron-hover);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .receta-tabla thead {
+            background: var(--panaderia-beige-claro);
+        }
+
+        .receta-tabla th {
+            color: var(--panaderia-marron-hover);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .receta-tabla td {
+            font-size: 0.85rem;
+        }
+
+        #recetaPreview {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 @endpush
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        
-        {{-- Side Bar: Incluye el sidebar de administrador --}}
-        @include('components.admin-sidebar') 
-        
-        {{-- CONTENIDO PRINCIPAL --}}
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
-            
-            {{-- Título y Controles --}}
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2"><i class="fas fa-industry"></i> Gestión de Producción</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    {{-- Espacio para botones secundarios o filtros si los hubiera --}}
+
+        @include('components.admin-sidebar')
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
+
+            {{-- Header --}}
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4 border-bottom">
+                <div>
+                    <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-hover);">
+                        <i class="fas fa-industry me-2"></i>Gestión de Producción
+                    </h1>
+                    <p class="text-muted mb-0">Registro y reversión de producción de productos terminados.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-produccion px-4 py-2 shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#registrarModal">
+                        <i class="fas fa-plus-circle me-2"></i>Nueva Producción
+                    </button>
+                    <a href="{{ route('produccion.index') }}" class="btn btn-outline-secondary px-3">
+                        <i class="fas fa-sync"></i>
+                    </a>
                 </div>
             </div>
 
-            {{-- MENSAJES --}}
-            @if (session('success'))
-                <div class="alert alert-success my-3 shadow-sm"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+            {{-- Alertas --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4"
+                     style="border-radius: var(--panaderia-radius-lg);">
+                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             @endif
-            @if (session('error'))
-                <div class="alert alert-danger my-3 shadow-sm"><i class="fas fa-times-circle"></i> {{ session('error') }}</div>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4"
+                     style="border-radius: var(--panaderia-radius-lg);">
+                    <i class="fas fa-times-circle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             @endif
-            
-            {{-- Botones de Acción Principal --}}
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#registrarModal">
-                    <i class="fas fa-plus-circle"></i> Registrar Nueva Producción
-                </button>
-                <a href="{{ route('produccion.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-sync"></i> Recargar Historial
-                </a>
-            </div>
-            
-            {{-- LISTADO / HISTORIAL DE PRODUCCIÓN --}}
-            <section id="historial" class="mb-5">
-                <h3 class="mb-3 text-secondary">Historial de Producción Registrada</h3>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover align-middle shadow-sm rounded-3">
-                        <thead class="table-dark"> {{-- Cabecera oscura para más impacto --}}
+            {{-- Tabla Historial --}}
+            <section class="mb-5">
+                <h5 class="fw-bold mb-3" style="color: var(--panaderia-marron-hover);">
+                    <i class="fas fa-history me-2"></i>Historial de Producción
+                </h5>
+
+                <div class="table-responsive shadow-sm rounded-3 overflow-hidden">
+                    <table class="table tabla-historial align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th>ID Producción</th>
-                                <th>Producto</th>
-                                <th>Cantidad Producida</th>
-                                <th>Fecha y Hora</th>
-                                <th style="width: 200px;" class="text-center">Acciones</th>
+                                <th class="px-4 py-3">ID</th>
+                                <th class="py-3">Producto</th>
+                                <th class="py-3">Cantidad Producida</th>
+                                <th class="py-3">Fecha y Hora</th>
+                                <th class="py-3 text-center" style="width: 180px;">Acciones</th>
                             </tr>
                         </thead>
-
-                        <tbody>
+                        <tbody class="bg-white">
                             @forelse($historial as $registro)
                                 <tr>
-                                    <td>{{ $registro['idProduccion'] }}</td>
-                                    <td>{{ $registro['nombreProducto'] ?? 'ID: ' . $registro['idProducto'] }}</td>
-
-                                    <td><span class="badge bg-info text-dark">{{ number_format($registro['cantidadProducida'], 2) }}</span></td> 
+                                    <td class="px-4 text-muted small">#{{ $registro['idProduccion'] }}</td>
+                                    <td class="fw-bold" style="color: var(--panaderia-gris-oscuro);">
+                                        {{ $registro['nombreProducto'] ?? 'ID: ' . $registro['idProducto'] }}
+                                    </td>
                                     <td>
+                                        <span class="badge-cantidad">
+                                            {{ number_format($registro['cantidadProducida'], 2) }} uds
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">
                                         @if(isset($registro['fechaProduccion']))
-                                            {{ \Carbon\Carbon::parse($registro['fechaProduccion'])->format('Y-m-d H:i:s') }}
+                                            <i class="far fa-clock me-1"></i>
+                                            {{ \Carbon\Carbon::parse($registro['fechaProduccion'])->format('d/m/Y H:i') }}
                                         @else
                                             N/A
                                         @endif
                                     </td>
-
                                     <td class="text-center">
-                                        {{-- BOTÓN ELIMINAR (Reversión de Inventario) --}}
                                         <form method="POST"
-                                            action="{{ route('produccion.destroy', $registro['idProduccion']) }}"
-                                            class="d-inline">
+                                              action="{{ route('produccion.destroy', $registro['idProduccion']) }}"
+                                              class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('ADVERTENCIA: ¿Eliminar y REVERTIR los cambios de inventario (ingredientes y stock)? Esta acción no se puede deshacer.')"
-                                                title="Revertir/Eliminar Producción">
-                                                <i class="fas fa-undo"></i> Revertir / Eliminar
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger btn-sm fw-bold"
+                                                    onclick="return confirm('ADVERTENCIA: ¿Eliminar y REVERTIR los cambios de inventario? Esta acción no se puede deshacer.')">
+                                                <i class="fas fa-undo me-1"></i>Revertir
                                             </button>
                                         </form>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center p-3">
-                                        <i class="fas fa-info-circle me-2"></i> No hay registros de producción en el historial.
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fas fa-box-open fa-2x mb-2 d-block opacity-25"></i>
+                                        No hay registros de producción.
                                     </td>
                                 </tr>
                             @endforelse
@@ -106,159 +222,185 @@
                 </div>
             </section>
 
-            {{-- MODAL REGISTRAR PRODUCCIÓN --}}
-            <section>
-                <div class="modal fade" id="registrarModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg"> {{-- Se redujo un poco el tamaño, XXL no parece necesario --}}
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title"><i class="fas fa-plus-square"></i> Registrar Nueva Producción</h5>
-                                <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <form method="POST" action="{{ route('produccion.store') }}" class="row g-3 p-4">
-                                @csrf
-
-                                {{-- Detalles de la Producción --}}
-                                <h4 class="mb-3 text-primary border-bottom pb-2"><i class="fas fa-bread-slice"></i> Producto Terminado</h4>
-                                <div class="row g-3 mb-4 p-3 rounded-3 bg-light border"> {{-- Se usa bg-light para resaltar --}}
-                                    <div class="col-md-6">
-                                        <label for="idProducto" class="form-label fw-bold">ID Producto Terminado</label>
-                                        <input type="number" id="idProducto" name="idProducto" class="form-control" required value="{{ old('idProducto') }}" placeholder="Ej: 101">
-                                        @error('idProducto')<div class="text-danger small">{{ $message }}</div>@enderror
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="cantidadProducida" class="form-label fw-bold">Cantidad Producida</label>
-                                        <input type="number" step="0.01" id="cantidadProducida" name="cantidadProducida" class="form-control" required min="0.01" value="{{ old('cantidadProducida') }}" placeholder="Ej: 50.50">
-                                        @error('cantidadProducida')<div class="text-danger small">{{ $message }}</div>@enderror
-                                    </div>
-                                </div>
-                                
-                                <hr class="my-3">
-                                
-                                {{-- Descuento Manual de Ingredientes --}}
-                                <h4 class="mb-3 text-success"><i class="fas fa-minus-circle"></i> Descuento Manual de Ingredientes (Opcional)</h4>
-                                <div class="alert alert-info small py-2">
-                                    Si no especifica ingredientes aquí, el sistema intentará descontar automáticamente los ingredientes basados en la **Receta** asociada al Producto ID.
-                                </div>
-
-                                <div id="detalles-container">
-                                    {{-- Se mantiene la lógica de rellenar con old() para la persistencia de datos --}}
-                                    @if(old('ingredientesDescontados'))
-                                        @foreach(old('ingredientesDescontados') as $index => $detalle)
-                                            <div class="row g-3 detalle-row mb-2 border p-3 bg-white rounded-3 shadow-sm" data-index="{{ $index }}">
-                                                <div class="col-md-5">
-                                                    <label class="form-label small">ID Ingrediente</label>
-                                                    <input type="number" name="ingredientesDescontados[{{ $index }}][idIngrediente]" class="form-control form-control-sm" required value="{{ $detalle['idIngrediente'] ?? '' }}" placeholder="ID Ingrediente">
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <label class="form-label small">Cantidad Usada</label>
-                                                    <input type="number" step="0.01" name="ingredientesDescontados[{{ $index }}][cantidadUsada]" class="form-control form-control-sm" required min="0.01" value="{{ $detalle['cantidadUsada'] ?? '' }}" placeholder="Cantidad">
-                                                </div>
-                                                <div class="col-md-2 d-flex align-items-end">
-                                                    <button type="button" class="btn btn-danger w-100 btn-sm remove-detail-btn" title="Eliminar este ingrediente">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                                
-                                <div class="col-12 text-end mt-3">
-                                    <button type="button" id="add-detail-btn" class="btn btn-sm btn-success shadow-sm">
-                                        <i class="fas fa-plus"></i> Agregar Ingrediente Manual
-                                    </button>
-                                </div>
-
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100 btn-lg shadow">
-                                        <i class="fas fa-save"></i> Registrar Producción
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
         </main>
     </div>
 </div>
+
+{{-- MODAL REGISTRAR PRODUCCIÓN --}}
+<div class="modal fade" id="registrarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+
+            <div class="modal-header-prod text-white">
+                <h5 class="modal-title fw-bold mb-0">
+                    <i class="fas fa-industry me-2"></i>Registrar Nueva Producción
+                </h5>
+                <button type="button" class="btn-close btn-close-white ms-auto"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="{{ route('produccion.store') }}">
+                @csrf
+                <div class="modal-body p-4" style="background: var(--panaderia-beige-claro);">
+
+                    {{-- PASO 1: Seleccionar receta --}}
+                    <div class="paso-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="paso-numero">1</span>
+                            <span class="paso-titulo">Seleccionar Producto a Fabricar</span>
+                        </div>
+
+                        <label class="form-label fw-bold small text-uppercase"
+                               style="color: var(--panaderia-gris-texto);">
+                            Receta / Producto
+                        </label>
+                        <select id="selectReceta" class="form-select mb-3" required>
+                            <option value="" disabled selected>Elegir receta registrada...</option>
+                            @forelse($productosConReceta as $prod)
+                                <option value="{{ $prod['idProducto'] }}">
+                                    {{ $prod['nombreProducto'] ?? 'Producto ID ' . $prod['idProducto'] }}
+                                </option>
+                            @empty
+                                <option disabled>No hay recetas registradas</option>
+                            @endforelse
+                        </select>
+
+                        <input type="hidden" name="idProducto" id="idProductoHidden">
+
+                        {{-- Preview ingredientes --}}
+                        <div id="recetaPreview" class="d-none mt-3">
+                            <p class="small fw-bold text-uppercase mb-2"
+                               style="color: var(--panaderia-gris-texto);">
+                                <i class="fas fa-list me-1"></i>Ingredientes que se consumirán
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-sm receta-tabla rounded-3 overflow-hidden mb-0 border">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-3 py-2">Ingrediente</th>
+                                            <th class="text-center py-2">Cant. por unidad</th>
+                                            <th class="text-center py-2">Unidad</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recetaIngredientesBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="alert small py-2 mt-2 mb-0"
+                                 style="background: var(--panaderia-beige-oscuro);
+                                        border-radius: var(--panaderia-radius-sm);
+                                        color: var(--panaderia-marron-hover);
+                                        border: 1px solid var(--panaderia-cafe-claro);">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Las cantidades son por <strong>cada unidad producida</strong>.
+                                El sistema multiplicará por la cantidad del paso 2.
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- PASO 2: Cantidad --}}
+                    <div class="paso-card mb-0">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="paso-numero">2</span>
+                            <span class="paso-titulo">Cantidad a Producir</span>
+                        </div>
+
+                        <div class="row align-items-end g-3">
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">Unidades a fabricar</label>
+                                <input type="number" step="0.01"
+                                       name="cantidadProducida"
+                                       id="cantidadProducida"
+                                       class="form-control form-control-lg"
+                                       min="0.01"
+                                       placeholder="Ej: 10"
+                                       value="{{ old('cantidadProducida') }}"
+                                       required>
+                                @error('cantidadProducida')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-7">
+                                <div class="alert small py-2 mb-0"
+                                     style="background: var(--panaderia-beige-oscuro);
+                                            border-radius: var(--panaderia-radius-sm);
+                                            color: var(--panaderia-marron-hover);
+                                            border: 1px solid var(--panaderia-cafe-claro);">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    El sistema descontará ingredientes automáticamente
+                                    según la receta seleccionada.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-0 bg-white px-4 pb-4"
+                     style="border-radius: 0 0 var(--panaderia-radius-xl) var(--panaderia-radius-xl);">
+                    <button type="button" class="btn btn-light px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" id="btnRegistrar"
+                            class="btn btn-produccion px-4 fw-bold" disabled>
+                        <i class="fas fa-save me-2"></i>Registrar Producción
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
-    {{-- Script para manejar la adición y remoción dinámica de campos de ingredientes --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const container = document.getElementById('detalles-container');
-            const addButton = document.getElementById('add-detail-btn');
-            
-            // Función para obtener el índice más alto y calcular el siguiente.
-            // Esto es crucial para manejar correctamente los arrays de inputs de Laravel/PHP.
-            function getNextIndex() {
-                const rows = container.querySelectorAll('.detalle-row');
-                if (rows.length === 0) {
-                    return 0;
-                }
-                
-                let maxIndex = -1;
-                rows.forEach(row => {
-                    const index = parseInt(row.dataset.index);
-                    if (!isNaN(index) && index > maxIndex) {
-                        maxIndex = index;
-                    }
-                });
-                return maxIndex + 1;
-            }
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
-            function addDetailRow() {
-                const detailIndex = getNextIndex();
-                const newRow = document.createElement('div');
-                newRow.className = 'row g-3 detalle-row mb-2 border p-3 bg-white rounded-3 shadow-sm';
-                newRow.setAttribute('data-index', detailIndex);
+    const todasLasRecetas        = @json($recetas ?? []);
+    const selectReceta           = document.getElementById('selectReceta');
+    const idProductoHidden       = document.getElementById('idProductoHidden');
+    const recetaPreview          = document.getElementById('recetaPreview');
+    const recetaIngredientesBody = document.getElementById('recetaIngredientesBody');
+    const btnRegistrar           = document.getElementById('btnRegistrar');
 
-                newRow.innerHTML = `
-                    <div class="col-md-5">
-                        <label class="form-label small">ID Ingrediente</label>
-                        <input type="number" name="ingredientesDescontados[${detailIndex}][idIngrediente]" class="form-control form-control-sm" required placeholder="ID Ingrediente">
-                    </div>
-                    <div class="col-md-5">
-                        <label class="form-label small">Cantidad Usada</label>
-                        <input type="number" step="0.01" name="ingredientesDescontados[${detailIndex}][cantidadUsada]" class="form-control form-control-sm" required min="0.01" placeholder="Cantidad">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger w-100 btn-sm remove-detail-btn" title="Eliminar este ingrediente">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(newRow);
-            }
+    selectReceta.addEventListener('change', function () {
+        const idProducto = this.value;
+        idProductoHidden.value = idProducto;
 
-            // Listener para agregar filas
-            addButton.addEventListener('click', addDetailRow);
+        const ingredientes = todasLasRecetas.filter(
+            r => String(r.idProducto) === String(idProducto)
+        );
 
-            // Listener para eliminar filas
-            container.addEventListener('click', function(e) {
-                if (e.target.closest('.remove-detail-btn')) {
-                    const rowToRemove = e.target.closest('.detalle-row');
-                    if (rowToRemove) {
-                         rowToRemove.remove();
-                    }
-                }
-            });
-            
-            // Mostrar modal si hubo errores de validación
-            @php
-                if(session()->has('errors') && $errors->any()) {
-                    echo "const modalElement = document.getElementById('registrarModal');\n";
-                    echo "if(modalElement) {\n";
-                    echo "    const modal = new bootstrap.Modal(modalElement);\n";
-                    echo "    modal.show();\n";
-                    echo "}\n";
-                }
-            @endphp
-        });
-    </script>
+        if (ingredientes.length > 0) {
+            recetaIngredientesBody.innerHTML = ingredientes.map(ing => `
+                <tr>
+                    <td class="px-3 fw-bold">
+                        ${ing.nombreIngrediente ?? 'ID ' + ing.idIngrediente}
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-light text-dark border">
+                            ${parseFloat(ing.cantidadRequerida).toFixed(2)}
+                        </span>
+                    </td>
+                    <td class="text-center text-muted">
+                        ${ing.nombreUnidad ?? '—'}
+                    </td>
+                </tr>
+            `).join('');
+
+            recetaPreview.classList.remove('d-none');
+            btnRegistrar.disabled = false;
+        } else {
+            recetaPreview.classList.add('d-none');
+            btnRegistrar.disabled = true;
+        }
+    });
+
+    @if($errors->any())
+        const modalEl = document.getElementById('registrarModal');
+        if (modalEl) new bootstrap.Modal(modalEl).show();
+    @endif
+
+});
+</script>
 @endpush
