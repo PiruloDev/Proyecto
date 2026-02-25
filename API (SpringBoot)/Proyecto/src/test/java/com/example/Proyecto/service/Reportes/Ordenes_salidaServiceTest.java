@@ -62,6 +62,18 @@ class Ordenes_salidaServiceTest {
         assertEquals(250.00, resultado.get(0).getTotalFactura(),
                 "El total de la factura debe coincidir");
 
+
+        System.out.println("=== TEST 1: obtenerOrdenesSalida ===");
+        System.out.println("Cantidad de órdenes obtenidas: " + resultado.size());
+        System.out.println("ID Factura     : " + resultado.get(0).getIdFactura());
+        System.out.println("ID Cliente     : " + resultado.get(0).getIdCliente());
+        System.out.println("ID Pedido      : " + resultado.get(0).getIdPedido());
+        System.out.println("Nombre Cliente : " + resultado.get(0).getNombreCliente());
+        System.out.println("Total Factura  : " + resultado.get(0).getTotalFactura());
+        System.out.println("Fecha Factura  : " + resultado.get(0).getFechaFacturacion());
+        System.out.println("Resultado      : ✔ PRUEBA PASADA");
+        System.out.println("====================================");
+
         verify(jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class));
     }
 
@@ -72,13 +84,24 @@ class Ordenes_salidaServiceTest {
     void testAgregarVenta_insercionExitosaRetornaTrue() {
         // Arrange
         when(jdbcTemplate.update(anyString(), any(), any(), any(), any()))
-                .thenReturn(1); // 1 fila afectada = éxito
+                .thenReturn(1);
 
         // Act
         boolean resultado = ordenesSalidaService.agregarVenta(ordenEjemplo);
 
         // Assert
         assertTrue(resultado, "Debe retornar true cuando la inserción es exitosa");
+
+
+        System.out.println("=== TEST 2: agregarVenta (Exitoso) ===");
+        System.out.println("Datos de la orden insertada:");
+        System.out.println("ID Cliente     : " + ordenEjemplo.getIdCliente());
+        System.out.println("ID Pedido      : " + ordenEjemplo.getIdPedido());
+        System.out.println("Total Factura  : " + ordenEjemplo.getTotalFactura());
+        System.out.println("Fecha Factura  : " + ordenEjemplo.getFechaFacturacion());
+        System.out.println("Resultado      : " + resultado + " → ✔ PRUEBA PASADA");
+        System.out.println("======================================");
+
         verify(jdbcTemplate, times(1))
                 .update(anyString(), any(), any(), any(), any());
     }
@@ -97,6 +120,15 @@ class Ordenes_salidaServiceTest {
 
         // Assert
         assertFalse(resultado, "Debe retornar false cuando ocurre un DataAccessException");
+
+
+        System.out.println("=== TEST 3: agregarVenta (Excepción) ===");
+        System.out.println("Escenario      : Error de conexión simulado en BD");
+        System.out.println("ID Cliente     : " + ordenEjemplo.getIdCliente());
+        System.out.println("ID Pedido      : " + ordenEjemplo.getIdPedido());
+        System.out.println("Resultado      : " + resultado + " → ✔ PRUEBA PASADA (el catch funcionó correctamente)");
+        System.out.println("========================================");
+
         verify(jdbcTemplate, times(1))
                 .update(anyString(), any(), any(), any(), any());
     }
@@ -109,7 +141,7 @@ class Ordenes_salidaServiceTest {
         // Arrange
         int idFactura = 1;
         when(jdbcTemplate.update(anyString(), eq(idFactura)))
-                .thenReturn(1); // 1 fila eliminada
+                .thenReturn(1);
 
         // Act
         int resultado = ordenesSalidaService.eliminarVenta(idFactura);
@@ -117,6 +149,14 @@ class Ordenes_salidaServiceTest {
         // Assert
         assertEquals(1, resultado,
                 "Debe retornar 1 cuando la eliminación afecta exactamente una fila");
+
+
+        System.out.println("=== TEST 4: eliminarVenta ===");
+        System.out.println("ID Factura eliminada : " + idFactura);
+        System.out.println("Filas afectadas      : " + resultado);
+        System.out.println("Resultado            : ✔ PRUEBA PASADA");
+        System.out.println("============================");
+
         verify(jdbcTemplate, times(1)).update(anyString(), eq(idFactura));
     }
 }

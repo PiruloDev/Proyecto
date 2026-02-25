@@ -1123,6 +1123,24 @@ ALTER TABLE `recetas_detalle`
   ADD CONSTRAINT `FK_UNIDAD_DETALLE` FOREIGN KEY (`ID_UNIDAD`) REFERENCES `unidades_medida` (`ID_UNIDAD`) ON UPDATE CASCADE;
 COMMIT;
 
+CREATE TRIGGER `trg_orden_salida_after_pedido`
+AFTER INSERT ON `pedidos`
+FOR EACH ROW
+BEGIN
+    INSERT INTO `ordenes_salida` (
+        `ID_CLIENTE`,
+        `ID_PEDIDO`,
+        `FECHA_FACTURACION`,
+        `TOTAL_FACTURA`
+    )
+    VALUES (
+        NEW.ID_CLIENTE,
+        NEW.ID_PEDIDO,
+        NOW(),
+        NEW.TOTAL_PRODUCTO
+    );
+END;
+
 --
 -- Consulta de tablas para productos mas vendidos
 --

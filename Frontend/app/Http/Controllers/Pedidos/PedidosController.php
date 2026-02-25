@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pedidos;
 
+use App\Services\Reportes\OrdenSalidaService;
 use App\Http\Controllers\Controller;
 use App\Services\Pedidos\PedidosApiService; 
 use Illuminate\Http\Request;
@@ -11,10 +12,12 @@ use Exception;
 class PedidosController extends Controller
 {
     protected $apiService;
+    protected $ordenSalidaService;
 
-    public function __construct(PedidosApiService $apiService)
+    public function __construct(PedidosApiService $apiService, OrdenSalidaService $ordenSalidaService)
     {
-        $this->apiService = $apiService;
+    $this->apiService = $apiService;
+    $this->ordenSalidaService = $ordenSalidaService;
     }
 
     
@@ -47,34 +50,32 @@ class PedidosController extends Controller
 
 public function store(Request $request)
 {
-    // 1. Validación estricta
+    
     $request->validate([
         'ID_CLIENTE'       => 'required|integer|min:1',
         'ID_EMPLEADO'      => 'required|integer|min:1',
         'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
         'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
-        'productos'        => 'required_without:carrito|array', // Valida que lleguen productos del modal si no hay carrito
+        'productos'        => 'required_without:carrito|array', 
     ]);
 
     $detallesApi = [];
 
-    // 2. Lógica Híbrida: ¿Viene del Modal de Admin o del Carrito de Cliente?
+    
     if ($request->has('productos')) {
-        // FLUJO ADMINISTRADOR (Datos desde el Formulario/Modal)
+        
         foreach ($request->input('productos') as $key => $productoId) {
             $cantidad = (int)$request->input('cantidades')[$key];
             
             $detallesApi[] = [
                 'idProducto'       => (int)$productoId,
                 'cantidadProducto' => $cantidad,
-                // Nota: El precio unitario y subtotal deberían venir del request 
-                // o consultarse para asegurar integridad.
                 'precioUnitario'   => (float)($request->input('precios_unitarios')[$key] ?? 0), 
                 'subtotal'         => (float)($request->input('subtotales')[$key] ?? 0)
             ];
         }
     } else {
-        // FLUJO CLIENTE (Datos desde la Sesión/Carrito)
+        
         $carrito = session('carrito', []);
         foreach ($carrito as $item) {
             $detallesApi[] = [
@@ -86,7 +87,6 @@ public function store(Request $request)
         }
     }
 
-    // 3. Preparación de datos para la API de Java
     $dataApi = [
         'cliente_id'       => (int)$request->input('ID_CLIENTE'), 
         'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
@@ -97,23 +97,37 @@ public function store(Request $request)
         'detalles'         => $detallesApi,
     ];
 
-    try {
-        // 4. Envío a Java
-        // Al enviar el objeto 'detalles' a Java, tu API de Spring Boot debe estar 
-        // programada para recorrer ese array y restar el stock en su propia base de datos.
-        $this->apiService->crearPedido($dataApi); 
+try {
+    $pedidoCreado = $this->apiService->crearPedido($dataApi);
 
-        // Limpiar carrito si existía
-        if (session()->has('carrito')) {
-            session()->forget('carrito');
+    
+    $idPedido  = $pedidoCreado['ID_PEDIDO']      ?? $pedidoCreado['id_pedido']      ?? null;
+    $idCliente = $pedidoCreado['cliente_id']      ?? $pedidoCreado['ID_CLIENTE']     ?? $dataApi['cliente_id'];
+    $total     = $pedidoCreado['total_producto']  ?? $pedidoCreado['TOTAL_PRODUCTO'] ?? $dataApi['total_producto'];
+
+    if ($idPedido && $idCliente) {
+        $resultadoOrden = $this->ordenSalidaService->agregarVenta([
+            'ID_CLIENTE'        => $idCliente,
+            'ID_PEDIDO'         => $idPedido,
+            'FECHA_FACTURACION' => now()->format('Y-m-d\TH:i:s'), 
+            'TOTAL_FACTURA'     => $total,
+        ]);
+
+        if (isset($resultadoOrden['error'])) {
+            \Log::warning("Pedido {$idPedido} creado pero falló la orden de salida: " . $resultadoOrden['error']);
         }
-
-        $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
-        return redirect()->route($route)->with('success', 'Pedido creado y stock actualizado en el sistema.');
-        
-    } catch (Exception $e) {
-        return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
     }
+
+    if (session()->has('carrito')) {
+        session()->forget('carrito');
+    }
+
+    $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
+    return redirect()->route($route)->with('success', 'Pedido creado y orden de salida generada correctamente.');
+
+} catch (Exception $e) {
+    return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
+}
 }
 
     public function edit($id)
@@ -125,13 +139,9 @@ public function store(Request $request)
             return redirect()->back()->with('error', 'Pedido no encontrado.');
         }
 
-        // --- SOLUCIÓN AQUÍ ---
-        // Si el pedido no trae los detalles, búscalos manualmente si tienes el método en el service
         if (!isset($pedido['detalles']) || empty($pedido['detalles'])) {
-            // Intenta cargar los detalles desde otro método del service si existe
-            // $pedido['detalles'] = $this->apiService->obtenerDetallesDePedido($id);
+            
         }
-        // ---------------------
 
         $estados = []; 
         return view('pedidosviews.PedidosClientes.edit', compact('pedido', 'estados'));
@@ -143,7 +153,6 @@ public function store(Request $request)
     
    public function update(Request $request, $id)
 {
-    // 1. Validación: Aseguramos que los arrays de productos lleguen completos
     $request->validate([
         'ID_CLIENTE'       => 'required|integer',
         'ID_EMPLEADO'      => 'required|integer',
@@ -154,13 +163,10 @@ public function store(Request $request)
     ]);
 
     try {
-        // 2. Procesamos los detalles para la API de Java
         $detallesApi = [];
         foreach ($request->input('productos') as $key => $productoId) {
-            // Validamos que el producto no sea nulo (por si acaso quedó una fila vacía)
             if (!empty($productoId)) {
                 $detallesApi[] = [
-                    // Estos nombres deben coincidir con tu Entity/DTO en Java
                     'idProducto'       => (int)$productoId,
                     'cantidadProducto' => (int)$request->input('cantidades')[$key],
                     'precioUnitario'   => (float)($request->input('precios_unitarios')[$key] ?? 0),
@@ -169,9 +175,8 @@ public function store(Request $request)
             }
         }
 
-        // 3. Estructura de datos para enviar al Service
         $dataApi = [
-            'id_pedido'        => (int)$id, // A veces Java necesita el ID dentro del cuerpo
+            'id_pedido'        => (int)$id, 
             'cliente_id'       => (int)$request->input('ID_CLIENTE'),
             'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
             'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
@@ -180,10 +185,9 @@ public function store(Request $request)
             'detalles'         => $detallesApi,
         ];
 
-        // 4. Llamada al servicio
+        
         $this->apiService->actualizarPedido($id, $dataApi);
 
-        // 5. Redirección inteligente según el rol/URL
         $msg = "Pedido #{$id} actualizado correctamente.";
         
         if (str_contains($request->url(), 'admin')) {
@@ -246,29 +250,25 @@ public function store(Request $request)
     $productosDisponibles = 0;
 
     try {
-        // 1. Obtener Pedidos
+        
         $pedidos = $this->apiService->obtenerPedidos();
         $totalPedidos = count($pedidos);
 
-        // 2. Obtener Productos (Para que no marque 0 en stock)
+        
         $productosRaw = $this->apiService->obtenerProductos();
         $productosDisponibles = collect($productosRaw)->filter(function($prod) {
-            // Buscamos la llave del stock que devuelve tu API de Java
             $stock = $prod['stockActual'] ?? $prod['STOCK_ACTUAL'] ?? 0;
             return $stock > 0;
         })->count();
 
-        // 3. Lógica de conteo de fechas y estados
         $fechaActual = now()->format('Y-m-d');
         
         foreach ($pedidos as $pedido) {
-            // Verificamos fecha (ajusta 'fecha_ingreso' si en Java llega diferente)
             $fechaIngreso = $pedido['fecha_ingreso'] ?? $pedido['fechaIngreso'] ?? '';
             if (str_contains($fechaIngreso, $fechaActual)) {
                 $pedidosHoy++;
             }
             
-            // Verificamos estado pendiente (ID 1)
             $estadoId = $pedido['estado_pedido_id'] ?? $pedido['idEstadoPedido'] ?? 0;
             if ($estadoId == 1) {
                 $pedidosPendientes++;
@@ -279,7 +279,6 @@ public function store(Request $request)
         \Log::error("Error en dashboardEmpleado: " . $e->getMessage());
     }
 
-    // Retornamos la vista con todos los datos calculados
     return view('dashboards.employee', compact(
         'pedidos', 
         'pedidosHoy', 

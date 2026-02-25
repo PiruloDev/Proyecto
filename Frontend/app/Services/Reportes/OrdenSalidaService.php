@@ -48,36 +48,43 @@ class OrdenSalidaService {
      * Agregar una nueva venta
      */
     public function agregarVenta($datos) {
-        DB::beginTransaction();
+    DB::beginTransaction();
+    
+    try {
         
-        try {
-            // Validar datos requeridos
-            if (empty($datos['idCliente']) || empty($datos['idPedido']) || 
-                empty($datos['fechaFacturacion']) || empty($datos['totalFactura'])) {
-                return ['error' => 'Todos los campos son obligatorios'];
-            }
+        $idCliente        = $datos['ID_CLIENTE']        ?? $datos['idCliente']        ?? null;
+        $idPedido         = $datos['ID_PEDIDO']         ?? $datos['idPedido']         ?? null;
+        $fechaFacturacion = $datos['FECHA_FACTURACION'] ?? $datos['fechaFacturacion'] ?? null;
+        $totalFactura     = $datos['TOTAL_FACTURA']     ?? $datos['totalFactura']     ?? null;
 
-            // Validar que el total sea positivo
-            if ($datos['totalFactura'] <= 0) {
-                return ['error' => 'El total de la factura debe ser mayor a 0'];
-            }
-
-            // Validar formato de fecha
-            if (!$this->validarFechaISO8601($datos['fechaFacturacion'])) {
-                return ['error' => 'Formato de fecha inválido. Use formato ISO 8601 (YYYY-MM-DDTHH:mm:ss)'];
-            }
-
-            $venta = OrdenSalida::create($datos);
-            
-            DB::commit();
-            
-            return ['success' => true, 'data' => $venta->load(['cliente', 'pedido'])];
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error("Error en agregarVenta: " . $e->getMessage());
-            return ['error' => $e->getMessage()];
+        if (empty($idCliente) || empty($idPedido) || empty($fechaFacturacion) || empty($totalFactura)) {
+            return ['error' => 'Todos los campos son obligatorios'];
         }
+
+        if ($totalFactura <= 0) {
+            return ['error' => 'El total de la factura debe ser mayor a 0'];
+        }
+
+        if (!$this->validarFechaISO8601($fechaFacturacion)) {
+            return ['error' => 'Formato de fecha inválido. Use formato ISO 8601 (YYYY-MM-DDTHH:mm:ss)'];
+        }
+
+        $venta = OrdenSalida::create([
+            'ID_CLIENTE'        => $idCliente,
+            'ID_PEDIDO'         => $idPedido,
+            'FECHA_FACTURACION' => $fechaFacturacion,
+            'TOTAL_FACTURA'     => $totalFactura,
+        ]);
+        
+        DB::commit();
+        
+        return ['success' => true, 'data' => $venta]; 
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error("Error en agregarVenta: " . $e->getMessage());
+        return ['error' => $e->getMessage()];
     }
+}
 
     /**
      * Actualizar una venta existente
