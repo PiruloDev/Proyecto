@@ -298,40 +298,35 @@ CREATE TABLE `ingredientes` (
   `ID_INGREDIENTE` int(11) NOT NULL,
   `ID_PROVEEDOR` int(11) DEFAULT NULL,
   `ID_CATEGORIA` int(11) DEFAULT NULL,
+  `ID_UNIDAD_MEDIDA` int(11) DEFAULT NULL,
   `NOMBRE_INGREDIENTE` varchar(100) NOT NULL,
   `CANTIDAD_INGREDIENTE` decimal(10,4) DEFAULT NULL,
   `FECHA_VENCIMIENTO` date DEFAULT NULL,
   `REFERENCIA_INGREDIENTE` varchar(100) DEFAULT NULL,
   `FECHA_ENTREGA_INGREDIENTE` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;  
 
 --
 -- Volcado de datos para la tabla `ingredientes`
 --
 
-INSERT INTO `ingredientes` (`ID_INGREDIENTE`, `ID_PROVEEDOR`, `ID_CATEGORIA`, `NOMBRE_INGREDIENTE`, `CANTIDAD_INGREDIENTE`, `FECHA_VENCIMIENTO`, `REFERENCIA_INGREDIENTE`, `FECHA_ENTREGA_INGREDIENTE`) VALUES
-(1, 2, 1, 'Harina de Trigo', 1315.0000, '2025-12-20', 'HAR-TRG-05', '2025-07-01'),
-(2, 1, 2, 'Leche Entera UHT', 30.0000, '2025-08-01', 'LECH-ENT-1L', '2025-07-01'),
-(3, 3, 3, 'Azucar Blanca', 4600.0000, '2026-01-30', 'AZUC-BLN-KG', '2025-07-01'),
-(4, 4, 4, 'Mantequilla sin Sal', 775.0000, '2025-09-15', 'MANT-SS-KG', '2025-07-01'),
-(5, 5, 9, 'Huevos Grandes', 116.0000, '2025-07-25', 'HUEV-GR-DZ', '2025-07-01'),
-(6, 6, 10, 'Chocolate Semi-Amargo (Gotas)', 15.0000, '2026-03-10', 'CHOC-SM-KG', '2025-07-01'),
-(7, 7, 8, 'Levadura Fresca', 5.0000, '2025-07-10', 'LEV-FRES-GR', '2025-07-01'),
-(8, 1, 3, 'Azucar Moreno', 5680.0000, '2026-02-20', 'AZUC-MRN-KG', '2025-07-01'),
-(9, 2, 1, 'Harina Integral', 50.0000, '2025-11-01', 'HAR-INT-02', '2025-07-01'),
-(10, 3, 4, 'Aceite Vegetal', 20.0000, '2026-05-01', 'ACET-VEG-LT', '2025-07-01'),
-(11, 4, 10, 'Cacao en Polvo', 93.0000, '2026-04-15', 'CACAO-POL-KG', '2025-07-01'),
-(12, 5, 6, 'Manzanas Verdes (Kg)', 10.0000, '2025-07-12', 'MANZ-VRD-KG', '2025-07-01'),
-(13, 6, 7, 'Nueces Picadas', 2615.0000, '2025-10-01', 'NUEZ-PIC-KG', '2025-07-01'),
-(14, 7, 5, 'Esencia de Vainilla', 6.0000, '2027-01-01', 'ESEN-VN-LT', '2025-07-01'),
-(15, 8, 13, 'Sal Fina', 6.0000, '2028-01-01', 'SAL-FIN-KG', '2025-07-01'),
-(16, 1, 2, 'Crema de Leche', 5.0000, '2025-08-05', 'CREM-LECH-LT', '2025-07-01'),
-(17, 2, 11, 'Gelatina sin Sabor', 1.0000, '2026-09-01', 'GEL-SS-KG', '2025-07-01'),
-(18, 3, 12, 'Colorante Alimentario Rojo', 0.5000, '2027-03-01', 'COLR-ROJ-ML', '2025-07-01'),
-(19, 4, 15, 'Semillas de Sesamo', 1.0000, '2026-06-01', 'SEM-SES-KG', '2025-07-01'),
-(20, 5, 16, 'Dulce de Leche', 10.0000, '2025-11-15', 'DDL-KG', '2025-07-01'),
-(21, 1, 1, 'Avena en Hojuelas', 905.0000, '2026-10-01', 'ADS-LT', NULL),
-(29, 1, 1, 'l', 255.0000, '2025-12-31', 'faljkvfa', NULL);
+INSERT INTO `ingredientes` (`ID_INGREDIENTE`, `ID_PROVEEDOR`, `ID_CATEGORIA`, `ID_UNIDAD_MEDIDA`, `NOMBRE_INGREDIENTE`, `CANTIDAD_INGREDIENTE`, `FECHA_VENCIMIENTO`, `REFERENCIA_INGREDIENTE`, `FECHA_ENTREGA_INGREDIENTE`) VALUES
+(1, 2, 1, 1, 'Harina de Trigo', 13479.4648, '2025-12-20', 'HAR-TRG-05', '2025-07-01'),
+(2, 1, 2, 3, 'Leche Entera', 8668.0000, '2025-08-01', 'LECH-ENT-1L', '2025-07-01'),
+(3, 3, 3, 1, 'Azucar Blanca', 24600.0000, '2026-01-30', 'AZUC-BLN-KG', '2025-07-01'),
+(4, 4, 4, 1, 'Mantequilla sin Sal', 25775.0000, '2025-09-15', 'MANT-SS-KG', '2025-07-01'),
+(5, 5, 9, 5, 'Huevos Grandes', 316.0000, '2025-07-25', 'HUEV-GR-DZ', '2025-07-01'),
+(6, 6, 10, 1, 'Chocolate Semi-Amargo (Gotas)', 15.0000, '2026-03-10', 'CHOC-SM-KG', '2025-07-01'),
+(7, 7, 8, 2, 'Levadura Fresca', 5.0000, '2025-07-10', 'LEV-FRES-GR', '2025-07-01'),
+(8, 1, 3, 1, 'Azucar Moreno', 20680.0000, '2026-02-20', 'AZUC-MRN-KG', '2025-07-01'),
+(10, 3, 4, 3, 'Aceite Vegetal', 352.0000, '2026-05-01', 'ACET-VEG-LT', '2025-07-01'),
+(11, 4, 10, 1, 'Cacao en Polvo', 93.0000, '2026-04-15', 'CACAO-POL-KG', '2025-07-01'),
+(12, 5, 6, 1, 'Manzanas Verdes (Kg)', 10.0000, '2025-07-12', 'MANZ-VRD-KG', '2025-07-01'),
+(13, 6, 7, 1, 'Nueces Picadas', 17615.0000, '2025-10-01', 'NUEZ-PIC-KG', '2025-07-01'),
+(14, 7, 5, 4, 'Esencia de Vainilla', 106.0000, '2027-01-01', 'ESEN-VN-LT', '2025-07-01'),
+(15, 8, 13, 1, 'Sal Fina', 113.0000, '2028-01-01', 'SAL-FIN-KG', '2025-07-01'),
+(20, 5, 16, 1, 'Dulce de Leche', 10.0000, '2025-11-15', 'DDL-KG', '2025-07-01'),
+(21, 1, 1, 1, 'Avena en Hojuelas', 30917.0000, '2026-10-01', 'ADS-LT', NULL);
 
 -- --------------------------------------------------------
 
@@ -803,8 +798,9 @@ ALTER TABLE `failed_jobs`
 --
 ALTER TABLE `ingredientes`
   ADD PRIMARY KEY (`ID_INGREDIENTE`),
-  ADD KEY `FK_PROVEEDOR_INGREDIENTE` (`ID_PROVEEDOR`),
-  ADD KEY `FK_CATEGORIA_INGREDIENTE` (`ID_CATEGORIA`);
+  ADD CONSTRAINT `FK_CATEGORIA_INGREDIENTE` FOREIGN KEY (`ID_CATEGORIA`) REFERENCES `categoria_ingredientes` (`ID_CATEGORIA`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_PROVEEDOR_INGREDIENTE` FOREIGN KEY (`ID_PROVEEDOR`) REFERENCES `proveedores` (`ID_PROVEEDOR`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_UNIDAD_INGREDIENTE` FOREIGN KEY (`ID_UNIDAD_MEDIDA`) REFERENCES `unidades_medida` (`ID_UNIDAD`) ON UPDATE CASCADE;
 
 --
 -- Indices de la tabla `jobs`
@@ -1122,6 +1118,8 @@ ALTER TABLE `recetas_detalle`
   ADD CONSTRAINT `FK_RECETA_DETALLE` FOREIGN KEY (`ID_RECETA`) REFERENCES `recetas` (`ID_RECETA`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_UNIDAD_DETALLE` FOREIGN KEY (`ID_UNIDAD`) REFERENCES `unidades_medida` (`ID_UNIDAD`) ON UPDATE CASCADE;
 COMMIT;
+
+
 
 CREATE TRIGGER `trg_orden_salida_after_pedido`
 AFTER INSERT ON `pedidos`
