@@ -86,7 +86,7 @@
         @csrf
         <div id="method-field"></div>
 
-        {{-- ✅ CAMBIO: Select con nombres reales de clientes --}}
+        {{-- Select con nombres reales de clientes --}}
         <div class="form-group">
             <label for="ID_CLIENTE">Cliente</label>
             <select name="ID_CLIENTE" id="ID_CLIENTE" required>
@@ -99,7 +99,7 @@
             </select>
         </div>
 
-        {{-- ✅ CAMBIO: Select pedidos filtrados por cliente --}}
+        {{-- Select pedidos filtrados por cliente --}}
         <div class="form-group">
             <label for="ID_PEDIDO">Pedido</label>
             <select name="ID_PEDIDO" id="ID_PEDIDO" required>
