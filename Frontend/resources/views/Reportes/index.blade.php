@@ -12,10 +12,8 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Component -->
         @include('components.admin-sidebar')
 
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                 <h1 class="h2"><i class="bi bi-receipt me-2"></i>Órdenes de Salida</h1>
@@ -28,45 +26,45 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            {{-- ============================
-                 ÓRDENES DE SALIDA
-                 ============================ --}}
             @if($ventas && count($ventas) > 0)
                 <div class="cards-grid">
-            @foreach($ventas as $venta)
-                <div class="orden-card">
-                    <div class="card-header-custom">
-                        <span class="orden-id">Orden #{{ $venta->ID_FACTURA }}</span>
-                        <span class="fecha-badge">{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('d/m/Y H:i') }}</span>
-                    </div>
-                    <div class="card-body-custom">
-                        <div class="info-row">
-    <span class="info-label">Cliente:</span>
-    <span class="info-value">{{ $venta->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</span>
-</div>
-                        <div class="info-row"><span class="info-label">Pedido:</span><span class="info-value">{{ $venta->ID_PEDIDO }}</span></div>
-                        <div class="total-factura">
-                            <div class="total-label">TOTAL FACTURA</div>
-                            <div class="total-amount">${{ number_format($venta->TOTAL_FACTURA,2,',','.') }}</div>
+                @foreach($ventas as $venta)
+                    <div class="orden-card">
+                        <div class="card-header-custom">
+                            <span class="orden-id">Orden #{{ $venta->ID_FACTURA }}</span>
+                            <span class="fecha-badge">{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="info-row">
+                                <span class="info-label">Cliente:</span>
+                                <span class="info-value">{{ $venta->cliente->NOMBRE_CLI ?? 'Sin cliente' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Pedido:</span>
+                                <span class="info-value">{{ $venta->ID_PEDIDO }}</span>
+                            </div>
+                            <div class="total-factura">
+                                <div class="total-label">TOTAL FACTURA</div>
+                                <div class="total-amount">${{ number_format($venta->TOTAL_FACTURA,2,',','.') }}</div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-action btn-editar" onclick="editarModal(
+                                {{ $venta->ID_FACTURA }},
+                                {{ $venta->ID_CLIENTE }},
+                                {{ $venta->ID_PEDIDO }},
+                                '{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('Y-m-d\TH:i') }}',
+                                {{ $venta->TOTAL_FACTURA }}
+                            )">Editar</button>
+                            <form action="{{ route('ordenes.salida.destroy',$venta->ID_FACTURA) }}" method="POST" style="flex: 1;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn-action btn-eliminar" type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta orden?')">Eliminar</button>
+                            </form>
                         </div>
                     </div>
-                    <div class="card-actions">
-                        <button class="btn-action btn-editar" onclick="editarModal(
-{{ $venta->ID_FACTURA }},
-{{ $venta->ID_CLIENTE }},
-{{ $venta->ID_PEDIDO }},
-'{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('Y-m-d\TH:i') }}',
-{{ $venta->TOTAL_FACTURA }}
-)">Editar</button>
-                        <form action="{{ route('ordenes.salida.destroy',$venta->ID_FACTURA) }}" method="POST" style="flex: 1;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn-action btn-eliminar" type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta orden?')">Eliminar</button>
-                        </form>
-                    </div>
+                @endforeach
                 </div>
-            @endforeach
-            </div>
             @else
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle me-2"></i>No hay órdenes de salida disponibles.
@@ -76,10 +74,8 @@
     </div>
 </div>
 
-{{-- MODAL OVERLAY --}}
 <div id="modal-overlay" onclick="cerrarModal()"></div>
 
-{{-- MODAL BOX --}}
 <div id="modal-box">
     <div class="modal-header">
         <h2 id="modal-titulo">Nueva Orden</h2>
@@ -90,14 +86,30 @@
         @csrf
         <div id="method-field"></div>
 
+        {{-- ✅ CAMBIO: Select con nombres reales de clientes --}}
         <div class="form-group">
-            <label for="ID_CLIENTE">ID Cliente</label>
-            <input type="number" name="ID_CLIENTE" id="ID_CLIENTE" required>
+            <label for="ID_CLIENTE">Cliente</label>
+            <select name="ID_CLIENTE" id="ID_CLIENTE" required>
+                <option value="" disabled selected>-- Selecciona un cliente --</option>
+                @foreach($clientes as $cliente)
+                    <option value="{{ $cliente->ID_CLIENTE }}">
+                        {{ $cliente->NOMBRE_CLI }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
+        {{-- ✅ CAMBIO: Select pedidos filtrados por cliente --}}
         <div class="form-group">
-            <label for="ID_PEDIDO">ID Pedido</label>
-            <input type="number" name="ID_PEDIDO" id="ID_PEDIDO" required>
+            <label for="ID_PEDIDO">Pedido</label>
+            <select name="ID_PEDIDO" id="ID_PEDIDO" required>
+                <option value="" disabled selected>-- Primero selecciona un cliente --</option>
+                @foreach($pedidos as $pedido)
+                    <option value="{{ $pedido->ID_PEDIDO }}" data-cliente="{{ $pedido->ID_CLIENTE }}">
+                        Pedido #{{ $pedido->ID_PEDIDO }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="form-group">
@@ -115,63 +127,87 @@
 </div>
 
 <script>
-function abrirModal() {
-    document.getElementById('modal-overlay').classList.add('show');
-    document.getElementById('modal-box').classList.add('show');
+    // Reutilizable: filtra pedidos según clienteId dado
+    function filtrarPedidosPorCliente(clienteId) {
+        const selectPedido = document.getElementById('ID_PEDIDO');
+        const opciones = selectPedido.querySelectorAll('option[data-cliente]');
 
-    document.getElementById('modal-titulo').textContent = 'Nueva Orden';
-    document.getElementById('formulario-modal').action = '{{ route("ordenes.salida.store") }}';
-    document.getElementById('method-field').innerHTML = '';
-    document.getElementById('formulario-modal').reset();
+        selectPedido.value = '';
+        let hayOpciones = false;
 
-    document.body.style.overflow = 'hidden';
-}
+        opciones.forEach(opt => {
+            if (opt.dataset.cliente === String(clienteId)) {
+                opt.style.display = '';
+                hayOpciones = true;
+            } else {
+                opt.style.display = 'none';
+            }
+        });
 
-function editarModal(id, cliente, pedido, fecha, total) {
-    document.getElementById('modal-overlay').classList.add('show');
-    document.getElementById('modal-box').classList.add('show');
-
-    document.getElementById('modal-titulo').textContent = 'Editar Orden #' + id;
-    document.getElementById('formulario-modal').action = '/reportes/ordenes-salida/' + id;
-    document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PATCH">';
-
-    document.getElementById('ID_CLIENTE').value = cliente;
-    document.getElementById('ID_PEDIDO').value = pedido;
-    document.getElementById('FECHA_FACTURACION').value = fecha;
-    document.getElementById('TOTAL_FACTURA').value = total;
-
-    document.body.style.overflow = 'hidden';
-}
-
-function cerrarModal() {
-    document.getElementById('modal-overlay').classList.remove('show');
-    document.getElementById('modal-box').classList.remove('show');
-    document.body.style.overflow = 'auto';
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        cerrarModal();
+        selectPedido.querySelector('option[disabled]').textContent = hayOpciones
+            ? '-- Selecciona un pedido --'
+            : '-- Este cliente no tiene pedidos --';
     }
-});
 
-// Actualizar nombre y rol del administrador en sidebar
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
-        const userData = AuthManager.getUserData();
-        const userRole = AuthManager.getRole();
+    // Evento: cuando el usuario cambia el cliente en el select
+    document.getElementById('ID_CLIENTE').addEventListener('change', function () {
+        filtrarPedidosPorCliente(this.value);
+    });
 
-        const adminNameElement = document.getElementById('admin-name');
-        const adminRoleElement = document.getElementById('admin-role');
+    function abrirModal() {
+        document.getElementById('modal-overlay').classList.add('show');
+        document.getElementById('modal-box').classList.add('show');
+        document.getElementById('modal-titulo').textContent = 'Nueva Orden';
+        document.getElementById('formulario-modal').action = '{{ route("ordenes.salida.store") }}';
+        document.getElementById('method-field').innerHTML = '';
+        document.getElementById('formulario-modal').reset();
 
-        if (adminNameElement && userData && userData.nombre) {
-            adminNameElement.textContent = userData.nombre;
-        }
+        // Ocultar todos los pedidos al abrir vacío
+        const selectPedido = document.getElementById('ID_PEDIDO');
+        selectPedido.querySelectorAll('option[data-cliente]').forEach(opt => opt.style.display = 'none');
+        selectPedido.querySelector('option[disabled]').textContent = '-- Primero selecciona un cliente --';
+        selectPedido.value = '';
 
-        if (adminRoleElement && userRole) {
-            adminRoleElement.textContent = userRole.charAt(0) + userRole.slice(1).toLowerCase();
-        }
+        document.body.style.overflow = 'hidden';
     }
-});
+
+    function editarModal(id, clienteId, pedidoId, fecha, total) {
+        document.getElementById('modal-overlay').classList.add('show');
+        document.getElementById('modal-box').classList.add('show');
+        document.getElementById('modal-titulo').textContent = 'Editar Orden #' + id;
+        document.getElementById('formulario-modal').action = '/reportes/ordenes-salida/' + id;
+        document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PATCH">';
+
+        // Seleccionar cliente y filtrar pedidos automáticamente
+        document.getElementById('ID_CLIENTE').value = clienteId;
+        filtrarPedidosPorCliente(clienteId);
+        document.getElementById('ID_PEDIDO').value = pedidoId;
+
+        document.getElementById('FECHA_FACTURACION').value = fecha;
+        document.getElementById('TOTAL_FACTURA').value = total;
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-overlay').classList.remove('show');
+        document.getElementById('modal-box').classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') cerrarModal();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
+            const userData = AuthManager.getUserData();
+            const userRole = AuthManager.getRole();
+            const adminNameElement = document.getElementById('admin-name');
+            const adminRoleElement = document.getElementById('admin-role');
+            if (adminNameElement && userData?.nombre) adminNameElement.textContent = userData.nombre;
+            if (adminRoleElement && userRole) adminRoleElement.textContent = userRole.charAt(0) + userRole.slice(1).toLowerCase();
+        }
+    });
 </script>
 @endsection

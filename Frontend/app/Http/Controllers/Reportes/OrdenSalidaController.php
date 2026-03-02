@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Reportes;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Clientes;
 use App\Models\Reportes\OrdenSalida;
 use App\Http\Controllers\Controller;
 
@@ -12,8 +13,10 @@ class OrdenSalidaController extends Controller
     public function index()
 {
     $ventas = OrdenSalida::with('cliente')->get();
+    $clientes = Clientes::where('ACTIVO_CLI', 1)->get(); // solo clientes activos
+    $pedidos = \DB::table('pedidos')->select('ID_PEDIDO', 'ID_CLIENTE')->get();
 
-    return view('reportes.index', compact('ventas'));
+    return view('reportes.index', compact('ventas', 'clientes', 'pedidos'));
 }
 
 
