@@ -92,8 +92,7 @@ public function store(Request $request)
         'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
         'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
         'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
-        'fecha_ingreso'    => now()->format('Y-m-d H:i:s'),
-        'fecha_entrega' => $request->input('FECHA_ENTREGA') 
+        'fecha_ingreso' => now('America/Bogota')->format('Y-m-d H:i:s'),        'fecha_entrega' => $request->input('FECHA_ENTREGA') 
         ? \Carbon\Carbon::parse($request->input('FECHA_ENTREGA'))->format('Y-m-d H:i:s') 
         : null,
     'detalles' => $detallesApi,
@@ -101,34 +100,58 @@ public function store(Request $request)
 
 try {
     $pedidoCreado = $this->apiService->crearPedido($dataApi);
+    $pedidoRespuesta = $pedidoCreado ?? [];
 
-    
-    $idPedido  = $pedidoCreado['ID_PEDIDO']      ?? $pedidoCreado['id_pedido']      ?? null;
-    $idCliente = $pedidoCreado['cliente_id']      ?? $pedidoCreado['ID_CLIENTE']     ?? $dataApi['cliente_id'];
-    $total     = $pedidoCreado['total_producto']  ?? $pedidoCreado['TOTAL_PRODUCTO'] ?? $dataApi['total_producto'];
+    // 1. Intentamos obtener el ID de la respuesta
+    $idPedido = $pedidoRespuesta['ID_PEDIDO'] ?? $pedidoRespuesta['id_pedido'] ?? $pedidoRespuesta['id'] ?? null;
+
+    // 2. PLAN DE RESCATE: Si Java no devolvió el ID, lo buscamos en la DB
+    if (!$idPedido) {
+        \Log::info("Java no devolvió ID. Buscando el último pedido del cliente {$dataApi['cliente_id']} en la DB local...");
+        
+        $ultimoPedido = \DB::table('pedidos')
+            ->where('ID_CLIENTE', $dataApi['cliente_id'])
+            ->orderBy('ID_PEDIDO', 'desc')
+            ->first();
+            
+        if ($ultimoPedido) {
+            $idPedido = $ultimoPedido->ID_PEDIDO;
+            \Log::info("ID rescatado de la DB: {$idPedido}");
+        }
+    }
+
+    $idCliente = $dataApi['cliente_id']; // Usamos el que ya tenemos
+    $total     = $dataApi['total_producto']; // Usamos el que ya tenemos
 
     if ($idPedido && $idCliente) {
+        // Formato con \T para que el OrdenSalidaService no rechace la fecha
+        $fechaFactura = now('America/Bogota')->format('Y-m-d\TH:i:s');
+
         $resultadoOrden = $this->ordenSalidaService->agregarVenta([
             'ID_CLIENTE'        => $idCliente,
             'ID_PEDIDO'         => $idPedido,
-            'FECHA_FACTURACION' => now()->format('Y-m-d\TH:i:s'), 
+            'FECHA_FACTURACION' => $fechaFactura,
             'TOTAL_FACTURA'     => $total,
         ]);
 
         if (isset($resultadoOrden['error'])) {
-            \Log::warning("Pedido {$idPedido} creado pero falló la orden de salida: " . $resultadoOrden['error']);
-        }
+            \Log::error("Fallo al crear orden: " . $resultadoOrden['error']);
+        } else {
+            \Log::info("ORDEN DE SALIDA GENERADA EXITOSAMENTE PARA PEDIDO #{$idPedido}");
+        } 
+    } else {
+        \Log::error("ERROR: No se pudo obtener el ID del pedido ni de la API ni de la DB.");
     }
 
-    if (session()->has('carrito')) {
-        session()->forget('carrito');
-    }
-
+    // Limpieza y Redirección
+    if (session()->has('carrito')) session()->forget('carrito');
+    
     $route = $request->routeIs('admin.*') ? 'admin.pedidos.index' : 'pedidos.index';
-    return redirect()->route($route)->with('success', 'Pedido creado y orden de salida generada correctamente.');
+    return redirect()->route($route)->with('success', 'Pedido y Orden de Salida procesados.');
 
 } catch (Exception $e) {
-    return redirect()->back()->withInput()->with('error', 'Error al crear pedido: ' . $e->getMessage());
+    \Log::error("Error en store: " . $e->getMessage());
+    return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
 }
 }
 
