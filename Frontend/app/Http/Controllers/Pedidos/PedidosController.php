@@ -93,9 +93,11 @@ public function store(Request $request)
         'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
         'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
         'fecha_ingreso'    => now()->format('Y-m-d H:i:s'),
-        'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
-        'detalles'         => $detallesApi,
-    ];
+        'fecha_entrega' => $request->input('FECHA_ENTREGA') 
+        ? \Carbon\Carbon::parse($request->input('FECHA_ENTREGA'))->format('Y-m-d H:i:s') 
+        : null,
+    'detalles' => $detallesApi,
+];
 
 try {
     $pedidoCreado = $this->apiService->crearPedido($dataApi);
@@ -181,8 +183,9 @@ try {
             'empleado_id'      => (int)$request->input('ID_EMPLEADO'),
             'estado_pedido_id' => (int)$request->input('ID_ESTADO_PEDIDO'),
             'total_producto'   => (float)$request->input('TOTAL_PRODUCTO'),
-            'fecha_entrega'    => $request->input('FECHA_ENTREGA') ? $request->input('FECHA_ENTREGA') . ' 23:59:59' : null,
-            'detalles'         => $detallesApi,
+            'fecha_entrega' => $request->input('FECHA_ENTREGA') 
+            ? \Carbon\Carbon::parse($request->input('FECHA_ENTREGA'))->format('Y-m-d H:i:s') 
+            : null,            'detalles'         => $detallesApi,
         ];
 
         

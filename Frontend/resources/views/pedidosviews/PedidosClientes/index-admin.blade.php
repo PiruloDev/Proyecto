@@ -79,7 +79,21 @@
                                     </td>
                                     <td>${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}</td>
                                     <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
-                                    <td>{{ $pedido['fecha_entrega'] ?? 'N/A' }}</td>
+                                    <td>
+    @if(!empty($pedido['fecha_entrega']) && $pedido['fecha_entrega'] !== 'N/A')
+        <div class="d-flex flex-column">
+            <span class="fw-bold">{{ \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('d/m/Y') }}</span>
+            @php $hora = \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('H:i'); @endphp
+            @if($hora !== '23:59')
+                <small class="text-muted"><i class="far fa-clock me-1"></i>{{ $hora }}</small>
+            @else
+                <small class="text-warning" style="font-size: 0.75rem;">Hora por definir</small>
+            @endif
+        </div>
+    @else
+        <span class="text-muted">No asignada</span>
+    @endif
+</td>
                                     <td class="text-center text-nowrap">
                                         <button type="button" class="btn btn-warning btn-sm me-1 btn-edit-pedido" data-pedido="{{ json_encode($pedido) }}">
                                             <i class="fas fa-edit"></i>
@@ -127,10 +141,10 @@
                         <label class="form-label fw-bold">ID Estado Pedido</label>
                         <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Fecha de Entrega</label>
-                        <input type="date" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
-                    </div>
+                   <div class="col-md-6">
+    <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
+    <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
+</div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Total Producto ($)</label>
                         <input type="number" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" readonly>
@@ -299,8 +313,9 @@
                 document.getElementById('modal_ID_ESTADO_PEDIDO').value = data.id_ESTADO_PEDIDO || data.ID_ESTADO_PEDIDO;
                 document.getElementById('modal_TOTAL_PRODUCTO').value = data.total_PRODUCTO || data.TOTAL_PRODUCTO;
                 
-                if (data.fecha_ENTREGA) {
-                    document.getElementById('modal_FECHA_ENTREGA').value = new Date(data.fecha_ENTREGA).toISOString().split('T')[0];
+                if (data.fecha_ENTREGA && data.fecha_ENTREGA !== 'N/A') {
+                const fechaFormateada = data.fecha_ENTREGA.replace(" ", "T").substring(0, 16);
+                document.getElementById('modal_FECHA_ENTREGA').value = fechaFormateada;
                 }
 
                 detallesBody.innerHTML = '';

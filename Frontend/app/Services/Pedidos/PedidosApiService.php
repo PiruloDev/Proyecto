@@ -68,14 +68,27 @@ class PedidosApiService
         }
     }
 
-    public function actualizarPedido($id, $data)
-    {
-        try {
-            return Http::put("{$this->baseUrl}/{$id}", $data)->throw()->json();
-        } catch (Exception $e) {
-            throw new Exception("Error al actualizar pedido ID {$id} en la API.");
+   public function actualizarPedido($id, $data)
+{
+    try {
+        // Agregamos logging para ver qué estamos enviando exactamente a Java
+        \Log::info("Enviando actualización a API Java para Pedido #{$id}:", $data);
+
+        $response = Http::put("{$this->baseUrl}/{$id}", $data);
+
+        if ($response->failed()) {
+            // Esto imprimirá en storage/logs/laravel.log el error real de Java
+            \Log::error("Error desde API Java (Pedido #{$id}): " . $response->body());
+            
+            $mensajeError = $response->json('message') ?? "Error servidor Java: " . $response->status();
+            throw new Exception($mensajeError);
         }
+
+        return $response->json();
+    } catch (Exception $e) {
+        throw new Exception($e->getMessage());
     }
+}
 
     public function eliminarPedido($id)
     {
