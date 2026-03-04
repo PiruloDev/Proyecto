@@ -20,6 +20,7 @@
   --
   -- Base de datos: `proyectopanaderia`
   --
+-- DROP DATABASE proyectopanaderia;
   CREATE DATABASE IF NOT EXISTS `proyectopanaderia` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
   USE `proyectopanaderia`;
 
@@ -780,6 +781,12 @@
   --
   -- Indices de la tabla `ingredientes`
   --
+
+ALTER TABLE `unidades_medida` ADD PRIMARY KEY (`ID_UNIDAD`);
+ALTER TABLE `proveedores` ADD PRIMARY KEY (`ID_PROVEEDOR`);
+  --
+  -- Indices de la tabla `ingredientes`
+  --
   ALTER TABLE `ingredientes`
     ADD PRIMARY KEY (`ID_INGREDIENTE`),
     ADD CONSTRAINT `FK_CATEGORIA_INGREDIENTE` FOREIGN KEY (`ID_CATEGORIA`) REFERENCES `categoria_ingredientes` (`ID_CATEGORIA`) ON UPDATE CASCADE,
@@ -850,11 +857,6 @@
     ADD KEY `FK_CATEGORIA_PRODUCTO` (`ID_CATEGORIA_PRODUCTO`),
     ADD KEY `FK_ADMIN_PRODUCTO` (`ID_ADMIN`);
 
-  --
-  -- Indices de la tabla `proveedores`
-  --
-  ALTER TABLE `proveedores`
-    ADD PRIMARY KEY (`ID_PROVEEDOR`);
 
   --
   -- Indices de la tabla `recetas`
@@ -880,11 +882,6 @@
     ADD KEY `sessions_user_id_index` (`user_id`),
     ADD KEY `sessions_last_activity_index` (`last_activity`);
 
-  --
-  -- Indices de la tabla `unidades_medida`
-  --
-  ALTER TABLE `unidades_medida`
-    ADD PRIMARY KEY (`ID_UNIDAD`);
 
   --
   -- Indices de la tabla `users`
@@ -1047,12 +1044,6 @@
     ADD CONSTRAINT `FK_DETALLE_PEDIDOPROV` FOREIGN KEY (`ID_PEDIDO_PROV`) REFERENCES `pedidos_proveedores` (`ID_PEDIDO_PROV`) ON DELETE CASCADE ON UPDATE CASCADE,
     ADD CONSTRAINT `FK_INGREDIENTE_ORDENADO` FOREIGN KEY (`ID_INGREDIENTE`) REFERENCES `ingredientes` (`ID_INGREDIENTE`) ON UPDATE CASCADE;
 
-  --
-  -- Filtros para la tabla `ingredientes`
-  --
-  ALTER TABLE `ingredientes`
-    ADD CONSTRAINT `FK_CATEGORIA_INGREDIENTE` FOREIGN KEY (`ID_CATEGORIA`) REFERENCES `categoria_ingredientes` (`ID_CATEGORIA`) ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_PROVEEDOR_INGREDIENTE` FOREIGN KEY (`ID_PROVEEDOR`) REFERENCES `proveedores` (`ID_PROVEEDOR`) ON UPDATE CASCADE;
 
   --
   -- Filtros para la tabla `ordenes_salida`
@@ -1104,7 +1095,7 @@
   COMMIT;
 
 
-
+DELIMITER $$
   CREATE TRIGGER `trg_orden_salida_after_pedido`
   AFTER INSERT ON `pedidos`
   FOR EACH ROW
@@ -1121,11 +1112,12 @@
           NOW(),
           NEW.TOTAL_PRODUCTO
       );
-  END;
-
+  END$$
+DELIMITER ;
   --
   -- Consulta de tablas para productos mas vendidos
   --
+SHOW TRIGGERS FROM `proyectopanaderia`;
 
 
   /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
