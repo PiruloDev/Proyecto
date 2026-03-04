@@ -7,6 +7,7 @@ public class Ingredientes {
     private Long idIngrediente;
     private Long idProveedor;
     private Long idCategoria;
+    private Long idUnidadMedida;
     private String nombreIngrediente;
     private BigDecimal cantidadIngrediente;
     private Date fechaVencimiento;
@@ -17,6 +18,7 @@ public class Ingredientes {
     public Ingredientes(Long idIngrediente,
                         Long idProveedor,
                         Long idCategoria,
+                        Long idUnidadMedida,
                         String nombreIngrediente,
                         BigDecimal cantidadIngrediente,
                         Date fechaVencimiento,
@@ -25,6 +27,7 @@ public class Ingredientes {
         this.idIngrediente = idIngrediente;
         this.idProveedor = idProveedor;
         this.idCategoria = idCategoria;
+        this.idUnidadMedida =  idUnidadMedida;
         this.nombreIngrediente = nombreIngrediente;
         this.cantidadIngrediente = cantidadIngrediente;
         this.fechaVencimiento = fechaVencimiento;
@@ -41,6 +44,13 @@ public class Ingredientes {
 
     public Long getIdCategoria() { return idCategoria; }
     public void setIdCategoria(Long idCategoria) { this.idCategoria = idCategoria; }
+
+    public Long getIdUnidadMedida() {
+        return idUnidadMedida;
+    }
+    public void setIdUnidadMedida(Long idUnidadMedida) {
+        this.idUnidadMedida = idUnidadMedida;
+    }
 
     public String getNombreIngrediente() { return nombreIngrediente; }
     public void setNombreIngrediente(String nombreIngrediente) { this.nombreIngrediente = nombreIngrediente; }

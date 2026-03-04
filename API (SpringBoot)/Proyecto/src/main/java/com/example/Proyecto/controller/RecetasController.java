@@ -145,5 +145,5 @@ public class RecetasController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(receta);
-    }
+    }   
 }

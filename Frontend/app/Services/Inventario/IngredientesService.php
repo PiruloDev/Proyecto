@@ -33,6 +33,7 @@ class IngredientesService
         $allowedKeys = [
             'idProveedor', 
             'idCategoria', 
+            'idUnidadMedida', 
             'nombreIngrediente', 
             'referenciaIngrediente'
         ];

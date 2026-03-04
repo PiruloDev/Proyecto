@@ -69,11 +69,12 @@ class IngredientesController extends Controller
         $request->validate([
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
+            'idUnidadMedida' => 'required|integer',  // ⬅️ AGREGAR ESTA VALIDACIÓN
             'nombreIngrediente' => 'required|string|max:255',
             'referenciaIngrediente' => 'required|string|max:50',
         ]);
 
-        $data = $request->only(['idProveedor', 'idCategoria', 'nombreIngrediente', 'referenciaIngrediente']);
+        $data = $request->only(['idProveedor', 'idCategoria', 'idUnidadMedida','nombreIngrediente', 'referenciaIngrediente']);
         $response = $this->ingredientesService->agregarIngredientes($data);
 
         if ($response['success']) {
@@ -88,11 +89,12 @@ class IngredientesController extends Controller
         $request->validate([
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
+            'idUnidadMedida' => 'required|integer',
             'nombreIngrediente' => 'required|string|max:255',
             'referenciaIngrediente' => 'required|string|max:50',
         ]);
         
-        $data = $request->only(['idProveedor', 'idCategoria', 'nombreIngrediente', 'referenciaIngrediente']);
+        $data = $request->only(['idProveedor', 'idCategoria', 'idUnidadMedida', 'nombreIngrediente', 'referenciaIngrediente']);
         $response = $this->ingredientesService->actualizarIngrediente($id, $data);
 
         if ($response['success']) {

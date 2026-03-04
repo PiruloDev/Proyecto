@@ -101,17 +101,26 @@ public class IngredientesService {
     }
 
     public void crearIngrediente(Ingredientes ingrediente) {
-        String sql = "INSERT INTO Ingredientes (ID_PROVEEDOR, ID_CATEGORIA, NOMBRE_INGREDIENTE, REFERENCIA_INGREDIENTE, CANTIDAD_INGREDIENTE, FECHA_VENCIMIENTO, FECHA_ENTREGA_INGREDIENTE) " +
-                "VALUES (?, ?, ?, ?, ?, NULL, NULL)";
+        String sql = "INSERT INTO Ingredientes (" +
+                "ID_PROVEEDOR, " +
+                "ID_CATEGORIA, " +
+                "ID_UNIDAD_MEDIDA, " +              // ⬅️ AGREGAR
+                "NOMBRE_INGREDIENTE, " +
+                "REFERENCIA_INGREDIENTE, " +
+                "CANTIDAD_INGREDIENTE, " +
+                "FECHA_VENCIMIENTO, " +
+                "FECHA_ENTREGA_INGREDIENTE" +
+                ") VALUES (?, ?, ?, ?, ?, ?, NULL, NULL)";  // ⬅️ Ahora son 8 placeholders
 
         BigDecimal cantidadInicial = BigDecimal.ZERO;
 
         jdbcTemplate.update(sql,
-                ingrediente.getIdProveedor(),
-                ingrediente.getIdCategoria(),
-                ingrediente.getNombreIngrediente(),
-                ingrediente.getReferenciaIngrediente(),
-                cantidadInicial
+                ingrediente.getIdProveedor(),           // Parámetro 1
+                ingrediente.getIdCategoria(),           // Parámetro 2
+                ingrediente.getIdUnidadMedida(),        // Parámetro 3 ⬅️ AGREGAR
+                ingrediente.getNombreIngrediente(),     // Parámetro 4
+                ingrediente.getReferenciaIngrediente(), // Parámetro 5
+                cantidadInicial                         // Parámetro 6
         );
     }
 
@@ -119,6 +128,7 @@ public class IngredientesService {
         String sql = "UPDATE Ingredientes SET " +
                 "ID_PROVEEDOR = ?, " +
                 "ID_CATEGORIA = ?, " +
+                "ID_UNIDAD_MEDIDA = ?, " +
                 "NOMBRE_INGREDIENTE = ?, " +
                 "REFERENCIA_INGREDIENTE = ? " +
                 "WHERE ID_INGREDIENTE = ?";
@@ -126,6 +136,7 @@ public class IngredientesService {
         return jdbcTemplate.update(sql,
                 ingrediente.getIdProveedor(),
                 ingrediente.getIdCategoria(),
+                ingrediente.getIdUnidadMedida(),
                 ingrediente.getNombreIngrediente(),
                 ingrediente.getReferenciaIngrediente(),
                 id
