@@ -91,19 +91,27 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             
             {{-- HEADER --}}
-            <div class="d-flex justify-content-between align-items-center pt-4 pb-2 mb-4 border-bottom">
-                <div>
-                    <h1 class="h2 fw-bold" style="color: #3e2723;">
-                        <i class="fas fa-boxes-stacked me-2"></i>Control de Inventario
-                    </h1>
-                    <p class="text-muted small">Supervisa y repon stock de ingredientes en tiempo real.</p>
-                </div>
-                <div class="btn-group shadow-sm">
-                    <a href="{{ route('ingredientes.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-list me-1"></i> Lista Completa
-                    </a>
-                </div>
-            </div>
+<div class="d-flex justify-content-between align-items-center pt-4 pb-2 mb-4 border-bottom">
+    <div class="d-flex align-items-center">
+        {{-- Botón Volver --}}
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <div>
+            <h1 class="h2 fw-bold mb-0" style="color: #3e2723;">
+                <i class="fas fa-boxes-stacked me-2"></i>Control de Inventario
+            </h1>
+            <p class="text-muted small mb-0">Supervisa y repone stock de ingredientes en tiempo real.</p>
+        </div>
+    </div>
+
+    <div class="btn-group shadow-sm">
+        <a href="{{ route('ingredientes.index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-1"></i> Lista Completa
+        </a>
+    </div>
+</div>
 
             {{-- ALERTAS --}}
             @if (session('success') || request('success'))

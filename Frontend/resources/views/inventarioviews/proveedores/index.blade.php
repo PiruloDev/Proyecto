@@ -115,7 +115,11 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-4">
                 <div>
-                    <h1 class="h2 fw-bold" style="color: #3e2723;">Socio Proveedores</h1>
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>    
+                
+                <h1 class="h2 fw-bold" style="color: #3e2723;">Socio Proveedores</h1>
                     <p class="text-muted small">Catálogo de contacto y suministros para la panadería.</p>
                 </div>
                 <button class="btn btn-panaderia shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">

@@ -89,7 +89,11 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4">
                 <div>
-                    <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+                </a>    
+                
+                <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
                     <p class="text-muted small">Gestión de proporciones e ingredientes por producto.</p>
                 </div>
                 <button class="btn btn-panaderia px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">

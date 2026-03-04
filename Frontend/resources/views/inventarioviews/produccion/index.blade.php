@@ -126,7 +126,11 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4 border-bottom">
                 <div>
-                    <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-hover);">
+                    
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+                <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-hover);">
                         <i class="fas fa-industry me-2"></i>Gestión de Producción
                     </h1>
                     <p class="text-muted mb-0">Registro y reversión de producción de productos terminados.</p>

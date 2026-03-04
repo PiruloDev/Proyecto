@@ -82,15 +82,22 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             
             {{-- HEADER --}}
-            <div class="d-flex justify-content-between align-items-center flex-wrap pt-4 pb-2 mb-4 border-bottom">
-                <div>
-                    <h1 class="h2 fw-bold" style="color: #3e2723;">Pedidos a Proveedores</h1>
-                    <p class="text-muted">Gestión de suministros e insumos para la panadería.</p>
-                </div>
-                <button class="btn btn-crear shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
-                    <i class="fas fa-plus-circle me-2"></i> Nuevo Pedido
-                </button>
-            </div>
+<div class="d-flex justify-content-between align-items-center flex-wrap pt-4 pb-2 mb-4 border-bottom">
+    <div class="d-flex align-items-center">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        
+        <div>
+            <h1 class="h2 fw-bold mb-0" style="color: #3e2723;">Pedidos a Proveedores</h1>
+            <p class="text-muted mb-0">Gestión de suministros e insumos para la panadería.</p>
+        </div>
+    </div>
+    
+    <button class="btn btn-crear shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
+        <i class="fas fa-plus-circle me-2"></i> Nuevo Pedido
+    </button>
+</div>
 
             {{-- BUSCADOR --}}
             <div class="mb-5">

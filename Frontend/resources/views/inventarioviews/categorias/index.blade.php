@@ -92,7 +92,13 @@
             {{-- ENCABEZADO --}}
             <div class="d-flex justify-content-between align-items-center pt-4 pb-2 mb-4 border-bottom">
                 <div>
-                    <h1 class="h2 fw-bold" style="color: #3e2723;">Categorías de Ingredientes</h1>
+                    
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+                <h1 class="h2 fw-bold" style="color: #3e2723;">Categorías de Ingredientes</h1>
+                    
+                    
                     <p class="text-muted small mb-0">Organiza los insumos de la panadería</p>
                 </div>
                 <button class="btn btn-crear shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">

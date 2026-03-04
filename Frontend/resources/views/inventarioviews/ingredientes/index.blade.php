@@ -100,7 +100,9 @@
                             <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
                         </div>
                     @endif
-
+<a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
                     <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-oscuro);">Catálogo de Ingredientes</h1>
                     <p class="text-muted">Gestión visual de insumos para producción.</p>
                 </div>
