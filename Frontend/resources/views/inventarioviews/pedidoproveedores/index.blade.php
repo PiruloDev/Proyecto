@@ -84,7 +84,7 @@
             {{-- HEADER --}}
 <div class="d-flex justify-content-between align-items-center flex-wrap pt-4 pb-2 mb-4 border-bottom">
     <div class="d-flex align-items-center">
-        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+        <a href="{{ route('dashboard.inventario') }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
             <i class="fas fa-arrow-left"></i>
         </a>
         
