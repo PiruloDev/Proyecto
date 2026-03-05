@@ -210,21 +210,28 @@
                             {{-- Botones --}}
                             <div class="d-flex gap-2 mt-auto pt-3 border-top flex-wrap">
 
-                                {{-- Botón Entregar — solo si NO está entregado --}}
-                                @if(strtoupper($estado) !== 'ENTREGADO')
-                                    <form method="POST"
-                                          action="{{ route('pedidoproveedores.entregar', $pedido['idPedidoProv']) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit"
-                                                class="btn btn-sm btn-success fw-bold"
-                                                onclick="return confirm('¿Confirmar entrega? Se sumará al inventario.')">
-                                            <i class="fas fa-box-open me-1"></i> Entregar
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="btn btn-sm btn-outline-success disabled fw-bold">
-                                        <i class="fas fa-check me-1"></i> Entregado
+                                {{-- Botón Entregar — solo si está COMPLETADO --}}
+                                    @if(strtoupper($estado) === 'COMPLETADO')
+                                        <form method="POST"
+                                            action="{{ route('pedidoproveedores.entregar', $pedido['idPedidoProv']) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success fw-bold"
+                                                    onclick="return confirm('¿Confirmar entrega? Se sumará al inventario.')">
+                                                <i class="fas fa-box-open me-1"></i> Entregar
+                                            </button>
+                                        </form>
+
+                                    @elseif(strtoupper($estado) === 'ENTREGADO')
+                                        <span class="btn btn-sm btn-outline-success disabled fw-bold">
+                                            <i class="fas fa-check me-1"></i> Entregado
+                                        </span>
+
+                                    @else
+                                    {{-- PENDIENTE, CANCELADO u otro: botón desactivado --}}
+                                    <span class="btn btn-sm btn-secondary disabled fw-bold" title="El pedido debe estar COMPLETADO para entregar">
+                                        <i class="fas fa-box-open me-1"></i> Entregar
                                     </span>
                                 @endif
 
