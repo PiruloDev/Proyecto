@@ -129,18 +129,42 @@
                 <input type="hidden" name="_method" value="POST" id="formMethod"> 
                 <div class="modal-body row g-3">
                     <input type="hidden" name="id_PEDIDO" id="modal_id_PEDIDO">
+                   <div class="col-md-6">
+    <label class="form-label fw-bold">Cliente</label>
+    <select class="form-select" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
+        <option value="">Seleccione Cliente...</option>
+        @foreach($clientes as $cliente)
+            {{-- Usamos las llaves exactas de tu Map en Java --}}
+            <option value="{{ $cliente['Id:'] ?? '' }}">
+                {{ $cliente['Nombre:'] ?? 'Sin Nombre' }}
+            </option>
+        @endforeach
+    </select>
+</div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">ID Cliente</label>
-                        <input type="number" class="form-control" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
-                    </div>
+    <label class="form-label fw-bold">Empleado</label>
+    <select class="form-select" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
+        <option value="">Seleccione Empleado...</option>
+        @foreach($empleados as $empleado)
+            {{-- Usamos las llaves exactas de tu Map en Java --}}
+            <option value="{{ $empleado['Id:'] ?? '' }}">
+                {{ $empleado['Nombre:'] ?? 'Sin Nombre' }}
+            </option>
+        @endforeach
+    </select>
+</div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">ID Empleado</label>
-                        <input type="number" class="form-control" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">ID Estado Pedido</label>
-                        <input type="number" class="form-control" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
-                    </div>
+    <label class="form-label fw-bold">Estado del Pedido</label>
+    <select class="form-select" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
+        <option value="">Seleccione Estado...</option>
+        @foreach($estados as $estado)
+            {{-- Intentamos con "Id:" o "id_ESTADO_PEDIDO" por si varía el formato --}}
+            <option value="{{ $estado['Id:'] ?? $estado['id_ESTADO_PEDIDO'] ?? $estado['id'] ?? '' }}">
+                {{ $estado['Nombre:'] ?? $estado['nombre_ESTADO'] ?? $estado['nombre'] ?? 'Sin Estado' }}
+            </option>
+        @endforeach
+    </select>
+</div>
                    <div class="col-md-6">
     <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
     <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">

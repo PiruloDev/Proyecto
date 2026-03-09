@@ -24,11 +24,15 @@ public class ConexionClienteService {
     private PasswordEncoder passwordEncoder;
 
     public List<Map<String, Object>> obtenerDetallesCliente() {
-        String sql = "SELECT TELEFONO_CLI, EMAIL_CLI, NOMBRE_CLI FROM Clientes";
+        // 1. Agregamos ID_CLIENTE al SELECT
+        String sql = "SELECT ID_CLIENTE, TELEFONO_CLI, EMAIL_CLI, NOMBRE_CLI FROM Clientes";
+
         return jdbcTemplate.query(sql, new RowMapper<Map<String, Object>>() {
             @Override
             public Map<String, Object> mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
                 Map<String, Object> cliente = new HashMap<>();
+                // 2. Agregamos la llave "Id:" para que Laravel la encuentre
+                cliente.put("Id:", rs.getInt("ID_CLIENTE"));
                 cliente.put("Nombre:", rs.getString("NOMBRE_CLI"));
                 cliente.put("Correo Electronico:", rs.getString("EMAIL_CLI"));
                 cliente.put("Telefono:", rs.getString("TELEFONO_CLI"));

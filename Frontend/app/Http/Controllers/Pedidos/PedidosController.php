@@ -32,15 +32,25 @@ class PedidosController extends Controller
         }
     }
     public function indexAdmin()
-    {
-        try {
-            $pedidos = $this->apiService->obtenerPedidos();
-            return view('pedidosviews.PedidosClientes.index-admin', compact('pedidos'));
-            
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Error al cargar los pedidos: ' . $e->getMessage());
-        }
+{
+    try {
+        $pedidos = $this->apiService->obtenerPedidos();
+        
+        // Obtenemos los catálogos de los nuevos endpoints
+        $clientes = $this->apiService->obtenerClientes();
+        $empleados = $this->apiService->obtenerEmpleados();
+        $estados = $this->apiService->obtenerEstados();
+
+        return view('pedidosviews.PedidosClientes.index-admin', compact(
+            'pedidos', 
+            'clientes', 
+            'empleados', 
+            'estados'
+        ));
+    } catch (Exception $e) {
+        return redirect()->back()->with('error', 'Error al cargar datos: ' . $e->getMessage());
     }
+}
 
     public function create()
     {

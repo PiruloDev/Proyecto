@@ -153,4 +153,35 @@ public function obtenerTodosLosPedidos()
         throw new Exception("Error al obtener el listado global de pedidos de la API.");
     }
 }
+
+/* =========================
+    CATÁLOGOS PARA MODALES
+   ========================= */
+
+public function obtenerEstados()
+{
+    try {
+        return Http::get("http://localhost:8080/estadosPedidos")->throw()->json();
+    } catch (Exception $e) {
+        return []; // Retorna array vacío si falla
+    }
+}
+
+public function obtenerClientes()
+{
+    try {
+        return Http::get("http://localhost:8080/detalle/cliente")->throw()->json();
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+public function obtenerEmpleados()
+{
+    try {
+        return Http::get("http://localhost:8080/detalle/empleado")->throw()->json();
+    } catch (Exception $e) {
+        return [];
+    }
+}
 }
