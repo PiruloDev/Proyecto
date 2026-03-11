@@ -21,16 +21,25 @@ class PedidosController extends Controller
     }
 
     
-    public function index()
-    {
-        try {
-            $pedidos = $this->apiService->obtenerPedidos();
-            return view('pedidosviews.PedidosClientes.index', compact('pedidos'));
-            
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Error al cargar los pedidos: ' . $e->getMessage());
-        }
+   public function index()
+{
+    try {
+        $pedidos   = $this->apiService->obtenerPedidos();
+        $clientes  = $this->apiService->obtenerClientes();
+        $empleados = $this->apiService->obtenerEmpleados();
+        $estados   = $this->apiService->obtenerEstados();
+
+        return view('pedidosviews.PedidosClientes.index', compact(
+            'pedidos',
+            'clientes',
+            'empleados',
+            'estados'
+        ));
+
+    } catch (Exception $e) {
+        return redirect()->back()->with('error', 'Error al cargar los pedidos: ' . $e->getMessage());
     }
+}
     public function indexAdmin()
 {
     try {
@@ -279,48 +288,58 @@ try {
     
     public function dashboardEmpleado()
 {
-    $pedidos = [];
-    $pedidosHoy = 0;
-    $pedidosPendientes = 0;
-    $totalPedidos = 0;
+    $pedidos             = [];
+    $pedidosHoy          = 0;
+    $pedidosPendientes   = 0;
+    $totalPedidos        = 0;
     $productosDisponibles = 0;
 
+    // Catálogos para el modal de crear pedido
+    $clientes  = [];
+    $empleados = [];
+    $estados   = [];
+
     try {
-        
-        $pedidos = $this->apiService->obtenerPedidos();
+        $pedidos      = $this->apiService->obtenerPedidos();
         $totalPedidos = count($pedidos);
 
-        
-        $productosRaw = $this->apiService->obtenerProductos();
-        $productosDisponibles = collect($productosRaw)->filter(function($prod) {
+        $productosRaw         = $this->apiService->obtenerProductos();
+        $productosDisponibles = collect($productosRaw)->filter(function ($prod) {
             $stock = $prod['stockActual'] ?? $prod['STOCK_ACTUAL'] ?? 0;
             return $stock > 0;
         })->count();
 
         $fechaActual = now()->format('Y-m-d');
-        
+
         foreach ($pedidos as $pedido) {
             $fechaIngreso = $pedido['fecha_ingreso'] ?? $pedido['fechaIngreso'] ?? '';
             if (str_contains($fechaIngreso, $fechaActual)) {
                 $pedidosHoy++;
             }
-            
             $estadoId = $pedido['estado_pedido_id'] ?? $pedido['idEstadoPedido'] ?? 0;
             if ($estadoId == 1) {
                 $pedidosPendientes++;
             }
         }
 
+        // Cargar catálogos para el modal
+        $clientes  = $this->apiService->obtenerClientes();
+        $empleados = $this->apiService->obtenerEmpleados();
+        $estados   = $this->apiService->obtenerEstados();
+
     } catch (Exception $e) {
         \Log::error("Error en dashboardEmpleado: " . $e->getMessage());
     }
 
     return view('dashboards.employee', compact(
-        'pedidos', 
-        'pedidosHoy', 
-        'pedidosPendientes', 
-        'productosDisponibles', 
-        'totalPedidos' 
+        'pedidos',
+        'pedidosHoy',
+        'pedidosPendientes',
+        'productosDisponibles',
+        'totalPedidos',
+        'clientes',
+        'empleados',
+        'estados'
     ));
 }
 }
