@@ -22,7 +22,6 @@ public class AuthService {
     private JdbcTemplate jdbcTemplate;
     
     /**
-     * Método helper para hashear contraseñas usando SHA-256
      */
     private String hashPassword(String password) {
         try {
@@ -78,7 +77,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarAdmin(String email, String contrasena) {
-        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM Administradores WHERE EMAIL_ADMIN = ? AND CONTRASENA_ADMIN = ?";
+        String sql = "SELECT ID_ADMIN, NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN FROM administradores WHERE EMAIL_ADMIN = ? AND CONTRASENA_ADMIN = ?";
         try {
             String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
@@ -98,7 +97,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarEmpleado(String email, String contrasena) {
-        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM Empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASENA_EMPLEADO = ? AND ACTIVO_EMPLEADO = TRUE";
+        String sql = "SELECT ID_EMPLEADO, NOMBRE_EMPLEADO, EMAIL_EMPLEADO FROM empleados WHERE EMAIL_EMPLEADO = ? AND CONTRASENA_EMPLEADO = ? AND ACTIVO_EMPLEADO = TRUE";
         try {
             String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
@@ -117,7 +116,7 @@ public class AuthService {
     }
     
     private Map<String, Object> autenticarCliente(String email, String contrasena) {
-        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM Clientes WHERE EMAIL_CLI = ? AND CONTRASENA_CLI = ? AND ACTIVO_CLI = TRUE";
+        String sql = "SELECT ID_CLIENTE, NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI FROM clientes WHERE EMAIL_CLI = ? AND CONTRASENA_CLI = ? AND ACTIVO_CLI = TRUE";
         try {
             String contrasenaHasheada = hashPassword(contrasena);
             return jdbcTemplate.queryForObject(sql, new RowMapper<Map<String, Object>>() {
@@ -140,7 +139,7 @@ public class AuthService {
      * Registra un nuevo administrador
      */
     public boolean registrarAdmin(PojoAdmin admin) {
-        String sql = "INSERT INTO Administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO administradores (NOMBRE_ADMIN, EMAIL_ADMIN, TELEFONO_ADMIN, CONTRASENA_ADMIN) VALUES (?, ?, ?, ?)";
         try {
             String contrasenaHasheada = hashPassword(admin.getContrasena());
             int result = jdbcTemplate.update(sql, admin.getNombre(), admin.getEmail(), admin.getTelefono(), contrasenaHasheada);
@@ -155,7 +154,7 @@ public class AuthService {
      * Registra un nuevo empleado
      */
     public boolean registrarEmpleado(PojoEmpleado empleado) {
-        String sql = "INSERT INTO Empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO empleados (NOMBRE_EMPLEADO, EMAIL_EMPLEADO, CONTRASENA_EMPLEADO) VALUES (?, ?, ?)";
         try {
             String contrasenaHasheada = hashPassword(empleado.getContrasena());
             int result = jdbcTemplate.update(sql, empleado.getNombre(), empleado.getEmail(), contrasenaHasheada);
@@ -170,7 +169,7 @@ public class AuthService {
      * Registra un nuevo cliente
      */
     public boolean registrarCliente(PojoCliente cliente) {
-        String sql = "INSERT INTO Clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (NOMBRE_CLI, EMAIL_CLI, TELEFONO_CLI, CONTRASENA_CLI) VALUES (?, ?, ?, ?)";
         try {
             String contrasenaHasheada = hashPassword(cliente.getContrasena());
             int result = jdbcTemplate.update(sql, cliente.getNombre(), cliente.getEmail(), cliente.getTelefono(), contrasenaHasheada);
