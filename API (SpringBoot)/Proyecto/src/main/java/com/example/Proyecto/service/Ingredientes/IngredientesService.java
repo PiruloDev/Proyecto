@@ -38,9 +38,7 @@ public class IngredientesService {
 
             ingrediente.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
             ingrediente.setCantidadIngrediente(rs.getBigDecimal("CANTIDAD_INGREDIENTE"));
-            ingrediente.setFechaVencimiento(rs.getDate("FECHA_VENCIMIENTO"));
             ingrediente.setReferenciaIngrediente(rs.getString("REFERENCIA_INGREDIENTE"));
-            ingrediente.setFechaEntregaIngrediente(rs.getDate("FECHA_ENTREGA_INGREDIENTE"));
 
             return ingrediente;
         }
@@ -101,26 +99,25 @@ public class IngredientesService {
     }
 
     public void crearIngrediente(Ingredientes ingrediente) {
+        // Eliminada la coma después de CANTIDAD_INGREDIENTE y los NULL sobrantes
         String sql = "INSERT INTO Ingredientes (" +
                 "ID_PROVEEDOR, " +
                 "ID_CATEGORIA, " +
-                "ID_UNIDAD_MEDIDA, " +              // ⬅️ AGREGAR
+                "ID_UNIDAD_MEDIDA, " +
                 "NOMBRE_INGREDIENTE, " +
                 "REFERENCIA_INGREDIENTE, " +
-                "CANTIDAD_INGREDIENTE, " +
-                "FECHA_VENCIMIENTO, " +
-                "FECHA_ENTREGA_INGREDIENTE" +
-                ") VALUES (?, ?, ?, ?, ?, ?, NULL, NULL)";  // ⬅️ Ahora son 8 placeholders
+                "CANTIDAD_INGREDIENTE" +
+                ") VALUES (?, ?, ?, ?, ?, ?)";
 
         BigDecimal cantidadInicial = BigDecimal.ZERO;
 
         jdbcTemplate.update(sql,
-                ingrediente.getIdProveedor(),           // Parámetro 1
-                ingrediente.getIdCategoria(),           // Parámetro 2
-                ingrediente.getIdUnidadMedida(),        // Parámetro 3 ⬅️ AGREGAR
-                ingrediente.getNombreIngrediente(),     // Parámetro 4
-                ingrediente.getReferenciaIngrediente(), // Parámetro 5
-                cantidadInicial                         // Parámetro 6
+                ingrediente.getIdProveedor(),
+                ingrediente.getIdCategoria(),
+                ingrediente.getIdUnidadMedida(),
+                ingrediente.getNombreIngrediente(),
+                ingrediente.getReferenciaIngrediente(),
+                cantidadInicial
         );
     }
 

@@ -205,7 +205,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg border-0" style="border-radius: 25px;">
             <div class="modal-header text-white border-0"
-                 style="background: var(--panaderia-marron-oscuro); border-radius: 25px 25px 0 0;">
+                 style="background: var(--panaderia-marron-principal); border-radius: 25px 25px 0 0;">
                 <h5 class="modal-title fw-bold">
                     <i class="fas fa-edit me-2 text-warning"></i>Actualizar Ficha Técnica
                 </h5>

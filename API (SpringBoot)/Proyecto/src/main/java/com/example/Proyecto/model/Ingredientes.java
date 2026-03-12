@@ -10,9 +10,7 @@ public class Ingredientes {
     private Long idUnidadMedida;
     private String nombreIngrediente;
     private BigDecimal cantidadIngrediente;
-    private Date fechaVencimiento;
     private String referenciaIngrediente;
-    private Date fechaEntregaIngrediente;
     public Ingredientes() {}
 
     public Ingredientes(Long idIngrediente,
@@ -21,18 +19,14 @@ public class Ingredientes {
                         Long idUnidadMedida,
                         String nombreIngrediente,
                         BigDecimal cantidadIngrediente,
-                        Date fechaVencimiento,
-                        String referenciaIngrediente,
-                        Date fechaEntregaIngrediente) {
+                        String referenciaIngrediente ) {
         this.idIngrediente = idIngrediente;
         this.idProveedor = idProveedor;
         this.idCategoria = idCategoria;
         this.idUnidadMedida =  idUnidadMedida;
         this.nombreIngrediente = nombreIngrediente;
         this.cantidadIngrediente = cantidadIngrediente;
-        this.fechaVencimiento = fechaVencimiento;
         this.referenciaIngrediente = referenciaIngrediente;
-        this.fechaEntregaIngrediente = fechaEntregaIngrediente;
     }
 
     // Getters y Setters
@@ -58,12 +52,7 @@ public class Ingredientes {
     public BigDecimal getCantidadIngrediente() { return cantidadIngrediente; }
     public void setCantidadIngrediente(BigDecimal cantidadIngrediente) { this.cantidadIngrediente = cantidadIngrediente; }
 
-    public Date getFechaVencimiento() { return fechaVencimiento; }
-    public void setFechaVencimiento(Date fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }
-
     public String getReferenciaIngrediente() { return referenciaIngrediente; }
     public void setReferenciaIngrediente(String referenciaIngrediente) { this.referenciaIngrediente = referenciaIngrediente; }
 
-    public Date getFechaEntregaIngrediente() { return fechaEntregaIngrediente; }
-    public void setFechaEntregaIngrediente(Date fechaEntregaIngrediente) { this.fechaEntregaIngrediente = fechaEntregaIngrediente; }
 }

@@ -256,12 +256,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        {{-- Fecha Vencimiento ← NUEVO --}}
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Fecha de Vencimiento</label>
-                                            <input type="date" name="fechaVencimiento" class="form-control"
-                                                   value="{{ $ing['fechaVencimiento'] ?? '' }}">
-                                        </div>
                                     </div>
 
                                 </div>
@@ -295,7 +289,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
             <div class="modal-header text-white border-0"
-                 style="background: var(--panaderia-marron-oscuro); border-radius: 20px 20px 0 0;">
+                 style="background: var(--panaderia-marron-principal); border-radius: 20px 20px 0 0;">
                 <h5 class="modal-title fw-bold">
                     <i class="fas fa-plus-circle me-2"></i>Nuevo Ingrediente
                 </h5>
@@ -358,13 +352,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
-                        {{-- Fecha Vencimiento ← NUEVO --}}
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">
-                                Fecha de Vencimiento <span class="text-danger">*</span>
-                            </label>
-                            <input type="date" name="fechaVencimiento" class="form-control" required>
                         </div>
                     </div>
 

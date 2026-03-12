@@ -44,8 +44,9 @@ class IngredientesService
         // Aseguramos que los IDs sean tratados como enteros (Long en Java)
         if (isset($filtered['idProveedor'])) $filtered['idProveedor'] = (int)$filtered['idProveedor'];
         if (isset($filtered['idCategoria'])) $filtered['idCategoria'] = (int)$filtered['idCategoria'];
-
-        return $filtered;
+        if (isset($filtered['idUnidadMedida'])) $filtered['idUnidadMedida'] = (int)$filtered['idUnidadMedida'];
+        
+    return $filtered;
     }
 
     // --- MÉTODOS DE OBTENCIÓN ---
