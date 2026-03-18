@@ -6,10 +6,10 @@
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
 <style>
-    /* --- ESTRUCTURA DE SCROLL (Mantenida) --- */
+    /* --- ESTRUCTURA DE SCROLL --- */
     body, html {
         height: 100%;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
     .container-fluid, .row {
@@ -22,12 +22,12 @@
         top: 0;
         display: flex;
         flex-direction: column;
-        background-color: #8d734d; 
+        background-color: #8d734d;
     }
 
     .main-content {
         height: 100vh;
-        overflow-y: auto; 
+        overflow-y: auto;
         padding-bottom: 50px;
     }
 
@@ -43,14 +43,14 @@
     }
 
     .sidebar-user {
-        margin-top: auto; 
+        margin-top: auto;
         padding: 20px 15px;
-        background: rgba(0, 0, 0, 0.15); 
+        background: rgba(0, 0, 0, 0.15);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .logout-btn-custom {
-        color: #ffbaba !important; 
+        color: #ffbaba !important;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 186, 186, 0.2);
         padding: 10px 15px;
@@ -68,6 +68,28 @@
         padding: 6px 14px;
         border-radius: 20px;
         font-weight: 700;
+    }
+
+    /* --- RESPONSIVIDAD MÓVIL --- */
+    @media (max-width: 767.98px) {
+        body, html { overflow: auto; }
+        .container-fluid, .row { height: auto; }
+        .main-content { height: auto; overflow-y: visible; }
+
+        /* Sidebar fuera del flujo, entra solo al abrir */
+        .sidebar {
+            position: fixed !important;
+            top: 0;
+            left: -100%;
+            height: 100vh !important;
+            width: 280px;
+            z-index: 1050;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
     }
 </style>
 @endpush
