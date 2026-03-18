@@ -19,7 +19,7 @@ public class ProveedoresService {
 
     // Obtener todos los proveedores
     public List<Proveedores> obtenerTodosLosProveedores() {
-        String sql = "SELECT * FROM Proveedores";
+        String sql = "SELECT * FROM proveedores";
         return jdbcTemplate.query(sql, new RowMapper<Proveedores>() {
             @Override
             public Proveedores mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
@@ -37,7 +37,7 @@ public class ProveedoresService {
 
     // Crear un nuevo proveedor (POST)
     public void crearProveedor(Proveedores proveedor) {
-        String sql = "INSERT INTO Proveedores (NOMBRE_PROV, TELEFONO_PROV, ACTIVO_PROV, EMAIL_PROV, DIRECCION_PROV) " +
+        String sql = "INSERT INTO proveedores (NOMBRE_PROV, TELEFONO_PROV, ACTIVO_PROV, EMAIL_PROV, DIRECCION_PROV) " +
                 "VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 proveedor.getNombreProv(),
@@ -50,7 +50,7 @@ public class ProveedoresService {
 
     // Actualizar un proveedor (PUT)
     public int editarProveedor(Proveedores proveedor) {
-        String sql = "UPDATE Proveedores SET NOMBRE_PROV=?, TELEFONO_PROV=?, ACTIVO_PROV=?, EMAIL_PROV=?, DIRECCION_PROV=? WHERE ID_PROVEEDOR=?";
+        String sql = "UPDATE proveedores SET NOMBRE_PROV=?, TELEFONO_PROV=?, ACTIVO_PROV=?, EMAIL_PROV=?, DIRECCION_PROV=? WHERE ID_PROVEEDOR=?";
         return jdbcTemplate.update(sql,
                 proveedor.getNombreProv(),
                 proveedor.getTelefonoProv(),
@@ -63,7 +63,7 @@ public class ProveedoresService {
 
     // Eliminar un proveedor (DELETE)
     public int eliminarProveedor(int idProveedor) {
-        String sql = "DELETE FROM Proveedores WHERE ID_PROVEEDOR = ?";
+        String sql = "DELETE FROM proveedores WHERE ID_PROVEEDOR = ?";
         return jdbcTemplate.update(sql, idProveedor);
     }
 }

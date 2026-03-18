@@ -49,8 +49,8 @@ public class RecetasService {
      */
     public List<RecetaProducto> obtenerRecetaPorIdProducto(Long idProducto) {
         String sql = "SELECT rd.ID_RECETA, r.ID_PRODUCTO, rd.ID_INGREDIENTE, rd.CANTIDAD_REQUERIDA, rd.ID_UNIDAD " +
-                "FROM RECETAS_DETALLE rd " +
-                "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA " +
+                "FROM recetas_detalle rd " +
+                "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA " +
                 "WHERE r.ID_PRODUCTO = ?";
 
         return jdbcTemplate.query(sql, recetaRowMapper, idProducto);
@@ -58,7 +58,7 @@ public class RecetasService {
 
     public List<RecetaProducto> obtenerTodasLasRecetas() {
         String sql = "SELECT rd.ID_RECETA, r.ID_PRODUCTO, rd.ID_INGREDIENTE, rd.CANTIDAD_REQUERIDA, rd.ID_UNIDAD " +
-                "FROM RECETAS_DETALLE rd " + "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA";
+                "FROM recetas_detalle rd " + "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA";
 
         return jdbcTemplate.query(sql, recetaRowMapper);
     }
@@ -70,7 +70,7 @@ public class RecetasService {
         }
 
         // 1. Insertar en la tabla RECETAS (ENCABEZADO) y obtener el ID generado
-        String sqlInsertEncabezado = "INSERT INTO RECETAS (ID_PRODUCTO, NOMBRE_RECETA) VALUES (?, ?)";
+        String sqlInsertEncabezado = "INSERT INTO recetas (ID_PRODUCTO, NOMBRE_RECETA) VALUES (?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -85,7 +85,7 @@ public class RecetasService {
         Long idReceta = Objects.requireNonNull(keyHolder.getKey()).longValue();
 
         // 2. Insertar detalles
-        String sqlInsertDetalle = "INSERT INTO RECETAS_DETALLE (ID_RECETA, ID_INGREDIENTE, CANTIDAD_REQUERIDA, ID_UNIDAD) VALUES (?, ?, ?, ?)";
+        String sqlInsertDetalle = "INSERT INTO recetas_detalle (ID_RECETA, ID_INGREDIENTE, CANTIDAD_REQUERIDA, ID_UNIDAD) VALUES (?, ?, ?, ?)";
 
         if (request.getIngredientes() != null && !request.getIngredientes().isEmpty()) {
             for (RecetaRequest.IngredienteReceta ing : request.getIngredientes()) {
@@ -106,7 +106,7 @@ public class RecetasService {
     @Transactional
     public void actualizarReceta(Long idProducto, RecetaRequest request) {
         // 1. Obtener el ID_RECETA para el ID_PRODUCTO dado
-        String sqlSelectReceta = "SELECT ID_RECETA FROM RECETAS WHERE ID_PRODUCTO = ?";
+        String sqlSelectReceta = "SELECT ID_RECETA FROM recetas WHERE ID_PRODUCTO = ?";
         Long idReceta;
         try {
             idReceta = jdbcTemplate.queryForObject(sqlSelectReceta, Long.class, idProducto);
@@ -115,11 +115,11 @@ public class RecetasService {
         }
 
         // 2. Eliminar los detalles de la receta antigua
-        String sqlDelete = "DELETE FROM RECETAS_DETALLE WHERE ID_RECETA = ?";
+        String sqlDelete = "DELETE FROM recetas_detalle WHERE ID_RECETA = ?";
         jdbcTemplate.update(sqlDelete, idReceta);
 
         // 3. Insertar los nuevos detalles
-        String sqlInsert = "INSERT INTO RECETAS_DETALLE (ID_RECETA, ID_INGREDIENTE, CANTIDAD_REQUERIDA, ID_UNIDAD) VALUES (?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO recetas_detalle (ID_RECETA, ID_INGREDIENTE, CANTIDAD_REQUERIDA, ID_UNIDAD) VALUES (?, ?, ?, ?)";
 
         if (request.getIngredientes() != null && !request.getIngredientes().isEmpty()) {
             for (RecetaRequest.IngredienteReceta ing : request.getIngredientes()) {
@@ -139,7 +139,7 @@ public class RecetasService {
     @Transactional
     public void eliminarReceta(Long idProducto) {
         // 1. Obtener el ID_RECETA para el ID_PRODUCTO dado
-        String sqlSelectReceta = "SELECT ID_RECETA FROM RECETAS WHERE ID_PRODUCTO = ?";
+        String sqlSelectReceta = "SELECT ID_RECETA FROM recetas WHERE ID_PRODUCTO = ?";
         Long idReceta;
         try {
             idReceta = jdbcTemplate.queryForObject(sqlSelectReceta, Long.class, idProducto);
@@ -148,11 +148,11 @@ public class RecetasService {
         }
 
         // 2. Eliminar detalles
-        String sqlDeleteDetalle = "DELETE FROM RECETAS_DETALLE WHERE ID_RECETA = ?";
+        String sqlDeleteDetalle = "DELETE FROM recetas_detalle WHERE ID_RECETA = ?";
         jdbcTemplate.update(sqlDeleteDetalle, idReceta);
 
         // 3. Eliminar encabezado
-        String sqlDeleteEncabezado = "DELETE FROM RECETAS WHERE ID_RECETA = ?";
+        String sqlDeleteEncabezado = "DELETE FROM recetas WHERE ID_RECETA = ?";
         int rows = jdbcTemplate.update(sqlDeleteEncabezado, idReceta);
 
         if (rows == 0) {
@@ -164,11 +164,11 @@ public class RecetasService {
     public List<RecetaDetalleDTO> obtenerTodasLasRecetasOptimizadas() {
         String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
                 "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, u.NOMBRE_UNIDAD " +
-                "FROM RECETAS_DETALLE rd " +
-                "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA " +
-                "JOIN PRODUCTOS p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
-                "LEFT JOIN INGREDIENTES i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
-                "LEFT JOIN UNIDADES_MEDIDA u ON rd.ID_UNIDAD = u.ID_UNIDAD";
+                "FROM recetas_detalle rd " +
+                "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA " +
+                "JOIN productos p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
+                "LEFT JOIN ingredientes i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                "LEFT JOIN unidades_medidas u ON rd.ID_UNIDAD = u.ID_UNIDAD";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             RecetaDetalleDTO dto = new RecetaDetalleDTO();
@@ -187,11 +187,11 @@ public class RecetasService {
         String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
                 "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, " +
                 "rd.ID_UNIDAD, u.NOMBRE_UNIDAD " +
-                "FROM RECETAS_DETALLE rd " +
-                "JOIN RECETAS r ON rd.ID_RECETA = r.ID_RECETA " +
-                "JOIN PRODUCTOS p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
-                "LEFT JOIN INGREDIENTES i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
-                "LEFT JOIN UNIDADES_MEDIDA u ON rd.ID_UNIDAD = u.ID_UNIDAD " +
+                "FROM recetas_detalle rd " +
+                "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA " +
+                "JOIN productos p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
+                "LEFT JOIN ingredientes i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                "LEFT JOIN unidades_medida u ON rd.ID_UNIDAD = u.ID_UNIDAD " +
                 "WHERE r.ID_PRODUCTO = ?";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {

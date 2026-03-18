@@ -70,12 +70,12 @@ public class IngredientesService {
 
 
     public List<String> obtenerIngredientes() {
-        String sql = "SELECT NOMBRE_INGREDIENTE FROM Ingredientes ORDER BY NOMBRE_INGREDIENTE";
+        String sql = "SELECT NOMBRE_INGREDIENTE FROM ingredientes ORDER BY NOMBRE_INGREDIENTE";
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
     public List<Ingredientes> obtenerTodosLosIngredientes() {
-        String sql = "SELECT * FROM Ingredientes";
+        String sql = "SELECT * FROM ingredientes";
         return jdbcTemplate.query(sql, ingredienteRowMapper);
     }
 
@@ -100,7 +100,7 @@ public class IngredientesService {
 
     public void crearIngrediente(Ingredientes ingrediente) {
         // Eliminada la coma después de CANTIDAD_INGREDIENTE y los NULL sobrantes
-        String sql = "INSERT INTO Ingredientes (" +
+        String sql = "INSERT INTO ingredientes (" +
                 "ID_PROVEEDOR, " +
                 "ID_CATEGORIA, " +
                 "ID_UNIDAD_MEDIDA, " +
@@ -122,7 +122,7 @@ public class IngredientesService {
     }
 
     public int editarIngrediente(Long id, Ingredientes ingrediente) {
-        String sql = "UPDATE Ingredientes SET " +
+        String sql = "UPDATE ingredientes SET " +
                 "ID_PROVEEDOR = ?, " +
                 "ID_CATEGORIA = ?, " +
                 "ID_UNIDAD_MEDIDA = ?, " +
@@ -142,18 +142,18 @@ public class IngredientesService {
 
 
     public int actualizarCantidad(Long id, BigDecimal cantidad) {
-        String sql = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = ? WHERE ID_INGREDIENTE = ?";
+        String sql = "UPDATE ingredientes SET CANTIDAD_INGREDIENTE = ? WHERE ID_INGREDIENTE = ?";
         return jdbcTemplate.update(sql, cantidad, id);
     }
 
     public int eliminarIngrediente(Long id) {
-        String sql = "DELETE FROM Ingredientes WHERE ID_INGREDIENTE = ?";
+        String sql = "DELETE FROM ingredientes WHERE ID_INGREDIENTE = ?";
         return jdbcTemplate.update(sql, id);
     }
 
     public List<IngredientesCantidad> obtenerIngredientesCantidad() {
         String sql = "SELECT ID_INGREDIENTE, NOMBRE_INGREDIENTE, CANTIDAD_INGREDIENTE " +
-                "FROM Ingredientes " +
+                "FROM ingredientes " +
                 "ORDER BY NOMBRE_INGREDIENTE";
 
         return jdbcTemplate.query(sql, ingredientesCantidadRowMapper);
@@ -163,11 +163,8 @@ public class IngredientesService {
     @Transactional
     public int actualizarStock(Long idIngrediente, BigDecimal cantidadAjuste) {
         if (cantidadAjuste.signum() > 0) {
-            // Si es positivo, repone (se usa en reversión)
             return reponerStock(idIngrediente, cantidadAjuste);
         } else {
-            // Si es negativo, descuenta (se usa en producción).
-            // Se usa abs() porque descontarStock espera la cantidad positiva a restar.
             return descontarStock(idIngrediente, cantidadAjuste.abs());
         }
     }
@@ -187,14 +184,14 @@ public class IngredientesService {
             throw new IllegalStateException("Stock insuficiente para el ingrediente ID " + idIngrediente + ". Stock actual: " + stockActual + ", Consumo requerido: " + cantidadConsumida);
         }
 
-        String sqlUpdate = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE - ? WHERE ID_INGREDIENTE = ?";
+        String sqlUpdate = "UPDATE ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE - ? WHERE ID_INGREDIENTE = ?";
 
         return jdbcTemplate.update(sqlUpdate, cantidadConsumida, idIngrediente);
     }
 
     @Transactional
     public int reponerStock(Long idIngrediente, BigDecimal cantidadRepuesta) {
-        String sqlUpdate = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
+        String sqlUpdate = "UPDATE ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
 
         return jdbcTemplate.update(sqlUpdate, cantidadRepuesta, idIngrediente);
     }
@@ -203,7 +200,6 @@ public class IngredientesService {
     private EntityManager entityManager;
 
     public List<IngredienteDetalleDTO> obtenerIngredientesParaModal() {
-        // CORRECCIÓN: Se cambió i.id_unidad por i.ID_UNIDAD_MEDIDA que es el nombre real en tu DB
         String sql = "SELECT i.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, u.ABREVIATURA_UNIDAD, u.ID_UNIDAD " +
                 "FROM ingredientes i " +
                 "INNER JOIN unidades_medida u ON i.ID_UNIDAD_MEDIDA = u.ID_UNIDAD";
