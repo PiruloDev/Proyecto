@@ -26,3 +26,4 @@ yarn-error.log
 /.vscode
 /.zed
 /_ide_helper.php
+.env
