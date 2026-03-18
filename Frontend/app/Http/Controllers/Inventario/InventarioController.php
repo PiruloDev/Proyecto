@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inventario;
 
 use Illuminate\Http\Request;
-use App\Providers\InventarioService; 
+use App\Services\Inventario\InventarioService; 
 use Illuminate\Support\Facades\Validator;
 
 class InventarioController extends Controller 

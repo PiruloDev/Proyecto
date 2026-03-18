@@ -83,7 +83,7 @@ public class IngredientesService {
         String sql = "SELECT i.ID_INGREDIENTE, i.ID_PROVEEDOR, i.ID_CATEGORIA, " +
                 "i.NOMBRE_INGREDIENTE, i.REFERENCIA_INGREDIENTE, " +
                 "u.ABREVIATURA_UNIDAD " +
-                "FROM Ingredientes i " +
+                "FROM ingredientes i " +
                 "LEFT JOIN unidades_medida u ON i.ID_UNIDAD_MEDIDA = u.ID_UNIDAD";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
