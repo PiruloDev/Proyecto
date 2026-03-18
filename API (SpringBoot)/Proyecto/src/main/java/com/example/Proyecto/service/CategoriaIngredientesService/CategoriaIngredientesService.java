@@ -18,7 +18,7 @@ public class CategoriaIngredientesService {
 
     // Obtener todas las categorías de ingredientes
     public List<CategoriaIngredientes> obtenerTodasLasCategoriasIngredientes() {
-        String sql = "SELECT * FROM Categoria_Ingredientes";
+        String sql = "SELECT * FROM categoria_ingredientes";
         return jdbcTemplate.query(sql, new RowMapper<CategoriaIngredientes>() {
             @Override
             public CategoriaIngredientes mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
@@ -32,19 +32,19 @@ public class CategoriaIngredientesService {
 
     // Crear una nueva categoría (POST)
     public void crearCategoriaIngrediente(CategoriaIngredientes categoria) {
-        String sql = "INSERT INTO Categoria_Ingredientes (NOMBRE_CATEGORIA_INGREDIENTE) VALUES (?)";
+        String sql = "INSERT INTO categoria_ingredientes (NOMBRE_CATEGORIA_INGREDIENTE) VALUES (?)";
         jdbcTemplate.update(sql, categoria.getNombreCategoria());
     }
 
     // Actualizar una categoría existente (PUT)
     public int editarCategoriaIngrediente(CategoriaIngredientes categoria) {
-        String sql = "UPDATE Categoria_Ingredientes SET NOMBRE_CATEGORIA_INGREDIENTE=? WHERE ID_CATEGORIA=?";
+        String sql = "UPDATE categoria_ingredientes SET NOMBRE_CATEGORIA_INGREDIENTE=? WHERE ID_CATEGORIA=?";
         return jdbcTemplate.update(sql, categoria.getNombreCategoria(), categoria.getIdCategoriaIngrediente());
     }
 
     // Eliminar una categoría por ID (DELETE)
     public int eliminarCategoriaIngrediente(int idCategoria) {
-        String sql = "DELETE FROM Categoria_Ingredientes WHERE ID_CATEGORIA = ?";
+        String sql = "DELETE FROM categoria_ingredientes WHERE ID_CATEGORIA = ?";
         return jdbcTemplate.update(sql, idCategoria);
     }
 }

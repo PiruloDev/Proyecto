@@ -57,10 +57,8 @@ public class PedidosProveedoresService {
             // Obtiene el nombre del ingrediente de la tabla Ingredientes (gracias al JOIN)
             detalle.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
 
-            // *** CORRECCIÓN CRÍTICA DE LECTURA (AJUSTADO A LA BD) ***
-            // Mapea la columna real: CANTIDAD_ORDENADA
             detalle.setCantidad(rs.getInt("CANTIDAD_ORDENADA"));
-            // Mapea la columna real: PRECIO_COMPRA
+
             detalle.setPrecioUnitario(rs.getBigDecimal("PRECIO_COMPRA"));
 
             // La columna SUBTOTAL NO existe en la BD. Se calcula en la aplicación.
@@ -136,11 +134,10 @@ public class PedidosProveedoresService {
      * @return PedidosProveedores con su lista de detalles o null si no se encuentra.
      */
     public PedidosProveedores obtenerPedidoConDetalles(int idPedidoProv) {
-        // ← JOIN con proveedores para traer el nombre
         String sqlEncabezado =
                 "SELECT pp.*, p.NOMBRE_PROV " +
                         "FROM pedidos_proveedores pp " +
-                        "LEFT JOIN Proveedores p ON pp.ID_PROVEEDOR = p.ID_PROVEEDOR " +
+                        "LEFT JOIN proveedores p ON pp.ID_PROVEEDOR = p.ID_PROVEEDOR " +
                         "WHERE pp.ID_PEDIDO_PROV = ?";
 
         PedidosProveedores pedido;
@@ -161,7 +158,7 @@ public class PedidosProveedoresService {
 
         String sqlDetalles =
                 "SELECT dp.*, i.NOMBRE_INGREDIENTE FROM detalle_pedidos_proveedores dp " +
-                        "JOIN Ingredientes i ON dp.ID_INGREDIENTE = i.ID_INGREDIENTE " +
+                        "JOIN ingredientes i ON dp.ID_INGREDIENTE = i.ID_INGREDIENTE " +
                         "WHERE dp.ID_PEDIDO_PROV = ?";
 
         pedido.setDetalles(jdbcTemplate.query(sqlDetalles, detallePedidoProveedoresRowMapper, idPedidoProv));
@@ -223,7 +220,7 @@ public class PedidosProveedoresService {
         }
 
         // 3. Actualizar el stock de cada ingrediente en el detalle
-        String sqlUpdateStock = "UPDATE Ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
+        String sqlUpdateStock = "UPDATE ingredientes SET CANTIDAD_INGREDIENTE = CANTIDAD_INGREDIENTE + ? WHERE ID_INGREDIENTE = ?";
 
         for (DetallePedidoProveedores detalle : pedido.getDetalles()) {
             jdbcTemplate.update(sqlUpdateStock,
@@ -233,7 +230,7 @@ public class PedidosProveedoresService {
         }
 
         // 4. Cambiar el estado del pedido a 'ENTREGADO'
-        String sqlUpdateEstado = "UPDATE PEDIDOS_PROVEEDORES SET ESTADO_PEDIDO = 'ENTREGADO' WHERE ID_PEDIDO_PROV = ?";
+        String sqlUpdateEstado = "UPDATE pedidos-proveedores SET ESTADO_PEDIDO = 'ENTREGADO' WHERE ID_PEDIDO_PROV = ?";
         jdbcTemplate.update(sqlUpdateEstado, idPedidoProv);
     }
 }
