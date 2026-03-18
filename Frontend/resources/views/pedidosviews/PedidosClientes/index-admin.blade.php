@@ -6,19 +6,68 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('css/variables.css') }}" rel="stylesheet"> 
     <link href="{{ asset('css/dashboard-admin.css') }}" rel="stylesheet"> 
+    <link href="{{ asset('css/stylempleado.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body, html { height: 100%; overflow: hidden; }
-        .container-fluid, .row { height: 100vh; }
-        .sidebar { height: 100vh; position: sticky; top: 0; z-index: 1000; }
-        .main-content { height: 100vh; overflow-y: auto; background-color: #fdfaf6; padding: 0 !important; }
-        .sticky-header-section { position: sticky; top: 0; z-index: 150; background-color: #fdfaf6; padding: 1.5rem 1.5rem 0 1.5rem; border-bottom: 1px solid #dee2e6; }
-        .table-responsive { overflow: visible !important; padding: 0 1.5rem 1.5rem 1.5rem; }
-        .table { border-collapse: separate !important; border-spacing: 0 !important; }
-        .table thead th { position: sticky; top: 103px; z-index: 100; background-color: #ffffff !important; border-bottom: 2px solid #dee2e6 !important; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        .table-bordered th, .table-bordered td { border: 1px solid #dee2e6 !important; }
-        .btn-quitar { border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; }
+      
+        .main-content { min-height: 100vh; background-color: #fdfaf6; }
+        .content-wrapper { padding: 2rem; }
+        
+        
+        @media (max-width: 991.98px) {
+            .content-wrapper { padding: 1rem; }
+            .table-responsive { border: 0; }
+            
+            .table thead {
+                display: none; 
+            }
+            
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1.5rem;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 0.5rem;
+                background-color: #fff;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            }
+            
+            .table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                padding: 0.75rem 1rem !important;
+                border-bottom: 1px solid #eee !important;
+            }
+            
+            .table tbody td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                color: #a67c52;
+                margin-right: 1rem;
+                text-align: left;
+            }
+
+            .table tbody td:last-child {
+                border-bottom: 0 !important;
+                justify-content: center;
+            }
+            
+            .btn-toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .btn-toolbar .btn {
+                width: 100%;
+            }
+        }
+
+        .modal-header { background: #a67c52; color: white; }
+        .btn-quitar { border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .badge-estado { font-size: 0.85rem; padding: 0.5em 0.8em; }
     </style>
 @endpush
 
@@ -28,32 +77,29 @@
         @include('components.admin-sidebar') 
         
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-            <div class="sticky-header-section">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                    <h1 class="h2">Listado de Pedidos (Panel de Administración)</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
-                            <i class="fas fa-plus"></i> Crear Pedido
+            <div class="content-wrapper">
+                
+                <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                    <h2 class="h3">Gestión de Pedidos</h2>
+                    <div class="btn-toolbar mt-2 mt-md-0">
+                        <button type="button" class="btn btn-primary me-md-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
+                            <i class="bi bi-plus-circle"></i> Nuevo Pedido
                         </button>
-                        <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-sync"></i> Recargar Listado
+                        <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-sync"></i> Recargar
                         </a>
                     </div>
                 </div>
 
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
+                        <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif  
 
-                <h3 class="mb-3 text-secondary">Pedidos Registrados</h3>
-            </div>
-
-            <section id="listado-pedidos" class="mb-5 mt-3">
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle shadow-sm rounded-3">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
@@ -69,50 +115,59 @@
                         <tbody>
                             @forelse($pedidos as $pedido)
                                 <tr>
-                                    <td>{{ $pedido['id_PEDIDO'] }}</td>
-                                    <td>{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['cliente_id'] }}</td>
-                                    <td>{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['empleado_id'] }}</td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">
+                                    <td data-label="ID">{{ $pedido['id_PEDIDO'] }}</td>
+                                    <td data-label="Cliente">{{ $pedido['nombre_cliente'] ?? 'ID: '.$pedido['cliente_id'] }}</td>
+                                    <td data-label="Empleado">{{ $pedido['nombre_empleado'] ?? 'ID: '.$pedido['empleado_id'] }}</td>
+                                    <td data-label="Estado">
+                                        <span class="badge bg-info text-dark badge-estado">
                                             {{ $pedido['nombre_estado'] ?? 'Estado: '.$pedido['estado_pedido_id'] }}
                                         </span>
                                     </td>
-                                    <td>${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}</td>
-                                    <td>{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
-                                    <td>
-    @if(!empty($pedido['fecha_entrega']) && $pedido['fecha_entrega'] !== 'N/A')
-        <div class="d-flex flex-column">
-            <span class="fw-bold">{{ \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('d/m/Y') }}</span>
-            @php $hora = \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('H:i'); @endphp
-            @if($hora !== '23:59')
-                <small class="text-muted"><i class="far fa-clock me-1"></i>{{ $hora }}</small>
-            @else
-                <small class="text-warning" style="font-size: 0.75rem;">Hora por definir</small>
-            @endif
-        </div>
-    @else
-        <span class="text-muted">No asignada</span>
-    @endif
-</td>
+                                    <td data-label="Total" class="fw-bold text-success">
+                                        ${{ number_format($pedido['total_producto'] ?? 0, 0, ',', '.') }}
+                                    </td>
+                                    <td data-label="Ingreso">{{ $pedido['fecha_ingreso'] ?? 'N/A' }}</td>
+                                    <td data-label="Entrega">
+                                        @if(!empty($pedido['fecha_entrega']) && $pedido['fecha_entrega'] !== 'N/A')
+                                            <div class="d-flex flex-column align-items-md-start align-items-end">
+                                                <span class="fw-bold">{{ \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('d/m/Y') }}</span>
+                                                @php $hora = \Carbon\Carbon::parse($pedido['fecha_entrega'])->format('H:i'); @endphp
+                                                @if($hora !== '23:59')
+                                                    <small class="text-muted"><i class="far fa-clock me-1"></i>{{ $hora }}</small>
+                                                @else
+                                                    <small class="text-warning" style="font-size: 0.75rem;">Hora por definir</small>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">No asignada</span>
+                                        @endif
+                                    </td>
                                     <td class="text-center text-nowrap">
-                                        <button type="button" class="btn btn-warning btn-sm me-1 btn-edit-pedido" data-pedido="{{ json_encode($pedido) }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro?')">
-                                                <i class="fas fa-trash"></i>
+                                        <div class="btn-actions">
+                                            <button type="button" class="btn btn-success btn-sm me-1 btn-edit-pedido" data-pedido="{{ json_encode($pedido) }}">
+                                                <i class="bi bi-pencil"></i>
                                             </button>
-                                        </form>
+                                            <form method="POST" action="{{ route('admin.pedidos.destroy', $pedido['id_PEDIDO']) }}" class="d-inline">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar el pedido #{{ $pedido['id_PEDIDO'] }}?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="text-center py-4 text-muted">No hay pedidos.</td></tr>
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+                                        <span class="text-muted">No hay pedidos registrados en el sistema.</span>
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-            </section>
+            </div>
         </main>
     </div>
 </div>
@@ -120,7 +175,7 @@
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius: 12px;">
-            <div class="modal-header text-white" style="background: #a67c52; border-radius: 12px 12px 0 0;">
+            <div class="modal-header text-white" style="border-radius: 12px 12px 0 0;">
                 <h5 class="modal-title" id="pedidoModalLabel">Gestión de Pedido</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -129,46 +184,48 @@
                 <input type="hidden" name="_method" value="POST" id="formMethod"> 
                 <div class="modal-body row g-3">
                     <input type="hidden" name="id_PEDIDO" id="modal_id_PEDIDO">
-                   <div class="col-md-6">
-    <label class="form-label fw-bold">Cliente</label>
-    <select class="form-select" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
-        <option value="">Seleccione Cliente...</option>
-        @foreach($clientes as $cliente)
-            {{-- Usamos las llaves exactas de tu Map en Java --}}
-            <option value="{{ $cliente['Id:'] ?? '' }}">
-                {{ $cliente['Nombre:'] ?? 'Sin Nombre' }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                    
                     <div class="col-md-6">
-    <label class="form-label fw-bold">Empleado</label>
-    <select class="form-select" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
-        <option value="">Seleccione Empleado...</option>
-        @foreach($empleados as $empleado)
-            {{-- Usamos las llaves exactas de tu Map en Java --}}
-            <option value="{{ $empleado['Id:'] ?? '' }}">
-                {{ $empleado['Nombre:'] ?? 'Sin Nombre' }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                        <label class="form-label fw-bold">Cliente</label>
+                        <select class="form-select" id="modal_ID_CLIENTE" name="ID_CLIENTE" required>
+                            <option value="">Seleccione Cliente...</option>
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente['Id:'] ?? '' }}">
+                                    {{ $cliente['Nombre:'] ?? 'Sin Nombre' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="col-md-6">
-    <label class="form-label fw-bold">Estado del Pedido</label>
-    <select class="form-select" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
-        <option value="">Seleccione Estado...</option>
-        @foreach($estados as $estado)
-            {{-- Intentamos con "Id:" o "id_ESTADO_PEDIDO" por si varía el formato --}}
-            <option value="{{ $estado['Id:'] ?? $estado['id_ESTADO_PEDIDO'] ?? $estado['id'] ?? '' }}">
-                {{ $estado['Nombre:'] ?? $estado['nombre_ESTADO'] ?? $estado['nombre'] ?? 'Sin Estado' }}
-            </option>
-        @endforeach
-    </select>
-</div>
-                   <div class="col-md-6">
-    <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
-    <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
-</div>
+                        <label class="form-label fw-bold">Empleado</label>
+                        <select class="form-select" id="modal_ID_EMPLEADO" name="ID_EMPLEADO" required>
+                            <option value="">Seleccione Empleado...</option>
+                            @foreach($empleados as $empleado)
+                                <option value="{{ $empleado['Id:'] ?? '' }}">
+                                    {{ $empleado['Nombre:'] ?? 'Sin Nombre' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Estado del Pedido</label>
+                        <select class="form-select" id="modal_ID_ESTADO_PEDIDO" name="ID_ESTADO_PEDIDO" required>
+                            <option value="">Seleccione Estado...</option>
+                            @foreach($estados as $estado)
+                                <option value="{{ $estado['Id:'] ?? $estado['id_ESTADO_PEDIDO'] ?? $estado['id'] ?? '' }}">
+                                    {{ $estado['Nombre:'] ?? $estado['nombre_ESTADO'] ?? $estado['nombre'] ?? 'Sin Estado' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
+                        <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
+                    </div>
+
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Total Producto ($)</label>
                         <input type="number" class="form-control" id="modal_TOTAL_PRODUCTO" name="TOTAL_PRODUCTO" readonly>
@@ -179,7 +236,7 @@
                             <h6 class="fw-bold text-secondary mb-0"><i class="fas fa-shopping-basket me-2"></i>Artículos</h6>
                             <button type="button" class="btn btn-sm btn-success" id="btn-agregar-fila"><i class="fas fa-plus"></i> Añadir</button>
                         </div>
-                        <div class="table-responsive border rounded">
+                        <div class="table-responsive border rounded bg-white">
                             <table class="table table-sm table-striped mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -231,7 +288,6 @@
         const detallesBody = document.getElementById('detalles-pedido-body');
 
         function agregarFila(detalle = null) {
-            // Eliminar mensaje de "Añada productos" si existe
             const emptyRow = detallesBody.querySelector('tr td[colspan]');
             if (emptyRow) detallesBody.innerHTML = '';
 
@@ -246,18 +302,18 @@
 
             const fila = document.createElement('tr');
             fila.innerHTML = `
-                <td>
+                <td data-label="Producto">
                     <select name="productos[]" class="form-select form-select-sm select-producto" required>
                         <option value="">Seleccione...</option>
                         ${opciones}
                     </select>
                 </td>
-                <td><input type="number" name="cantidades[]" class="form-control form-control-sm text-center input-cantidad" value="${cantidad}" min="1" required></td>
-                <td class="text-end align-middle">
+                <td data-label="Cant."><input type="number" name="cantidades[]" class="form-control form-control-sm text-center input-cantidad" value="${cantidad}" min="1" required></td>
+                <td data-label="Precio Unit." class="text-end align-middle">
                     <span class="precio-unit text-muted">$${Number(precio).toLocaleString('es-CO')}</span>
                     <input type="hidden" name="precios_unitarios[]" class="input-precio-unitario" value="${precio}">
                 </td>
-                <td class="text-end align-middle">
+                <td data-label="Subtotal" class="text-end align-middle">
                     <span class="subtotal-fila fw-bold">$${Number(subtotal).toLocaleString('es-CO')}</span>
                     <input type="hidden" name="subtotales[]" class="input-subtotal" value="${subtotal}">
                 </td>
@@ -279,7 +335,6 @@
             document.getElementById('modal_TOTAL_PRODUCTO').value = totalGeneral;
         }
 
-        // Evento para el botón Añadir
         document.getElementById('btn-agregar-fila').onclick = function(e) {
             e.preventDefault();
             agregarFila();
@@ -322,7 +377,6 @@
             }
         });
 
-        // Evento para editar
         document.addEventListener('click', function(e) {
             const btnEdit = e.target.closest('.btn-edit-pedido');
             if (btnEdit) {
@@ -338,8 +392,8 @@
                 document.getElementById('modal_TOTAL_PRODUCTO').value = data.total_PRODUCTO || data.TOTAL_PRODUCTO;
                 
                 if (data.fecha_ENTREGA && data.fecha_ENTREGA !== 'N/A') {
-                const fechaFormateada = data.fecha_ENTREGA.replace(" ", "T").substring(0, 16);
-                document.getElementById('modal_FECHA_ENTREGA').value = fechaFormateada;
+                    const fechaFormateada = data.fecha_ENTREGA.replace(" ", "T").substring(0, 16);
+                    document.getElementById('modal_FECHA_ENTREGA').value = fechaFormateada;
                 }
 
                 detallesBody.innerHTML = '';
@@ -355,3 +409,4 @@
     });
 </script>
 @endpush
+

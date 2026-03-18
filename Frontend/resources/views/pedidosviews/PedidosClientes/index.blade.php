@@ -9,17 +9,73 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body, html { height: 100%; overflow: hidden; }
-        .container-fluid, .row { height: 100vh; }
-        .sidebar { height: 100vh; position: sticky; top: 0; z-index: 1000; }
-        .main-content { height: 100vh; overflow-y: auto; background-color: #fdfaf6; padding: 0 !important; }
-        .sticky-header-section { position: sticky; top: 0; z-index: 150; background-color: #fdfaf6; padding: 1.5rem 1.5rem 0 1.5rem; border-bottom: 1px solid #dee2e6; }
-        .table-responsive { overflow: visible !important; padding: 0 1.5rem 1.5rem 1.5rem; }
-        .table { border-collapse: separate !important; border-spacing: 0 !important; }
-        .table thead th { position: sticky; top: 103px; z-index: 100; background-color: #ffffff !important; border-bottom: 2px solid #dee2e6 !important; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        .table-bordered th, .table-bordered td { border: 1px solid #dee2e6 !important; }
-        .btn-quitar { border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; }
-    </style>
+    body, html { height: 100%; }
+
+    .container-fluid { min-height: 100vh; }
+
+    .sidebar {
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .main-content {
+        height: 100vh;
+        overflow-y: auto;
+        background-color: #fdfaf6;
+        padding: 0 !important;
+    }
+
+    .sticky-header-section {
+        position: sticky;
+        top: 0;
+        z-index: 150;
+        background-color: #fdfaf6;
+        padding: 1.5rem 1.5rem 0 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-responsive { overflow: visible !important; padding: 0 1.5rem 1.5rem 1.5rem; }
+    .table { border-collapse: separate !important; border-spacing: 0 !important; }
+
+    .table thead th {
+        position: sticky;
+        top: 103px;
+        z-index: 100;
+        background-color: #ffffff !important;
+        border-bottom: 2px solid #dee2e6 !important;
+        box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+    }
+
+    .table-bordered th, .table-bordered td { border: 1px solid #dee2e6 !important; }
+    .btn-quitar { border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; }
+
+   @media (max-width: 767.98px) {
+    body, html { overflow: auto; }
+    .row { height: auto; }
+    .main-content { height: auto; overflow-y: visible; }
+
+    .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: -100%;
+        height: 100vh !important;
+        width: 280px;
+        z-index: 1050;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .sticky-header-section {
+        position: relative !important;
+        top: auto !important;
+    }
+}
+</style>
 @endpush
 
 @section('content')
@@ -117,7 +173,6 @@
     </div>
 </div>
 
-{{-- ===== MODAL GESTIÓN DE PEDIDO (idéntico al admin) ===== --}}
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius: 12px;">
@@ -233,7 +288,6 @@
         const form  = document.getElementById('pedidoForm');
         const detallesBody = document.getElementById('detalles-pedido-body');
 
-        /* ---------- helpers ---------- */
 
         function agregarFila(detalle = null) {
             const emptyRow = detallesBody.querySelector('tr td[colspan]');
@@ -280,14 +334,12 @@
             document.getElementById('modal_TOTAL_PRODUCTO').value = total;
         }
 
-        /* ---------- eventos ---------- */
 
         document.getElementById('btn-agregar-fila').onclick = function(e) {
             e.preventDefault();
             agregarFila();
         };
 
-        // Crear pedido
         document.getElementById('btn-create-pedido').addEventListener('click', () => {
             document.getElementById('pedidoModalLabel').textContent = 'Crear Nuevo Pedido';
             form.action = "{{ route('pedidos.store') }}";
@@ -297,7 +349,6 @@
             modal.show();
         });
 
-        // Cambio en selects / cantidades
         detallesBody.addEventListener('input', (e) => {
             if (e.target.classList.contains('select-producto') || e.target.classList.contains('input-cantidad')) {
                 const fila    = e.target.closest('tr');
@@ -315,7 +366,6 @@
             }
         });
 
-        // Quitar fila
         detallesBody.addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-quitar');
             if (btn) {
@@ -327,7 +377,6 @@
             }
         });
 
-        // Editar pedido
         document.addEventListener('click', function(e) {
             const btnEdit = e.target.closest('.btn-edit-pedido');
             if (!btnEdit) return;
@@ -343,7 +392,6 @@
             document.getElementById('modal_ID_ESTADO_PEDIDO').value = data.id_ESTADO_PEDIDO || data.ID_ESTADO_PEDIDO || data.estado_pedido_id;
             document.getElementById('modal_TOTAL_PRODUCTO').value  = data.total_PRODUCTO || data.TOTAL_PRODUCTO || data.total_producto;
 
-            // Fecha de entrega
             const fechaRaw = data.fecha_ENTREGA || data.FECHA_ENTREGA || data.fecha_entrega;
             if (fechaRaw && fechaRaw !== 'N/A') {
                 document.getElementById('modal_FECHA_ENTREGA').value = fechaRaw.replace(' ', 'T').substring(0, 16);
@@ -351,7 +399,6 @@
                 document.getElementById('modal_FECHA_ENTREGA').value = '';
             }
 
-            // Detalles / artículos
             detallesBody.innerHTML = '';
             const detalles = data.detalles || data.detalle_pedidos || [];
             if (detalles.length > 0) {

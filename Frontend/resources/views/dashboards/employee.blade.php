@@ -134,7 +134,6 @@
                                 </div>
                                 <h4 class="fw-bold">Crear Pedido</h4>
                                 <p class="text-muted">Inicia una nueva orden de venta para un cliente.</p>
-                                {{-- Abre el modal de creación en lugar de redirigir --}}
                                 <button type="button" id="btn-create-pedido"
                                     class="btn btn-primary btn-lg w-100 mt-2"
                                     style="background: #a67c52; border: none;">
@@ -158,12 +157,38 @@
                 </div>
 
             </div>{{-- /dashboard-section --}}
+
+            {{-- ===== SECCIÓN MI PERFIL ===== --}}
+            <div class="section-content-inner" id="perfil-section" style="display: none;">
+                <div class="pt-3 mb-4 border-bottom pb-2">
+                    <h2 class="fw-bold">Mi Perfil</h2>
+                    <p class="text-muted">Información de tu cuenta</p>
+                </div>
+                <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <i class="bi bi-person-circle" style="font-size: 6rem; color: #a67c52;"></i>
+                        </div>
+                        <div class="col-md-8">
+                            <p class="mb-1 text-muted">Nombre completo</p>
+                            <h5 class="text-capitalize mb-3" id="perfil-nombre">—</h5>
+                            <p class="mb-1 text-muted">Correo electrónico</p>
+                            <h5 class="mb-3" id="perfil-email">—</h5>
+                            <p class="mb-1 text-muted">Rol</p>
+                            <h5 class="mb-3" id="perfil-rol">—</h5>
+                            <span class="badge" style="background-color: #a67c52;">EMPLEADO REGISTRADO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- /perfil-section --}}
+
         </main>
     </div>
 </div>
 
 {{-- ===================================================
-     MODAL CREAR PEDIDO  (idéntico al admin / index)
+     MODAL CREAR PEDIDO
      =================================================== --}}
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -291,15 +316,12 @@ async function cargarProductosDesdeJava() {
    ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Cargar productos al abrir la página
     cargarProductosDesdeJava();
 
     const pedidoModal  = new bootstrap.Modal(document.getElementById('pedidoModal'));
     const detallesBody = document.getElementById('detalles-pedido-body');
 
-    /* --- helpers --- */
     function agregarFila() {
-        // Limpiar mensaje vacío si existe
         if (detallesBody.querySelector('td[colspan]')) {
             detallesBody.innerHTML = '';
         }
@@ -346,20 +368,17 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modal_TOTAL_PRODUCTO').value = total;
     }
 
-    /* --- abrir modal limpio --- */
     document.getElementById('btn-create-pedido').addEventListener('click', function () {
         document.getElementById('pedidoForm').reset();
         detallesBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Añada productos al pedido.</td></tr>';
         pedidoModal.show();
     });
 
-    /* --- añadir fila --- */
     document.getElementById('btn-agregar-fila').addEventListener('click', function (e) {
         e.preventDefault();
         agregarFila();
     });
 
-    /* --- cambios en select de producto o cantidad --- */
     detallesBody.addEventListener('input', function (e) {
         if (e.target.classList.contains('select-producto') ||
             e.target.classList.contains('input-cantidad')) {
@@ -379,7 +398,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    /* --- quitar fila --- */
     detallesBody.addEventListener('click', function (e) {
         const btn = e.target.closest('.btn-quitar');
         if (btn) {
@@ -419,15 +437,28 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             welcomeTitle.innerText = '¡Bienvenido, Empleado!';
         }
+
+        // Llenar datos del perfil
+        const nombreCompleto = userData?.nombre || userData?.name  || 'No disponible';
+        const emailUsuario   = userData?.email  || userData?.correo || 'No disponible';
+        const rolUsuario     = userRole === 'EMPLEADO' ? 'Empleado' : (userRole ?? 'Empleado');
+
+        const elNombre = document.getElementById('perfil-nombre');
+        const elEmail  = document.getElementById('perfil-email');
+        const elRol    = document.getElementById('perfil-rol');
+
+        if (elNombre) elNombre.textContent = nombreCompleto;
+        if (elEmail)  elEmail.textContent  = emailUsuario;
+        if (elRol)    elRol.textContent    = rolUsuario;
     }
 
     /* =====================================================
        4. NAVEGACIÓN INTERNA DEL SIDEBAR
        ===================================================== */
-    const navLinks    = document.querySelectorAll('.nav-link');
-    const sections    = document.querySelectorAll('.section-content-inner');
+    const navLinks      = document.querySelectorAll('.nav-link');
+    const sections      = document.querySelectorAll('.section-content-inner');
     const dashboardMain = document.getElementById('main-actions');
-    const statsMain   = document.getElementById('stats-row');
+    const statsMain     = document.getElementById('stats-row');
 
     navLinks.forEach(link => {
         link.addEventListener('click', function (e) {
