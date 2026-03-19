@@ -100,10 +100,10 @@
                             <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
                         </div>
                     @endif
-                    <a href="{{ route('dashboard.inventario') }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+                    <a href="{{ route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
                                 <i class="fas fa-arrow-left"></i>
                     </a>
-                    <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-oscuro);">Catálogo de Ingredientes</h1>
+                    <h1 class="dashboard-page-title" style="color: var(--panaderia-marron-oscuro);">Catálogo de Ingredientes</h1>
                     <p class="text-muted">Gestión visual de insumos para producción.</p>
                 </div>
                 <button class="btn btn-panaderia px-4 py-2" data-bs-toggle="modal" data-bs-target="#crearModal">
@@ -177,7 +177,7 @@
                                       class="flex-grow-1">
                                     @csrf @method('DELETE')
                                     <button type="submit"
-                                            class="btn btn-outline-danger btn-sm w-100 border-2 fw-bold"
+                                            class="btn btn-panaderia-action -sm w-100 border-2 fw-bold"
                                             onclick="return confirm('¿Eliminar este ingrediente?')">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -262,7 +262,7 @@
                                 <div class="modal-footer border-0">
                                     <button type="button" class="btn btn-light px-4"
                                             data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-warning px-4 fw-bold">
+                                    <button type="submit" class="btn btn-panaderia-action px-4 fw-bold">
                                         <i class="fas fa-save me-2"></i>Actualizar
                                     </button>
                                 </div>
@@ -357,7 +357,7 @@
 
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-panaderia-action px-4" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-panaderia px-4 fw-bold">
                         <i class="fas fa-save me-2"></i>Registrar
                     </button>

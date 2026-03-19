@@ -28,7 +28,7 @@
         
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2">Editar Pedido #{{ $pedido['id_PEDIDO'] }}</h1>
+                <h1 class="dashboard-page-title">Editar Pedido #{{ $pedido['id_PEDIDO'] }}</h1>
                 <a href="{{ route('pedidos.index') }}" class="btn btn-outline-secondary shadow-sm">
                     <i class="fas fa-arrow-left"></i> Volver al Listado
                 </a>

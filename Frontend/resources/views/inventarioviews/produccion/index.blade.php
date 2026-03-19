@@ -124,23 +124,22 @@
             <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
 
                 {{-- Header --}}
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4 border-bottom">
-                    <div>
-                        
-                    <a href="{{route('dashboard.inventario') }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-                    <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-hover);">
-                            <i class="fas fa-industry me-2"></i>Gestión de Producción
-                        </h1>
-                        <p class="text-muted mb-0">Registro y reversión de producción de productos terminados.</p>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <a href="{{route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <div>
+                            <h1 class="dashboard-page-title">Gestión de Producción</h1>
+                            <p class="text-muted mb-0">Registro y reversión de producción de productos terminados.</p>
+                        </div>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-produccion px-4 py-2 shadow-sm"
                                 data-bs-toggle="modal" data-bs-target="#registrarModal">
                             <i class="fas fa-plus-circle me-2"></i>Nueva Producción
                         </button>
-                        <a href="{{ route('produccion.index') }}" class="btn btn-outline-secondary px-3">
+                        <a href="{{ route('produccion.index') }}" class="btn btn-panaderia-action px-3">
                             <i class="fas fa-sync"></i>
                         </a>
                     </div>
@@ -341,7 +340,7 @@
 
                     <div class="modal-footer border-0 bg-white px-4 pb-4"
                         style="border-radius: 0 0 var(--panaderia-radius-xl) var(--panaderia-radius-xl);">
-                        <button type="button" class="btn btn-light px-4"
+                        <button type="button" class="btn btn-panaderia-action px-4"
                                 data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" id="btnRegistrar"
                                 class="btn btn-produccion px-4 fw-bold" disabled>

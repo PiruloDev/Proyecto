@@ -89,11 +89,11 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4">
                 <div>
-                <a href="{{ route('dashboard.inventario') }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+                <a href="{{ route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
             <i class="fas fa-arrow-left"></i>
                 </a>    
                 
-                <h1 class="h2 fw-bold" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
+                <h1 class="dashboard-page-title" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
                     <p class="text-muted small">Gestión de proporciones e ingredientes por producto.</p>
                 </div>
                 <button class="btn btn-panaderia px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
@@ -105,7 +105,7 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
                     <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if(session('error'))
@@ -221,7 +221,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="fw-bold mb-0"><i class="fas fa-list me-2"></i>Composición</h6>
-                        <button type="button" id="add-detail-btn" class="btn btn-sm btn-panaderia px-3 shadow-sm">
+                        <button type="button" id="add-detail-btn" class="btn btn-panaderia-action -sm -panaderia px-3 shadow-sm">
                             <i class="fas fa-plus me-1"></i> Agregar Insumo
                         </button>
                     </div>

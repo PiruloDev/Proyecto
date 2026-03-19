@@ -16,8 +16,8 @@
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2"><i class="bi bi-receipt me-2"></i>Órdenes de Salida</h1>
-                <button class="btn-nuevo" onclick="abrirModal()">
+                <h1 class="dashboard-page-title">Órdenes de Salida</h1>
+                <button class="btn btn-panaderia-action -nuevo" onclick="abrirModal()">
                     <i class="bi bi-plus-circle me-1"></i>Nueva Orden
                 </button>
             </div>
@@ -49,7 +49,7 @@
                             </div>
                         </div>
                         <div class="card-actions">
-                            <button class="btn-action btn-editar" onclick="editarModal(
+                            <button class="btn btn-panaderia-action -action -editar" onclick="editarModal(
                                 {{ $venta->ID_FACTURA }},
                                 {{ $venta->ID_CLIENTE }},
                                 {{ $venta->ID_PEDIDO }},
@@ -74,56 +74,61 @@
     </div>
 </div>
 
-<div id="modal-overlay" onclick="cerrarModal()"></div>
+{{-- Modal Bootstrap para Órdenes --}}
+<div class="modal fade" id="ordenModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="border-radius: 12px 12px 0 0; background: #a67c52;">
+                <h5 class="modal-title" id="modal-titulo">Nueva Orden</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="cerrarModal()"></button>
+            </div>
+            <form id="formulario-modal" method="POST" action="{{ route('ordenes.salida.store') }}">
+                @csrf
+                <div id="method-field"></div>
+                <div class="modal-body row g-3">
+                    {{-- Select con nombres reales de clientes --}}
+                    <div class="col-12">
+                        <label for="ID_CLIENTE" class="form-label fw-bold">Cliente</label>
+                        <select class="form-select" name="ID_CLIENTE" id="ID_CLIENTE" required>
+                            <option value="" disabled selected>-- Selecciona un cliente --</option>
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente->ID_CLIENTE }}">
+                                    {{ $cliente->NOMBRE_CLI }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-<div id="modal-box">
-    <div class="modal-header">
-        <h2 id="modal-titulo">Nueva Orden</h2>
-        <button class="btn-close-modal" onclick="cerrarModal()" type="button">&times;</button>
+                    {{-- Select pedidos filtrados por cliente --}}
+                    <div class="col-12">
+                        <label for="ID_PEDIDO" class="form-label fw-bold">Pedido</label>
+                        <select class="form-select" name="ID_PEDIDO" id="ID_PEDIDO" required>
+                            <option value="" disabled selected>-- Primero selecciona un cliente --</option>
+                            @foreach($pedidos as $pedido)
+                                <option value="{{ $pedido->ID_PEDIDO }}" data-cliente="{{ $pedido->ID_CLIENTE }}">
+                                    Pedido #{{ $pedido->ID_PEDIDO }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="FECHA_FACTURACION" class="form-label fw-bold">Fecha Facturación</label>
+                        <input type="datetime-local" class="form-control" name="FECHA_FACTURACION" id="FECHA_FACTURACION" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="TOTAL_FACTURA" class="form-label fw-bold">Total Factura</label>
+                        <input type="number" step="0.01" class="form-control" name="TOTAL_FACTURA" id="TOTAL_FACTURA" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal" onclick="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn text-white" style="background: #a67c52;">Guardar Orden</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <form id="formulario-modal" method="POST" action="{{ route('ordenes.salida.store') }}">
-        @csrf
-        <div id="method-field"></div>
-
-        {{-- Select con nombres reales de clientes --}}
-        <div class="form-group">
-            <label for="ID_CLIENTE">Cliente</label>
-            <select name="ID_CLIENTE" id="ID_CLIENTE" required>
-                <option value="" disabled selected>-- Selecciona un cliente --</option>
-                @foreach($clientes as $cliente)
-                    <option value="{{ $cliente->ID_CLIENTE }}">
-                        {{ $cliente->NOMBRE_CLI }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        {{-- Select pedidos filtrados por cliente --}}
-        <div class="form-group">
-            <label for="ID_PEDIDO">Pedido</label>
-            <select name="ID_PEDIDO" id="ID_PEDIDO" required>
-                <option value="" disabled selected>-- Primero selecciona un cliente --</option>
-                @foreach($pedidos as $pedido)
-                    <option value="{{ $pedido->ID_PEDIDO }}" data-cliente="{{ $pedido->ID_CLIENTE }}">
-                        Pedido #{{ $pedido->ID_PEDIDO }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="FECHA_FACTURACION">Fecha Facturación</label>
-            <input type="datetime-local" name="FECHA_FACTURACION" id="FECHA_FACTURACION" required>
-        </div>
-
-        <div class="form-group">
-            <label for="TOTAL_FACTURA">Total Factura</label>
-            <input type="number" step="0.01" name="TOTAL_FACTURA" id="TOTAL_FACTURA" required>
-        </div>
-
-        <button type="submit" class="btn-submit">Guardar Orden</button>
-    </form>
 </div>
 
 <script>
@@ -155,8 +160,7 @@
     });
 
     function abrirModal() {
-        document.getElementById('modal-overlay').classList.add('show');
-        document.getElementById('modal-box').classList.add('show');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('ordenModal')).show();
         document.getElementById('modal-titulo').textContent = 'Nueva Orden';
         document.getElementById('formulario-modal').action = '{{ route("ordenes.salida.store") }}';
         document.getElementById('method-field').innerHTML = '';
@@ -167,13 +171,10 @@
         selectPedido.querySelectorAll('option[data-cliente]').forEach(opt => opt.style.display = 'none');
         selectPedido.querySelector('option[disabled]').textContent = '-- Primero selecciona un cliente --';
         selectPedido.value = '';
-
-        document.body.style.overflow = 'hidden';
     }
 
     function editarModal(id, clienteId, pedidoId, fecha, total) {
-        document.getElementById('modal-overlay').classList.add('show');
-        document.getElementById('modal-box').classList.add('show');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('ordenModal')).show();
         document.getElementById('modal-titulo').textContent = 'Editar Orden #' + id;
         document.getElementById('formulario-modal').action = '/reportes/ordenes-salida/' + id;
         document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PATCH">';
@@ -185,19 +186,12 @@
 
         document.getElementById('FECHA_FACTURACION').value = fecha;
         document.getElementById('TOTAL_FACTURA').value = total;
-
-        document.body.style.overflow = 'hidden';
     }
 
     function cerrarModal() {
-        document.getElementById('modal-overlay').classList.remove('show');
-        document.getElementById('modal-box').classList.remove('show');
-        document.body.style.overflow = 'auto';
+        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('ordenModal'));
+        if(modalInstance) modalInstance.hide();
     }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') cerrarModal();
-    });
 
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {

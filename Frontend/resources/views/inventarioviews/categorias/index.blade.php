@@ -96,12 +96,12 @@
                 <a href="{{ url()->previous() }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
             <i class="fas fa-arrow-left"></i>
         </a>
-                <h1 class="h2 fw-bold" style="color: #3e2723;">Categorías de Ingredientes</h1>
+                <h1 class="dashboard-page-title" style="color: #3e2723;">Categorías de Ingredientes</h1>
                     
                     
                     <p class="text-muted small mb-0">Organiza los insumos de la panadería</p>
                 </div>
-                <button class="btn btn-crear shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
+                <button class="btn btn-panaderia-action -crear shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
                     <i class="fas fa-plus-circle me-2"></i> Nueva Categoría
                 </button>
             </div>
@@ -117,7 +117,7 @@
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 15px;">
                     <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
