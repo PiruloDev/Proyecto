@@ -7,6 +7,7 @@ use App\Services\Inventario\RecetasService;
 use App\Services\Productos\ProductoService; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class RecetasController extends Controller
 {
@@ -25,7 +26,7 @@ class RecetasController extends Controller
         $productos = $this->productosService->obtenerProductos(); 
 
         try {
-            $responseIng = Http::get('http:http://44.195.189.38:8080/recetas/lista-modal');
+            $responseIng = Http::get('http://44.195.189.38:8080/recetas/lista-modal');
             $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
         } catch (\Exception $e) {
             $ingredientesParaModal = []; 
