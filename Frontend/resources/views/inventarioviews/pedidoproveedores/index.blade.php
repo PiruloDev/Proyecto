@@ -84,12 +84,12 @@
             {{-- HEADER --}}
 <div class="d-flex justify-content-between align-items-center flex-wrap pt-4 pb-2 mb-4 border-bottom">
     <div class="d-flex align-items-center">
-        <a href="{{ route('dashboard.inventario') }}" class="btn btn-outline-secondary border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+        <a href="{{ route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
             <i class="fas fa-arrow-left"></i>
         </a>
         
         <div>
-            <h1 class="h2 fw-bold mb-0" style="color: #3e2723;">Pedidos a Proveedores</h1>
+            <h1 class="dashboard-page-title" style="color: #3e2723;">Pedidos a Proveedores</h1>
             <p class="text-muted mb-0">Gestión de suministros e insumos para la panadería.</p>
         </div>
     </div>
@@ -113,7 +113,7 @@
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4"
                      style="border-radius: 15px;">
                     <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if(session('error'))

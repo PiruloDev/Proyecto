@@ -136,13 +136,13 @@
 <section class="about-section bg-white py-5 my-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 animate__animated animate__fadeInLeft">
+                <div class="col-md-6 animate__animated animate__fadeInLeft order-2 order-md-1">
                     <h1 class="text-gris-oscuro mb-4 font-weight-bold">La mejor calidad directo a tu casa</h1>
                     <p class="text-gris-oscuro lead">
                         En El Castillo del Pan, la calidad es nuestro compromiso diario. Seleccionamos los mejores ingredientes y aplicamos técnicas artesanales tradicionales. Cada producto lleva el sello de la excelencia, llevando el auténtico sabor de la panadería artesanal directamente a tu mesa, sin intermediarios.
                     </p>
                 </div>
-                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center">
+                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center order-1 order-md-2 mb-4 mb-md-0">
                     <img src="{{ asset('images/panadero.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 325px;">
                 </div>
             </div>
@@ -152,11 +152,11 @@
 <section class="about-section bg-crema py-5 my-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 animate__animated animate__fadeInLeft d-flex justify-content-center">
+                <div class="col-md-6 animate__animated animate__fadeInLeft d-flex justify-content-center mb-4 mb-md-0">
                     <img src="{{ asset('images/preparacion.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 350px;">
                 </div>
                 <div class="col-md-6 animate__animated animate__fadeInRight">
-                    <h1 class="text-gris-oscuro mb-4">Nuestros productos son 100% frescos</h1>
+                    <h1 class="text-gris-oscuro mb-4 font-weight-bold">Nuestros productos son 100% frescos</h1>
                     <p class="text-gris-oscuro lead">
                     La frescura es nuestra promesa. Cada mañana horneamos antes del amanecer para ofrecerte pan recién hecho. Sin conservantes ni aditivos artificiales, solo ingredientes de calidad y proceso artesanal que garantizan sabor, textura y aroma natural desde el horno hasta tus manos.
                     </p>
@@ -167,13 +167,13 @@
     <section class="about-section bg-white py-5 my-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 animate__animated animate__fadeInLeft">
+                <div class="col-md-6 animate__animated animate__fadeInLeft order-2 order-md-1">
                     <h1 class="text-gris-oscuro mb-4 font-weight-bold">Frescura que se siente en tu paladar</h1>
                     <p class="text-gris-oscuro lead">
                         La diferencia se nota al primer bocado. Corteza crujiente, miga esponjosa, aroma irresistible: eso es frescura real. Elaboramos cada producto el mismo día para que disfrutes texturas y sabores auténticos. Más que comer pan, vives una experiencia que despierta recuerdos y crea momentos especiales.
                     </p>
                 </div>
-                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center">
+                <div class="col-md-6 animate__animated animate__fadeInRight d-flex justify-content-center order-1 order-md-2 mb-4 mb-md-0">
                     <img src="{{ asset('images/productoab.jpg') }}" alt="Panadero" class="img-fluid rounded-3 shadow-sm" style="max-width: 325px;">
                 </div>
             </div>

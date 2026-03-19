@@ -4,7 +4,7 @@
 <div class="container">
    <h2 class="mb-4">Estados de Pedido</h2>
 
-   <a href="{{ route('estados.create') }}" class="btn btn-primary mb-3">
+   <a href="{{ route('estados.create') }}" class="btn btn-panaderia-action mb-3">
     Crear nuevo estado
     </a>
     

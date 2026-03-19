@@ -29,7 +29,7 @@
                 <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
             </div>
 
-            <button type="submit" class="btn">
+            <button type="submit" class="btn btn-panaderia-action">
                 <span id="btnVerifyText">Verificar Correo</span>
             </button>
 

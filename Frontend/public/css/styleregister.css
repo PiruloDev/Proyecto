@@ -10,19 +10,22 @@
 }
 
 body {
-    background: url(../images/bg.jpg) no-repeat center center / cover;
-    height: 100vh;
+    background: url(../images/bg.jpg) no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: 'Lato', sans-serif;
+    padding: 40px 20px;
+    box-sizing: border-box;
 }
 
 .registro-container {
     background: var(--container-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     padding: 40px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -30,7 +33,7 @@ body {
     width: 90%;
     max-width: 900px;
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 40px;
     text-align: left;
 }

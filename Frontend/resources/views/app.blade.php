@@ -48,7 +48,7 @@
                 </h1>
                 <p class="mb-0 opacity-75">Administra el catálogo de productos de tu panadería</p>
             </div>
-            <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
+            <button class="btn btn-panaderia-action -lg" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
                 <i class="bi bi-plus-circle"></i> Nuevo Producto
             </button>
         </div>
@@ -82,7 +82,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
+                    <button class="btn btn-panaderia-action w-100" onclick="limpiarFiltros()">
                         <i class="bi bi-arrow-clockwise"></i> Limpiar
                     </button>
                 </div>

@@ -31,12 +31,6 @@
                     Gestionar Pedidos
                 </a>
             </div>
-            <div class="nav-item">
-                <a class="nav-link" href="#perfil" data-section="perfil">
-                    <i class="bi bi-person-circle"></i>
-                    Mi Perfil
-                </a>
-            </div>
         </ul>
 
         <div class="sidebar-divider"></div>

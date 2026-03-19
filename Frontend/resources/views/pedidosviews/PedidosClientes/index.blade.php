@@ -86,7 +86,7 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             <div class="sticky-header-section">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                    <h1 class="h2">Listado de Pedidos</h1>
+                    <h1 class="dashboard-page-title">Listado de Pedidos</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button type="button" class="btn btn-primary me-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
                             <i class="fas fa-plus"></i> Crear Pedido

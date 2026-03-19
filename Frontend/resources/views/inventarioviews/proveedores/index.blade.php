@@ -92,7 +92,7 @@
                     <div class="alert alert-success alert-dismissible fade show custom-alert d-flex align-items-center" role="alert">
                         <i class="fas fa-check-circle me-3 fa-lg"></i>
                         <div><strong>¡Éxito!</strong> {{ session('success') }}</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -119,7 +119,7 @@
             <i class="fas fa-arrow-left"></i>
         </a>    
                 
-                <h1 class="h2 fw-bold" style="color: #3e2723;">Socio Proveedores</h1>
+                <h1 class="dashboard-page-title" style="color: #3e2723;">Socio Proveedores</h1>
                     <p class="text-muted small">Catálogo de contacto y suministros para la panadería.</p>
                 </div>
                 <button class="btn btn-panaderia shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
@@ -146,7 +146,7 @@
                                 <div class="d-flex justify-content-between mb-3">
                                     <div class="icon-box"><i class="fas fa-truck"></i></div>
                                     <div class="dropdown">
-                                        <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                        <button class="btn btn-panaderia-action -link text-muted p-0" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 15px;">
                                             <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal-{{ $prov['idProveedor'] }}"><i class="fas fa-edit me-2 text-warning"></i> Editar</button></li>
                                             <li><hr class="dropdown-divider"></li>

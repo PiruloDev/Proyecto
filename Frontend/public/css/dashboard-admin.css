@@ -416,3 +416,52 @@ html {
         padding-top: 70px;
     }
 }
+
+/* ============================================
+   Títulos Unificados de Dashboards
+   ============================================ */
+.dashboard-page-title {
+    font-family: 'Playfair Display', serif !important;
+    color: var(--panaderia-marron-principal, #5c3a21) !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    letter-spacing: 0.5px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+.dashboard-page-title i {
+    color: var(--panaderia-dorado, #a67c52) !important;
+    margin-right: 0.75rem !important;
+    font-size: 1.8rem !important;
+}
+
+/* ============================================
+   Botón Primario Unificado (Crear/Agregar)
+   ============================================ */
+.btn-panaderia-action {
+    background-color: var(--panaderia-dorado, #a67c52) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 600 !important;
+    transition: all var(--panaderia-transition-normal, 0.3s ease) !important;
+    border-radius: var(--panaderia-radius-sm, 6px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.btn-panaderia-action:hover {
+    background-color: var(--panaderia-marron-hover, #8b6745) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important;
+}
+
+/* ============================================
+   Ajustes Generales del Dashboard
+   ============================================ */
+body, html {
+    overflow-x: hidden;
+}

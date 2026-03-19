@@ -79,10 +79,10 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             <div class="content-wrapper">
                 
-                <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-                    <h2 class="h3">Gestión de Pedidos</h2>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <h2 class="dashboard-page-title">Gestión de Pedidos</h2>
                     <div class="btn-toolbar mt-2 mt-md-0">
-                        <button type="button" class="btn btn-primary me-md-2" id="btn-create-pedido" style="background: #a67c52; border: none;">
+                        <button type="button" class="btn btn-panaderia-action me-md-2" id="btn-create-pedido" >
                             <i class="bi bi-plus-circle"></i> Nuevo Pedido
                         </button>
                         <a href="{{ route('admin.pedidos.index') }}" class="btn btn-outline-secondary">

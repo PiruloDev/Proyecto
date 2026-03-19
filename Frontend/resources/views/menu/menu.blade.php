@@ -145,28 +145,6 @@
 </div>
     </div>
 </section>
-
-<section class="py-5 bg-success text-white text-center">
-    <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
-                <h2 class="display-5 fw-bold mb-4">¿Listo para ordenar?</h2>
-                <p class="lead mb-4">
-                    Contacta con nosotros para realizar tu pedido personalizado o visita nuestra tienda
-                </p>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="tel:+1234567890" class="btn btn-light btn-rounded fw-bold">
-                        <i class="fas fa-phone me-2"></i>Llamar Ahora
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-rounded fw-bold">
-                        <i class="fas fa-map-marker-alt me-2"></i>Visitar Tienda
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 @include('partials.footer')
 @endsection
 
