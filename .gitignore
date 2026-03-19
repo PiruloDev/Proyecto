@@ -1,0 +1,4 @@
+.env
+**/application.properties
+**/application-*.properties
+*.pem
