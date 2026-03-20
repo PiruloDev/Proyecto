@@ -230,7 +230,7 @@ public class PedidosProveedoresService {
         }
 
         // 4. Cambiar el estado del pedido a 'ENTREGADO'
-        String sqlUpdateEstado = "UPDATE pedidos-proveedores SET ESTADO_PEDIDO = 'ENTREGADO' WHERE ID_PEDIDO_PROV = ?";
+        String sqlUpdateEstado = "UPDATE pedidos_proveedores SET ESTADO_PEDIDO = 'ENTREGADO' WHERE ID_PEDIDO_PROV = ?";
         jdbcTemplate.update(sqlUpdateEstado, idPedidoProv);
     }
 }

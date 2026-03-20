@@ -21,27 +21,34 @@ class RecetasController extends Controller
     }
 
     public function index()
-    {
-        $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
-        $productos = $this->productosService->obtenerProductos(); 
+{
+    $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
 
-        try {
-            $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
-            $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
-        } catch (\Exception $e) {
-            $ingredientesParaModal = []; 
-        }
-
-        if (!$resRecetas['success']) {
-            return back()->with('error', $resRecetas['error']);
-        }
-
-        return view('inventarioviews.recetas.index', [
-            'recetas'      => $resRecetas['data'],
-            'productos'    => $productos,
-            'ingredientes' => $ingredientesParaModal 
-        ]);
+    // ✅ Envolver en try/catch
+    try {
+        $productos = $this->productosService->obtenerProductos();
+    } catch (\Exception $e) {
+        $productos = [];
+        Log::error('Error al obtener productos en RecetasController: ' . $e->getMessage());
     }
+
+    try {
+        $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
+        $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
+    } catch (\Exception $e) {
+        $ingredientesParaModal = [];
+    }
+
+    if (!$resRecetas['success']) {
+        return back()->with('error', $resRecetas['error']);
+    }
+
+    return view('inventarioviews.recetas.index', [
+        'recetas'      => $resRecetas['data'],
+        'productos'    => $productos,
+        'ingredientes' => $ingredientesParaModal
+    ]);
+}
 
     public function show($idProducto)
     {
