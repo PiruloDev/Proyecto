@@ -26,7 +26,7 @@ class RecetasController extends Controller
         $productos = $this->productosService->obtenerProductos(); 
 
         try {
-            $responseIng = Http::get('http://44.195.189.38:8080/recetas/lista-modal');
+            $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
             $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
         } catch (\Exception $e) {
             $ingredientesParaModal = []; 
@@ -49,7 +49,7 @@ class RecetasController extends Controller
 
         // ✅ Cargar ingredientes para el select del modal de edición
         try {
-            $responseIng = Http::get('http://http://44.195.189.38:8080/recetas/lista-modal');
+            $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
             $ingredientes = $responseIng->successful() ? $responseIng->json() : [];
         } catch (\Exception $e) {
             $ingredientes = [];

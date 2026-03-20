@@ -11,7 +11,7 @@ class PedidosProveedoresService
 
     public function __construct()
     {
-        $this->baseUrl = env('API_BASE_URL', 'http://localhost:8080'); 
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     protected function getApiClient()
