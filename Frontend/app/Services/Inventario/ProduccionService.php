@@ -67,7 +67,7 @@ class ProduccionService
             // Spring espera el formato de ProduccionRequest (idProducto, cantidadProducida, etc.)
             $response = $this->getApiClient()->post('/inventario/produccion', $data);
 
-            if ($response->successful() && $response->status() === 201) {
+            if ($response->successful() ) {
                 return [
                     'success' => true,
                     'response' => $response->json()
