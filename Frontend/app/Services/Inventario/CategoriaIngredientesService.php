@@ -11,7 +11,7 @@ class CategoriaIngredientesService
     public function __construct()
     {
         // Obtiene la URL base de la API desde el archivo .env
-        $this->baseUrl = env('API_BASE_URL', 'http://44.195.189.38'); 
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     /**

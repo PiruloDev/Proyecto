@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Inventario;
     $pedidos  = $response['success'] ? ($response['data'] ?? []) : [];
 
     try {
-        $proveedores  = Http::get('http://localhost:8080/proveedores')->json() ?? [];
-        $ingredientes = Http::get('http://localhost:8080/ingredientes/lista')->json() ?? [];
+        $proveedores  = Http::get('http://32.193.167.191:8080/proveedores')->json() ?? [];
+        $ingredientes = Http::get('http://32.193.167.191:8080/ingredientes/lista')->json() ?? [];
     } catch (\Exception $e) {
         $proveedores  = [];
         $ingredientes = [];
@@ -102,7 +102,7 @@ namespace App\Http\Controllers\Inventario;
     $pedido = $response['data'];
 
     try {
-        $proveedores = Http::get('http://localhost:8080/proveedores')->json() ?? [];
+        $proveedores = Http::get('http://32.193.167.191:8080/proveedores')->json() ?? [];
     } catch (\Exception $e) {
         $proveedores = [];
     }

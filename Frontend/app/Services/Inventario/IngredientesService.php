@@ -12,7 +12,7 @@ class IngredientesService
     public function __construct()
     {
         // Prioriza la URL del .env, usa localhost:8080 como respaldo
-        $this->baseUrl = env('API_BASE_URL', 'http://localhost:8080'); 
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     /**
