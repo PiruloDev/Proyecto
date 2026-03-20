@@ -191,7 +191,7 @@
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2">Estadísticas</h1>
+                <h1 class="dashboard-page-title">Estadísticas</h1>
             </div>
 
             @if(session('success'))
@@ -208,7 +208,7 @@
 
                 @if(isset($productosMasVendidos) && count($productosMasVendidos) > 0)
                     <div class="chart-container">
-                        <div class="chart-wrapper">
+                        <div class="chart-wrapper" style="max-width: 280px; margin: 0 auto; min-height: 280px; display: flex; justify-content: center; align-items: center;">
                             <canvas id="pieProductosMasVendidos"></canvas>
                         </div>
                         <div class="chart-legend-table">
@@ -299,11 +299,11 @@
 
                     {{-- Gráficos: donut de distribución + barras horizontales --}}
                     <div class="usuarios-charts-grid">
-                        <div>
-                            <canvas id="donutUsuarios" height="220"></canvas>
+                        <div style="height: 280px; display: flex; justify-content: center;">
+                            <canvas id="donutUsuarios"></canvas>
                         </div>
-                        <div>
-                            <canvas id="barUsuarios" height="220"></canvas>
+                        <div style="height: 280px; display: flex; justify-content: center; width: 100%;">
+                            <canvas id="barUsuarios"></canvas>
                         </div>
                     </div>
 
@@ -418,31 +418,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const labels           = productosData.map(p => p.nombreProducto || 'N/A');
     const valores          = productosData.map(p => p.cantidadVendida || 0);
     const backgroundColors = productosData.map((_, i) => colores[i % colores.length]);
+    
+    const totalVentas = valores.reduce((a, b) => a + b, 0);
+    const isZeroSales = totalVentas === 0;
 
     productosData.forEach((_, index) => {
         const legendEl = document.getElementById('legend-color-' + index);
-        if (legendEl) legendEl.style.backgroundColor = colores[index % colores.length];
+        if (legendEl) legendEl.style.backgroundColor = isZeroSales ? '#e9ecef' : colores[index % colores.length];
     });
 
     new Chart(canvas, {
         type: 'pie',
         data: {
-            labels,
+            labels: isZeroSales ? ['Sin ventas aún'] : labels,
             datasets: [{
-                data: valores,
-                backgroundColor: backgroundColors,
+                data: isZeroSales ? [1] : valores,
+                backgroundColor: isZeroSales ? ['#e9ecef'] : backgroundColors,
                 borderColor: '#ffffff',
                 borderWidth: 2,
-                hoverBorderWidth: 3,
-                hoverOffset: 8
+                hoverBorderWidth: isZeroSales ? 2 : 3,
+                hoverOffset: isZeroSales ? 0 : 8
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: !isZeroSales, // Disable tooltip if there are no sales
                     backgroundColor: 'rgba(44, 62, 80, 0.95)',
                     titleColor: '#ffffff',
                     bodyColor: '#ffffff',
@@ -510,6 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 cutout: '62%',
                 plugins: {
                     legend: {
@@ -562,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 indexAxis: 'y',
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
                     tooltip: {

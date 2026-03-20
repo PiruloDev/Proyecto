@@ -49,12 +49,11 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-4 main-content">
             <div class="content-wrapper">
                 <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom gap-3">
                     <div>
-                        <h2 class="h3 mb-1"><i class="bi bi-box-seam"></i> Gestión de Productos</h2>
-                        <p class="text-muted mb-0">Administra el catálogo de productos de tu panadería</p>
+                        <h1 class="dashboard-page-title">Gestión de Productos</h1>
                     </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
+                    <button class="btn btn-panaderia-action mt-2 mt-md-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
                         <i class="bi bi-plus-circle"></i> Nuevo Producto
                     </button>
                 </div>
@@ -63,7 +62,7 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show">
                         <i class="bi bi-check-circle"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
 
@@ -88,7 +87,7 @@
 
                 <!-- Estadísticas rápidas -->
                 <div class="row g-3 mb-4">
-                    <div class="col-md-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stats-card border-0 shadow-sm">
                             <div class="card-body text-center py-3">
                                 <i class="bi bi-box-seam" style="font-size: 2.5rem;"></i>
@@ -98,7 +97,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stats-card border-0 shadow-sm">
                             <div class="card-body text-center py-3">
                                 <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
@@ -108,7 +107,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stats-card border-0 shadow-sm">
                             <div class="card-body text-center py-3">
                                 <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem;"></i>
@@ -120,7 +119,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stats-card border-0 shadow-sm">
                             <div class="card-body text-center py-3">
                                 <i class="bi bi-cash-coin" style="font-size: 2.5rem;"></i>
@@ -137,14 +136,14 @@
                 <div class="card filter-card mb-4">
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-12 col-md-4">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar por nombre...">
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-12 col-md-3">
                                 <select id="filtroCategoria" class="form-select">
                                     <option value="">📦 Todas las categorías</option>
                                     @foreach ($categorias as $id => $nombre)
@@ -153,7 +152,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-12 col-md-3">
                                 <select id="filtroEstado" class="form-select">
                                     <option value="">Todos los estados</option>
                                     <option value="activo">Activo</option>
@@ -161,8 +160,8 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-2">
-                                <button onclick="limpiarFiltros()" class="btn btn-outline-secondary w-100">
+                            <div class="col-12 col-md-2">
+                                <button onclick="limpiarFiltros()" class="btn btn-outline-secondary w-100 h-100">
                                     <i class="bi bi-arrow-clockwise"></i> Limpiar
                                 </button>
                             </div>

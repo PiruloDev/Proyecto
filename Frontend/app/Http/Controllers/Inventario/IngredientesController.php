@@ -34,9 +34,9 @@ class IngredientesController extends Controller
 
     // Proveedores y categorías (los que ya tienes)
     try {
-        $proveedores = Http::get('http://localhost:8080/proveedores')->json() ?? [];
-        $categorias  = Http::get('http://localhost:8080/categorias/ingredientes')->json() ?? [];
-        $unidades    = Http::get('http://localhost:8080/unidades-medida')->json() ?? []; // ← nuevo
+        $proveedores = Http::get('http://32.193.167.191:8080/proveedores')->json() ?? [];
+        $categorias  = Http::get('http://32.193.167.191:8080/categorias/ingredientes')->json() ?? [];
+        $unidades    = Http::get('http://32.193.167.191:8080/unidades-medida')->json() ?? []; // ← nuevo
     } catch (\Exception $e) {
         $proveedores = $categorias = $unidades = [];
     }
@@ -69,7 +69,7 @@ class IngredientesController extends Controller
         $request->validate([
             'idProveedor' => 'required|integer',
             'idCategoria' => 'required|integer',
-            'idUnidadMedida' => 'required|integer',  // ⬅️ AGREGAR ESTA VALIDACIÓN
+            'idUnidadMedida' => 'required|integer', 
             'nombreIngrediente' => 'required|string|max:255',
             'referenciaIngrediente' => 'required|string|max:50',
         ]);

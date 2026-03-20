@@ -5,93 +5,6 @@
 @push('styles')
 <link href="{{ asset('css/variables.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dashboard-client.css') }}" rel="stylesheet">
-<style>
-    /* --- ESTRUCTURA DE SCROLL --- */
-    body, html {
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .container-fluid, .row {
-        height: 100vh;
-    }
-
-    .sidebar {
-        height: 100vh;
-        position: sticky;
-        top: 0;
-        display: flex;
-        flex-direction: column;
-        background-color: #8d734d;
-    }
-
-    .main-content {
-        height: 100vh;
-        overflow-y: auto;
-        padding-bottom: 50px;
-    }
-
-    /* --- ESTILOS DE NAVEGACIÓN --- */
-    .nav-link {
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .nav-link.active {
-        background: rgba(255, 255, 255, 0.2) !important;
-        font-weight: bold;
-    }
-
-    .sidebar-user {
-        margin-top: auto;
-        padding: 20px 15px;
-        background: rgba(0, 0, 0, 0.15);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .logout-btn-custom {
-        color: #ffbaba !important;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 186, 186, 0.2);
-        padding: 10px 15px;
-        border-radius: 8px;
-        width: 100%;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-    }
-
-    .price-badge {
-        background-color: #f0f7ff;
-        color: #0d6efd;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 700;
-    }
-
-    /* --- RESPONSIVIDAD MÓVIL --- */
-    @media (max-width: 767.98px) {
-        body, html { overflow: auto; }
-        .container-fluid, .row { height: auto; }
-        .main-content { height: auto; overflow-y: visible; }
-
-        /* Sidebar fuera del flujo, entra solo al abrir */
-        .sidebar {
-            position: fixed !important;
-            top: 0;
-            left: -100%;
-            height: 100vh !important;
-            width: 280px;
-            z-index: 1050;
-            transition: left 0.3s ease;
-        }
-
-        .sidebar.show {
-            left: 0;
-        }
-    }
-</style>
 @endpush
 
 @section('content')
@@ -157,11 +70,6 @@
                     <li class="nav-item">
                         <a class="nav-link" data-section="detalles-general">
                             <i class="bi bi-journal-text"></i> Detalle de Pedidos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-section="mi-cuenta">
-                            <i class="bi bi-person-circle"></i> Mi Perfil
                         </a>
                     </li>
                 </ul>
@@ -332,68 +240,5 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- SELECTORES ---
-        const navLinks = document.querySelectorAll('.nav-link[data-section]');
-        const sections = document.querySelectorAll('.section-content');
-        const mainContent = document.querySelector('.main-content');
-
-        // --- FUNCIÓN PARA MOSTRAR SECCIONES ---
-        function showSection(sectionId) {
-            // Ocultar todo
-            sections.forEach(s => s.style.display = 'none');
-            
-            // Mostrar la correcta
-            const target = document.getElementById(sectionId + '-section');
-            if (target) {
-                target.style.display = 'block';
-                // Reset del scroll del contenedor principal cada vez que cambias
-                mainContent.scrollTop = 0;
-            }
-        }
-
-        // --- EVENTOS DE CLIC ---
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Actualizar estado activo en el menú
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-
-                // Cambiar sección
-                const sectionName = this.getAttribute('data-section');
-                showSection(sectionName);
-
-                // Cerrar sidebar en móviles si está abierto
-                const sidebar = document.querySelector('.sidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (sidebar.classList.contains('show')) {
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                }
-            });
-        });
-
-        // --- TOGGLE PARA MÓVILES (Hamburgesa) ---
-        const toggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        if(toggle) {
-            toggle.onclick = () => {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-            };
-        }
-
-        if(overlay) {
-            overlay.onclick = () => {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            };
-        }
-    });
-</script>
+<script src="{{ asset('js/dashboard-client.js') }}"></script>
 @endpush

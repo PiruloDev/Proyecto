@@ -45,10 +45,12 @@
 
             <div class="section-content" id="dashboard-section">
 
-                {{-- Bienvenida --}}
-                <div class="welcome-section mb-4 pt-3">
-                    <h2 id="welcome-name" class="fw-bold">Cargando...</h2>
-                    <p class="text-muted">Panel de control operativo de la panadería</p>
+                {{-- Encabezado estándar del dashboard --}}
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <div>
+                        <h1 class="dashboard-page-title" id="welcome-name">Bienvenido</h1>
+                        <p class="text-muted mb-0">Panel de control operativo de la panadería</p>
+                    </div>
                 </div>
 
                 {{-- Alertas de sesión --}}
@@ -67,11 +69,11 @@
 
                 {{-- Tarjetas de estadísticas --}}
                 <div class="row g-3 mb-4" id="stats-row">
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="stat-card p-3 shadow-sm rounded">
                             <div class="d-flex align-items-center">
-                                <div class="card-icon bg-primary-light text-primary p-3 rounded-circle me-3">
-                                    <i class="bi bi-cart-check fs-4"></i>
+                                <div class="card-icon p-3 rounded-circle me-3" style="background: rgba(166,124,82,0.12);">
+                                    <i class="bi bi-cart-check fs-4" style="color: #a67c52;"></i>
                                 </div>
                                 <div>
                                     <div class="stat-number fw-bold fs-4">{{ $pedidosHoy ?? 0 }}</div>
@@ -80,11 +82,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="stat-card p-3 shadow-sm rounded">
                             <div class="d-flex align-items-center">
-                                <div class="card-icon bg-warning-light text-warning p-3 rounded-circle me-3">
-                                    <i class="bi bi-clock fs-4"></i>
+                                <div class="card-icon p-3 rounded-circle me-3" style="background: rgba(166,124,82,0.12);">
+                                    <i class="bi bi-clock fs-4" style="color: #a67c52;"></i>
                                 </div>
                                 <div>
                                     <div class="stat-number fw-bold fs-4">{{ $pedidosPendientes ?? 0 }}</div>
@@ -93,11 +95,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="stat-card p-3 shadow-sm rounded">
                             <div class="d-flex align-items-center">
-                                <div class="card-icon bg-info-light text-info p-3 rounded-circle me-3">
-                                    <i class="bi bi-box-seam fs-4"></i>
+                                <div class="card-icon p-3 rounded-circle me-3" style="background: rgba(166,124,82,0.12);">
+                                    <i class="bi bi-box-seam fs-4" style="color: #a67c52;"></i>
                                 </div>
                                 <div>
                                     <div class="stat-number fw-bold fs-4">{{ $productosDisponibles ?? 0 }}</div>
@@ -106,11 +108,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="stat-card p-3 shadow-sm rounded">
                             <div class="d-flex align-items-center">
-                                <div class="card-icon bg-success-light text-success p-3 rounded-circle me-3">
-                                    <i class="bi bi-check-circle fs-4"></i>
+                                <div class="card-icon p-3 rounded-circle me-3" style="background: rgba(166,124,82,0.12);">
+                                    <i class="bi bi-check-circle fs-4" style="color: #a67c52;"></i>
                                 </div>
                                 <div>
                                     <div class="stat-number fw-bold fs-4">{{ $totalPedidos ?? 0 }}</div>
@@ -124,69 +126,41 @@
                 {{-- Acciones rápidas --}}
                 <div class="orders-section" id="main-actions">
                     <div class="section-header mb-3 border-bottom pb-2">
-                        <h4 class="fw-bold"><i class="fas fa-bolt text-warning me-2"></i>Acciones Rápidas</h4>
+                        <h4 class="fw-bold">Acciones Rápidas</h4>
                     </div>
                     <div class="row g-4">
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <div class="action-card text-center p-5 shadow-sm">
                                 <div class="mb-3">
-                                    <i class="bi bi-plus-circle-fill fs-1 text-primary"></i>
+                                    <i class="bi bi-plus-circle-fill fs-1" style="color: #a67c52;"></i>
                                 </div>
                                 <h4 class="fw-bold">Crear Pedido</h4>
                                 <p class="text-muted">Inicia una nueva orden de venta para un cliente.</p>
                                 <button type="button" id="btn-create-pedido"
-                                    class="btn btn-primary btn-lg w-100 mt-2"
-                                    style="background: #a67c52; border: none;">
-                                    <i class="fas fa-plus me-2"></i>Nueva Orden
+                                    class="btn btn-panaderia-action mt-2 px-4">
+                                    Nueva Orden
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <div class="action-card text-center p-5 shadow-sm">
                                 <div class="mb-3">
-                                    <i class="bi bi-list-check fs-1 text-success"></i>
+                                    <i class="bi bi-list-check fs-1" style="color: #a67c52;"></i>
                                 </div>
                                 <h4 class="fw-bold">Ver Pedidos</h4>
                                 <p class="text-muted">Gestiona, edita o cancela los pedidos existentes.</p>
-                                <a href="{{ route('pedidos.index') }}" class="btn btn-success btn-lg w-100 mt-2">
-                                    <i class="fas fa-search me-2"></i>Ver Listado
+                                <a href="{{ route('pedidos.index') }}" class="btn btn-panaderia-action mt-2 px-4">
+                                    Ver Listado
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-            </div>{{-- /dashboard-section --}}
-
-            {{-- ===== SECCIÓN MI PERFIL ===== --}}
-            <div class="section-content-inner" id="perfil-section" style="display: none;">
-                <div class="pt-3 mb-4 border-bottom pb-2">
-                    <h2 class="fw-bold">Mi Perfil</h2>
-                    <p class="text-muted">Información de tu cuenta</p>
-                </div>
-                <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
-                    <div class="row align-items-center">
-                        <div class="col-md-4 text-center mb-3 mb-md-0">
-                            <i class="bi bi-person-circle" style="font-size: 6rem; color: #a67c52;"></i>
-                        </div>
-                        <div class="col-md-8">
-                            <p class="mb-1 text-muted">Nombre completo</p>
-                            <h5 class="text-capitalize mb-3" id="perfil-nombre">—</h5>
-                            <p class="mb-1 text-muted">Correo electrónico</p>
-                            <h5 class="mb-3" id="perfil-email">—</h5>
-                            <p class="mb-1 text-muted">Rol</p>
-                            <h5 class="mb-3" id="perfil-rol">—</h5>
-                            <span class="badge" style="background-color: #a67c52;">EMPLEADO REGISTRADO</span>
-                        </div>
-                    </div>
-                </div>
             </div>
-            {{-- /perfil-section --}}
-
         </main>
     </div>
 </div>
-
 {{-- ===================================================
      MODAL CREAR PEDIDO
      =================================================== --}}

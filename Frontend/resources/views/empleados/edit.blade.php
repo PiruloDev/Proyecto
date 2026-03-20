@@ -23,7 +23,7 @@
     <div class="row">
         <main class="col-12 main-content">
             <div class="mb-4">
-                <a href="{{ route('empleados.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('empleados.index') }}" class="btn btn-panaderia-action">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
             </div>

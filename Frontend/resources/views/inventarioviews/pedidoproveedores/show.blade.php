@@ -150,7 +150,7 @@
                                     <p class="text-white-50 mb-0 small fw-bold text-uppercase">
                                         Orden de Compra Interna
                                     </p>
-                                    <h2 class="fw-bold mb-0">N° {{ $pedido['numeroPedido'] ?? 'S/N' }}</h2>
+                                    <h2 class="dashboard-page-title">N° {{ $pedido['numeroPedido'] ?? 'S/N' }}</h2>
                                 </div>
                             </div>
                         </div>

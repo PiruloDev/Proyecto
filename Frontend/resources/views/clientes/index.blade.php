@@ -30,8 +30,8 @@
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             <div class="content-wrapper">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="h3">Lista de Clientes</h2>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <h2 class="dashboard-page-title">Lista de Clientes</h2>
                 </div>
 
                 @if($error)
