@@ -1,6 +1,6 @@
-    <?php
+<?php
 
-    namespace App\Services\Inventario;
+namespace App\Services\Inventario;
 
     use Illuminate\Support\Facades\Http;
 

@@ -9,8 +9,13 @@ use App\Helpers\ProductImageHelper;
 
 class Menuproductos extends Controller
 {
-    private $apiBaseUrl = 'http://localhost:8080';
+   protected $baseUrl;
 
+    public function __construct()
+    {
+        // Obtiene la URL base de la API desde el archivo .env
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
+    }
     public function index()
     {
         try {

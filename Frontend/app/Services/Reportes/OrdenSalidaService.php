@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class OrdenSalidaService {
 
+public function __construct()
+    {
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
+    }
+
     /**
      * Obtener todas las ventas/órdenes de salida
      */
