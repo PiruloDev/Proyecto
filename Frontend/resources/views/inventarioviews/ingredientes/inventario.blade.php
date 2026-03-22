@@ -120,6 +120,12 @@
                 </div>
             @endif
 
+            @if (session('error') ?? $error ?? false)
+    <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 15px;">
+        <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') ?? $error }}
+    </div>
+            @endif
+
             {{-- ESTADÍSTICAS RÁPIDAS --}}
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
