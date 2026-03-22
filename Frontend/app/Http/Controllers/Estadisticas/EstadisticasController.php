@@ -25,6 +25,6 @@ class EstadisticasController extends Controller
         $productosMasVendidos = $this->productosMasVendidosService->obtenerProductosMasVendidos(10);
         $usuariosRegistrados  = $this->usuariosRegistradosService->obtenerUsuariosRegistrados();
 
-        return view('estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
+        return view('Estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
     }
 }

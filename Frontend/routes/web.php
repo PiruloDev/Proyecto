@@ -223,42 +223,55 @@ Route::prefix('/inventario/pedidos-proveedores')->group(function () {
 
 
 // --------------------------------------------
-// INGREDIENTES - CRUD COMPLETO
+// INGREDIENTES — Catálogo referencial (CRUD)
+// Pantalla: gestión de ingredientes como entidad
+// URL: /inventario/ingredientes
 // --------------------------------------------
 Route::prefix('/inventario/ingredientes')->group(function () {
-    // 1. Listar/Index (Vista completa de gestión)
+
+    // Listar catálogo completo
     Route::get('/', [IngredientesController::class, 'index'])
          ->name('ingredientes.index');
 
-    // 2. Vista de Inventario Simple (Stock) ⬅️ MOVIDA AQUÍ
-    Route::get('/stock', [IngredientesController::class, 'inventario'])
-         ->name('ingredientes.inventario');
-
-    // 3. Formulario de Creación
+    // Crear
     Route::get('/create', [IngredientesController::class, 'create'])
          ->name('ingredientes.create');
-
-    // 4. Almacenar (Store)
     Route::post('/store', [IngredientesController::class, 'store'])
          ->name('ingredientes.store');
 
-    // 5. Mostrar Detalle (Show)
+    // Detalle
     Route::get('/show/{id}', [IngredientesController::class, 'show'])
          ->name('ingredientes.show');
 
-    // 6. Actualización (Update)
+    // Editar
     Route::put('/update/{id}', [IngredientesController::class, 'update'])
          ->name('ingredientes.update');
 
-    // 7. Actualización Especial de Cantidad (Stock)
-    Route::patch('/update-cantidad/{id}', [IngredientesController::class, 'updateCantidad'])
-         ->name('ingredientes.updateCantidad');
-
-    // 8. Eliminar (Destroy)
+    // Eliminar
     Route::delete('/delete/{id}', [IngredientesController::class, 'destroy'])
          ->name('ingredientes.destroy');
 });
 
+// Ingresar stock (fuera del prefix porque la ruta viene del JS fetch de almacén)
+Route::post('/ingredientes/{id}/ingresar-stock', [IngredientesController::class, 'ingresarStock'])
+     ->name('ingredientes.ingresarStock');
+
+
+// --------------------------------------------
+// ALMACÉN — Control de stock operativo
+// Pantalla: monitoreo y reposición de cantidades
+// URL: /inventario/almacen
+// --------------------------------------------
+Route::prefix('/inventario/almacen')->group(function () {
+
+    // Vista principal de stock
+    Route::get('/', [IngredientesController::class, 'inventario'])
+         ->name('almacen.index');
+
+    // Actualización de cantidad (si lo necesitas por ruta, no solo AJAX)
+    Route::patch('/update-cantidad/{id}', [IngredientesController::class, 'updateCantidad'])
+         ->name('almacen.updateCantidad');
+});
 
 // --------------------------------------------
 // RECETAS - CRUD
