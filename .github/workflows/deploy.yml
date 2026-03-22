@@ -1,0 +1,32 @@
+name: Deploy a EC2
+
+on:
+  push:
+    branches:
+      - produccion
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo systemctl start mysql || true
+            sudo fuser -k 8080/tcp || true
+            sudo fuser -k 80/tcp || true
+
+            cd "/home/ubuntu/Desktop/Proyecto/Proyecto"
+            git pull origin produccion
+
+            cd "/home/ubuntu/Desktop/Proyecto/Proyecto/API (SpringBoot)/Proyecto/"
+            chmod +x mvnw
+            nohup ./mvnw spring-boot:run > /home/ubuntu/backend.log 2>&1 &
+
+            cd /home/ubuntu/Desktop/Proyecto/Proyecto/Frontend/
+            sudo nohup php artisan serve --host=0.0.0.0 --port=80 > /home/ubuntu/frontend.log 2>&1 &

@@ -15,7 +15,6 @@ class Menuproductos extends Controller
     {
         $this->apiBaseUrl = env('API_BASE_URL', 'http://localhost:8080');
     }
-
     public function index()
     {
         try {

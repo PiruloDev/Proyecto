@@ -12,7 +12,7 @@ class ProduccionService
     public function __construct()
     {
         // Obtiene la URL base de la API desde el archivo .env
-        $this->baseUrl = env('API_BASE_URL', 'http://44.195.189.38:8080'); 
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     protected function getApiClient()
@@ -67,7 +67,7 @@ class ProduccionService
             // Spring espera el formato de ProduccionRequest (idProducto, cantidadProducida, etc.)
             $response = $this->getApiClient()->post('/inventario/produccion', $data);
 
-            if ($response->successful() && $response->status() === 201) {
+            if ($response->successful() ) {
                 return [
                     'success' => true,
                     'response' => $response->json()

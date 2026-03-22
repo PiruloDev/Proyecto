@@ -9,6 +9,9 @@ public class IngredienteListadoDTO {
     private String referenciaIngrediente;
     private String abreviaturaUnidad; // ← nuevo
 
+    private Long idUnidadMedida; // ← AGREGAR
+
+
     // Constructor vacío (necesario para el nuevo mapper manual)
     public IngredienteListadoDTO() {}
 
@@ -39,4 +42,8 @@ public class IngredienteListadoDTO {
 
     public String getAbreviaturaUnidad() { return abreviaturaUnidad; } // ← nuevo
     public void setAbreviaturaUnidad(String abreviaturaUnidad) { this.abreviaturaUnidad = abreviaturaUnidad; } // ← nuevo
+
+    public Long getIdUnidadMedida() { return idUnidadMedida; }
+    public void setIdUnidadMedida(Long idUnidadMedida) { this.idUnidadMedida = idUnidadMedida; }
+
 }
