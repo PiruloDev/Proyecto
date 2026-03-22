@@ -8,7 +8,12 @@ use App\Http\Controllers\Controller;
 
 class Categoriaproductos extends Controller
 {
-    private $apiBaseUrl = 'http://localhost:8080';
+    private $apiBaseUrl;
+
+    public function __construct()
+    {
+        $this->apiBaseUrl = env('API_BASE_URL', 'http://localhost:8080');
+    }
 
     public function index()
     {
