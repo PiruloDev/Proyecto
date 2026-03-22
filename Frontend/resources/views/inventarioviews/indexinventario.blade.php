@@ -77,7 +77,7 @@
                             ['route' => 'produccion.index', 'icon' => 'bi-gear-wide-connected', 'title' => 'Fabricación', 'desc' => 'Órdenes y consumo de stock.'],
                             ['route' => 'proveedores.index', 'icon' => 'bi-truck', 'title' => 'Proveedores', 'desc' => 'Directorio y contactos.'],
                             ['route' => 'pedidoproveedores.index', 'icon' => 'bi-receipt', 'title' => 'Pedidos Compra', 'desc' => 'Órdenes de reposición.'],
-                            ['route' => 'ingredientes.inventario', 'icon' => 'bi-house-door', 'title' => 'Almacén', 'desc' => 'Control físico de stock.'],
+                            ['route' => 'almacen.index', 'icon' => 'bi-house-door', 'title' => 'Almacén', 'desc' => 'Control físico de stock.'],
                         ];
                     @endphp
 

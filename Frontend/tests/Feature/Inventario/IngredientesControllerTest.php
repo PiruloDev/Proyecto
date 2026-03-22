@@ -86,34 +86,34 @@ class IngredientesControllerTest extends TestCase
     // =========================================================
 
     #[Test]
-    public function inventario_retorna_vista_con_ingredientes(): void
-    {
-        Http::fake([
-            '*/ingredientes/cantidad' => Http::response([
-                ['idIngrediente' => 1, 'nombreIngrediente' => 'Harina', 'cantidadIngrediente' => 50.0]
-            ], 200)
-        ]);
+public function inventario_retorna_vista_con_ingredientes(): void
+{
+    Http::fake([
+        '*/ingredientes/cantidad' => Http::response([
+            ['idIngrediente' => 1, 'nombreIngrediente' => 'Harina', 'cantidadIngrediente' => 50.0]
+        ], 200)
+    ]);
 
-        $response = $this->get('/inventario/ingredientes/stock');
+    $response = $this->get('/inventario/almacen'); // ← URL nueva
 
-        $response->assertStatus(200);
-        $response->assertViewIs('inventarioviews.ingredientes.inventario');
-        $response->assertViewHas('ingredientes');
-    }
+    $response->assertStatus(200);
+    $response->assertViewIs('inventarioviews.ingredientes.inventario'); // ← vista no cambia
+    $response->assertViewHas('ingredientes');
+}
 
-    #[Test]
+#[Test]
 public function inventario_muestra_error_cuando_api_falla(): void
 {
     Http::fake([
         '*/ingredientes/cantidad' => Http::response([], 500)
     ]);
 
-    $response = $this->get('/inventario/ingredientes/stock');
+    $response = $this->get('/inventario/almacen'); // ← URL nueva
 
     $response->assertStatus(200);
-    $response->assertViewIs('inventarioviews.ingredientes.inventario'); 
-    $response->assertViewHas('ingredientes', []);                       
-    $response->assertViewHas('error');                                  
+    $response->assertViewIs('inventarioviews.ingredientes.inventario'); // ← vista no cambia
+    $response->assertViewHas('ingredientes', []);
+    $response->assertViewHas('error');
 }
 
     // =========================================================

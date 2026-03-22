@@ -22,9 +22,11 @@ class RecetasController extends Controller
 
     public function index()
 {
+    // ✅ Recetas — si falla, carga vacío en lugar de redirigir
     $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
+    $recetas = $resRecetas['success'] ? $resRecetas['data'] : [];
 
-    // ✅ Envolver en try/catch
+    // ✅ Productos — ya tiene try/catch
     try {
         $productos = $this->productosService->obtenerProductos();
     } catch (\Exception $e) {
@@ -32,6 +34,7 @@ class RecetasController extends Controller
         Log::error('Error al obtener productos en RecetasController: ' . $e->getMessage());
     }
 
+    // ✅ Ingredientes para modal — ya tiene try/catch
     try {
         $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
         $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
@@ -39,14 +42,12 @@ class RecetasController extends Controller
         $ingredientesParaModal = [];
     }
 
-    if (!$resRecetas['success']) {
-        return back()->with('error', $resRecetas['error']);
-    }
-
+    // ✅ Siempre carga la vista — muestra error como alerta si hubo fallo
     return view('inventarioviews.recetas.index', [
-        'recetas'      => $resRecetas['data'],
+        'recetas'      => $recetas,
         'productos'    => $productos,
-        'ingredientes' => $ingredientesParaModal
+        'ingredientes' => $ingredientesParaModal,
+        'error'        => $resRecetas['success'] ? null : $resRecetas['error'],
     ]);
 }
 
