@@ -7,14 +7,9 @@ use App\Models\Productos\ProductosAdmin;
 
 class ProductoService
 {
-    public function obtenerProductos()
+    public function __construct()
     {
-        return ProductosAdmin::all();
-    }
-
-    public function obtenerProductoPorId($id)
-    {
-        return ProductosAdmin::find($id);
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     public function crearProducto($request)
