@@ -59,21 +59,21 @@ public class Ingredientescontroller {
     }
 
     @Operation(summary = "Crear ingrediente", description = "Registra un nuevo ingrediente en el sistema")
-    @ApiResponse(responseCode = "200", description = "Ingrediente creado exitosamente")
     @PostMapping("/crearingrediente")
-    public String crearIngrediente(
-        @Parameter(description = "Datos del ingrediente", required = true)
-        @RequestBody Ingredientes ingrediente) {
-        ingredientesService.crearIngrediente(ingrediente);
-        System.out.println("Ingrediente recibido: " + ingrediente.getNombreIngrediente());
-        return "Ingrediente " + ingrediente.getNombreIngrediente() + " creado con éxito.";
+    public ResponseEntity<?> crearIngrediente(
+            @Parameter(description = "Datos del ingrediente", required = true)
+            @RequestBody Ingredientes ingrediente) {
+        try {
+            ingredientesService.crearIngrediente(ingrediente);
+            System.out.println("Ingrediente recibido: " + ingrediente.getNombreIngrediente());
+            return ResponseEntity.ok("Ingrediente " + ingrediente.getNombreIngrediente() + " creado con éxito.");
+        } catch (Exception e) {
+            // ESTO es lo que necesitamos ver en el curl
+            System.err.println("ERROR AL CREAR INGREDIENTE: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error real en la base de datos: " + e.getMessage());
+        }
     }
-
-    @Operation(summary = "Editar ingrediente", description = "Actualiza los datos de un ingrediente existente")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Ingrediente actualizado exitosamente"),
-        @ApiResponse(responseCode = "404", description = "Ingrediente no encontrado")
-    })
     @PutMapping("ingrediente/{id}")
     public String editarIngrediente(
         @Parameter(description = "ID del ingrediente", required = true)
