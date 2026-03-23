@@ -99,7 +99,6 @@ public class IngredientesService {
     }
 
     public void crearIngrediente(Ingredientes ingrediente) {
-        // Eliminada la coma después de CANTIDAD_INGREDIENTE y los NULL sobrantes
         String sql = "INSERT INTO ingredientes (" +
                 "ID_PROVEEDOR, " +
                 "ID_CATEGORIA, " +
@@ -109,7 +108,10 @@ public class IngredientesService {
                 "CANTIDAD_INGREDIENTE" +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
 
-        BigDecimal cantidadInicial = BigDecimal.ZERO;
+        // Aseguramos que la cantidad nunca sea nula al insertar
+        BigDecimal cantidad = (ingrediente.getCantidadIngrediente() != null)
+                ? ingrediente.getCantidadIngrediente()
+                : BigDecimal.ZERO;
 
         jdbcTemplate.update(sql,
                 ingrediente.getIdProveedor(),
@@ -117,7 +119,7 @@ public class IngredientesService {
                 ingrediente.getIdUnidadMedida(),
                 ingrediente.getNombreIngrediente(),
                 ingrediente.getReferenciaIngrediente(),
-                cantidadInicial
+                cantidad
         );
     }
 

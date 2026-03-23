@@ -9,19 +9,18 @@ use App\Helpers\ProductImageHelper;
 
 class Menuproductos extends Controller
 {
-   protected $baseUrl;
+    private $apiBaseUrl;
 
     public function __construct()
     {
-        // Obtiene la URL base de la API desde el archivo .env
-        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
+        $this->apiBaseUrl = env('API_BASE_URL', 'http://localhost:8080');
     }
     public function index()
     {
         try {
             $responseCategorias = Http::get($this->apiBaseUrl . '/categorias');
             $responseProductos = Http::get($this->apiBaseUrl . '/productos');
-
+            
             $categorias = collect([]);
             $productos = collect([]);
 
@@ -45,7 +44,6 @@ class Menuproductos extends Controller
                                 'DESCRIPCION_PRODUCTO' => $prod['Descripcion Producto:'] ?? 'Producto fresco y delicioso',
                                 'PRECIO_PRODUCTO' => $prod['Precio:'] ?? 0,
                                 'STOCK_ACTUAL' => $prod['Stock Minímo:'] ?? 0,
-                                // Si la API no devuelve imagen, usar el helper para obtenerla
                                 'imagen' => $imagenApi ?? ProductImageHelper::getImage($nombreProducto, $prod['Id Producto:'] ?? null, $categoria['nombreCategoriaProducto'] ?? null)
                             ];
                         });
@@ -67,7 +65,6 @@ class Menuproductos extends Controller
                         'DESCRIPCION_PRODUCTO' => $prod['Descripcion Producto:'] ?? 'Producto fresco y delicioso',
                         'PRECIO_PRODUCTO' => $prod['Precio:'] ?? 0,
                         'STOCK_ACTUAL' => $prod['Stock Minímo:'] ?? 0,
-                        // Si la API no devuelve imagen, usar el helper para obtenerla
                         'imagen' => $imagenApi ?? ProductImageHelper::getImage($nombreProducto, $prod['Id Producto:'] ?? null)
                     ];
                 });

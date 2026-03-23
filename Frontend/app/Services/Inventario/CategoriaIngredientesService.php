@@ -1,10 +1,10 @@
-    <?php
+<?php
 
-    namespace App\Services\Inventario;
+namespace App\Services\Inventario;
 
-    use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Http;
 
-    class CategoriaIngredientesService
+class CategoriaIngredientesService
     {
         protected $baseUrl;
 
