@@ -168,7 +168,7 @@ public class RecetasService {
                 "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA " +
                 "JOIN productos p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
                 "LEFT JOIN ingredientes i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
-                "LEFT JOIN unidades_medidas u ON rd.ID_UNIDAD = u.ID_UNIDAD";
+                "LEFT JOIN unidades_medida u ON rd.ID_UNIDAD = u.ID_UNIDAD";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             RecetaDetalleDTO dto = new RecetaDetalleDTO();
