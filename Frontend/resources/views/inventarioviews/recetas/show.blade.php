@@ -92,7 +92,7 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show mt-3 rounded-3" role="alert">
                     <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if(session('error'))
@@ -102,8 +102,17 @@
                 </div>
             @endif
 
+            {{-- ✅ Guardia: si $detalles viene vacío mostramos aviso en lugar de explotar --}}
+            @if(empty($detalles))
+                <div class="alert alert-warning mt-4 rounded-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Esta receta no tiene ingredientes registrados.
+                    <a href="{{ route('recetas.index') }}" class="alert-link ms-2">Volver al listado</a>
+                </div>
+            @else
+
             {{-- Header --}}
-            <div class="recipe-header-panaderia mt-4 shadow-sm animate__animated animate__fadeIn">
+            <div class="recipe-header-panaderia mt-4 shadow-sm">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <nav aria-label="breadcrumb">
@@ -114,6 +123,7 @@
                                 <li class="breadcrumb-item active text-white" aria-current="page">Ficha Técnica</li>
                             </ol>
                         </nav>
+                        {{-- ✅ Acceso seguro a $detalles[0] —solo llega aquí si !empty($detalles) --}}
                         <h1 class="display-5 fw-bold mb-0">
                             {{ $detalles[0]['nombreProducto'] ?? 'Referencia #'.$idProducto }}
                         </h1>
@@ -131,7 +141,7 @@
             </div>
 
             {{-- Tabla de ingredientes actuales --}}
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden animate__animated animate__fadeInUp">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold" style="color: var(--panaderia-marron-principal);">
                         <i class="fas fa-mortar-pestle me-2"></i>Ingredientes y Proporciones
@@ -159,21 +169,23 @@
                                                     <i class="fas fa-wheat-awn text-warning"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="fw-bold d-block">{{ $detalle['nombreIngrediente'] }}</span>
-                                                    <small class="text-muted">ID: {{ $detalle['idIngrediente'] }}</small>
+                                                    <span class="fw-bold d-block">
+                                                        {{ $detalle['nombreIngrediente'] ?? 'Ingrediente ID '.($detalle['idIngrediente'] ?? '?') }}
+                                                    </span>
+                                                    <small class="text-muted">ID: {{ $detalle['idIngrediente'] ?? 'N/A' }}</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge badge-cantidad px-3 py-2 rounded-3">
-                                                {{ number_format($detalle['cantidadRequerida'], 3) }}
+                                                {{ number_format($detalle['cantidadRequerida'] ?? 0, 3) }}
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="fw-bold text-secondary">{{ $detalle['nombreUnidad'] }}</span>
+                                            <span class="fw-bold text-secondary">{{ $detalle['nombreUnidad'] ?? 'N/A' }}</span>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <code class="small text-muted">REC-{{ $detalle['idReceta'] }}</code>
+                                            <code class="small text-muted">REC-{{ $detalle['idReceta'] ?? '?' }}</code>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -196,11 +208,14 @@
                 </a>
             </div>
 
+            @endif {{-- fin guardia empty($detalles) --}}
+
         </main>
     </div>
 </div>
 
-{{-- MODAL EDITAR --}}
+{{-- MODAL EDITAR — solo se renderiza si hay detalles --}}
+@if(!empty($detalles))
 <div class="modal fade" id="editarModal" data-bs-backdrop="static" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg border-0" style="border-radius: 25px;">
@@ -229,9 +244,8 @@
                     </div>
 
                     <div id="contenedorEditar" class="p-3 rounded-4" style="background: rgba(0,0,0,0.02); border: 1px dashed #ccc;">
-                        {{-- Filas precargadas con datos actuales --}}
                         @foreach($detalles as $i => $detalle)
-                        <div class="row g-2 mb-3 align-items-end fila-ingrediente animate__animated animate__fadeIn">
+                        <div class="row g-2 mb-3 align-items-end fila-ingrediente">
                             <div class="col-md-5">
                                 <label class="small fw-bold">Ingrediente</label>
                                 <select name="detalles[{{ $i }}][idIngrediente]"
@@ -239,10 +253,10 @@
                                     <option value="">Seleccionar...</option>
                                     @foreach($ingredientes as $ing)
                                         <option value="{{ $ing['idIngrediente'] }}"
-                                                data-uni="{{ $ing['abreviaturaUnidad'] }}"
-                                                data-id-unidad="{{ $ing['idUnidad'] }}"
-                                                {{ $ing['idIngrediente'] == $detalle['idIngrediente'] ? 'selected' : '' }}>
-                                            {{ $ing['nombreIngrediente'] }}
+                                                data-uni="{{ $ing['abreviaturaUnidad'] ?? '' }}"
+                                                data-id-unidad="{{ $ing['idUnidad'] ?? '' }}"
+                                                {{ ($ing['idIngrediente'] ?? null) == ($detalle['idIngrediente'] ?? null) ? 'selected' : '' }}>
+                                            {{ $ing['nombreIngrediente'] ?? 'Ingrediente' }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -253,16 +267,16 @@
                                        name="detalles[{{ $i }}][cantidadRequerida]"
                                        class="form-control"
                                        step="0.001" min="0.001"
-                                       value="{{ $detalle['cantidadRequerida'] }}"
+                                       value="{{ $detalle['cantidadRequerida'] ?? '' }}"
                                        required>
                             </div>
                             <div class="col-md-2">
                                 <label class="small fw-bold">Unidad</label>
-                                <div class="unidad-badge unidad-display">{{ $detalle['nombreUnidad'] }}</div>
+                                <div class="unidad-badge unidad-display">{{ $detalle['nombreUnidad'] ?? '---' }}</div>
                                 <input type="hidden"
                                        name="detalles[{{ $i }}][idUnidad]"
                                        class="input-unidad"
-                                       value="{{ $detalle['idUnidad'] }}">
+                                       value="{{ $detalle['idUnidad'] ?? '' }}">
                             </div>
                             <div class="col-md-1 text-end">
                                 <button type="button"
@@ -286,28 +300,25 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('scripts')
 <script>
-    // Ingredientes disponibles desde PHP
     const insumosEditar = @json($ingredientes ?? []);
+    let indexEditar = {{ count($detalles ?? []) }};
 
-    // Índice inicial = cantidad de filas precargadas
-    let indexEditar = {{ count($detalles) }};
-
-    // ── Agregar nueva fila ──────────────────────────────────────────
-    document.getElementById('btnAgregarEditar').addEventListener('click', function () {
+    document.getElementById('btnAgregarEditar')?.addEventListener('click', function () {
         const contenedor = document.getElementById('contenedorEditar');
 
         let options = insumosEditar.map(i =>
-            `<option value="${i.idIngrediente}" data-uni="${i.abreviaturaUnidad}" data-id-unidad="${i.idUnidad}">
-                ${i.nombreIngrediente}
+            `<option value="${i.idIngrediente}" data-uni="${i.abreviaturaUnidad ?? ''}" data-id-unidad="${i.idUnidad ?? ''}">
+                ${i.nombreIngrediente ?? 'Ingrediente'}
             </option>`
         ).join('');
 
         const div = document.createElement('div');
-        div.className = 'row g-2 mb-3 align-items-end fila-ingrediente animate__animated animate__fadeIn';
+        div.className = 'row g-2 mb-3 align-items-end fila-ingrediente';
         div.innerHTML = `
             <div class="col-md-5">
                 <label class="small fw-bold">Ingrediente</label>
@@ -342,11 +353,9 @@
         indexEditar++;
     });
 
-    // ── Eliminar fila (delegado) ────────────────────────────────────
-    document.getElementById('contenedorEditar').addEventListener('click', function (e) {
+    document.getElementById('contenedorEditar')?.addEventListener('click', function (e) {
         const btn = e.target.closest('.btn-eliminar');
         if (!btn) return;
-
         const filas = this.querySelectorAll('.fila-ingrediente');
         if (filas.length > 1) {
             btn.closest('.fila-ingrediente').remove();
@@ -356,24 +365,20 @@
         }
     });
 
-    // ── Actualizar badge y idUnidad al cambiar select (delegado) ───
-    document.getElementById('contenedorEditar').addEventListener('change', function (e) {
+    document.getElementById('contenedorEditar')?.addEventListener('change', function (e) {
         if (!e.target.classList.contains('select-insumo-editar')) return;
-
-        const option  = e.target.options[e.target.selectedIndex];
-        const uni     = option.getAttribute('data-uni') || '---';
+        const option   = e.target.options[e.target.selectedIndex];
+        const uni      = option.getAttribute('data-uni') || '---';
         const idUnidad = option.getAttribute('data-id-unidad') || '';
-
         const fila = e.target.closest('.fila-ingrediente');
         fila.querySelector('.unidad-display').textContent = uni;
         fila.querySelector('.input-unidad').value = idUnidad;
     });
 
-    // ── Reindexar tras eliminar filas ──────────────────────────────
     function reindexarEditar() {
         document.querySelectorAll('#contenedorEditar .fila-ingrediente').forEach((fila, i) => {
-            fila.querySelectorAll('[name]').forEach(input => {
-                input.name = input.name.replace(/detalles\[\d+\]/, `detalles[${i}]`);
+            fila.querySelectorAll('[name]').forEach(el => {
+                el.name = el.name.replace(/detalles\[\d+\]/, `detalles[${i}]`);
             });
         });
         indexEditar = document.querySelectorAll('#contenedorEditar .fila-ingrediente').length;
