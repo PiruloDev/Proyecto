@@ -9,9 +9,9 @@ class ProductosMasVendidosService
 {
     protected $apiService;
 
-    public function __construct(ApiService $apiService)
+    public function __construct()
     {
-        $this->apiService = $apiService;
+        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
     }
 
     /**
