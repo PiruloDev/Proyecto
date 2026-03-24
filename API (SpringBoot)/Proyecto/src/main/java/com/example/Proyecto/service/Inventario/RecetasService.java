@@ -169,7 +169,7 @@ public class RecetasService {
                 "JOIN productos p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
                 "LEFT JOIN ingredientes i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
                 "LEFT JOIN unidades_medida u ON rd.ID_UNIDAD = u.ID_UNIDAD";
-
+// cambios relevantes
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             RecetaDetalleDTO dto = new RecetaDetalleDTO();
             dto.setIdReceta(rs.getLong("ID_RECETA"));
