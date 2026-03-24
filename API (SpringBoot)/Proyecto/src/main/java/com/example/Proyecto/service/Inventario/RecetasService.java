@@ -162,27 +162,41 @@ public class RecetasService {
 
     // Modificación en RecetasService.java
     public List<RecetaDetalleDTO> obtenerTodasLasRecetasOptimizadas() {
+
         String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
-                "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, u.NOMBRE_UNIDAD " +
+                "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, " +
+                "rd.ID_UNIDAD, u.NOMBRE_UNIDAD " +  // ✅ FIX CLAVE
                 "FROM recetas_detalle rd " +
                 "JOIN recetas r ON rd.ID_RECETA = r.ID_RECETA " +
                 "JOIN productos p ON r.ID_PRODUCTO = p.ID_PRODUCTO " +
                 "LEFT JOIN ingredientes i ON rd.ID_INGREDIENTE = i.ID_INGREDIENTE " +
                 "LEFT JOIN unidades_medida u ON rd.ID_UNIDAD = u.ID_UNIDAD";
-// cambios relevantes
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
+
             RecetaDetalleDTO dto = new RecetaDetalleDTO();
+
             dto.setIdReceta(rs.getLong("ID_RECETA"));
             dto.setIdProducto(rs.getLong("ID_PRODUCTO"));
             dto.setNombreProducto(rs.getString("NOMBRE_PRODUCTO"));
+
             dto.setIdIngrediente(rs.getLong("ID_INGREDIENTE"));
             dto.setNombreIngrediente(rs.getString("NOMBRE_INGREDIENTE"));
+
             dto.setCantidadRequerida(rs.getBigDecimal("CANTIDAD_REQUERIDA"));
+
+            // 🔥 FIX CRÍTICO
+            dto.setIdUnidad(
+                    rs.getObject("ID_UNIDAD") != null
+                            ? rs.getLong("ID_UNIDAD")
+                            : null
+            );
+
             dto.setNombreUnidad(rs.getString("NOMBRE_UNIDAD"));
+
             return dto;
         });
     }
-
     public List<RecetaDetalleDTO> obtenerRecetaOptimizadaPorProducto(Long idProducto) {
         String sql = "SELECT r.ID_RECETA, r.ID_PRODUCTO, p.NOMBRE_PRODUCTO, " +
                 "rd.ID_INGREDIENTE, i.NOMBRE_INGREDIENTE, rd.CANTIDAD_REQUERIDA, " +
