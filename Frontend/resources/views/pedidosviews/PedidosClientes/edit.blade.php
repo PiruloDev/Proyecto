@@ -129,7 +129,7 @@
     async function inicializarVista() {
         try {
             console.log("Iniciando carga de productos desde Java...");
-            const response = await fetch('http://localhost:8080/productos');
+            const response = await fetch('http://32.193.167.191:8080/productos');
             if (!response.ok) throw new Error("Fallo al conectar con Java");
             
             const data = await response.json();
