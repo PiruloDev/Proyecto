@@ -268,7 +268,7 @@
 
     async function cargarProductosDesdeJava() {
         try {
-            const response = await fetch('http://localhost:8080/productos');
+            const response = await fetch('http://32.193.167.191:8080/productos');
             const data = await response.json();
             listaProductosGlobal = data.map(p => ({
                 id: p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
