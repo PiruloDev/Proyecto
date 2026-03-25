@@ -203,4 +203,18 @@ class ProductoController extends Controller
                 ->with('error', 'Error de conexión: ' . $e->getMessage());
         }
     }
+
+    // Añade esto a ProductoController.php
+public function getProductosJson()
+{
+    try {
+        $response = Http::timeout(10)->get($this->apiUrl);
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+        return response()->json(['error' => 'API no disponible'], 500);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 }
