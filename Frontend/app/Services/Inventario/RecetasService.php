@@ -79,7 +79,7 @@ class RecetasService
                 'ingredientes' => array_map(function($detalle) {
                     return [
                         'idIngrediente'    => (int) $detalle['idIngrediente'],
-                        'cantidadNecesaria' => (float) $detalle['cantidadRequerida'],
+                        'cantidadRequerida' => (float) $detalle['cantidadRequerida'],
                         'idUnidad'         => (int) $detalle['idUnidad'],
                     ];
                 }, $data['detalles'] ?? [])
@@ -105,7 +105,7 @@ class RecetasService
             'ingredientes' => array_map(function($detalle) {
                 return [
                     'idIngrediente'     => (int) $detalle['idIngrediente'],
-                    'cantidadNecesaria' => (float) $detalle['cantidadRequerida'],
+                    'cantidadRequerida' => (float) $detalle['cantidadRequerida'],
                     'idUnidad'          => (int) $detalle['idUnidad'],
                 ];
             }, $data['detalles'] ?? [])
