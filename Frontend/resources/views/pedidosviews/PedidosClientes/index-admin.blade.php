@@ -267,18 +267,28 @@
     let listaProductosGlobal = [];
 
     async function cargarProductosDesdeJava() {
-        try {
-            const response = await fetch('http://32.193.167.191:8080/productos');
-            const data = await response.json();
-            listaProductosGlobal = data.map(p => ({
-                id: p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
-                nombre: p.nombre_PRODUCTO || p.nombreProducto || p["Nombre Producto:"],
-                precio: p.precio_UNITARIO || p.precio || p["Precio:"] || 0
-            }));
-        } catch (error) {
-            console.error("Error productos:", error);
+    try {
+        // Cambiamos la IP por nuestra ruta interna de Laravel
+        const response = await fetch("{{ route('api.productos.lista') }}");
+        const data = await response.json();
+        
+        if (data.error) {
+            console.error("Error de la API:", data.error);
+            return;
         }
+
+        listaProductosGlobal = data.map(p => ({
+            // Ajustamos los campos según lo que devuelve tu API de Java
+            id: p.ID_PRODUCTO || p.id_PRODUCTO || p.idProducto || p["Id Producto:"],
+            nombre: p.NOMBRE_PRODUCTO || p.nombre_PRODUCTO || p.nombreProducto || p["Nombre Producto:"],
+            precio: p.PRECIO_PRODUCTO || p.precio_UNITARIO || p.precio || p["Precio:"] || 0
+        }));
+        
+        console.log("Productos cargados correctamente desde el proxy de Laravel");
+    } catch (error) {
+        console.error("Error al cargar productos:", error);
     }
+}
 
     document.addEventListener('DOMContentLoaded', function() {
         cargarProductosDesdeJava();

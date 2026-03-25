@@ -41,8 +41,10 @@ Route::prefix('productos')->group(function () {
     Route::patch('/{id}', [ProductoController::class, 'update'])->name('productos.update');
     Route::delete('/{id}', [ProductoController::class, 'destroy'])->name('productos.destroy');
     Route::resource('productos', ProductoController::class)->except(['show', 'create', 'edit']);
-
 });
+
+Route::get('/api/productos-lista', [App\Http\Controllers\Productos\ProductoController::class, 'getProductosJson'])
+    ->name('api.productos.lista');
 
 // ============================================
 // AUTENTICACIÓN
