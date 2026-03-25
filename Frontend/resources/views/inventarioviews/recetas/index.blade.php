@@ -223,11 +223,16 @@
                         <label class="form-label fw-bold text-muted small text-uppercase">Producto a Producir</label>
                         <select name="idProducto" class="form-select shadow-sm p-3" style="border-radius: 12px;" required>
                             <option value="">Seleccione el producto...</option>
-                            {{-- ✅ La API devuelve JSON array, acceder con ['clave'] no ->propiedad --}}
                             @foreach($productos as $prod)
-                                <option value="{{ $prod['idProducto'] ?? $prod['ID_PRODUCTO'] ?? '' }}">
-                                    {{ $prod['nombreProducto'] ?? $prod['NOMBRE_PRODUCTO'] ?? 'Producto sin nombre' }}
-                                </option>
+                                @php
+                                    // Mapeo manual para adaptarnos a lo que envía el módulo de Productos
+                                    $id = $prod['idProducto'] ?? $prod['ID_PRODUCTO'] ?? $prod['Id Producto:'] ?? null;
+                                    $nombre = $prod['nombreProducto'] ?? $prod['NOMBRE_PRODUCTO'] ?? $prod['Nombre Producto:'] ?? 'Producto sin nombre';
+                                @endphp
+                                
+                                @if($id)
+                                    <option value="{{ $id }}">{{ $nombre }}</option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
