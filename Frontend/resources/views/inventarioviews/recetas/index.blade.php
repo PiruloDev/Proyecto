@@ -89,11 +89,10 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-2 mb-4">
                 <div>
-                <a href="{{ route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
-            <i class="fas fa-arrow-left"></i>
-                </a>    
-                
-                <h1 class="dashboard-page-title" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
+                    <a href="{{ route('dashboard.inventario') }}" class="btn btn-panaderia-action border-0 me-3" style="color: #5d4037; font-size: 1.5rem; transition: transform 0.2s;">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>    
+                    <h1 class="dashboard-page-title" style="color: var(--panaderia-marron-oscuro);">Fichas Técnicas (Recetas)</h1>
                     <p class="text-muted small">Gestión de proporciones e ingredientes por producto.</p>
                 </div>
                 <button class="btn btn-panaderia px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
@@ -101,26 +100,19 @@
                 </button>
             </div>
 
-            {{-- Alertas de éxito / error --}}
+            {{-- ✅ Alerta de éxito --}}
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
                     <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            {{-- ✅ Maneja tanto session('error') como variable $error de vista --}}
-            @if(session('error') || !empty($error))
-                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') ?? $error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
-            @if(session('error'))
+            {{-- ✅ UN solo bloque de error — cubre session('error') y variable $error del controller --}}
+            @if(session('error') || !empty($error))
                 <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ session('error') ?? $error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
@@ -148,20 +140,29 @@
                                     <div class="dropdown">
                                         <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 15px;">
-                                            <li><a class="dropdown-item rounded-2" href="{{ route('recetas.show', $receta['idProducto']) }}"><i class="fas fa-eye me-2 text-primary"></i>Ver detalle</a></li>
+                                            <li>
+                                                <a class="dropdown-item rounded-2" href="{{ route('recetas.show', $receta['idProducto']) }}">
+                                                    <i class="fas fa-eye me-2 text-primary"></i>Ver detalle
+                                                </a>
+                                            </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
                                                 <form action="{{ route('recetas.destroy', $receta['idProducto']) }}" method="POST">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="dropdown-item rounded-2 text-danger" onclick="return confirm('¿Eliminar?')"><i class="fas fa-trash me-2"></i>Eliminar</button>
+                                                    <button type="submit" class="dropdown-item rounded-2 text-danger"
+                                                            onclick="return confirm('¿Eliminar esta receta?')">
+                                                        <i class="fas fa-trash me-2"></i>Eliminar
+                                                    </button>
                                                 </form>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
 
-                                <h5 class="fw-bold mb-1" style="color: var(--panaderia-marron-oscuro);">{{ $receta['nombreProducto'] }}</h5>
-                                <span class="badge rounded-pill bg-white text-muted border mb-3 w-fit">ID Producto: {{ $receta['idProducto'] }}</span>
+                                <h5 class="fw-bold mb-1" style="color: var(--panaderia-marron-oscuro);">
+                                    {{ $receta['nombreProducto'] ?? 'Producto ID '.$receta['idProducto'] }}
+                                </h5>
+                                <span class="badge rounded-pill bg-white text-muted border mb-3">ID Producto: {{ $receta['idProducto'] }}</span>
 
                                 <div class="preview-table p-2 mb-4">
                                     <table class="table table-sm table-borderless mb-0">
@@ -172,12 +173,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{-- ✅ Protegido contra campos null --}}
-                                            @foreach(array_slice($receta['detalles'], 0, 3) as $detalle)
+                                            @foreach(array_slice($receta['detalles'] ?? [], 0, 3) as $detalle)
                                                 <tr>
                                                     <td class="ps-2 text-secondary">
                                                         <i class="bi bi-dot text-warning"></i>
-                                                        {{ isset($detalle['nombreIngrediente']) ? $detalle['nombreIngrediente'] : 'Ingrediente ID '.($detalle['idIngrediente'] ?? '?') }}
+                                                        {{ $detalle['nombreIngrediente'] ?? 'Ingrediente ID '.($detalle['idIngrediente'] ?? '?') }}
                                                     </td>
                                                     <td class="text-end pe-2 fw-bold">
                                                         {{ number_format($detalle['cantidadRequerida'] ?? 0, 2) }}
@@ -224,20 +224,30 @@
                         <select name="idProducto" class="form-select shadow-sm p-3" style="border-radius: 12px;" required>
                             <option value="">Seleccione el producto...</option>
                             @foreach($productos as $prod)
-                                <option value="{{ $prod->ID_PRODUCTO }}">{{ $prod->NOMBRE_PRODUCTO }}</option>
+                                @php
+                                    // Mapeo manual para adaptarnos a lo que envía el módulo de Productos
+                                    $id = $prod['idProducto'] ?? $prod['ID_PRODUCTO'] ?? $prod['Id Producto:'] ?? null;
+                                    $nombre = $prod['nombreProducto'] ?? $prod['NOMBRE_PRODUCTO'] ?? $prod['Nombre Producto:'] ?? 'Producto sin nombre';
+                                @endphp
+                                
+                                @if($id)
+                                    <option value="{{ $id }}">{{ $nombre }}</option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="fw-bold mb-0"><i class="fas fa-list me-2"></i>Composición</h6>
-                        <button type="button" id="add-detail-btn" class="btn btn-panaderia-action -sm -panaderia px-3 shadow-sm">
+                        <button type="button" id="add-detail-btn" class="btn btn-panaderia px-3 shadow-sm">
                             <i class="fas fa-plus me-1"></i> Agregar Insumo
                         </button>
                     </div>
                     
                     <div id="detalles-container" class="p-3 rounded-4" style="background: rgba(0,0,0,0.02); border: 1px dashed #ccc;">
-                        {{-- JS llenará esto --}}
+                        <p class="text-muted text-center small mb-0" id="empty-msg">
+                            <i class="fas fa-info-circle me-1"></i>Agrega al menos un ingrediente
+                        </p>
                     </div>
                 </div>
 
@@ -261,21 +271,23 @@
         });
     });
 
-    // Lógica de Ingredientes Dinámicos
-    const container = document.getElementById('detalles-container');
-    const addBtn = document.getElementById('add-detail-btn');
-    let index = 0;
-
-    // ✅ Variable con ingredientes desde el controlador
+    // Ingredientes disponibles desde el controller
     const insumosDisponibles = @json($ingredientes ?? []);
 
-    addBtn.addEventListener('click', () => {
-        const div = document.createElement('div');
-        div.className = 'row g-2 mb-3 align-items-end animate__animated animate__fadeIn';
+    const container = document.getElementById('detalles-container');
+    const addBtn    = document.getElementById('add-detail-btn');
+    const emptyMsg  = document.getElementById('empty-msg');
+    let index = 0;
 
-        // ✅ Se agrega data-id-unidad para poder enviar el ID de la unidad al servidor
+    addBtn.addEventListener('click', () => {
+        // Ocultar mensaje vacío al agregar primer ingrediente
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-3 align-items-end';
+
         let options = insumosDisponibles.map(i =>
-            `<option value="${i.idIngrediente}" data-uni="${i.abreviaturaUnidad}" data-id-unidad="${i.idUnidad}">${i.nombreIngrediente}</option>`
+            `<option value="${i.idIngrediente}" data-uni="${i.abreviaturaUnidad ?? ''}" data-id-unidad="${i.idUnidad ?? ''}">${i.nombreIngrediente}</option>`
         ).join('');
 
         div.innerHTML = `
@@ -288,16 +300,18 @@
             </div>
             <div class="col-md-4">
                 <label class="small fw-bold">Cantidad</label>
-                <input type="number" step="0.001" name="detalles[${index}][cantidadRequerida]" class="form-control" placeholder="0.000" required>
+                <input type="number" step="0.001" min="0.001"
+                       name="detalles[${index}][cantidadRequerida]"
+                       class="form-control" placeholder="0.000" required>
             </div>
             <div class="col-md-2">
                 <label class="small fw-bold">Unidad</label>
                 <div class="unidad-badge">---</div>
-                {{-- ✅ Input hidden que guarda el ID de la unidad para enviarlo al servidor --}}
                 <input type="hidden" name="detalles[${index}][idUnidad]" class="input-unidad" value="">
             </div>
             <div class="col-md-1 text-end">
-                <button type="button" class="btn btn-outline-danger btn-sm border-0 mb-1" onclick="this.parentElement.parentElement.remove()">
+                <button type="button" class="btn btn-outline-danger btn-sm border-0 mb-1"
+                        onclick="this.closest('.row').remove()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -306,20 +320,20 @@
         index++;
     });
 
-    // ✅ Evento actualiza tanto el badge visual como el input hidden con el ID de unidad
+    // Actualiza badge visual e input hidden al seleccionar ingrediente
     document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('select-insumo')) {
-            const option = e.target.options[e.target.selectedIndex];
-            const uni = option.getAttribute('data-uni') || '---';
-            const idUnidad = option.getAttribute('data-id-unidad') || '';
+        if (!e.target.classList.contains('select-insumo')) return;
 
-            const row = e.target.closest('.row');
-            const badge = row.querySelector('.unidad-badge');
-            const hiddenUnidad = row.querySelector('.input-unidad');
+        const option   = e.target.options[e.target.selectedIndex];
+        const uni      = option.getAttribute('data-uni') || '---';
+        const idUnidad = option.getAttribute('data-id-unidad') || '';
 
-            if (badge) badge.textContent = uni;
-            if (hiddenUnidad) hiddenUnidad.value = idUnidad; // ✅ guarda el ID real
-        }
+        const row = e.target.closest('.row');
+        const badge  = row.querySelector('.unidad-badge');
+        const hidden = row.querySelector('.input-unidad');
+
+        if (badge)  badge.textContent = uni;
+        if (hidden) hidden.value = idUnidad;
     });
 </script>
 @endpush
