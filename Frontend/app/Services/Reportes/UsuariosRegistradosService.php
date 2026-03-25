@@ -9,9 +9,9 @@ class UsuariosRegistradosService
 {
     protected $apiService;
 
-    public function __construct()
+    public function __construct(ApiService $apiService)
     {
-        $this->baseUrl = env('API_BASE_URL', 'http://32.193.167.191:8080'); 
+        $this->apiService = $apiService;
     }
 
     /**
