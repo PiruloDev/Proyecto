@@ -108,6 +108,16 @@
                     <button type="button" class="btn btn-panaderia-action -close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
+
+            {{-- ✅ Maneja tanto session('error') como variable $error de vista --}}
+            @if(session('error') || !empty($error))
+                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ session('error') ?? $error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}

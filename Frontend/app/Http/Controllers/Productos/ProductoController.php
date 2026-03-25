@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Log;
 
 class ProductoController extends Controller
 {
-    protected $apiUrl = 'http://localhost:8080/productos';
+    protected $apiUrl;
+
+    public function __construct()
+{
+    $this->apiUrl = env('API_BASE_URL', 'http://localhost:8080') . '/productos';
+}
 
     public function index()
     {
@@ -35,13 +40,13 @@ class ProductoController extends Controller
                 10 => 'Pasteles Pollo',
             ];
 
-            return view('productos.index', compact('productos', 'categorias'));
+            return view('Productos.index', compact('productos', 'categorias'));
         
         } catch (\Exception $e) {
             Log::error('Excepción en ProductoController@index: ' . $e->getMessage());
             $productos = [];
             $categorias = [];
-            return view('productos.index', compact('productos', 'categorias'))
+            return view('Productos.index', compact('productos', 'categorias'))
                 ->withErrors('No se pudo conectar con el servicio de productos.');
         }
     }

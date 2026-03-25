@@ -21,27 +21,35 @@ class RecetasController extends Controller
     }
 
     public function index()
-    {
-        $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
-        $productos = $this->productosService->obtenerProductos(); 
+{
+    // ✅ Recetas — si falla, carga vacío en lugar de redirigir
+    $resRecetas = $this->recetasService->obtenerTodasLasRecetas();
+    $recetas = $resRecetas['success'] ? $resRecetas['data'] : [];
 
-        try {
-            $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
-            $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
-        } catch (\Exception $e) {
-            $ingredientesParaModal = []; 
-        }
-
-        if (!$resRecetas['success']) {
-            return back()->with('error', $resRecetas['error']);
-        }
-
-        return view('inventarioviews.recetas.index', [
-            'recetas'      => $resRecetas['data'],
-            'productos'    => $productos,
-            'ingredientes' => $ingredientesParaModal 
-        ]);
+    // ✅ Productos — ya tiene try/catch
+    try {
+        $productos = $this->productosService->obtenerProductos();
+    } catch (\Exception $e) {
+        $productos = [];
+        Log::error('Error al obtener productos en RecetasController: ' . $e->getMessage());
     }
+
+    // ✅ Ingredientes para modal — ya tiene try/catch
+    try {
+        $responseIng = Http::get('http://32.193.167.191:8080/recetas/lista-modal');
+        $ingredientesParaModal = $responseIng->successful() ? $responseIng->json() : [];
+    } catch (\Exception $e) {
+        $ingredientesParaModal = [];
+    }
+
+    // ✅ Siempre carga la vista — muestra error como alerta si hubo fallo
+    return view('inventarioviews.recetas.index', [
+        'recetas'      => $recetas,
+        'productos'    => $productos,
+        'ingredientes' => $ingredientesParaModal,
+        'error'        => $resRecetas['success'] ? null : $resRecetas['error'],
+    ]);
+}
 
     public function show($idProducto)
     {
