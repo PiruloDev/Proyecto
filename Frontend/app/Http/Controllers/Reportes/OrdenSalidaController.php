@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Clientes;
 use App\Models\Reportes\OrdenSalida;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class OrdenSalidaController extends Controller
 {
