@@ -222,8 +222,8 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
-                        <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA">
+                    <label class="form-label fw-bold">Fecha y Hora de Entrega</label>
+                    <input type="datetime-local" class="form-control" id="modal_FECHA_ENTREGA" name="FECHA_ENTREGA" min="">
                     </div>
 
                     <div class="col-md-6">
@@ -291,6 +291,16 @@
 }
 
     document.addEventListener('DOMContentLoaded', function() {
+
+    // Bloquear fechas pasadas en el input de entrega
+    function setFechaMinima() {
+    const ahora = new Date();
+    // Ajuste para evitar desfase de zona horaria
+    ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+    const fechaMin = ahora.toISOString().slice(0, 16);
+    document.getElementById('modal_FECHA_ENTREGA').setAttribute('min', fechaMin);
+}
+setFechaMinima();
         cargarProductosDesdeJava();
 
         const modal = new bootstrap.Modal(document.getElementById('pedidoModal'));

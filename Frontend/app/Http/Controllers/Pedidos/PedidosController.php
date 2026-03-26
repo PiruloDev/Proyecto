@@ -75,7 +75,8 @@ public function store(Request $request)
         'ID_EMPLEADO'      => 'required|integer|min:1',
         'ID_ESTADO_PEDIDO' => 'required|integer|min:1',
         'TOTAL_PRODUCTO'   => 'required|numeric|min:0',
-        'productos'        => 'required_without:carrito|array', 
+        'productos'        => 'required_without:carrito|array',
+        'FECHA_ENTREGA'    => 'nullable|date|after_or_equal:today',
     ]);
 
     $detallesApi = [];
@@ -204,6 +205,7 @@ try {
         'TOTAL_PRODUCTO'   => 'required|numeric',
         'productos'        => 'required|array|min:1',
         'cantidades'       => 'required|array',
+        'FECHA_ENTREGA'    => 'nullable|date|after_or_equal:today',
     ]);
 
     try {
