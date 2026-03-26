@@ -21,6 +21,11 @@ class UsuariosRegistradosService
      */
     public function obtenerUsuariosRegistrados(): array
     {
+        if (!$this->apiService) {
+            Log::error('ApiService no está inicializado en UsuariosRegistradosService. ¿Falló la inyección de dependencias?');
+            return [];
+        }
+
         try {
             $response = $this->apiService->get('/reporte/usuarios');
 
