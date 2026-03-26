@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Estadisticas;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use App\Services\Reportes\ProductosMasVendidosService;
 use App\Services\Reportes\UsuariosRegistradosService;
 
