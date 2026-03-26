@@ -32,7 +32,13 @@
                     <div class="orden-card">
                         <div class="card-header-custom">
                             <span class="orden-id">Orden #{{ $venta->ID_FACTURA }}</span>
-                            <span class="fecha-badge">{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('d/m/Y H:i') }}</span>
+                            <span class="fecha-badge">
+                                @if($venta->FECHA_FACTURACION)
+                                    {{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('d/m/Y H:i') }}
+                                @else
+                                    N/A
+                                @endif
+                            </span>
                         </div>
                         <div class="card-body-custom">
                             <div class="info-row">
@@ -53,8 +59,8 @@
                                 {{ $venta->ID_FACTURA }},
                                 {{ $venta->ID_CLIENTE }},
                                 {{ $venta->ID_PEDIDO }},
-                                '{{ \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format('Y-m-d\TH:i') }}',
-                                {{ $venta->TOTAL_FACTURA }}
+                                '{{ $venta->FECHA_FACTURACION ? \Carbon\Carbon::parse($venta->FECHA_FACTURACION)->format("Y-m-d\TH:i") : "" }}',
+                                {{ $venta->TOTAL_FACTURA ?? 0 }}
                             )">Editar</button>
                             <form action="{{ route('ordenes.salida.destroy',$venta->ID_FACTURA) }}" method="POST" style="flex: 1;">
                                 @csrf

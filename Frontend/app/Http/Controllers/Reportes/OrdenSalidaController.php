@@ -7,23 +7,44 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Clientes;
 use App\Models\Reportes\OrdenSalida;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class OrdenSalidaController extends Controller
 {
     public function index()
-{
-    $ventas = OrdenSalida::with('cliente')->get();
-    $clientes = Clientes::where('ACTIVO_CLI', 1)->get(); // solo clientes activos
-    $pedidos = \DB::table('pedidos')->select('ID_PEDIDO', 'ID_CLIENTE')->get();
+    {
+        Log::info('Accediendo a OrdenSalidaController@index');
 
-    return view('reportes.index', compact('ventas', 'clientes', 'pedidos'));
-}
+        try {
+            $ventas = OrdenSalida::with('cliente')->get();
+            $clientes = Clientes::where('ACTIVO_CLI', 1)->get();
+            $pedidos = \DB::table('pedidos')->select('ID_PEDIDO', 'ID_CLIENTE')->get();
+
+            Log::info('Datos de OrdenSalida cargados', [
+                'ventas_count' => count($ventas),
+                'clientes_count' => count($clientes),
+                'pedidos_count' => count($pedidos)
+            ]);
+
+            return view('Reportes.index', compact('ventas', 'clientes', 'pedidos'));
+        } catch (\Exception $e) {
+            Log::error('Error en OrdenSalidaController@index: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return view('Reportes.index', [
+                'ventas' => collect([]),
+                'clientes' => collect([]),
+                'pedidos' => collect([])
+            ])->with('error', 'Error al cargar las órdenes de salida. Por favor revisa los logs.');
+        }
+    }
 
 
 
     public function create()
     {
-        return view('reportes.create');
+        return view('Reportes.create');
     }
 
     public function edit($id)
@@ -34,7 +55,7 @@ class OrdenSalidaController extends Controller
             return abort(404, 'Orden no encontrada');
         }
 
-        return view('reportes.edit', compact('venta'));
+        return view('Reportes.edit', compact('venta'));
     }
 
     public function store(Request $request)
