@@ -34,13 +34,13 @@ class EstadisticasController extends Controller
                 'usuarios_count' => count($usuariosRegistrados)
             ]);
 
-            return view('estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
+            return view('Estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
         } catch (\Exception $e) {
             Log::error('Excepción en EstadisticasController@index: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
             
-            return view('estadisticas.index', [
+            return view('Estadisticas.index', [
                 'productosMasVendidos' => [],
                 'usuariosRegistrados' => []
             ])->with('error', 'Ocurrió un error al cargar las estadísticas. Por favor, revisa los logs.');
