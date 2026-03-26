@@ -7,8 +7,19 @@ use Exception;
 
 class PedidosApiService
 {
-    protected $baseUrl = 'http://localhost:8080/pedidos';
-    protected $productosUrl = 'http://localhost:8080/productos';
+    protected $baseUrl;
+    protected $productosUrl;
+    protected $detallesUrl;
+
+    public function __construct()
+    {
+        // Usamos la variable de entorno, si no existe, usa la IP de tu instancia
+        $apiHost = env('API_BASE_URL', 'http://32.193.167.191:8080');
+        
+        $this->baseUrl = "{$apiHost}/pedidos";
+        $this->productosUrl = "{$apiHost}/productos";
+        $this->detallesUrl = "{$apiHost}/detalles-pedidos";
+    }
 
     /* =========================
        PRODUCTOS
@@ -19,15 +30,12 @@ class PedidosApiService
         try {
             $response = Http::get($this->productosUrl);
             $response->throw();
-
             $productosResponse = $response->json();
 
             if (isset($productosResponse['content']) && is_array($productosResponse['content'])) {
                 return $productosResponse['content'];
             }
-
             return $productosResponse;
-
         } catch (Exception $e) {
             throw new Exception("Error al obtener productos de la API.");
         }
@@ -68,27 +76,22 @@ class PedidosApiService
         }
     }
 
-   public function actualizarPedido($id, $data)
-{
-    try {
-        // Agregamos logging para ver qué estamos enviando exactamente a Java
-        \Log::info("Enviando actualización a API Java para Pedido #{$id}:", $data);
+    public function actualizarPedido($id, $data)
+    {
+        try {
+            \Log::info("Enviando actualización a API Java para Pedido #{$id}:", $data);
+            $response = Http::put("{$this->baseUrl}/{$id}", $data);
 
-        $response = Http::put("{$this->baseUrl}/{$id}", $data);
-
-        if ($response->failed()) {
-            // Esto imprimirá en storage/logs/laravel.log el error real de Java
-            \Log::error("Error desde API Java (Pedido #{$id}): " . $response->body());
-            
-            $mensajeError = $response->json('message') ?? "Error servidor Java: " . $response->status();
-            throw new Exception($mensajeError);
+            if ($response->failed()) {
+                \Log::error("Error desde API Java (Pedido #{$id}): " . $response->body());
+                $mensajeError = $response->json('message') ?? "Error servidor Java: " . $response->status();
+                throw new Exception($mensajeError);
+            }
+            return $response->json();
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
-
-        return $response->json();
-    } catch (Exception $e) {
-        throw new Exception($e->getMessage());
     }
-}
 
     public function eliminarPedido($id)
     {
@@ -100,24 +103,25 @@ class PedidosApiService
     }
 
     /* =========================
-       CHECKOUT (CLAVE)
+       CHECKOUT
        ========================= */
 
     public function crearPedidoCheckout(array $payload)
-{
-    try {
-        return Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ])
-        ->asJson() 
-        ->post($this->baseUrl, $payload) 
-        ->throw()
-        ->json();
-    } catch (\Exception $e) {
-        throw new Exception("Error API: " . ($e->response?->body() ?? $e->getMessage()));
+    {
+        try {
+            return Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->asJson() 
+            ->post($this->baseUrl, $payload) 
+            ->throw()
+            ->json();
+        } catch (\Exception $e) {
+            throw new Exception("Error API: " . ($e->response?->body() ?? $e->getMessage()));
+        }
     }
-}
+
     /* =========================
        DASHBOARD CLIENTE
        ========================= */
@@ -133,55 +137,47 @@ class PedidosApiService
         }
     }
 
-    protected $detallesUrl = 'http://localhost:8080/detalles-pedidos'; // URL de tu nuevo Controller en Java
-
-public function obtenerTodosLosDetalles()
-{
-    try {
-        $data = Http::get($this->detallesUrl)->throw()->json();
-        \Log::info("Detalles desde API Java:", $data); // Esto te dirá exactamente cómo se llaman las llaves
-        return $data;
-    } catch (Exception $e) { }
-}
-
-public function obtenerTodosLosPedidos()
-{
-    try {
-        // Usamos la baseUrl (http://localhost:8080/pedidos) que ya tienes definida
-        return Http::get($this->baseUrl)->throw()->json();
-    } catch (Exception $e) {
-        throw new Exception("Error al obtener el listado global de pedidos de la API.");
+    public function obtenerTodosLosDetalles()
+    {
+        try {
+            $data = Http::get($this->detallesUrl)->throw()->json();
+            return $data;
+        } catch (Exception $e) {
+            return [];
+        }
     }
-}
 
-/* =========================
-    CATÁLOGOS PARA MODALES
-   ========================= */
+    /* =========================
+       CATÁLOGOS (CORREGIDOS)
+       ========================= */
 
-public function obtenerEstados()
-{
-    try {
-        return Http::get("http://localhost:8080/estadosPedidos")->throw()->json();
-    } catch (Exception $e) {
-        return []; // Retorna array vacío si falla
+    public function obtenerEstados()
+    {
+        $apiHost = env('API_BASE_URL', 'http://32.193.167.191:8080');
+        try {
+            return Http::get("{$apiHost}/estadosPedidos")->throw()->json();
+        } catch (Exception $e) {
+            return [];
+        }
     }
-}
 
-public function obtenerClientes()
-{
-    try {
-        return Http::get("http://localhost:8080/detalle/cliente")->throw()->json();
-    } catch (Exception $e) {
-        return [];
+    public function obtenerClientes()
+    {
+        $apiHost = env('API_BASE_URL', 'http://32.193.167.191:8080');
+        try {
+            return Http::get("{$apiHost}/detalle/cliente")->throw()->json();
+        } catch (Exception $e) {
+            return [];
+        }
     }
-}
 
-public function obtenerEmpleados()
-{
-    try {
-        return Http::get("http://localhost:8080/detalle/empleado")->throw()->json();
-    } catch (Exception $e) {
-        return [];
+    public function obtenerEmpleados()
+    {
+        $apiHost = env('API_BASE_URL', 'http://32.193.167.191:8080');
+        try {
+            return Http::get("{$apiHost}/detalle/empleado")->throw()->json();
+        } catch (Exception $e) {
+            return [];
+        }
     }
-}
 }
