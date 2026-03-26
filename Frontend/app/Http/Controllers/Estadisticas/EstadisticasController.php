@@ -22,9 +22,27 @@ class EstadisticasController extends Controller
 
     public function index()
     {
-        $productosMasVendidos = $this->productosMasVendidosService->obtenerProductosMasVendidos(10);
-        $usuariosRegistrados  = $this->usuariosRegistradosService->obtenerUsuariosRegistrados();
+        Log::info('Accediendo a EstadisticasController@index');
+        
+        try {
+            $productosMasVendidos = $this->productosMasVendidosService->obtenerProductosMasVendidos(10);
+            $usuariosRegistrados = $this->usuariosRegistradosService->obtenerUsuariosRegistrados();
 
-        return view('estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
+            Log::info('Estadísticas obtenidas correctamente', [
+                'productos_count' => count($productosMasVendidos),
+                'usuarios_count' => count($usuariosRegistrados)
+            ]);
+
+            return view('estadisticas.index', compact('productosMasVendidos', 'usuariosRegistrados'));
+        } catch (\Exception $e) {
+            Log::error('Excepción en EstadisticasController@index: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return view('estadisticas.index', [
+                'productosMasVendidos' => [],
+                'usuariosRegistrados' => []
+            ])->with('error', 'Ocurrió un error al cargar las estadísticas. Por favor, revisa los logs.');
+        }
     }
 }

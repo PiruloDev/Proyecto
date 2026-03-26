@@ -14,6 +14,7 @@ class ProductosMasVendidosService
         $this->apiService = $apiService;
     }
 
+
     /**
      * Obtener los productos más vendidos desde la API de Spring Boot
      *
@@ -22,6 +23,11 @@ class ProductosMasVendidosService
      */
     public function obtenerProductosMasVendidos(int $limite = 10): array
     {
+        if (!$this->apiService) {
+            Log::error('ApiService no está inicializado en ProductosMasVendidosService. ¿Falló la inyección de dependencias?');
+            return [];
+        }
+
         try {
             $response = $this->apiService->get("/productos/mas-vendidos?limite={$limite}");
 
