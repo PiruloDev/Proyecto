@@ -61,8 +61,8 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Fecha de Entrega</label>
-                                <input type="date" class="form-control" name="FECHA_ENTREGA" 
-                                       value="{{ isset($pedido['fecha_ENTREGA']) ? substr($pedido['fecha_ENTREGA'], 0, 10) : '' }}">
+                                <input type="date" class="form-control" id="FECHA_ENTREGA" name="FECHA_ENTREGA" 
+                                value="{{ isset($pedido['fecha_ENTREGA']) ? substr($pedido['fecha_ENTREGA'], 0, 10) : '' }}" min="">
                             </div>
 
                             <div class="mt-4 p-3 bg-light rounded text-center border">
@@ -142,6 +142,13 @@
             }));
 
             console.log("Inventario normalizado (Check ID y Nombre):", listaProductosGlobal);
+
+            const inputFecha = document.getElementById('FECHA_ENTREGA');
+        if (inputFecha) {
+            const hoy = new Date();
+            hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+            inputFecha.setAttribute('min', hoy.toISOString().slice(0, 10));
+        }
             
             // Solo después de normalizar, intentamos renderizar el pedido
             renderizarDetallesExistentes();
@@ -260,5 +267,15 @@
             actualizarCalculos();
         }
     });
+
+    // Bloquear fechas pasadas en edición
+document.addEventListener('DOMContentLoaded', () => {
+    const inputFecha = document.getElementById('FECHA_ENTREGA');
+    if (inputFecha) {
+        const hoy = new Date();
+        hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+        inputFecha.setAttribute('min', hoy.toISOString().slice(0, 10));
+    }
+});
 </script>
 @endpush
