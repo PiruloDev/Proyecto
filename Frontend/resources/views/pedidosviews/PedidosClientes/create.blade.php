@@ -41,7 +41,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="FECHA_ENTREGA" class="form-label fw-bold">Fecha de Entrega</label>
-                            <input type="date" class="form-control" id="FECHA_ENTREGA" name="FECHA_ENTREGA" value="{{ old('FECHA_ENTREGA') }}">
+                            <input type="date" class="form-control" id="FECHA_ENTREGA" name="FECHA_ENTREGA" value="{{ old('FECHA_ENTREGA') }}" min="">
                         </div>
                         <div class="col-md-6">
                             <label for="TOTAL_PRODUCTO" class="form-label fw-bold">Total General ($)</label>
@@ -103,6 +103,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+        // Bloquear fechas pasadas
+const hoy = new Date();
+hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+document.getElementById('FECHA_ENTREGA').setAttribute('min', hoy.toISOString().slice(0, 10));
         await cargarProductos();
         const detallesBody = document.getElementById('detalles-pedido-body');
 
